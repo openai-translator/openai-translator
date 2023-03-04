@@ -16,8 +16,8 @@ OpenAI Translator Chrome Extension
 
 由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
 
-1. 去 release 页面下载 [openai-translator-chrome-extension-v*.zip](https://github.com/yetone/openai-translator/releases) 文件
-2. 解压缩下载后的 openai-translator-chrome-extension-v*.zip 文件
+1. 去 Release 页面下载 [openai-translator-chrome-extension-*.zip](https://github.com/yetone/openai-translator/releases) 文件
+2. 解压缩下载后的 openai-translator-chrome-extension-*.zip 文件
 3. 打开 Chrome 的 Extension 页面
 
 ![](https://user-images.githubusercontent.com/1206493/222926817-414b91ea-e90f-43f5-9fb3-e9b170b40ce8.png)
