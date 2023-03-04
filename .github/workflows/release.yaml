@@ -1,0 +1,43 @@
+name: Pre-release
+
+on:
+  push:
+    tags: [ v\d+\.\d+\.\d+ ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - run: yarn install
+      - run: yarn build
+
+      - name: Change version
+        run: sed -i -e "s/1\.0/${{ steps.get_version.outputs.version-without-v }}/" dist/manifest.json
+
+      - name: Package plugin
+        run: |
+          mkdir release
+          mv dist release/openai-translator-chrome-extension
+          cd release
+          zip -j -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension/*
+
+      - name: Upload plugin to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_name: ${{ steps.get_version.outputs.version }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
+          asset_name: openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ${{ steps.tag.outputs.message }}
