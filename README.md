@@ -8,7 +8,7 @@ OpenAI Translator Chrome Extension
 
 # 使用截图
 
-![](https://user-images.githubusercontent.com/1206493/222926646-811e73eb-cc2a-4ee4-b4d2-225e5bbf8cae.gif)
+![](https://user-images.githubusercontent.com/1206493/222957225-9ec10f26-6f86-47f1-8045-8b23a6ab048b.gif)
 
 # 安装方法
 
