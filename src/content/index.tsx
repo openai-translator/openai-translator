@@ -6,8 +6,6 @@ import { PopupCard } from './PopupCard'
 
 let hidePopupThumbTimer: number | null = null
 
-const mousePos: { x?: number; y?: number } = { x: undefined, y: undefined }
-
 function popupThumbClickHandler(event: MouseEvent) {
     event.stopPropagation()
     event.preventDefault()
@@ -88,7 +86,7 @@ async function showPopupCard(x: number, y: number, text: string) {
     )
 }
 
-function showPopupThumb(text: string) {
+function showPopupThumb(text: string, x: number, y: number) {
     if (!text) {
         return
     }
@@ -131,19 +129,14 @@ function showPopupThumb(text: string) {
     $popupThumb.dataset['text'] = text
     $popupThumb.style.display = 'block'
     $popupThumb.style.opacity = '100'
-    $popupThumb.style.left = `${mousePos.x ?? 0}px`
-    $popupThumb.style.top = `${mousePos.y ?? 0}px`
+    $popupThumb.style.left = `${x}px`
+    $popupThumb.style.top = `${y}px`
 }
 
-document.body.addEventListener('mousemove', (event) => {
-    mousePos.x = event.clientX + window.scrollX + 7
-    mousePos.y = event.clientY + window.scrollY + 7
-})
-
-document.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', (event: MouseEvent) => {
     window.setTimeout(() => {
         const text = (window.getSelection()?.toString() ?? '').trim()
-        showPopupThumb(text)
+        showPopupThumb(text, event.pageX + 7, event.pageY + 7)
     })
 })
 
