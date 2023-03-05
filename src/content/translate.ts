@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import * as utils from '../utils'
+import * as utils from '../common/utils'
 import * as lang from './lang'
 
 export interface TranslateQuery {
@@ -26,11 +26,12 @@ export async function translate(query: TranslateQuery): Promise<TranslateResult>
     if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
         prompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
     }
-    if (
+    const isZh =
         query.detectFrom === 'wyw' ||
+        query.detectFrom === 'zh' ||
         query.detectFrom === 'zh-Hans' ||
         query.detectFrom === 'zh-Hant'
-    ) {
+    if (isZh) {
         if (query.detectTo === 'zh-Hant') {
             prompt = '翻译成繁体白话文'
         } else if (query.detectTo === 'zh-Hans') {
@@ -40,7 +41,7 @@ export async function translate(query: TranslateQuery): Promise<TranslateResult>
         }
     }
     if (query.detectFrom === query.detectTo) {
-        if (query.detectTo === 'zh-Hant' || query.detectTo === 'zh-Hans') {
+        if (isZh) {
             prompt = '润色此句'
         } else {
             prompt = 'polish this sentence'

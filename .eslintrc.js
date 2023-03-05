@@ -22,13 +22,17 @@ module.exports = {
         "react-hooks",
         "@typescript-eslint",
         "prettier",
+        "baseui",
     ],
     "rules": {
         "react/react-in-jsx-scope": "off",
         "camelcase": "error",
         "spaced-comment": "error",
         "quotes": ["error", "single"],
-        "no-duplicate-imports": "error"
+        "no-duplicate-imports": "error",
+        'baseui/deprecated-theme-api': "warn",
+        'baseui/deprecated-component-api': "warn",
+        'baseui/no-deep-imports': "warn",
     },
     "settings": {
         "import/resolver": {

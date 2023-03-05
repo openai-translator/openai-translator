@@ -1,0 +1,17 @@
+.formItem {
+    margin-bottom: 10px;
+}
+
+.formItem:last-child {
+    margin-bottom: 0;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+}
+
+.help {
+    color: orangered;
+    font-size: 12px;
+}

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const webpack = require('webpack')
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
@@ -5,10 +6,10 @@ const srcDir = path.join(__dirname, '..', 'src')
 
 module.exports = {
     entry: {
-        popup: path.join(srcDir, 'popup/popup.tsx'),
+        popup: path.join(srcDir, 'popup/index.tsx'),
         options: path.join(srcDir, 'options.tsx'),
         background: path.join(srcDir, 'background.ts'),
-        content_script: path.join(srcDir, 'content/content_script.tsx'),
+        content_script: path.join(srcDir, 'content/index.tsx'),
     },
     output: {
         path: path.join(__dirname, '../dist/js'),
@@ -16,9 +17,28 @@ module.exports = {
     },
     optimization: {
         splitChunks: {
-            name: 'vendor',
-            chunks(chunk) {
-                return chunk.name !== 'background'
+            chunks: 'all',
+            cacheGroups: {
+                dependencyVendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors.dependencies',
+                    chunks: 'all',
+                },
+                commonVendor: {
+                    test: /[\\/]src[\\/]common[\\/]/,
+                    name: 'vendors.common',
+                    chunks: 'all',
+                },
+                contentVendor: {
+                    test: /[\\/]src[\\/]content[\\/]/,
+                    name: 'vendors.content',
+                    chunks: 'all',
+                },
+                popupVendor: {
+                    test: /[\\/]src[\\/]popup[\\/]/,
+                    name: 'vendors.popup',
+                    chunks: 'all',
+                },
             },
         },
     },
@@ -53,19 +73,10 @@ module.exports = {
                 test: /\.css$/i,
             },
             {
-                test: /content\/.*\.(gif|png)$/,
+                test: /\.(jpg|jpeg|gif|png)$/,
                 use: [
                     {
                         loader: 'url-loader',
-                        options: {},
-                    },
-                ],
-            },
-            {
-                test: /popup\/.*\.(gif|png)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
                         options: {},
                     },
                 ],
