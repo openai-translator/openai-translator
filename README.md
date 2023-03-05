@@ -35,7 +35,7 @@ OpenAI Translator Chrome Extension
 
 7. 把 API KEY 填入此插件配置界面的 API KEY 输入框中
 
-![](https://user-images.githubusercontent.com/1206493/222926184-9ab5f072-f0ee-4ada-8520-812ed22a8186.png)
+![](https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png)
 
 # 请作者喝一杯咖啡
 
