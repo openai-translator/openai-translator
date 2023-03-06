@@ -1,15 +1,22 @@
+import '@webcomponents/webcomponentsjs'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import icon from './assets/images/icon.png'
-import { popupCardID, popupThumbID, zIndex } from './consts'
+import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
+import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+import { create } from 'jss'
+import preset from 'jss-preset-default'
+import { JssProvider, createGenerateId } from 'react-jss'
+import { Client as Styletron } from 'styletron-engine-atomic'
 
-let hidePopupThumbTimer: number | null = null
+const generateId = createGenerateId()
+const hidePopupThumbTimer: number | null = null
 
-function popupThumbClickHandler(event: MouseEvent) {
+async function popupThumbClickHandler(event: MouseEvent) {
     event.stopPropagation()
     event.preventDefault()
-    const $popupThumb: HTMLDivElement | null = document.querySelector(`#${popupThumbID}`)
+    const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if (!$popupThumb) {
         return
     }
@@ -18,76 +25,40 @@ function popupThumbClickHandler(event: MouseEvent) {
     showPopupCard(x, y, $popupThumb.dataset['text'] || '')
 }
 
-async function tryToRemoveContainer() {
-    const $popupThumb: HTMLDivElement | null = document.querySelector(`#${popupThumbID}`)
-    const $popupCard: HTMLDivElement | null = document.querySelector(`#${popupCardID}`)
-    if (
-        $popupThumb &&
-        $popupThumb.style.display === 'none' &&
-        $popupCard &&
-        $popupCard.style.display === 'none'
-    ) {
-        const $container = await getContainer()
-        $container.remove()
-    }
+async function removeContainer() {
+    const $container = await getContainer()
+    $container.remove()
 }
 
 async function hidePopupThumb() {
-    if (hidePopupThumbTimer) {
-        clearTimeout(hidePopupThumbTimer)
+    const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
+    if (!$popupThumb) {
+        return
     }
-    hidePopupThumbTimer = window.setTimeout(() => {
-        const $popupThumb: HTMLDivElement | null = document.querySelector(`#${popupThumbID}`)
-        if (!$popupThumb) {
-            return
-        }
-        $popupThumb.style.display = 'none'
-        tryToRemoveContainer()
-    }, 100)
+    removeContainer()
 }
 
 async function hidePopupCard() {
-    const $popupCard: HTMLDivElement | null = document.querySelector(`#${popupCardID}`)
+    const $popupCard: HTMLDivElement | null = await queryPopupCardElement()
     if (!$popupCard) {
         return
     }
     chrome.runtime.sendMessage({
         type: 'stopSpeaking',
     })
-    $popupCard.style.display = 'none'
     ReactDOM.unmountComponentAtNode($popupCard)
-    await tryToRemoveContainer()
-}
-
-async function getContainer(): Promise<HTMLElement> {
-    const containerTagName = 'yetone-openai-translator'
-    let $container: HTMLElement | null = document.querySelector(containerTagName)
-    if (!$container) {
-        $container = document.createElement(containerTagName)
-        $container.style.zIndex = zIndex
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const $html = document.body.parentElement
-                if ($html) {
-                    $html.appendChild($container as HTMLElement)
-                } else {
-                    document.appendChild($container as HTMLElement)
-                }
-                resolve($container as HTMLElement)
-            }, 100)
-        })
-    }
-    return new Promise((resolve) => {
-        resolve($container as HTMLElement)
-    })
+    removeContainer()
 }
 
 async function showPopupCard(x: number, y: number, text: string) {
     if (!text) {
         return
     }
-    hidePopupThumb()
-    let $popupCard: HTMLDivElement | null = document.querySelector(`#${popupCardID}`)
+    const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
+    if ($popupThumb) {
+        $popupThumb.style.display = 'none'
+    }
+    let $popupCard: HTMLDivElement | null = await queryPopupCardElement()
     if (!$popupCard) {
         $popupCard = document.createElement('div')
         $popupCard.id = popupCardID
@@ -95,7 +66,7 @@ async function showPopupCard(x: number, y: number, text: string) {
         $popupCard.style.zIndex = zIndex
         $popupCard.style.background = '#fff'
         $popupCard.style.borderRadius = '4px'
-        $popupCard.style.boxShadow = '0 0 6px rgba(0,0,0,.3)'
+        $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
         $popupCard.style.minWidth = '200px'
         $popupCard.style.maxWidth = '600px'
         $popupCard.style.lineHeight = '1.6'
@@ -110,7 +81,7 @@ async function showPopupCard(x: number, y: number, text: string) {
             event.stopPropagation()
         })
         const $container = await getContainer()
-        $container.appendChild($popupCard)
+        $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
     $popupCard.style.width = 'auto'
@@ -118,9 +89,24 @@ async function showPopupCard(x: number, y: number, text: string) {
     $popupCard.style.opacity = '100'
     $popupCard.style.left = `${x}px`
     $popupCard.style.top = `${y}px`
+    const engine = new Styletron({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        container: $popupCard.parentElement as any,
+    })
+    const jss = create().setup({
+        ...preset(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        insertionPoint: $popupCard.parentElement as any,
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const JSS = JssProvider as any
     ReactDOM.render(
         <React.StrictMode>
-            <PopupCard text={text} />
+            <div>
+                <JSS jss={jss} generateId={generateId}>
+                    <PopupCard text={text} engine={engine} />
+                </JSS>
+            </div>
         </React.StrictMode>,
         $popupCard,
     )
@@ -133,7 +119,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
     if (hidePopupThumbTimer) {
         clearTimeout(hidePopupThumbTimer)
     }
-    let $popupThumb: HTMLDivElement | null = document.querySelector(`#${popupThumbID}`)
+    let $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if (!$popupThumb) {
         $popupThumb = document.createElement('div')
         $popupThumb.id = popupThumbID
@@ -165,7 +151,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $img.style.height = '100%'
         $popupThumb.appendChild($img)
         const $container = await getContainer()
-        $container.appendChild($popupThumb)
+        $container.shadowRoot?.querySelector('div')?.appendChild($popupThumb)
     }
     $popupThumb.dataset['text'] = text
     $popupThumb.style.display = 'block'
@@ -173,6 +159,18 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.left = `${x}px`
     $popupThumb.style.top = `${y}px`
 }
+
+customElements.define(
+    containerTagName,
+    class extends HTMLElement {
+        constructor() {
+            super()
+            const shadowRoot = this.attachShadow({ mode: 'open' })
+            const $container = document.createElement('div')
+            shadowRoot.appendChild($container)
+        }
+    },
+)
 
 document.addEventListener('mouseup', (event: MouseEvent) => {
     window.setTimeout(() => {

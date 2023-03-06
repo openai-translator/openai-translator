@@ -13,6 +13,7 @@ import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { HiOutlineSpeakerWave } from 'react-icons/hi2'
+import { queryPopupCardElement } from './utils'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -23,8 +24,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
         } as Option,
     ]
 }, [] as Value)
-
-const engine = new Styletron()
 
 const useStyles = createUseStyles({
     popupCard: {},
@@ -121,6 +120,7 @@ const useStyles = createUseStyles({
 
 export interface IPopupCardProps {
     text: string
+    engine: Styletron
 }
 
 const loadingIcons = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘']
@@ -169,11 +169,6 @@ export function PopupCard(props: IPopupCardProps) {
             return undefined
         }
 
-        const $popupCard: HTMLDivElement | null = document.querySelector(`#${popupCardID}`)
-        if (!$popupCard) {
-            return
-        }
-
         let closed = true
 
         const dragMouseDown = (e: MouseEvent) => {
@@ -184,7 +179,8 @@ export function PopupCard(props: IPopupCardProps) {
             document.addEventListener('mousemove', elementDrag)
         }
 
-        const elementDrag = (e: MouseEvent) => {
+        const elementDrag = async (e: MouseEvent) => {
+            const $popupCard = await queryPopupCardElement()
             if (!$popupCard) {
                 return
             }
@@ -257,7 +253,7 @@ export function PopupCard(props: IPopupCardProps) {
     }, [])
 
     return (
-        <StyletronProvider value={engine}>
+        <StyletronProvider value={props.engine}>
             <BaseProvider theme={LightTheme}>
                 <div className={styles.popupCard}>
                     <div>
