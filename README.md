@@ -27,9 +27,11 @@ OpenAI Translator Chrome Extension
 
 4. 在 Extension 页面右上角打开 Developer mode，然后点击左上角的 Load unpacked 按钮，选择刚刚解压缩的目录即可安装完毕！（如果有旧版本记得先删除旧版本！）
 
-<img width="600" src="https://user-images.githubusercontent.com/1206493/223041892-3852d516-68d6-4eea-9651-d6172622e630.png" />
+<img width="600" src="https://user-images.githubusercontent.com/1206493/223045238-22c9b79b-205d-4f6b-a147-cc7cf4149c83.png" />
 
 5. 去 [OpenAI](https://platform.openai.com/account/api-keys) 获取你的 API KEY
+
+<img width="600" src="https://user-images.githubusercontent.com/1206493/223043946-0e7486ca-94d7-4324-a4f2-f62b9a3d527d.png" />
 
 6. 把 API KEY 填入此插件配置界面的 API KEY 输入框中
 
