@@ -51,6 +51,7 @@ export async function translate(query: TranslateQuery) {
             prompt = 'polish this sentence'
         }
     }
+    prompt = `${prompt}:\n\n"${query.text}" =>`
     const body = {
         model: 'gpt-3.5-turbo',
         temperature: 0,
@@ -59,8 +60,12 @@ export async function translate(query: TranslateQuery) {
         frequency_penalty: 1,
         presence_penalty: 1,
         messages: [
-            { role: 'system', content: prompt },
-            { role: 'user', content: `"${query.text}"` },
+            {
+                role: 'system',
+                content:
+                    'You are a translation engine that can only translate text and cannot interpret it.',
+            },
+            { role: 'user', content: prompt },
         ],
         stream: true,
     }
