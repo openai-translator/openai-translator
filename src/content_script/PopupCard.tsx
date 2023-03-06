@@ -6,14 +6,19 @@ import { LightTheme, BaseProvider } from 'baseui'
 import { Textarea } from 'baseui/textarea'
 import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
+import { AiOutlineTranslation } from 'react-icons/ai'
+import { IoColorPaletteOutline } from 'react-icons/io5'
+import { MdOutlineSummarize } from 'react-icons/md'
+import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
-import { translate } from './translate'
+import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { HiOutlineSpeakerWave } from 'react-icons/hi2'
 import { queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
+import { Button } from 'baseui/button'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -51,6 +56,16 @@ const useStyles = createUseStyles({
         fontSize: '12px',
         color: '#333',
         fontWeight: 500,
+    },
+    paragraph: {
+        margin: '14px 0',
+    },
+    popupCardHeaderButtonGroup: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '5px',
+        marginLeft: '10px',
     },
     popupCardHeaderActionsContainer: {
         display: 'flex',
@@ -128,6 +143,7 @@ const useStyles = createUseStyles({
         },
     },
     popupCardTranslatedContentContainer: {
+        marginTop: '-14px',
         padding: '4px 8px',
     },
     errorMessage: {
@@ -139,7 +155,7 @@ const useStyles = createUseStyles({
         flexDirection: 'row',
         alignItems: 'center',
         gap: '12px',
-        paddingTop: '10px',
+        marginTop: '10px',
     },
     actionButton: {
         cursor: 'pointer',
@@ -166,6 +182,8 @@ export interface IPopupCardProps {
 }
 
 export function PopupCard(props: IPopupCardProps) {
+    const [translateMode, setTranslateMode] = useState<TranslateMode>('translate')
+
     const styles = useStyles()
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
@@ -249,10 +267,21 @@ export function PopupCard(props: IPopupCardProps) {
     const translateText = useCallback(
         async (text: string) => {
             startLoading()
-            setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
+            switch (translateMode) {
+                case 'translate':
+                    setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
+                    break
+                case 'polishing':
+                    setActionStr('Polishing...')
+                    break
+                case 'summarize':
+                    setActionStr('Summarizing...')
+                    break
+            }
             setTranslatedText('')
             try {
                 await translate({
+                    mode: translateMode,
                     text,
                     detectFrom,
                     detectTo,
@@ -270,7 +299,17 @@ export function PopupCard(props: IPopupCardProps) {
                             setActionStr('Error')
                             setErrorMessage(`${actionStr} failed：${reason}`)
                         } else {
-                            setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
+                            switch (translateMode) {
+                                case 'translate':
+                                    setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
+                                    break
+                                case 'polishing':
+                                    setActionStr('Polished')
+                                    break
+                                case 'summarize':
+                                    setActionStr('Summarized')
+                                    break
+                            }
                         }
                         setTranslatedText((translatedText) => {
                             if (translatedText.endsWith('"') || translatedText.endsWith('」')) {
@@ -291,7 +330,7 @@ export function PopupCard(props: IPopupCardProps) {
                 stopLoading()
             }
         },
-        [detectFrom, detectTo],
+        [translateMode, detectFrom, detectTo],
     )
 
     useEffect(() => {
@@ -368,6 +407,35 @@ export function PopupCard(props: IPopupCardProps) {
                                         onChange={({ value }) => setDetectTo(value[0]?.id as string)}
                                     />
                                 </div>
+                            </div>
+                            <div className={styles.popupCardHeaderButtonGroup}>
+                                <StatefulTooltip content='Translate' placement='top'>
+                                    <Button
+                                        size='mini'
+                                        kind={translateMode === 'translate' ? 'primary' : 'secondary'}
+                                        onClick={() => setTranslateMode('translate')}
+                                    >
+                                        <AiOutlineTranslation />
+                                    </Button>
+                                </StatefulTooltip>
+                                <StatefulTooltip content='Polishing' placement='top'>
+                                    <Button
+                                        size='mini'
+                                        kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
+                                        onClick={() => setTranslateMode('polishing')}
+                                    >
+                                        <IoColorPaletteOutline />
+                                    </Button>
+                                </StatefulTooltip>
+                                <StatefulTooltip content='Summarize' placement='top'>
+                                    <Button
+                                        size='mini'
+                                        kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
+                                        onClick={() => setTranslateMode('summarize')}
+                                    >
+                                        <MdOutlineSummarize />
+                                    </Button>
+                                </StatefulTooltip>
                             </div>
                         </div>
                         <div className={styles.popupCardContentContainer}>
@@ -473,7 +541,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             <div>
                                                 {translatedLines.map((line, i) => {
                                                     return (
-                                                        <p key={`p-${i}`}>
+                                                        <p className={styles.paragraph} key={`p-${i}`}>
                                                             {line}
                                                             {isLoading && i === translatedLines.length - 1 && (
                                                                 <span className={styles.caret} />

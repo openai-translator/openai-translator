@@ -3,10 +3,13 @@ import * as utils from '../common/utils'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
+export type TranslateMode = 'translate' | 'polishing' | 'summarize'
+
 export interface TranslateQuery {
     text: string
     detectFrom: string
     detectTo: string
+    mode: TranslateMode
     onMessage: (message: { content: string; role: string }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
@@ -19,40 +22,57 @@ export interface TranslateResult {
     error?: string
 }
 
+const chineseLangs = ['zh', 'zh-CN', 'zh-TW', 'zh-Hans', 'zh-Hant', 'wyw', 'yue']
+
 export async function translate(query: TranslateQuery) {
     const apiKey = await utils.getApiKey()
     const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
     }
-    let prompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${lang.langMap.get(query.detectTo) || query.detectTo
+    const fromChinese = chineseLangs.indexOf(query.detectFrom) > 0
+    const toChinese = chineseLangs.indexOf(query.detectTo) > 0
+    let systemPrompt =
+        'You are a translation engine that can only translate text and cannot interpret it.'
+    let userPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${lang.langMap.get(query.detectTo) || query.detectTo
         }`
-    if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
-        prompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
+    switch (query.mode) {
+        case 'translate':
+            if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
+                userPrompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
+            }
+            if (fromChinese) {
+                if (query.detectTo === 'zh-Hant') {
+                    userPrompt = '翻译成繁体白话文'
+                } else if (query.detectTo === 'zh-Hans') {
+                    userPrompt = '翻译成简体白话文'
+                } else if (query.detectTo === 'yue') {
+                    userPrompt = '翻译成粤语白话文'
+                }
+            }
+            break
+        case 'polishing':
+            systemPrompt =
+                'You are a text embellisher, you can only embellish the text, don\'t interpret it.'
+            if (fromChinese) {
+                userPrompt = `使用 ${lang.langMap.get(query.detectFrom) || query.detectFrom
+                    } 语言润色此段文本`
+            } else {
+                userPrompt = `polish this text in ${lang.langMap.get(query.detectFrom) || query.detectFrom}`
+            }
+            break
+        case 'summarize':
+            systemPrompt =
+                'You are a text summarizer, you can only summarize the text, don\'t interpret it.'
+            if (toChinese) {
+                userPrompt = '用最简洁的语言使用中文总结此段文本'
+            } else {
+                userPrompt = `summarize this text in the most concise language and ${lang.langMap.get(query.detectTo) || query.detectTo
+                    }`
+            }
+            break
     }
-    const isZh =
-        query.detectFrom === 'wyw' ||
-        query.detectFrom === 'zh' ||
-        query.detectFrom === 'zh-Hans' ||
-        query.detectFrom === 'zh-Hant'
-    if (isZh) {
-        if (query.detectTo === 'zh-Hant') {
-            prompt = '翻译成繁体白话文'
-        } else if (query.detectTo === 'zh-Hans') {
-            prompt = '翻译成简体白话文'
-        } else if (query.detectTo === 'yue') {
-            prompt = '翻译成粤语白话文'
-        }
-    }
-    const isEmbellisher = query.detectFrom === query.detectTo
-    if (isEmbellisher) {
-        if (isZh) {
-            prompt = '润色此句'
-        } else {
-            prompt = 'polish this sentence'
-        }
-    }
-    prompt = `${prompt}:\n\n"${query.text}" =>`
+    userPrompt = `${userPrompt}:\n\n"${query.text}" =>`
     const body = {
         model: 'gpt-3.5-turbo',
         temperature: 0,
@@ -63,11 +83,9 @@ export async function translate(query: TranslateQuery) {
         messages: [
             {
                 role: 'system',
-                content: isEmbellisher
-                    ? 'You are a text embellisher, you can only embellish the text, don\'t interpret it.'
-                    : 'You are a translation engine that can only translate text and cannot interpret it.',
+                content: systemPrompt,
             },
-            { role: 'user', content: prompt },
+            { role: 'user', content: userPrompt },
         ],
         stream: true,
     }
