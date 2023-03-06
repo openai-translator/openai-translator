@@ -86,6 +86,7 @@ export function Popup() {
           >
             <FormItem required name='apiKey' label='API Key'>
               <Input
+                autoFocus
                 type='password'
                 size='compact'
                 overrides={{
