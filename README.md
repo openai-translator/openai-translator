@@ -25,7 +25,7 @@ OpenAI Translator Chrome Extension
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222926817-414b91ea-e90f-43f5-9fb3-e9b170b40ce8.png" />
 
-4. 在 Extension 页面右上角打开 Developer mode，然后点击左上角的 Load unpacked 按钮，选择刚刚解压缩的目录即可安装完毕！
+4. 在 Extension 页面右上角打开 Developer mode，然后点击左上角的 Load unpacked 按钮，选择刚刚解压缩的目录即可安装完毕！（如果有旧版本记得先删除旧版本！）
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/223041892-3852d516-68d6-4eea-9651-d6172622e630.png" />
 
