@@ -1,11 +1,15 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
 import * as lang from './lang'
+import { fetchSSE } from './utils'
 
 export interface TranslateQuery {
     text: string
     detectFrom: string
     detectTo: string
+    onMessage: (message: { content: string; role: string }) => void
+    onError: (error: string) => void
+    onFinish: (reason: string) => void
 }
 
 export interface TranslateResult {
@@ -15,7 +19,7 @@ export interface TranslateResult {
     error?: string
 }
 
-export async function translate(query: TranslateQuery): Promise<TranslateResult> {
+export async function translate(query: TranslateQuery) {
     const apiKey = await utils.getApiKey()
     const headers = {
         'Content-Type': 'application/json',
@@ -58,36 +62,49 @@ export async function translate(query: TranslateQuery): Promise<TranslateResult>
             { role: 'system', content: prompt },
             { role: 'user', content: `"${query.text}"` },
         ],
+        stream: true,
     }
 
-    // use fetch to request
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    let isFirst = true
+
+    await fetchSSE('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
+        onMessage: (msg) => {
+            let resp
+            try {
+                resp = JSON.parse(msg)
+                // eslint-disable-next-line no-empty
+            } catch {
+                query.onFinish('stop')
+                return
+            }
+            const { choices } = resp
+            if (!choices || choices.length === 0) {
+                return { error: 'No result' }
+            }
+            const { delta, finish_reason: finishReason } = choices[0]
+            if (finishReason) {
+                query.onFinish(finishReason)
+                return
+            }
+            const { content = '', role } = delta
+            let targetTxt = content
+
+            if ((isFirst && targetTxt.startsWith('"')) || targetTxt.startsWith('「')) {
+                targetTxt = targetTxt.slice(1)
+            }
+
+            if (!role) {
+                isFirst = false
+            }
+
+            query.onMessage({ content: targetTxt, role })
+        },
+        onError: (err) => {
+            const { error } = err
+            query.onError(error.message)
+        },
     })
-
-    if (resp.status !== 200) {
-        const { error } = await resp.json()
-        return { error: error.message }
-    }
-
-    const { choices } = await resp.json()
-    if (!choices || choices.length === 0) {
-        return { error: 'No result' }
-    }
-    let targetTxt = choices[0].message.content.trim()
-
-    if (targetTxt.startsWith('"') || targetTxt.startsWith('「')) {
-        targetTxt = targetTxt.slice(1)
-    }
-    if (targetTxt.endsWith('"') || targetTxt.endsWith('」')) {
-        targetTxt = targetTxt.slice(0, -1)
-    }
-
-    return {
-        from: query.detectFrom,
-        to: query.detectTo,
-        text: targetTxt,
-    }
 }

@@ -8,12 +8,12 @@ import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
 import { detectLang, supportLanguages } from './lang'
 import { translate } from './translate'
-import { popupCardID } from './consts'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { HiOutlineSpeakerWave } from 'react-icons/hi2'
 import { queryPopupCardElement } from './utils'
+import classnames from 'classnames'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -96,13 +96,41 @@ const useStyles = createUseStyles({
         borderBottom: '1px solid #e9e9e9',
     },
     popupCardTranslatedContainer: {
+        position: 'relative',
         display: 'flex',
-        padding: '10px',
+        padding: '16px 10px 10px 10px',
+    },
+    actionStr: {
+        position: 'absolute',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '6px',
+        top: '0',
+        left: '50%',
+        transform: 'translateX(-50%) translateY(-50%)',
+        fontSize: '10px',
+        color: '#333',
+        padding: '2px 12px',
+        background: '#eee',
+    },
+    error: {
+        background: '#f8d7da',
+    },
+    caret: {
+        marginLeft: '4px',
+        borderRight: '0.2em solid #777',
+        animation: '$caret 500ms steps(44) infinite',
+    },
+    '@keyframes caret': {
+        '50%': {
+            borderColor: 'transparent',
+        },
     },
     popupCardTranslatedContentContainer: {
         padding: '4px 8px',
     },
-    error: {
+    errorMessage: {
         display: 'flex',
         color: 'red',
     },
@@ -116,14 +144,26 @@ const useStyles = createUseStyles({
     actionButton: {
         cursor: 'pointer',
     },
+    writing: {
+        marginLeft: '3px',
+        width: '10px',
+        '&::after': {
+            content: '"✍️"',
+            animation: '$writing 1.3s infinite',
+        },
+    },
+    '@keyframes writing': {
+        '50%': {
+            marginLeft: '-3px',
+            marginBottom: '-3px',
+        },
+    },
 })
 
 export interface IPopupCardProps {
     text: string
     engine: Styletron
 }
-
-const loadingIcons = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘']
 
 export function PopupCard(props: IPopupCardProps) {
     const styles = useStyles()
@@ -134,25 +174,16 @@ export function PopupCard(props: IPopupCardProps) {
     const [translatedText, setTranslatedText] = useState('')
     const [isSpeakingTranslatedText, setIsSpeakingTranslatedText] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
+    const startLoading = useCallback(() => {
+        setIsLoading(true)
+    }, [])
+    const stopLoading = useCallback(() => {
+        setIsLoading(false)
+    }, [])
     useEffect(() => {
         setEditableText(props.text)
         setOriginalText(props.text)
     }, [props.text])
-    const [loadingIconIndex, setLoadingIconIndex] = useState(0)
-    const loading = () => {
-        setLoadingIconIndex((loadingIconIndex) => {
-            return (loadingIconIndex + 1) % loadingIcons.length
-        })
-    }
-    const loadingIntervalRef = useRef<NodeJS.Timeout>()
-    const startLoading = useCallback(() => {
-        setIsLoading(true)
-        loadingIntervalRef.current = setInterval(loading, 100)
-    }, [])
-    const stopLoading = useCallback(() => {
-        setIsLoading(false)
-        clearInterval(loadingIntervalRef.current)
-    }, [])
     const [detectFrom, setDetectFrom] = useState(detectLang(props.text) ?? 'en')
     const [detectTo, setDetectTo] = useState(detectFrom === 'zh' ? 'en' : 'zh')
     useEffect(() => {
@@ -160,6 +191,8 @@ export function PopupCard(props: IPopupCardProps) {
         setDetectFrom(from)
         setDetectTo(from === 'zh' ? 'en' : 'zh')
     }, [props.text])
+
+    const [actionStr, setActionStr] = useState('')
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -212,21 +245,44 @@ export function PopupCard(props: IPopupCardProps) {
     const translateText = useCallback(
         async (text) => {
             startLoading()
+            setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
+            setTranslatedText('')
             try {
-                const res = await translate({
+                await translate({
                     text,
                     detectFrom,
                     detectTo,
+                    onMessage: (message) => {
+                        if (message.role) {
+                            return
+                        }
+                        setTranslatedText((translatedText) => {
+                            return translatedText + message.content
+                        })
+                    },
+                    onFinish: (reason) => {
+                        stopLoading()
+                        if (reason !== 'stop') {
+                            setActionStr('Error')
+                            setErrorMessage(`${actionStr} failed：${reason}`)
+                        } else {
+                            setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
+                        }
+                        setTranslatedText((translatedText) => {
+                            if (translatedText.endsWith('"') || translatedText.endsWith('」')) {
+                                return translatedText.slice(0, -1)
+                            }
+                            return translatedText
+                        })
+                    },
+                    onError: (error) => {
+                        setActionStr('Error')
+                        setErrorMessage(error)
+                    },
                 })
-                if (res.error) {
-                    setErrorMessage(res.error)
-                    return
-                }
-                if (!res.text) {
-                    setErrorMessage('No result')
-                    return
-                }
-                setTranslatedText(res.text)
+            } catch (error) {
+                setActionStr('Error')
+                setErrorMessage(error as string)
             } finally {
                 stopLoading()
             }
@@ -384,17 +440,35 @@ export function PopupCard(props: IPopupCardProps) {
                                 </div>
                             </div>
                             <div className={styles.popupCardTranslatedContainer}>
-                                {isLoading ? (
-                                    <div className={styles.loadingContainer}>
-                                        <div>{loadingIcons[loadingIconIndex]}</div>
-                                        <div>{detectFrom === detectTo ? 'Polishing' : 'Translating'}...</div>
+                                {actionStr && (
+                                    <div
+                                        className={classnames({
+                                            [styles.actionStr]: true,
+                                            [styles.error]: !!errorMessage,
+                                        })}
+                                    >
+                                        <div>{actionStr}</div>
+                                        {isLoading ? (
+                                            <span className={styles.writing} />
+                                        ) : errorMessage ? (
+                                            <span>😢</span>
+                                        ) : (
+                                            <span>👍</span>
+                                        )}
                                     </div>
-                                ) : errorMessage ? (
-                                    <div className={styles.error}>{errorMessage}</div>
+                                )}
+                                {errorMessage ? (
+                                    <div className={styles.errorMessage}>{errorMessage}</div>
                                 ) : (
-                                    <div>
+                                    <div
+                                        style={{
+                                            width: '100%',
+                                        }}
+                                    >
                                         <div className={styles.popupCardTranslatedContentContainer}>
-                                            {translatedText}
+                                            <div>
+                                                {translatedText} {isLoading && <span className={styles.caret} />}
+                                            </div>
                                         </div>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
