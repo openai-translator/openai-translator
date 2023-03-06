@@ -27,9 +27,9 @@ jobs:
       - name: Package plugin
         run: |
           mkdir release
-          mv dist release/openai-translator-chrome-extension
+          mv dist release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
           cd release
-          zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension/*
+          zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
 
       - name: Upload plugin to release
         uses: svenstaro/upload-release-action@v2

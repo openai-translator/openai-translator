@@ -30,12 +30,12 @@ export async function getContainer(): Promise<HTMLElement> {
 
 export async function queryPopupThumbElement(): Promise<HTMLDivElement | null> {
     const $container = await getContainer()
-    return $container.shadowRoot?.getElementById(popupThumbID) as HTMLDivElement | null
+    return $container.querySelector(`#${popupThumbID}`) as HTMLDivElement | null
 }
 
 export async function queryPopupCardElement(): Promise<HTMLDivElement | null> {
     const $container = await getContainer()
-    return $container.shadowRoot?.getElementById(popupCardID) as HTMLDivElement | null
+    return $container.querySelector(`#${popupCardID}`) as HTMLDivElement | null
 }
 
 export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | null) {

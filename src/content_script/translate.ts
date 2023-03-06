@@ -44,7 +44,8 @@ export async function translate(query: TranslateQuery) {
             prompt = '翻译成粤语白话文'
         }
     }
-    if (query.detectFrom === query.detectTo) {
+    const isEmbellisher = query.detectFrom === query.detectTo
+    if (isEmbellisher) {
         if (isZh) {
             prompt = '润色此句'
         } else {
@@ -62,8 +63,9 @@ export async function translate(query: TranslateQuery) {
         messages: [
             {
                 role: 'system',
-                content:
-                    'You are a translation engine that can only translate text and cannot interpret it.',
+                content: isEmbellisher
+                    ? 'You are a text embellisher, you can only embellish the text, don\'t interpret it.'
+                    : 'You are a translation engine that can only translate text and cannot interpret it.',
             },
             { role: 'user', content: prompt },
         ],

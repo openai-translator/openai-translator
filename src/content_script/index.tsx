@@ -1,15 +1,16 @@
 import '@webcomponents/webcomponentsjs'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import icon from './assets/images/icon.png'
-import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
+import { popupCardID, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
 import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
+import { createRoot, Root } from 'react-dom/client'
 
+let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
 
@@ -46,7 +47,10 @@ async function hidePopupCard() {
     chrome.runtime.sendMessage({
         type: 'stopSpeaking',
     })
-    ReactDOM.unmountComponentAtNode($popupCard)
+    if (root) {
+        root.unmount()
+        root = null
+    }
     removeContainer()
 }
 
@@ -81,7 +85,7 @@ async function showPopupCard(x: number, y: number, text: string) {
             event.stopPropagation()
         })
         const $container = await getContainer()
-        $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
+        $container.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
     $popupCard.style.width = 'auto'
@@ -92,6 +96,7 @@ async function showPopupCard(x: number, y: number, text: string) {
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
+        prefix: '__yetone-openai-translator-styletron-',
     })
     const jss = create().setup({
         ...preset(),
@@ -100,15 +105,15 @@ async function showPopupCard(x: number, y: number, text: string) {
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const JSS = JssProvider as any
-    ReactDOM.render(
+    root = createRoot($popupCard)
+    root.render(
         <React.StrictMode>
             <div>
-                <JSS jss={jss} generateId={generateId}>
+                <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
                     <PopupCard text={text} engine={engine} />
                 </JSS>
             </div>
         </React.StrictMode>,
-        $popupCard,
     )
 }
 
@@ -151,7 +156,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $img.style.height = '100%'
         $popupThumb.appendChild($img)
         const $container = await getContainer()
-        $container.shadowRoot?.querySelector('div')?.appendChild($popupThumb)
+        $container.appendChild($popupThumb)
     }
     $popupThumb.dataset['text'] = text
     $popupThumb.style.display = 'block'
@@ -159,18 +164,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.left = `${x}px`
     $popupThumb.style.top = `${y}px`
 }
-
-customElements.define(
-    containerTagName,
-    class extends HTMLElement {
-        constructor() {
-            super()
-            const shadowRoot = this.attachShadow({ mode: 'open' })
-            const $container = document.createElement('div')
-            shadowRoot.appendChild($container)
-        }
-    },
-)
 
 document.addEventListener('mouseup', (event: MouseEvent) => {
     window.setTimeout(() => {
