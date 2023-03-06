@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import icon from './assets/images/icon.png'
 import beams from './assets/images/beams.jpg'
 import toast, { Toaster } from 'react-hot-toast'
@@ -39,10 +39,10 @@ export function Popup() {
     })()
   }, [])
 
-  const onChange = useCallback((_changes, values_) => {
+  const onChange = useCallback((_changes: Partial<SettingsSchema>, values_: SettingsSchema) => {
     setValues(values_)
   }, [])
-  const onSubmmit = useCallback(async (data) => {
+  const onSubmmit = useCallback(async (data: SettingsSchema) => {
     setLoading(true)
     await utils.setApiKey(data.apiKey)
     toast('Saved', {
@@ -122,9 +122,10 @@ export function Popup() {
   )
 }
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root') as HTMLElement)
+
+root.render(
   <React.StrictMode>
     <Popup />
   </React.StrictMode>,
-  document.getElementById('root'),
 )

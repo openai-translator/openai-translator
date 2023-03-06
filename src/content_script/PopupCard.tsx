@@ -247,7 +247,7 @@ export function PopupCard(props: IPopupCardProps) {
     }, [headerRef])
 
     const translateText = useCallback(
-        async (text) => {
+        async (text: string) => {
             startLoading()
             setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
             setTranslatedText('')

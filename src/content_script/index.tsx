@@ -1,6 +1,5 @@
 import '@webcomponents/webcomponentsjs'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import icon from './assets/images/icon.png'
 import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
@@ -9,7 +8,9 @@ import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
+import { createRoot, Root } from 'react-dom/client'
 
+let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
 
@@ -46,7 +47,10 @@ async function hidePopupCard() {
     chrome.runtime.sendMessage({
         type: 'stopSpeaking',
     })
-    ReactDOM.unmountComponentAtNode($popupCard)
+    if (root) {
+        root.unmount()
+        root = null
+    }
     removeContainer()
 }
 
@@ -100,7 +104,8 @@ async function showPopupCard(x: number, y: number, text: string) {
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const JSS = JssProvider as any
-    ReactDOM.render(
+    root = createRoot($popupCard)
+    root.render(
         <React.StrictMode>
             <div>
                 <JSS jss={jss} generateId={generateId}>
@@ -108,7 +113,6 @@ async function showPopupCard(x: number, y: number, text: string) {
                 </JSS>
             </div>
         </React.StrictMode>,
-        $popupCard,
     )
 }
 
