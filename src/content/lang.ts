@@ -86,7 +86,7 @@ function detect(text: string) {
         pa: XRegExp('\\p{Gurmukhi}', 'gi'),
     }
     for (const [lang, regex] of Object.entries(regexes)) {
-        // detect occurances of lang in a word
+        // detect occurrences of lang in a word
         const matches = XRegExp.match(text, regex) || []
         const score = matches.length / text.length
         if (score) {
@@ -114,7 +114,7 @@ export function detectLang(text: string): string | null {
 
     if (langs.length === 0) return null
 
-    // count occurances of each lang
+    // count occurrences of each lang
     const langCount: Record<string, number> = langs.reduce((acc, lang) => {
         if (lang) {
             acc[lang] = (acc[lang] || 0) + 1

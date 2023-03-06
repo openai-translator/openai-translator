@@ -1,0 +1,5 @@
+# See https://github.com/crate-ci/typos/blob/master/docs/reference.md to configure typos
+[default.extend-words]
+Readed = "Readed"
+[files]
+extend-exclude = ["public/*"]

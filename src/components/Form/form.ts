@@ -154,6 +154,7 @@ export function createForm<S extends {} = Store>({
                 : [{ validator: composeValidator(validators) }]
 
         // eslint-disable-next-line react/destructuring-assignment
+        // eslint-disable-next-line react/prop-types
         if (props.required) {
             rules.push({ required: true, message: `${label} is required` })
         }
@@ -188,6 +189,7 @@ export function createForm<S extends {} = Store>({
                     FormControl,
                     {
                         error,
+                        // eslint-disable-next-line react/prop-types
                         label: props.required
                             ? React.createElement(
                                 'div',
@@ -207,6 +209,7 @@ export function createForm<S extends {} = Store>({
         )
     }
 
+    // eslint-disable-next-line react/display-name
     const Form = React.forwardRef<FormInstance<S>, FormProps<S>>(
         ({ children, onFinish, beforeSubmit, initialValues, transformInitialValues, ...props }, ref) =>
             React.createElement(
