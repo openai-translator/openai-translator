@@ -56,7 +56,7 @@ export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | 
     }
 }
 
-const streamAsyncIteator = {
+const streamAsyncIterator = {
     [Symbol.asyncIterator]: streamAsyncIterable
 }
 
@@ -78,7 +78,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
             onMessage(event.data)
         }
     })
-    for await (const chunk of streamAsyncIteator[Symbol.asyncIterator](resp.body)) {
+    for await (const chunk of streamAsyncIterator[Symbol.asyncIterator](resp.body)) {
         const str = new TextDecoder().decode(chunk)
         parser.feed(str)
     }
