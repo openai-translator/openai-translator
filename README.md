@@ -6,7 +6,7 @@ OpenAI Translator Chrome Extension
 
 # 使用截图
 
-<img width="800" src="https://user-images.githubusercontent.com/1206493/223086113-ee0d002a-6150-4c9c-9d0c-8c0aad1478d1.gif" />
+<img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
 
 # 特性
 
