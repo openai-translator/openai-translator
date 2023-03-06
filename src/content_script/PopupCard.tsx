@@ -13,7 +13,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { HiOutlineSpeakerWave } from 'react-icons/hi2'
 import { queryPopupCardElement } from './utils'
-import classnames from 'classnames'
+import { clsx } from 'clsx'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -446,7 +446,7 @@ export function PopupCard(props: IPopupCardProps) {
                             <div className={styles.popupCardTranslatedContainer}>
                                 {actionStr && (
                                     <div
-                                        className={classnames({
+                                        className={clsx({
                                             [styles.actionStr]: true,
                                             [styles.error]: !!errorMessage,
                                         })}
