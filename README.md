@@ -35,6 +35,8 @@ OpenAI Translator Chrome Extension
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
+7. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
+
 # 请作者喝一杯咖啡
 
 <div align="center">
