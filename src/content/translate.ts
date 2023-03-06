@@ -16,17 +16,7 @@ export interface TranslateResult {
 }
 
 export async function translate(query: TranslateQuery): Promise<TranslateResult> {
-    const apiKeys = await utils.getApiKey(); 
-    const keys = apiKeys.split(';'); // Split the API keys into an array
-    const key = keys[Math.floor(Math.random() * keys.length)]; // Select a random API key from the array
-    if (keys.length === 0) { // If there are only one key
-      return translateWithApiKey(query, apiKeys); // Use the original API key
-    } else {
-      return translateWithApiKey(query, key); // Use the randomly selected API key
-    }
-}
-
-export async function translateWithApiKey(query: TranslateQuery, apiKey: string): Promise<TranslateResult> {
+    const apiKey = await utils.getApiKey()
     const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,

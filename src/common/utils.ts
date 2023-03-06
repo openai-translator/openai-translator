@@ -3,7 +3,9 @@ const apiKeyStorageKey = 'apiKey'
 export async function getApiKey(): Promise<string> {
     return new Promise((resolve) => {
         chrome.storage.sync.get([apiKeyStorageKey], (items) => {
-            resolve(items?.[apiKeyStorageKey] ?? '')
+            const apiKeys = items?.[apiKeyStorageKey] ?? ''
+            const keys = apiKeys.split(',') // Split the API keys into an array
+            keys.length === 0 ? resolve(keys) : resolve(keys[Math.floor(Math.random() * keys.length)])
         })
     })
 }
