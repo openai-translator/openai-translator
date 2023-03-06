@@ -172,6 +172,10 @@ export function PopupCard(props: IPopupCardProps) {
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [originalText, setOriginalText] = useState(props.text)
     const [translatedText, setTranslatedText] = useState('')
+    const [translatedLines, setTranslatedLines] = useState<string[]>([])
+    useEffect(() => {
+        setTranslatedLines(translatedText.split('\n'))
+    }, [translatedText])
     const [isSpeakingTranslatedText, setIsSpeakingTranslatedText] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
     const startLoading = useCallback(() => {
@@ -467,7 +471,16 @@ export function PopupCard(props: IPopupCardProps) {
                                     >
                                         <div className={styles.popupCardTranslatedContentContainer}>
                                             <div>
-                                                {translatedText} {isLoading && <span className={styles.caret} />}
+                                                {translatedLines.map((line, i) => {
+                                                    return (
+                                                        <p key={`p-${i}`}>
+                                                            {line}
+                                                            {isLoading && i === translatedLines.length - 1 && (
+                                                                <span className={styles.caret} />
+                                                            )}
+                                                        </p>
+                                                    )
+                                                })}
                                             </div>
                                         </div>
                                         <div className={styles.actionButtonsContainer}>
