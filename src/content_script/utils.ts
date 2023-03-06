@@ -56,6 +56,10 @@ export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | 
     }
 }
 
+const streamAsyncIterator = {
+    [Symbol.asyncIterator]: streamAsyncIterable
+}
+
 interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +78,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
             onMessage(event.data)
         }
     })
-    for await (const chunk of streamAsyncIterable(resp.body)) {
+    for await (const chunk of streamAsyncIterator[Symbol.asyncIterator](resp.body)) {
         const str = new TextDecoder().decode(chunk)
         parser.feed(str)
     }
