@@ -17,7 +17,7 @@
   "content_scripts": [
       {
           "matches": ["<all_urls>"],
-          "js": ["js/vendors.dependencies.js", "js/vendors.content.js", "js/content_script.js"]
+          "js": ["js/vendors.dependencies.js", "js/vendors.content_script.js", "js/content_script.js"]
       }
   ],
 

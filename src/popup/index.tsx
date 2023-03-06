@@ -20,7 +20,7 @@ const engine = new Styletron()
 
 const { Form, FormItem, useForm } = createForm<SettingsSchema>()
 
-function Popup() {
+export function Popup() {
   const [loading, setLoading] = useState(false)
   const [values, setValues] = useState<SettingsSchema>({
     apiKey: '',

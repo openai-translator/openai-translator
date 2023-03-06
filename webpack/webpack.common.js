@@ -7,9 +7,9 @@ const srcDir = path.join(__dirname, '..', 'src')
 module.exports = {
     entry: {
         popup: path.join(srcDir, 'popup/index.tsx'),
-        options: path.join(srcDir, 'options.tsx'),
-        background: path.join(srcDir, 'background.ts'),
-        content_script: path.join(srcDir, 'content/index.tsx'),
+        options: path.join(srcDir, 'options/index.tsx'),
+        background: path.join(srcDir, 'background/index.ts'),
+        content_script: path.join(srcDir, 'content_script/index.tsx'),
     },
     output: {
         path: path.join(__dirname, '../dist/js'),
@@ -29,14 +29,19 @@ module.exports = {
                     name: 'vendors.common',
                     chunks: 'all',
                 },
-                contentVendor: {
-                    test: /[\\/]src[\\/]content[\\/]/,
-                    name: 'vendors.content',
+                contentScriptVendor: {
+                    test: /[\\/]src[\\/]content_script[\\/]/,
+                    name: 'vendors.content_script',
                     chunks: 'all',
                 },
                 popupVendor: {
                     test: /[\\/]src[\\/]popup[\\/]/,
                     name: 'vendors.popup',
+                    chunks: 'all',
+                },
+                optionsVendor: {
+                    test: /[\\/]src[\\/]options[\\/]/,
+                    name: 'vendors.options',
                     chunks: 'all',
                 },
             },
