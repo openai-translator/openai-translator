@@ -1,9 +1,7 @@
 import archiver from 'archiver'
 import autoprefixer from 'autoprefixer'
 import esbuild from 'esbuild'
-import postcssPlugin from 'esbuild-style-plugin'
 import fs from 'fs-extra'
-import tailwindcss from 'tailwindcss'
 
 const outdir = 'dist'
 
@@ -28,13 +26,6 @@ async function runEsbuild() {
       '.png': 'dataurl',
       '.jpg': 'dataurl',
     },
-    plugins: [
-      postcssPlugin({
-        postcss: {
-          plugins: [tailwindcss, autoprefixer],
-        },
-      }),
-    ],
   })
 }
 
