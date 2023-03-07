@@ -6,7 +6,6 @@ export interface ISettings {
     apiURL: string
     autoTranslate: boolean
     defaultTranslateMode: TranslateMode | 'nop'
-
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
@@ -20,32 +19,29 @@ export async function getApiKey(): Promise<string> {
 }
 
 export async function getSettings(): Promise<ISettings> {
-    return new Promise((resolve) => {
-        browser.storage.sync.get(
-            ['apiKeys', 'apiURL', 'autoTranslate', 'defaultTranslateMode'] as Array<keyof ISettings>).then((items) => {
-                const settings = items as ISettings
-                if (!settings.apiKeys) {
-                    settings.apiKeys = ''
-                }
-                if (!settings.apiURL) {
-                    settings.apiURL = defaultAPIURL
-                }
-                if (!settings.autoTranslate) {
-                    settings.autoTranslate = defaultAutoTranslate
-                }
-                if (!settings.defaultTranslateMode) {
-                    settings.defaultTranslateMode = 'translate'
-                }
-                resolve(settings)
-            }
-        )
-    })
+    const items = await browser.storage.sync.get([
+        'apiKeys',
+        'apiURL',
+        'autoTranslate',
+        'defaultTranslateMode',
+    ] as Array<keyof ISettings>)
+
+    const settings = items as ISettings
+    if (!settings.apiKeys) {
+        settings.apiKeys = ''
+    }
+    if (!settings.apiURL) {
+        settings.apiURL = defaultAPIURL
+    }
+    if (settings.autoTranslate === undefined || settings.autoTranslate === null) {
+        settings.autoTranslate = defaultAutoTranslate
+    }
+    if (!settings.defaultTranslateMode) {
+        settings.defaultTranslateMode = 'translate'
+    }
+    return settings
 }
 
 export async function setSettings(settings: ISettings) {
-    return new Promise<void>((resolve) => {
-        browser.storage.sync.set(settings).then(() => {
-            resolve()
-        })
-    })
+    await browser.storage.sync.set(settings)
 }

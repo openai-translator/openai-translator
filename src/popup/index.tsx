@@ -59,6 +59,7 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
 function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
   return (
     <Checkbox
+      checkmarkType='toggle_round'
       checked={props.value}
       onChange={(e) => {
         props.onChange?.(e.target.checked)
