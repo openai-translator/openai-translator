@@ -70,8 +70,8 @@ export async function translate(query: TranslateQuery) {
             if (toChinese) {
                 assistantPrompt = '用最简洁的语言使用中文总结此段文本'
             } else {
-                assistantPrompt = `summarize this text in the most concise language and ${lang.langMap.get(query.detectTo) || query.detectTo
-                    }`
+                assistantPrompt = `summarize this text in the most concise language and muse use ${lang.langMap.get(query.detectTo) || query.detectTo
+                    } language!`
             }
             break
     }
