@@ -58,18 +58,18 @@ interface BasicFormItemProps<S extends {} = Store> extends OmittedRcFieldProps {
 type Deps<S> = Array<NamePath<S>>
 type FormItemPropsDeps<S extends {} = Store> =
     | {
-        deps?: Deps<S>
-        children?: ReactElement
-        validators?: Array<Validator | null>
-    }
+          deps?: Deps<S>
+          children?: ReactElement
+          validators?: Array<Validator | null>
+      }
     | {
-        deps: Deps<S>
-        validators: (value: S) => Array<Validator | null>
-    }
+          deps: Deps<S>
+          validators: (value: S) => Array<Validator | null>
+      }
     | {
-        deps: Deps<S>
-        children: (value: S) => ReactElement
-    }
+          deps: Deps<S>
+          children: (value: S) => ReactElement
+      }
 
 export type FormItemProps<S extends {} = Store> = BasicFormItemProps<S> & FormItemPropsDeps<S>
 
@@ -88,7 +88,7 @@ const getValues = (obj: any, paths: (string | number)[]) =>
     paths.reduce<any>((result, key) => result && result[key] && result[key], obj)
 
 export function createShouldUpdate(
-    names: Array<string | number | (string | number)[]> = [],
+    names: Array<string | number | (string | number)[]> = []
 ): RcFieldProps['shouldUpdate'] {
     return (prev, curr) => {
         // eslint-disable-next-line no-restricted-syntax
@@ -122,7 +122,7 @@ export function createForm<S extends {} = Store>({
             'div',
             { className: ClassNames.item },
             React.createElement('label', { className: ClassNames.label }, label),
-            children,
+            children
         )
 
     const FormItem = (props_: FormItemProps<S>) => {
@@ -147,10 +147,10 @@ export function createForm<S extends {} = Store>({
         const rules: Rule[] =
             typeof validators === 'function'
                 ? [
-                    ({ getFieldsValue }) => ({
-                        validator: composeValidator(validators(getFieldsValue(deps) as any)),
-                    }),
-                ]
+                      ({ getFieldsValue }) => ({
+                          validator: composeValidator(validators(getFieldsValue(deps) as any)),
+                      }),
+                  ]
                 : [{ validator: composeValidator(validators) }]
 
         // eslint-disable-next-line react/destructuring-assignment
@@ -175,8 +175,8 @@ export function createForm<S extends {} = Store>({
                     typeof children === 'function'
                         ? children(getFieldsValue(deps))
                         : React.cloneElement(children as React.ReactElement, {
-                            ...control,
-                        })
+                              ...control,
+                          })
 
                 if (noStyle) {
                     return childNode
@@ -191,21 +191,17 @@ export function createForm<S extends {} = Store>({
                         error,
                         // eslint-disable-next-line react/prop-types
                         label: props.required
-                            ? React.createElement(
-                                'div',
-                                { style: { display: 'flex', alignItems: 'center', gap: 4 } },
-                                [
-                                    React.createElement('div', {}, '*'),
-                                    React.createElement('div', { style: { flexShrink: 0 } }, label),
-                                ],
-                            )
+                            ? React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } }, [
+                                  React.createElement('div', {}, '*'),
+                                  React.createElement('div', { style: { flexShrink: 0 } }, label),
+                              ])
                             : label,
                         caption,
                         children: childNode,
                     },
-                    childNode,
+                    childNode
                 )
-            }) as any,
+            }) as any
         )
     }
 
@@ -218,17 +214,15 @@ export function createForm<S extends {} = Store>({
                     ...props,
                     ref,
                     initialValues:
-                        initialValues && transformInitialValues
-                            ? transformInitialValues(initialValues)
-                            : initialValues,
+                        initialValues && transformInitialValues ? transformInitialValues(initialValues) : initialValues,
                     onFinish:
                         onFinish &&
                         ((store: any) => {
                             onFinish(beforeSubmit ? beforeSubmit(store) : store)
                         }),
                 } as any,
-                children as any,
-            ),
+                children as any
+            )
     )
 
     const useForm: () => [FormInstance<S>] = RcUseForm as any

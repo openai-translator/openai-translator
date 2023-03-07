@@ -9,13 +9,7 @@ export interface IFormItemProps extends FieldProps {
     style?: React.CSSProperties
 }
 
-export const FormItem = ({
-    label: label_,
-    required,
-    style,
-    children,
-    ...restProps
-}: IFormItemProps) => {
+export const FormItem = ({ label: label_, required, style, children, ...restProps }: IFormItemProps) => {
     let label = label_
     if (required) {
         label = <span>{label} *</span>
@@ -29,10 +23,10 @@ export const FormItem = ({
                         typeof children === 'function'
                             ? children(control, meta, form)
                             : React.cloneElement(children as React.ReactElement, {
-                                label,
-                                errorMessage: meta.errors.join(';'),
-                                ...control,
-                            })
+                                  label,
+                                  errorMessage: meta.errors.join(';'),
+                                  ...control,
+                              })
                     return <>{childNode}</>
                 }}
             </Field>
