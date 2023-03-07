@@ -13,10 +13,16 @@ import { Button } from 'baseui/button'
 import './index.css'
 import { TranslateMode } from '../content_script/translate'
 import { Select } from 'baseui/select'
+import { Checkbox } from 'baseui/checkbox'
 
 interface ITranslateModeSelectorProps {
   value?: TranslateMode | 'nop'
   onChange?: (value: TranslateMode | 'nop') => void
+}
+
+interface AutoTransalteCheckboxProps {
+  value?: boolean
+  onChange?: (value: boolean) => void
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
@@ -45,6 +51,17 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
           id: TranslateMode
         }[]
       }
+    />
+  )
+}
+
+function AutoTranslateCheckbox(props: AutoTransalteCheckboxProps) {
+  return (
+    <Checkbox
+      checked={props.value}
+      onChange={e => {
+        props.onChange?.(e.target.checked)
+      }}
     />
   )
 }
@@ -152,19 +169,11 @@ export function Popup() {
                 }}
               />
             </FormItem>
-            <FormItem required name='autoTranslate' label='Auto Translate'>
-              <Input
-                size='compact'
-                overrides={{
-                  Root: {
-                    style: {
-                      width: '392px',
-                    },
-                  },
-                }} />
-            </FormItem>
             <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
               <TranslateModeSelector />
+            </FormItem>
+            <FormItem required name='autoTranslate' label='Auto Translate'>
+              <AutoTranslateCheckbox />
             </FormItem>
             <div
               style={{

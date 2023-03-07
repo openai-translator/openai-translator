@@ -4,14 +4,14 @@ import { TranslateMode } from '../content_script/translate'
 export interface ISettings {
     apiKeys: string
     apiURL: string
-    autoTranslate: string
+    autoTranslate: boolean
     defaultTranslateMode: TranslateMode | 'nop'
 
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
 
-export const defaultAutoTranslate = 'false'
+export const defaultAutoTranslate = false
 
 export async function getApiKey(): Promise<string> {
     const settings = await getSettings()

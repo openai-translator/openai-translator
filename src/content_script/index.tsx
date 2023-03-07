@@ -170,7 +170,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
 document.addEventListener('mouseup', (event: MouseEvent) => {
     window.setTimeout(async () => {
         const text = (window.getSelection()?.toString() ?? '').trim();
-        (await utils.getSettings()).autoTranslate === 'true'
+        (await utils.getSettings()).autoTranslate === true
             ? showPopupCard(event.pageX + 7, event.pageY + 7, text) : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
     })
 })
