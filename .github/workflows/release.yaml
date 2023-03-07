@@ -1,4 +1,4 @@
-name: Pre-release
+name: Release
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: Package plugin
         run: |
           mkdir release
-          mv dist release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
+          mv dist/chromium release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
           cd release
           zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
 
