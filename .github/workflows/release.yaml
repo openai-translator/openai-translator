@@ -22,7 +22,9 @@ jobs:
       - run: yarn build
 
       - name: Change version
-        run: sed -i -e "s/1\.0/${{ steps.get_version.outputs.version-without-v }}/" dist/manifest.json
+        run: |
+          sed -i -e "s/1\.0/${{ steps.get_version.outputs.version-without-v }}/" dist/chromium/manifest.json
+          sed -i -e "s/1\.0/${{ steps.get_version.outputs.version-without-v }}/" dist/firefox/manifest.json
 
       - name: Package plugin
         run: |
