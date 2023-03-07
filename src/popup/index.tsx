@@ -20,7 +20,7 @@ interface ITranslateModeSelectorProps {
   onChange?: (value: TranslateMode | 'nop') => void
 }
 
-interface AutoTransalteCheckboxProps {
+interface AutoTranslateCheckboxProps {
   value?: boolean
   onChange?: (value: boolean) => void
 }
@@ -56,11 +56,11 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
   )
 }
 
-function AutoTranslateCheckbox(props: AutoTransalteCheckboxProps) {
+function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
   return (
     <Checkbox
       checked={props.value}
-      onChange={e => {
+      onChange={(e) => {
         props.onChange?.(e.target.checked)
       }}
     />
