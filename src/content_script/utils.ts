@@ -57,7 +57,7 @@ export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | 
 }
 
 const streamAsyncIterator = {
-    [Symbol.asyncIterator]: streamAsyncIterable
+    [Symbol.asyncIterator]: streamAsyncIterable,
 }
 
 interface FetchSSEOptions extends RequestInit {

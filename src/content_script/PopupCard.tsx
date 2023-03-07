@@ -188,7 +188,7 @@ export interface IPopupCardProps {
 export function PopupCard(props: IPopupCardProps) {
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const settings = await getSettings()
             if (settings.defaultTranslateMode !== 'nop') {
                 setTranslateMode(settings.defaultTranslateMode)
@@ -220,7 +220,7 @@ export function PopupCard(props: IPopupCardProps) {
     const [detectFrom, setDetectFrom] = useState('')
     const [detectTo, setDetectTo] = useState('')
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const from = (await detectLang(props.text)) ?? 'en'
             const settings = await getSettings()
             setDetectFrom(from)
