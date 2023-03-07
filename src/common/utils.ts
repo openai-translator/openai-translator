@@ -26,6 +26,7 @@ export async function getSettings(): Promise<ISettings> {
         'apiURL',
         'autoTranslate',
         'defaultTranslateMode',
+        'defaultTargetLanguage',
     ] as Array<keyof ISettings>)
 
     const settings = items as ISettings

@@ -37,6 +37,7 @@ function LanguageSelector(props: ILanguageSelectorProps) {
     return (
         <Select
             size='compact'
+            clearable={false}
             options={langOptions}
             value={value ? [{ id: value }] : []}
             onChange={({ value }) => {
@@ -121,7 +122,7 @@ export function Popup() {
     }, [form, values])
 
     useEffect(() => {
-        ;(async () => {
+        !(async () => {
             const settings = await utils.getSettings()
             setValues(settings)
         })()
