@@ -15,21 +15,23 @@
   },
 
   "content_scripts": [
-      {
-          "matches": ["<all_urls>"],
-          "all_frames": true,
-          "js": ["js/content_script.js"]
-      }
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content_script.js"]
+    }
   ],
 
   "background": {
-    "service_worker": "js/background.js"
+    "scripts": ["js/background.js"]
   },
 
-  "permissions": [
-    "storage",
-    "tts"
-  ],
+  "permissions": ["storage"],
 
-  "host_permissions": ["https://*.openai.com/"]
+  "host_permissions": ["https://*.openai.com/"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "yetone-openai-translator@example.com"
+    }
+  }
 }

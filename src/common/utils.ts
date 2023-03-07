@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill'
+
 export interface ISettings {
     apiKeys: string
     apiURL: string
@@ -13,7 +15,7 @@ export async function getApiKey(): Promise<string> {
 
 export async function getSettings(): Promise<ISettings> {
     return new Promise((resolve) => {
-        chrome.storage.sync.get(['apiKeys', 'apiURL'] as Array<keyof ISettings>, (items) => {
+        browser.storage.sync.get(['apiKeys', 'apiURL'] as Array<keyof ISettings>).then((items) => {
             const settings = items as ISettings
             if (!settings.apiKeys) {
                 settings.apiKeys = ''
@@ -28,7 +30,7 @@ export async function getSettings(): Promise<ISettings> {
 
 export async function setSettings(settings: ISettings) {
     return new Promise<void>((resolve) => {
-        chrome.storage.sync.set(settings, () => {
+        browser.storage.sync.set(settings).then(() => {
             resolve()
         })
     })

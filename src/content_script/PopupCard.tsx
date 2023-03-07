@@ -19,6 +19,7 @@ import { HiOutlineSpeakerWave } from 'react-icons/hi2'
 import { queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
+import browser from 'webextension-polyfill'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -325,7 +326,7 @@ export function PopupCard(props: IPopupCardProps) {
                 })
             } catch (error) {
                 setActionStr('Error')
-                setErrorMessage(error as string)
+                setErrorMessage((error as Error).toString())
             } finally {
                 stopLoading()
             }
@@ -345,9 +346,9 @@ export function PopupCard(props: IPopupCardProps) {
                 setIsSpeakingTranslatedText(false)
             }
         }
-        chrome.runtime.onMessage.addListener(messageHandler)
+        browser.runtime.onMessage.addListener(messageHandler)
         return () => {
-            chrome.runtime.onMessage.removeListener(messageHandler)
+            browser.runtime.onMessage.removeListener(messageHandler)
         }
     }, [])
 
@@ -481,14 +482,14 @@ export function PopupCard(props: IPopupCardProps) {
                                         className={styles.actionButton}
                                         onClick={() => {
                                             if (isSpeakingEditableText) {
-                                                chrome.runtime.sendMessage({
+                                                browser.runtime.sendMessage({
                                                     type: 'stopSpeaking',
                                                 })
                                                 setIsSpeakingEditableText(false)
                                                 return
                                             }
                                             setIsSpeakingEditableText(true)
-                                            chrome.runtime.sendMessage({
+                                            browser.runtime.sendMessage({
                                                 type: 'speak',
                                                 text: editableText,
                                             })
@@ -557,14 +558,14 @@ export function PopupCard(props: IPopupCardProps) {
                                                 className={styles.actionButton}
                                                 onClick={() => {
                                                     if (isSpeakingTranslatedText) {
-                                                        chrome.runtime.sendMessage({
+                                                        browser.runtime.sendMessage({
                                                             type: 'stopSpeaking',
                                                         })
                                                         setIsSpeakingTranslatedText(false)
                                                         return
                                                     }
                                                     setIsSpeakingTranslatedText(true)
-                                                    chrome.runtime.sendMessage({
+                                                    browser.runtime.sendMessage({
                                                         type: 'speak',
                                                         text: translatedText,
                                                     })
