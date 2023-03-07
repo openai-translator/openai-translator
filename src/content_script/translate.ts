@@ -35,20 +35,20 @@ export async function translate(query: TranslateQuery) {
     const toChinese = chineseLangs.indexOf(query.detectTo) > 0
     let systemPrompt =
         'You are a translation engine that can only translate text and cannot interpret it.'
-    let userPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${lang.langMap.get(query.detectTo) || query.detectTo
-        }`
+    let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom
+        } to ${lang.langMap.get(query.detectTo) || query.detectTo}`
     switch (query.mode) {
         case 'translate':
             if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
-                userPrompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
+                assistantPrompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
             }
             if (fromChinese) {
                 if (query.detectTo === 'zh-Hant') {
-                    userPrompt = '翻译成繁体白话文'
+                    assistantPrompt = '翻译成繁体白话文'
                 } else if (query.detectTo === 'zh-Hans') {
-                    userPrompt = '翻译成简体白话文'
+                    assistantPrompt = '翻译成简体白话文'
                 } else if (query.detectTo === 'yue') {
-                    userPrompt = '翻译成粤语白话文'
+                    assistantPrompt = '翻译成粤语白话文'
                 }
             }
             break
@@ -56,24 +56,24 @@ export async function translate(query: TranslateQuery) {
             systemPrompt =
                 'You are a text embellisher, you can only embellish the text, don\'t interpret it.'
             if (fromChinese) {
-                userPrompt = `使用 ${lang.langMap.get(query.detectFrom) || query.detectFrom
+                assistantPrompt = `使用 ${lang.langMap.get(query.detectFrom) || query.detectFrom
                     } 语言润色此段文本`
             } else {
-                userPrompt = `polish this text in ${lang.langMap.get(query.detectFrom) || query.detectFrom}`
+                assistantPrompt = `polish this text in ${lang.langMap.get(query.detectFrom) || query.detectFrom
+                    }`
             }
             break
         case 'summarize':
             systemPrompt =
                 'You are a text summarizer, you can only summarize the text, don\'t interpret it.'
             if (toChinese) {
-                userPrompt = '用最简洁的语言使用中文总结此段文本'
+                assistantPrompt = '用最简洁的语言使用中文总结此段文本'
             } else {
-                userPrompt = `summarize this text in the most concise language and ${lang.langMap.get(query.detectTo) || query.detectTo
+                assistantPrompt = `summarize this text in the most concise language and ${lang.langMap.get(query.detectTo) || query.detectTo
                     }`
             }
             break
     }
-    userPrompt = `${userPrompt}:\n\n"${query.text}" =>`
     const body = {
         model: 'gpt-3.5-turbo',
         temperature: 0,
@@ -86,7 +86,11 @@ export async function translate(query: TranslateQuery) {
                 role: 'system',
                 content: systemPrompt,
             },
-            { role: 'user', content: userPrompt },
+            {
+                role: 'assistant',
+                content: assistantPrompt,
+            },
+            { role: 'user', content: `"${query.text}"` },
         ],
         stream: true,
     }
