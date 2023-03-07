@@ -3047,6 +3047,11 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.npmjs.org/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
+guesslanguage-ng@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/guesslanguage-ng/-/guesslanguage-ng-0.0.2.tgz#9e9e29f3f4f0d499fdeeec2ca520cb373702ffa3"
+  integrity sha512-bUi04SY9rjFQJBxYOB8Ktq9lyW90wepzQo7OMGPu21Zu9c7XUkqmaPGSf7Ny6QmFrsecc2Ipl9+mq3yuQ63itQ==
+
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/has-bigints/-/has-bigints-1.0.2.tgz"
@@ -4141,6 +4146,11 @@ lazystream@^1.0.0:
   dependencies:
     readable-stream "^2.0.5"
 
+languagedetect@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/languagedetect/-/languagedetect-2.0.0.tgz#4b8fa2b7593b2a3a02fb1100891041c53238936c"
+  integrity sha512-AZb/liiQ+6ZoTj4f1J0aE6OkzhCo8fyH+tuSaPfSo8YHCWLFJrdSixhtO2TYdIkjcDQNaR4RmGaV2A5FJklDMQ==
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/leven/-/leven-3.1.0.tgz"
@@ -4929,6 +4939,13 @@ react-dropzone@9.0.0:
     file-selector "^0.1.8"
     prop-types "^15.6.2"
     prop-types-extra "^1.1.0"
+
+react-error-boundary@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-3.1.4.tgz#255db92b23197108757a888b01e5b729919abde0"
+  integrity sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
 
 react-fast-compare@^3.0.1:
   version "3.2.0"
