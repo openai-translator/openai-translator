@@ -208,12 +208,14 @@ export function PopupCard(props: IPopupCardProps) {
         setEditableText(props.text)
         setOriginalText(props.text)
     }, [props.text])
-    const [detectFrom, setDetectFrom] = useState(detectLang(props.text) ?? 'en')
-    const [detectTo, setDetectTo] = useState(detectFrom === 'zh' ? 'en' : 'zh')
+    const [detectFrom, setDetectFrom] = useState('')
+    const [detectTo, setDetectTo] = useState('')
     useEffect(() => {
-        const from = detectLang(props.text) ?? 'en'
-        setDetectFrom(from)
-        setDetectTo(from === 'zh' ? 'en' : 'zh')
+        ; (async () => {
+            const from = (await detectLang(props.text)) ?? 'en'
+            setDetectFrom(from)
+            setDetectTo(from === 'zh' ? 'en' : 'zh')
+        })()
     }, [props.text])
 
     const [actionStr, setActionStr] = useState('')
@@ -268,6 +270,9 @@ export function PopupCard(props: IPopupCardProps) {
 
     const translateText = useCallback(
         async (text: string) => {
+            if (!detectFrom || !detectTo) {
+                return
+            }
             startLoading()
             switch (translateMode) {
                 case 'translate':
