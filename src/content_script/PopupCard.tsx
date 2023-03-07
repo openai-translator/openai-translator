@@ -330,7 +330,10 @@ export function PopupCard(props: IPopupCardProps) {
                             }
                         }
                         setTranslatedText((translatedText) => {
-                            if (translatedText.endsWith('"') || translatedText.endsWith('」')) {
+                            if (
+                                translatedText &&
+                                ['”', '"', '」'].indexOf(translatedText[translatedText.length - 1]) >= 0
+                            ) {
                                 return translatedText.slice(0, -1)
                             }
                             return translatedText

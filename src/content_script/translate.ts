@@ -124,7 +124,7 @@ export async function translate(query: TranslateQuery) {
             const { content = '', role } = delta
             let targetTxt = content
 
-            if ((isFirst && targetTxt.startsWith('"')) || targetTxt.startsWith('「')) {
+            if (isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
                 targetTxt = targetTxt.slice(1)
             }
 
