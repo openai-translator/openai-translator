@@ -4,8 +4,9 @@
   "description": "chrome-extension-typescript-starter",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf ./dist",
     "watch": "webpack --config webpack/webpack.dev.js --watch",
-    "build": "webpack --config webpack/webpack.prod.js",
+    "build": "yarn run clean && webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
     "lint": "eslint src/**/*.{ts,tsx}",

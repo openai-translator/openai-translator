@@ -13,6 +13,7 @@ export interface TranslateQuery {
     onMessage: (message: { content: string; role: string }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
+    signal: AbortSignal
 }
 
 export interface TranslateResult {
@@ -101,6 +102,7 @@ export async function translate(query: TranslateQuery) {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
+        signal: query.signal,
         onMessage: (msg) => {
             let resp
             try {

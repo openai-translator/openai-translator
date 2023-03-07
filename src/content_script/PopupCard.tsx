@@ -21,6 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
+import { getSettings } from '../common/utils'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -184,8 +185,15 @@ export interface IPopupCardProps {
 }
 
 export function PopupCard(props: IPopupCardProps) {
-    const [translateMode, setTranslateMode] = useState<TranslateMode>('translate')
-
+    const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
+    useEffect(() => {
+        ; (async () => {
+            const settings = await getSettings()
+            if (settings.defaultTranslateMode !== 'nop') {
+                setTranslateMode(settings.defaultTranslateMode)
+            }
+        })()
+    }, [])
     const styles = useStyles()
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
@@ -269,8 +277,8 @@ export function PopupCard(props: IPopupCardProps) {
     }, [headerRef])
 
     const translateText = useCallback(
-        async (text: string) => {
-            if (!detectFrom || !detectTo) {
+        async (text: string, signal: AbortSignal) => {
+            if (!detectFrom || !detectTo || !translateMode) {
                 return
             }
             startLoading()
@@ -285,10 +293,12 @@ export function PopupCard(props: IPopupCardProps) {
                     setActionStr('Summarizing...')
                     break
             }
+            let isStopped = false
             setTranslatedText('')
             try {
                 await translate({
                     mode: translateMode,
+                    signal,
                     text,
                     detectFrom,
                     detectTo,
@@ -332,6 +342,11 @@ export function PopupCard(props: IPopupCardProps) {
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
+                // if error is a AbortError then ignore this error
+                if (error.name === 'AbortError') {
+                    isStopped = true
+                    return
+                }
                 setActionStr('Error')
                 if (error.messasge) {
                     setErrorMessage(error.message as string)
@@ -339,14 +354,22 @@ export function PopupCard(props: IPopupCardProps) {
                     setErrorMessage(String(error))
                 }
             } finally {
-                stopLoading()
+                if (!isStopped) {
+                    stopLoading()
+                    isStopped = true
+                }
             }
         },
         [translateMode, detectFrom, detectTo],
     )
 
     useEffect(() => {
-        translateText(originalText)
+        const controller = new AbortController()
+        const { signal } = controller
+        translateText(originalText, signal)
+        return () => {
+            controller.abort()
+        }
     }, [translateText, originalText])
 
     useEffect(() => {
