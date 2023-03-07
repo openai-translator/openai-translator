@@ -2,6 +2,13 @@
 /* eslint-disable no-misleading-character-class */
 
 import XRegExp from 'xregexp'
+import LanguageDetect from 'languagedetect'
+import GuessLanguage from 'guesslanguage-ng'
+
+const langDetector = new LanguageDetect()
+langDetector.setLanguageType('iso2')
+
+const langGuesser = GuessLanguage()
 
 export const supportLanguages: [string, string][] = [
     // ['auto', 'auto'],
@@ -103,7 +110,23 @@ function detect(text: string) {
     return Object.keys(scores).reduce((a, b) => (scores[a] > scores[b] ? a : b))
 }
 
-export function detectLang(text: string): string | null {
+export async function detectLang(text: string): Promise<string | null> {
+    const lang = await langGuesser.detect(text)
+    if (lang !== 'unknown') {
+        if (lang !== 'en' && lang !== 'zh' && lang !== 'zh-TW') {
+            const res = langDetector.detect(text, 1)
+            if (res.length > 0) {
+                return res[0][0]
+            }
+        }
+        return lang
+    }
+
+    const res = langDetector.detect(text, 1)
+    if (res.length > 0) {
+        return res[0][0]
+    }
+
     // split into words
     const langs = text
         .trim()

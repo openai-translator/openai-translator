@@ -11,6 +11,43 @@ import { Input } from 'baseui/input'
 import { createForm } from '../components/Form'
 import { Button } from 'baseui/button'
 import './index.css'
+import { TranslateMode } from '../content_script/translate'
+import { Select } from 'baseui/select'
+
+interface ITranslateModeSelectorProps {
+  value?: TranslateMode | 'nop'
+  onChange?: (value: TranslateMode | 'nop') => void
+}
+
+function TranslateModeSelector(props: ITranslateModeSelectorProps) {
+  return (
+    <Select
+      searchable={false}
+      clearable={false}
+      value={
+        props.value && [
+          {
+            id: props.value,
+          },
+        ]
+      }
+      onChange={(params) => {
+        props.onChange?.(params.value[0].id as TranslateMode | 'nop')
+      }}
+      options={
+        [
+          { label: 'Translate', id: 'translate' },
+          { label: 'Polishing', id: 'polishing' },
+          { label: 'Summarize', id: 'summarize' },
+          { label: 'Nop', id: 'nop' },
+        ] as {
+          label: string
+          id: TranslateMode
+        }[]
+      }
+    />
+  )
+}
 
 const engine = new Styletron()
 
@@ -22,6 +59,7 @@ export function Popup() {
     apiKeys: '',
     apiURL: utils.defaultAPIURL,
     autoTranslate: utils.defaultAutoTranslate,
+    defaultTranslateMode: 'translate',
   })
 
   const [form] = useForm()
@@ -125,6 +163,8 @@ export function Popup() {
                   },
                 }}
               />
+            <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
+              <TranslateModeSelector />
             </FormItem>
             <div
               style={{

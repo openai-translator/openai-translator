@@ -10,6 +10,7 @@ import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
+import browser from 'webextension-polyfill'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -46,7 +47,7 @@ async function hidePopupCard() {
     if (!$popupCard) {
         return
     }
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: 'stopSpeaking',
     })
     if (root) {
