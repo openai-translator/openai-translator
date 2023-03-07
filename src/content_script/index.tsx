@@ -15,7 +15,6 @@ import browser from 'webextension-polyfill'
 let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
-const settings = utils.getSettings()
 
 async function popupThumbClickHandler(event: MouseEvent) {
     event.stopPropagation()
@@ -171,7 +170,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
 document.addEventListener('mouseup', (event: MouseEvent) => {
     window.setTimeout(async () => {
         const text = (window.getSelection()?.toString() ?? '').trim();
-        (await settings).autoTranslate === 'true'
+        (await utils.getSettings()).autoTranslate === 'true'
             ? showPopupCard(event.pageX + 7, event.pageY + 7, text) : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
     })
 })
