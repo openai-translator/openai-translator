@@ -45,7 +45,7 @@ export async function translate(query: TranslateQuery) {
             }
             if (fromChinese) {
                 if (query.detectTo === 'zh-Hant') {
-                    assistantPrompt = '翻译成繁体白话文'
+                    assistantPrompt = '翻譯成台灣常用用法之繁體中文白話文'
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
                 } else if (query.detectTo === 'yue') {
