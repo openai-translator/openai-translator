@@ -21,6 +21,7 @@ export function Popup() {
   const [values, setValues] = useState<utils.ISettings>({
     apiKeys: '',
     apiURL: utils.defaultAPIURL,
+    autoTranslate: utils.defaultAutoTranslate,
   })
 
   const [form] = useForm()
@@ -102,6 +103,18 @@ export function Popup() {
               />
             </FormItem>
             <FormItem required name='apiURL' label='API URL'>
+              <Input
+                size='compact'
+                overrides={{
+                  Root: {
+                    style: {
+                      width: '392px',
+                    },
+                  },
+                }}
+              />
+            </FormItem>
+            <FormItem required name='autoTranslate' label='Auto Translate'>
               <Input
                 size='compact'
                 overrides={{

@@ -1,4 +1,5 @@
 import '@webcomponents/webcomponentsjs'
+import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
 import { popupCardID, popupThumbID, zIndex } from './consts'
@@ -13,6 +14,7 @@ import { createRoot, Root } from 'react-dom/client'
 let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
+const settings = utils.getSettings()
 
 async function popupThumbClickHandler(event: MouseEvent) {
     event.stopPropagation()
@@ -166,9 +168,10 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 document.addEventListener('mouseup', (event: MouseEvent) => {
-    window.setTimeout(() => {
-        const text = (window.getSelection()?.toString() ?? '').trim()
-        showPopupThumb(text, event.pageX + 7, event.pageY + 7)
+    window.setTimeout(async () => {
+        const text = (window.getSelection()?.toString() ?? '').trim();
+        (await settings).autoTranslate === 'true'
+            ? showPopupCard(event.pageX + 7, event.pageY + 7, text) : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
     })
 })
 
