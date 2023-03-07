@@ -56,8 +56,10 @@ async function build() {
     { src: `${outdir}/content_script/index.js`, dst: 'js/content_script.js' },
     { src: `${outdir}/background/index.js`, dst: 'js/background.js' },
     { src: `${outdir}/options/index.js`, dst: 'js/options.js' },
+    { src: `${outdir}/options/index.css`, dst: 'css/options.css' },
     { src: 'public/options.html', dst: 'options.html' },
     { src: `${outdir}/popup/index.js`, dst: 'js/popup.js' },
+    { src: `${outdir}/popup/index.css`, dst: 'css/popup.css' },
     { src: 'public/popup.html', dst: 'popup.html' },
     { src: 'public/icon.png', dst: 'icon.png' },
   ]

@@ -22,6 +22,7 @@ interface ITranslateModeSelectorProps {
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
   return (
     <Select
+      size='compact'
       searchable={false}
       clearable={false}
       value={
@@ -126,30 +127,10 @@ export function Popup() {
               label='API Key'
               caption='You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
             >
-              <Input
-                autoFocus
-                type='password'
-                size='compact'
-                overrides={{
-                  Root: {
-                    style: {
-                      width: '392px',
-                    },
-                  },
-                }}
-              />
+              <Input autoFocus type='password' size='compact' />
             </FormItem>
             <FormItem required name='apiURL' label='API URL'>
-              <Input
-                size='compact'
-                overrides={{
-                  Root: {
-                    style: {
-                      width: '392px',
-                    },
-                  },
-                }}
-              />
+              <Input size='compact' />
             </FormItem>
             <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
               <TranslateModeSelector />
