@@ -161,8 +161,8 @@ export function Popup() {
                       width: '392px',
                     },
                   },
-                }}
-              />
+                }} />
+            </FormItem>
             <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
               <TranslateModeSelector />
             </FormItem>
