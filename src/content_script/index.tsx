@@ -1,4 +1,5 @@
 import '@webcomponents/webcomponentsjs'
+import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
 import { popupCardID, popupThumbID, zIndex } from './consts'
@@ -167,9 +168,10 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 document.addEventListener('mouseup', (event: MouseEvent) => {
-    window.setTimeout(() => {
-        const text = (window.getSelection()?.toString() ?? '').trim()
-        showPopupThumb(text, event.pageX + 7, event.pageY + 7)
+    window.setTimeout(async () => {
+        const text = (window.getSelection()?.toString() ?? '').trim();
+        (await utils.getSettings()).autoTranslate === true
+            ? showPopupCard(event.pageX + 7, event.pageY + 7, text) : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
     })
 })
 

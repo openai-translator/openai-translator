@@ -13,10 +13,16 @@ import { Button } from 'baseui/button'
 import './index.css'
 import { TranslateMode } from '../content_script/translate'
 import { Select } from 'baseui/select'
+import { Checkbox } from 'baseui/checkbox'
 
 interface ITranslateModeSelectorProps {
   value?: TranslateMode | 'nop'
   onChange?: (value: TranslateMode | 'nop') => void
+}
+
+interface AutoTransalteCheckboxProps {
+  value?: boolean
+  onChange?: (value: boolean) => void
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
@@ -50,6 +56,17 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
   )
 }
 
+function AutoTranslateCheckbox(props: AutoTransalteCheckboxProps) {
+  return (
+    <Checkbox
+      checked={props.value}
+      onChange={e => {
+        props.onChange?.(e.target.checked)
+      }}
+    />
+  )
+}
+
 const engine = new Styletron()
 
 const { Form, FormItem, useForm } = createForm<utils.ISettings>()
@@ -59,6 +76,7 @@ export function Popup() {
   const [values, setValues] = useState<utils.ISettings>({
     apiKeys: '',
     apiURL: utils.defaultAPIURL,
+    autoTranslate: utils.defaultAutoTranslate,
     defaultTranslateMode: 'translate',
   })
 
@@ -134,6 +152,9 @@ export function Popup() {
             </FormItem>
             <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
               <TranslateModeSelector />
+            </FormItem>
+            <FormItem required name='autoTranslate' label='Auto Translate'>
+              <AutoTranslateCheckbox />
             </FormItem>
             <div
               style={{
