@@ -19,6 +19,8 @@ import { HiOutlineSpeakerWave } from 'react-icons/hi2'
 import { queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
+import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorFallback } from '../components/ErrorFallback'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -323,9 +325,14 @@ export function PopupCard(props: IPopupCardProps) {
                         setErrorMessage(error)
                     },
                 })
-            } catch (error) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
                 setActionStr('Error')
-                setErrorMessage(error as string)
+                if (error.messasge) {
+                    setErrorMessage(error.message as string)
+                } else {
+                    setErrorMessage(String(error))
+                }
             } finally {
                 stopLoading()
             }
@@ -352,248 +359,250 @@ export function PopupCard(props: IPopupCardProps) {
     }, [])
 
     return (
-        <StyletronProvider value={props.engine}>
-            <BaseProvider theme={LightTheme}>
-                <div className={styles.popupCard}>
-                    <div>
-                        <div ref={headerRef} className={styles.popupCardHeaderContainer}>
-                            <div className={styles.iconContainer}>
-                                <img className={styles.icon} src={icon} />
-                                <div className={styles.iconText}>OpenAI Translator</div>
-                            </div>
-                            <div className={styles.popupCardHeaderActionsContainer}>
-                                <div className={styles.from}>
-                                    <Select
-                                        size='mini'
-                                        clearable={false}
-                                        searchable={false}
-                                        options={langOptions}
-                                        value={[{ id: detectFrom }]}
-                                        overrides={{
-                                            Root: {
-                                                style: {
-                                                    minWidth: '100px',
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <StyletronProvider value={props.engine}>
+                <BaseProvider theme={LightTheme}>
+                    <div className={styles.popupCard}>
+                        <div>
+                            <div ref={headerRef} className={styles.popupCardHeaderContainer}>
+                                <div className={styles.iconContainer}>
+                                    <img className={styles.icon} src={icon} />
+                                    <div className={styles.iconText}>OpenAI Translator</div>
+                                </div>
+                                <div className={styles.popupCardHeaderActionsContainer}>
+                                    <div className={styles.from}>
+                                        <Select
+                                            size='mini'
+                                            clearable={false}
+                                            searchable={false}
+                                            options={langOptions}
+                                            value={[{ id: detectFrom }]}
+                                            overrides={{
+                                                Root: {
+                                                    style: {
+                                                        minWidth: '100px',
+                                                    },
                                                 },
-                                            },
-                                        }}
-                                        onChange={({ value }) => setDetectFrom(value[0]?.id as string)}
-                                    />
-                                </div>
-                                <div
-                                    className={styles.arrow}
-                                    onClick={() => {
-                                        setEditableText(translatedText)
-                                        setOriginalText(translatedText)
-                                        setDetectFrom(detectTo)
-                                        setDetectTo(detectFrom)
-                                    }}
-                                >
-                                    ↔️
-                                </div>
-                                <div className={styles.to}>
-                                    <Select
-                                        size='mini'
-                                        clearable={false}
-                                        searchable={false}
-                                        options={langOptions}
-                                        value={[{ id: detectTo }]}
-                                        overrides={{
-                                            Root: {
-                                                style: {
-                                                    minWidth: '100px',
-                                                },
-                                            },
-                                        }}
-                                        onChange={({ value }) => setDetectTo(value[0]?.id as string)}
-                                    />
-                                </div>
-                            </div>
-                            <div className={styles.popupCardHeaderButtonGroup}>
-                                <StatefulTooltip content='Translate' placement='top'>
-                                    <Button
-                                        size='mini'
-                                        kind={translateMode === 'translate' ? 'primary' : 'secondary'}
-                                        onClick={() => setTranslateMode('translate')}
-                                    >
-                                        <AiOutlineTranslation />
-                                    </Button>
-                                </StatefulTooltip>
-                                <StatefulTooltip content='Polishing' placement='top'>
-                                    <Button
-                                        size='mini'
-                                        kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
-                                        onClick={() => setTranslateMode('polishing')}
-                                    >
-                                        <IoColorPaletteOutline />
-                                    </Button>
-                                </StatefulTooltip>
-                                <StatefulTooltip content='Summarize' placement='top'>
-                                    <Button
-                                        size='mini'
-                                        kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
-                                        onClick={() => setTranslateMode('summarize')}
-                                    >
-                                        <MdOutlineSummarize />
-                                    </Button>
-                                </StatefulTooltip>
-                            </div>
-                        </div>
-                        <div className={styles.popupCardContentContainer}>
-                            <div className={styles.popupCardEditorContainer}>
-                                <div
-                                    style={{
-                                        height: 0,
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {editableText}
-                                </div>
-                                <Textarea
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                width: '100%',
-                                                borderRadius: '0px',
-                                            },
-                                        },
-                                        Input: {
-                                            style: {
-                                                padding: '4px 8px',
-                                            },
-                                        },
-                                    }}
-                                    value={editableText}
-                                    size='mini'
-                                    resize='both'
-                                    onChange={(e) => setEditableText(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            if (!e.shiftKey) {
-                                                e.preventDefault()
-                                                setOriginalText(editableText)
-                                            }
-                                        }
-                                    }}
-                                />
-                                <div className={styles.actionButtonsContainer}>
-                                    <div style={{ marginRight: 'auto' }} />
+                                            }}
+                                            onChange={({ value }) => setDetectFrom(value[0]?.id as string)}
+                                        />
+                                    </div>
                                     <div
-                                        className={styles.actionButton}
+                                        className={styles.arrow}
                                         onClick={() => {
-                                            if (isSpeakingEditableText) {
-                                                chrome.runtime.sendMessage({
-                                                    type: 'stopSpeaking',
-                                                })
-                                                setIsSpeakingEditableText(false)
-                                                return
-                                            }
-                                            setIsSpeakingEditableText(true)
-                                            chrome.runtime.sendMessage({
-                                                type: 'speak',
-                                                text: editableText,
-                                            })
+                                            setEditableText(translatedText)
+                                            setOriginalText(translatedText)
+                                            setDetectFrom(detectTo)
+                                            setDetectTo(detectFrom)
                                         }}
                                     >
-                                        <HiOutlineSpeakerWave size={13} />
+                                        ↔️
                                     </div>
-                                    <CopyToClipboard
-                                        text={editableText}
-                                        onCopy={() => {
-                                            toast('Copied to clipboard', {
-                                                duration: 3000,
-                                                icon: '👏',
-                                            })
-                                        }}
-                                    >
-                                        <div className={styles.actionButton}>
-                                            <RxCopy size={13} />
-                                        </div>
-                                    </CopyToClipboard>
+                                    <div className={styles.to}>
+                                        <Select
+                                            size='mini'
+                                            clearable={false}
+                                            searchable={false}
+                                            options={langOptions}
+                                            value={[{ id: detectTo }]}
+                                            overrides={{
+                                                Root: {
+                                                    style: {
+                                                        minWidth: '100px',
+                                                    },
+                                                },
+                                            }}
+                                            onChange={({ value }) => setDetectTo(value[0]?.id as string)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.popupCardHeaderButtonGroup}>
+                                    <StatefulTooltip content='Translate' placement='top'>
+                                        <Button
+                                            size='mini'
+                                            kind={translateMode === 'translate' ? 'primary' : 'secondary'}
+                                            onClick={() => setTranslateMode('translate')}
+                                        >
+                                            <AiOutlineTranslation />
+                                        </Button>
+                                    </StatefulTooltip>
+                                    <StatefulTooltip content='Polishing' placement='top'>
+                                        <Button
+                                            size='mini'
+                                            kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
+                                            onClick={() => setTranslateMode('polishing')}
+                                        >
+                                            <IoColorPaletteOutline />
+                                        </Button>
+                                    </StatefulTooltip>
+                                    <StatefulTooltip content='Summarize' placement='top'>
+                                        <Button
+                                            size='mini'
+                                            kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
+                                            onClick={() => setTranslateMode('summarize')}
+                                        >
+                                            <MdOutlineSummarize />
+                                        </Button>
+                                    </StatefulTooltip>
                                 </div>
                             </div>
-                            <div className={styles.popupCardTranslatedContainer}>
-                                {actionStr && (
-                                    <div
-                                        className={clsx({
-                                            [styles.actionStr]: true,
-                                            [styles.error]: !!errorMessage,
-                                        })}
-                                    >
-                                        <div>{actionStr}</div>
-                                        {isLoading ? (
-                                            <span className={styles.writing} />
-                                        ) : errorMessage ? (
-                                            <span>😢</span>
-                                        ) : (
-                                            <span>👍</span>
-                                        )}
-                                    </div>
-                                )}
-                                {errorMessage ? (
-                                    <div className={styles.errorMessage}>{errorMessage}</div>
-                                ) : (
+                            <div className={styles.popupCardContentContainer}>
+                                <div className={styles.popupCardEditorContainer}>
                                     <div
                                         style={{
-                                            width: '100%',
+                                            height: 0,
+                                            overflow: 'hidden',
                                         }}
                                     >
-                                        <div className={styles.popupCardTranslatedContentContainer}>
-                                            <div>
-                                                {translatedLines.map((line, i) => {
-                                                    return (
-                                                        <p className={styles.paragraph} key={`p-${i}`}>
-                                                            {line}
-                                                            {isLoading && i === translatedLines.length - 1 && (
-                                                                <span className={styles.caret} />
-                                                            )}
-                                                        </p>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                        <div className={styles.actionButtonsContainer}>
-                                            <div style={{ marginRight: 'auto' }} />
-                                            <div
-                                                className={styles.actionButton}
-                                                onClick={() => {
-                                                    if (isSpeakingTranslatedText) {
-                                                        chrome.runtime.sendMessage({
-                                                            type: 'stopSpeaking',
-                                                        })
-                                                        setIsSpeakingTranslatedText(false)
-                                                        return
-                                                    }
-                                                    setIsSpeakingTranslatedText(true)
-                                                    chrome.runtime.sendMessage({
-                                                        type: 'speak',
-                                                        text: translatedText,
-                                                    })
-                                                }}
-                                            >
-                                                <HiOutlineSpeakerWave size={13} />
-                                            </div>
-                                            <CopyToClipboard
-                                                text={translatedText}
-                                                onCopy={() => {
-                                                    toast('Copied to clipboard', {
-                                                        duration: 3000,
-                                                        icon: '👏',
-                                                    })
-                                                }}
-                                            >
-                                                <div className={styles.actionButton}>
-                                                    <RxCopy size={13} />
-                                                </div>
-                                            </CopyToClipboard>
-                                        </div>
+                                        {editableText}
                                     </div>
-                                )}
-                                <Toaster />
+                                    <Textarea
+                                        overrides={{
+                                            Root: {
+                                                style: {
+                                                    width: '100%',
+                                                    borderRadius: '0px',
+                                                },
+                                            },
+                                            Input: {
+                                                style: {
+                                                    padding: '4px 8px',
+                                                },
+                                            },
+                                        }}
+                                        value={editableText}
+                                        size='mini'
+                                        resize='both'
+                                        onChange={(e) => setEditableText(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                if (!e.shiftKey) {
+                                                    e.preventDefault()
+                                                    setOriginalText(editableText)
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <div className={styles.actionButtonsContainer}>
+                                        <div style={{ marginRight: 'auto' }} />
+                                        <div
+                                            className={styles.actionButton}
+                                            onClick={() => {
+                                                if (isSpeakingEditableText) {
+                                                    chrome.runtime.sendMessage({
+                                                        type: 'stopSpeaking',
+                                                    })
+                                                    setIsSpeakingEditableText(false)
+                                                    return
+                                                }
+                                                setIsSpeakingEditableText(true)
+                                                chrome.runtime.sendMessage({
+                                                    type: 'speak',
+                                                    text: editableText,
+                                                })
+                                            }}
+                                        >
+                                            <HiOutlineSpeakerWave size={13} />
+                                        </div>
+                                        <CopyToClipboard
+                                            text={editableText}
+                                            onCopy={() => {
+                                                toast('Copied to clipboard', {
+                                                    duration: 3000,
+                                                    icon: '👏',
+                                                })
+                                            }}
+                                        >
+                                            <div className={styles.actionButton}>
+                                                <RxCopy size={13} />
+                                            </div>
+                                        </CopyToClipboard>
+                                    </div>
+                                </div>
+                                <div className={styles.popupCardTranslatedContainer}>
+                                    {actionStr && (
+                                        <div
+                                            className={clsx({
+                                                [styles.actionStr]: true,
+                                                [styles.error]: !!errorMessage,
+                                            })}
+                                        >
+                                            <div>{actionStr}</div>
+                                            {isLoading ? (
+                                                <span className={styles.writing} />
+                                            ) : errorMessage ? (
+                                                <span>😢</span>
+                                            ) : (
+                                                <span>👍</span>
+                                            )}
+                                        </div>
+                                    )}
+                                    {errorMessage ? (
+                                        <div className={styles.errorMessage}>{errorMessage}</div>
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: '100%',
+                                            }}
+                                        >
+                                            <div className={styles.popupCardTranslatedContentContainer}>
+                                                <div>
+                                                    {translatedLines.map((line, i) => {
+                                                        return (
+                                                            <p className={styles.paragraph} key={`p-${i}`}>
+                                                                {line}
+                                                                {isLoading && i === translatedLines.length - 1 && (
+                                                                    <span className={styles.caret} />
+                                                                )}
+                                                            </p>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                            <div className={styles.actionButtonsContainer}>
+                                                <div style={{ marginRight: 'auto' }} />
+                                                <div
+                                                    className={styles.actionButton}
+                                                    onClick={() => {
+                                                        if (isSpeakingTranslatedText) {
+                                                            chrome.runtime.sendMessage({
+                                                                type: 'stopSpeaking',
+                                                            })
+                                                            setIsSpeakingTranslatedText(false)
+                                                            return
+                                                        }
+                                                        setIsSpeakingTranslatedText(true)
+                                                        chrome.runtime.sendMessage({
+                                                            type: 'speak',
+                                                            text: translatedText,
+                                                        })
+                                                    }}
+                                                >
+                                                    <HiOutlineSpeakerWave size={13} />
+                                                </div>
+                                                <CopyToClipboard
+                                                    text={translatedText}
+                                                    onCopy={() => {
+                                                        toast('Copied to clipboard', {
+                                                            duration: 3000,
+                                                            icon: '👏',
+                                                        })
+                                                    }}
+                                                >
+                                                    <div className={styles.actionButton}>
+                                                        <RxCopy size={13} />
+                                                    </div>
+                                                </CopyToClipboard>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <Toaster />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </BaseProvider>
-        </StyletronProvider>
+                </BaseProvider>
+            </StyletronProvider>
+        </ErrorBoundary>
     )
 }
