@@ -73,9 +73,7 @@ export const supportLanguages: [string, string][] = [
 ]
 
 export const langMap: Map<string, string> = new Map(supportLanguages)
-export const langMapReverse = new Map(
-    supportLanguages.map(([standardLang, lang]) => [lang, standardLang]),
-)
+export const langMapReverse = new Map(supportLanguages.map(([standardLang, lang]) => [lang, standardLang]))
 
 function detect(text: string) {
     const scores: Record<string, number> = {}
@@ -114,7 +112,6 @@ function detect(text: string) {
 export async function detectLang(text: string): Promise<string | null> {
     const lang = await _detectLang(text)
     if (lang === 'zh' || lang === 'zh-CN' || lang === 'zh-TW') {
-        console.log('isTraditional', isTraditional(text))
         return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
     }
     return lang
@@ -157,7 +154,5 @@ export async function _detectLang(text: string): Promise<string | null> {
     // pick lang with highest count
     // if count is the same, pick the first lang
     // if no lang is detected, return null
-    return (
-        Object.keys(langCount).reduce((a, b) => (langCount[a] > langCount[b] ? a : b), 'en') || null
-    )
+    return Object.keys(langCount).reduce((a, b) => (langCount[a] > langCount[b] ? a : b), 'en') || null
 }

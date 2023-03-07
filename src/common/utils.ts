@@ -6,11 +6,13 @@ export interface ISettings {
     apiURL: string
     autoTranslate: boolean
     defaultTranslateMode: TranslateMode | 'nop'
+    defaultTargetLanguage: string
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
 
 export const defaultAutoTranslate = false
+export const defaultTargetLanguage = 'zh-Hans'
 
 export async function getApiKey(): Promise<string> {
     const settings = await getSettings()
@@ -38,6 +40,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.defaultTranslateMode) {
         settings.defaultTranslateMode = 'translate'
+    }
+    if (!settings.defaultTargetLanguage) {
+        settings.defaultTargetLanguage = defaultTargetLanguage
     }
     return settings
 }

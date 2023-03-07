@@ -12,8 +12,40 @@ import { createForm } from '../components/Form'
 import { Button } from 'baseui/button'
 import './index.css'
 import { TranslateMode } from '../content_script/translate'
-import { Select } from 'baseui/select'
+import { Select, Value, Option } from 'baseui/select'
 import { Checkbox } from 'baseui/checkbox'
+import { supportLanguages } from '../content_script/lang'
+
+const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
+  return [
+    ...acc,
+    {
+      id,
+      label,
+    } as Option,
+  ]
+}, [] as Value)
+
+interface ILanguageSelectorProps {
+  value?: string
+  onChange?: (value: string) => void
+}
+
+function LanguageSelector(props: ILanguageSelectorProps) {
+  const { value, onChange } = props
+
+  return (
+    <Select
+      size='compact'
+      options={langOptions}
+      value={value ? [{ id: value }] : []}
+      onChange={({ value }) => {
+        const selected = value[0]
+        onChange?.(selected?.id as string)
+      }}
+    />
+  )
+}
 
 interface ITranslateModeSelectorProps {
   value?: TranslateMode | 'nop'
@@ -79,6 +111,7 @@ export function Popup() {
     apiURL: utils.defaultAPIURL,
     autoTranslate: utils.defaultAutoTranslate,
     defaultTranslateMode: 'translate',
+    defaultTargetLanguage: utils.defaultTargetLanguage,
   })
 
   const [form] = useForm()
@@ -157,6 +190,9 @@ export function Popup() {
             <FormItem required name='autoTranslate' label='Auto Translate'>
               <AutoTranslateCheckbox />
             </FormItem>
+            <FormItem required name='defaultTargetLanguage' label='Default Target Language'>
+              <LanguageSelector />
+            </FormItem>
             <div
               style={{
                 display: 'flex',
@@ -187,5 +223,5 @@ const root = createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Popup />
-  </React.StrictMode>,
+  </React.StrictMode>
 )
