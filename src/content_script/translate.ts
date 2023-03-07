@@ -23,7 +23,7 @@ export interface TranslateResult {
     error?: string
 }
 
-const chineseLangs = ['zh', 'zh-CN', 'zh-TW', 'zh-Hans', 'zh-Hant', 'wyw', 'yue']
+const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
     const settings = await utils.getSettings()

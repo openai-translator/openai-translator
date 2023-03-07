@@ -222,8 +222,9 @@ export function PopupCard(props: IPopupCardProps) {
     useEffect(() => {
         ; (async () => {
             const from = (await detectLang(props.text)) ?? 'en'
+            console.log('from', from)
             setDetectFrom(from)
-            setDetectTo(from === 'zh' ? 'en' : 'zh')
+            setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : 'zh-Hans')
         })()
     }, [props.text])
 
