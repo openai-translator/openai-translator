@@ -12,18 +12,15 @@ import { createForm } from '../components/Form'
 import { Button } from 'baseui/button'
 import './index.css'
 
-interface SettingsSchema {
-  apiKey: string
-}
-
 const engine = new Styletron()
 
-const { Form, FormItem, useForm } = createForm<SettingsSchema>()
+const { Form, FormItem, useForm } = createForm<utils.ISettings>()
 
 export function Popup() {
   const [loading, setLoading] = useState(false)
-  const [values, setValues] = useState<SettingsSchema>({
-    apiKey: '',
+  const [values, setValues] = useState<utils.ISettings>({
+    apiKeys: '',
+    apiURL: utils.defaultAPIURL,
   })
 
   const [form] = useForm()
@@ -34,17 +31,18 @@ export function Popup() {
 
   useEffect(() => {
     ; (async () => {
-      const apiKey = await utils.getApiKey()
-      setValues((values_) => ({ ...values_, apiKey }))
+      const settings = await utils.getSettings()
+      setValues(settings)
     })()
   }, [])
 
-  const onChange = useCallback((_changes: Partial<SettingsSchema>, values_: SettingsSchema) => {
+  const onChange = useCallback((_changes: Partial<utils.ISettings>, values_: utils.ISettings) => {
     setValues(values_)
   }, [])
-  const onSubmmit = useCallback(async (data: SettingsSchema) => {
+
+  const onSubmmit = useCallback(async (data: utils.ISettings) => {
     setLoading(true)
-    await utils.setApiKey(data.apiKey)
+    await utils.setSettings(data)
     toast('Saved', {
       icon: '👍',
       duration: 3000,
@@ -84,10 +82,27 @@ export function Popup() {
             initialValues={values}
             onValuesChange={onChange}
           >
-            <FormItem required name='apiKey' label='API Key'>
+            <FormItem
+              required
+              name='apiKeys'
+              label='API Key'
+              caption='You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+            >
               <Input
                 autoFocus
                 type='password'
+                size='compact'
+                overrides={{
+                  Root: {
+                    style: {
+                      width: '392px',
+                    },
+                  },
+                }}
+              />
+            </FormItem>
+            <FormItem required name='apiURL' label='API URL'>
+              <Input
                 size='compact'
                 overrides={{
                   Root: {

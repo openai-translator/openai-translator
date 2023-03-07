@@ -1,18 +1,34 @@
-const apiKeyStorageKey = 'apiKey'
+export interface ISettings {
+    apiKeys: string
+    apiURL: string
+}
+
+export const defaultAPIURL = 'https://api.openai.com'
 
 export async function getApiKey(): Promise<string> {
+    const settings = await getSettings()
+    const apiKeys = (settings.apiKeys ?? '').split(',').map((s) => s.trim())
+    return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
+}
+
+export async function getSettings(): Promise<ISettings> {
     return new Promise((resolve) => {
-        chrome.storage.sync.get([apiKeyStorageKey], (items) => {
-            const apiKeys = items?.[apiKeyStorageKey] ?? ''
-            const keys = apiKeys.split(',') // Split the API keys into an array
-            keys.length === 0 ? resolve(apiKeys) : resolve(keys[Math.floor(Math.random() * keys.length)])
+        chrome.storage.sync.get(['apiKeys', 'apiURL'] as Array<keyof ISettings>, (items) => {
+            const settings = items as ISettings
+            if (!settings.apiKeys) {
+                settings.apiKeys = ''
+            }
+            if (!settings.apiURL) {
+                settings.apiURL = defaultAPIURL
+            }
+            resolve(settings)
         })
     })
 }
 
-export async function setApiKey(apiKey: string) {
+export async function setSettings(settings: ISettings) {
     return new Promise<void>((resolve) => {
-        chrome.storage.sync.set({ [apiKeyStorageKey]: apiKey }, () => {
+        chrome.storage.sync.set(settings, () => {
             resolve()
         })
     })
