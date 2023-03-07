@@ -503,7 +503,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         }}
                                         value={editableText}
                                         size='mini'
-                                        resize='both'
+                                        resize='verticle'
                                         onChange={(e) => setEditableText(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
