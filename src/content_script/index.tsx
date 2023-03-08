@@ -219,13 +219,16 @@ async function main() {
     window.__openai_translator_show_popup__ = (text?: string) => {
         // get selection position
         const selection = window.getSelection()
-        if (!selection) {
+        if (!selection || !selection?.anchorNode) {
             return
         }
 
-        const rect = selection.getRangeAt(0).getBoundingClientRect()
+        const rect =
+            selection.getRangeAt(0).getClientRects()[0] ?? selection.anchorNode?.parentElement?.getBoundingClientRect()
 
-        return showPopupCard(rect.x + 7, rect.y + 7, text ?? (window.getSelection()?.toString() ?? '').trim())
+        const textToTranslate = text ?? selection.toString().trim()
+
+        return showPopupCard(window.scrollX + rect.x + 7, window.scrollY + rect.y + 7, textToTranslate, !rect)
     }
 }
 
