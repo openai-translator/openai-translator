@@ -6,7 +6,6 @@ module.exports = {
     tabWidth: 4,
     useTabs: false,
     quoteProps: 'consistent',
-    parser: 'typescript',
     bracketSpacing: true,
     printWidth: 120,
 }
