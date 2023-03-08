@@ -186,3 +186,22 @@ document.addEventListener('mousedown', () => {
     hidePopupCard()
     hidePopupThumb()
 })
+
+declare global {
+    interface Window {
+        __openai_translator_show_popup__: (text?: string) => void
+    }
+}
+
+// eslint-disable-next-line camelcase
+window.__openai_translator_show_popup__ = (text?: string) => {
+    // get selection position
+    const selection = window.getSelection()
+    if (!selection || !text) {
+        return
+    }
+
+    const rect = selection.getRangeAt(0).getBoundingClientRect()
+
+    return showPopupCard(rect.x + 7, rect.y + 7, text)
+}

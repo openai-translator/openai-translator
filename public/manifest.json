@@ -26,7 +26,20 @@
         "service_worker": "js/background.js"
     },
 
-    "permissions": ["storage", "tts"],
+    "permissions": [
+      "storage",
+      "tts",
+      "contextMenus",
+      "scripting",
+      "activeTab",
+      "tabs"
+    ],
+  
+    "icons": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
 
     "host_permissions": ["https://*.openai.com/"]
 }

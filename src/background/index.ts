@@ -20,3 +20,27 @@ browser.runtime.onMessage.addListener(function (request) {
         }
     }
 })
+
+browser.runtime.onInstalled.addListener(async () => {
+    if (typeof chrome !== 'undefined') {
+        chrome.contextMenus.create({
+            id: 'openasdfasdf',
+            title: 'Translate with OpenAI',
+            type: 'normal',
+            contexts: ['selection'],
+        })
+    }
+})
+
+// Open a new search tab when the user clicks a context menu
+browser.contextMenus.onClicked.addListener((item, tab) => {
+    if (typeof chrome !== 'undefined' && tab?.id) {
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            args: [item.selectionText],
+            func: (selectionText) => {
+                window.__openai_translator_show_popup__(selectionText)
+            },
+        })
+    }
+})
