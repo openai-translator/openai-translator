@@ -189,7 +189,6 @@ export interface IPopupCardProps {
 
 export function PopupCard(props: IPopupCardProps) {
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
-    const [defaultTranslateTarget, setDefaultTranslateTarget] = useState<TranslateTarget | ''>('');
     useEffect(() => {
         ;(async () => {
             const settings = await getSettings()
