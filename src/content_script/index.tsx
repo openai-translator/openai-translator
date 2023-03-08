@@ -93,7 +93,8 @@ async function showPopupCard(x: number, y: number, text: string) {
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = `${x}px`
+    $popupCard.style.left = x + 600 > window.innerWidth ? 'auto' : `${x}px`
+    $popupCard.style.right = x + 600 > window.innerWidth ? '18px' : 'unset'
     $popupCard.style.top = `${y}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
