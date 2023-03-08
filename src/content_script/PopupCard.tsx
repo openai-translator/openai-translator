@@ -532,12 +532,15 @@ export function PopupCard(props: IPopupCardProps) {
                                             Input: {
                                                 style: {
                                                     padding: '4px 8px',
+                                                    fontFamily:
+                                                        translateMode === 'explain-code' ? 'monospace' : 'inherit',
                                                 },
                                             },
                                         }}
                                         value={editableText}
                                         size='mini'
                                         resize='vertical'
+                                        rows={Math.min(Math.max(editableText.split('\n').length, 3), 12)}
                                         onChange={(e) => setEditableText(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
