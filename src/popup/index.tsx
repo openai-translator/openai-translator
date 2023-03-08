@@ -15,6 +15,7 @@ import { TranslateMode } from '../content_script/translate'
 import { Select, Value, Option } from 'baseui/select'
 import { Checkbox } from 'baseui/checkbox'
 import { supportLanguages } from '../content_script/lang'
+import { bindHotKey } from '../content_script'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -136,6 +137,7 @@ export function Popup() {
     const onSubmmit = useCallback(async (data: utils.ISettings) => {
         setLoading(true)
         await utils.setSettings(data)
+        await bindHotKey(data.hotkey)
         toast('Saved', {
             icon: '👍',
             duration: 3000,

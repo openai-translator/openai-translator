@@ -165,12 +165,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.top = `${y}px`
 }
 
-declare global {
-    interface Window {
-        __openai_translator_show_popup__: (text?: string) => void
-    }
-}
-
 async function main() {
     document.addEventListener('mouseup', (event: MouseEvent) => {
         window.setTimeout(async () => {
@@ -193,43 +187,58 @@ async function main() {
     })
 
     const settings = await utils.getSettings()
-    const hotkey = settings.hotkey?.trim()
 
-    if (hotkey) {
-        hotkeys(hotkey, (e) => {
-            e.preventDefault()
-            let text = (window.getSelection()?.toString() ?? '').trim()
-            if (!text) {
-                if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-                    const elem = e.target
-                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
-                }
+    await bindHotKey(settings.hotkey)
+}
+
+export async function bindHotKey(hotkey_: string | undefined) {
+    const hotkey = hotkey_?.trim().replace(/-/g, '+')
+
+    if (!hotkey) {
+        return
+    }
+
+    hotkeys(hotkey, (event) => {
+        event.preventDefault()
+        let text = (window.getSelection()?.toString() ?? '').trim()
+        if (!text) {
+            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+                const elem = event.target
+                text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
             }
-            // showPopupCard in center of screen
-            showPopupCard(
-                window.innerWidth / 2 + window.scrollX - 506 / 2,
-                window.innerHeight / 2 + window.scrollY - 226 / 2,
-                text,
-                true
-            )
-        })
-    }
-
-    // eslint-disable-next-line camelcase
-    window.__openai_translator_show_popup__ = (text?: string) => {
-        // get selection position
-        const selection = window.getSelection()
-        if (!selection || !selection?.anchorNode) {
-            return
         }
-
-        const rect =
-            selection.getRangeAt(0).getClientRects()[0] ?? selection.anchorNode?.parentElement?.getBoundingClientRect()
-
-        const textToTranslate = text ?? selection.toString().trim()
-
-        return showPopupCard(window.scrollX + rect.x + 7, window.scrollY + rect.y + 7, textToTranslate, !rect)
-    }
+        hidePopupCard()
+        // showPopupCard in center of screen
+        showPopupCard(
+            window.innerWidth / 2 + window.scrollX - 506 / 2,
+            window.innerHeight / 2 + window.scrollY - 226 / 2,
+            text,
+            true
+        )
+    })
 }
 
 main()
+
+declare global {
+    interface Window {
+        __openai_translator_show_popup__: (text?: string) => void
+    }
+}
+
+// secret api for context menu
+// eslint-disable-next-line camelcase
+window.__openai_translator_show_popup__ = (text?: string) => {
+    // get selection position
+    const selection = window.getSelection()
+    if (!selection || !selection?.anchorNode) {
+        return
+    }
+
+    const rect =
+        selection.getRangeAt(0).getClientRects()[0] ?? selection.anchorNode?.parentElement?.getBoundingClientRect()
+
+    const textToTranslate = text ?? selection.toString().trim()
+
+    return showPopupCard(window.scrollX + rect.x + 7, window.scrollY + rect.y + 7, textToTranslate, !rect)
+}

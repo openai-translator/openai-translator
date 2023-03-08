@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "chokidar src -c 'npm run build'",
-    "build": "yarn run clean && node build.mjs",
+    "build": "make build",
     "clean": "rimraf dist",
     "test": "npx jest",
     "lint": "eslint src/**/*.{ts,tsx}",
