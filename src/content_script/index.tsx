@@ -11,6 +11,7 @@ import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import browser from 'webextension-polyfill'
+import hotkeys from 'hotkeys-js'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -56,10 +57,7 @@ async function hidePopupCard() {
     removeContainer()
 }
 
-async function showPopupCard(x: number, y: number, text: string) {
-    if (!text) {
-        return
-    }
+async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
         $popupThumb.style.display = 'none'
@@ -112,7 +110,7 @@ async function showPopupCard(x: number, y: number, text: string) {
         <React.StrictMode>
             <div>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <PopupCard text={text} engine={engine} />
+                    <PopupCard text={text} engine={engine} autoFocus={autoFocus} />
                 </JSS>
             </div>
         </React.StrictMode>
@@ -167,41 +165,68 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.top = `${y}px`
 }
 
-document.addEventListener('mouseup', (event: MouseEvent) => {
-    window.setTimeout(async () => {
-        let text = (window.getSelection()?.toString() ?? '').trim()
-        if (!text) {
-            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-                const elem = event.target
-                text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
-            }
-        }
-        ;(await utils.getSettings()).autoTranslate === true
-            ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
-            : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
-    })
-})
-
-document.addEventListener('mousedown', () => {
-    hidePopupCard()
-    hidePopupThumb()
-})
-
 declare global {
     interface Window {
         __openai_translator_show_popup__: (text?: string) => void
     }
 }
 
-// eslint-disable-next-line camelcase
-window.__openai_translator_show_popup__ = (text?: string) => {
-    // get selection position
-    const selection = window.getSelection()
-    if (!selection) {
-        return
+async function main() {
+    document.addEventListener('mouseup', (event: MouseEvent) => {
+        window.setTimeout(async () => {
+            let text = (window.getSelection()?.toString() ?? '').trim()
+            if (!text) {
+                if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+                    const elem = event.target
+                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
+                }
+            }
+            ;(await utils.getSettings()).autoTranslate === true
+                ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
+                : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
+        })
+    })
+
+    document.addEventListener('mousedown', () => {
+        hidePopupCard()
+        hidePopupThumb()
+    })
+
+    const settings = await utils.getSettings()
+    const hotkey = settings.hotkey?.trim()
+
+    if (hotkey) {
+        hotkeys(hotkey, (e) => {
+            e.preventDefault()
+            let text = (window.getSelection()?.toString() ?? '').trim()
+            if (!text) {
+                if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                    const elem = e.target
+                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
+                }
+            }
+            // showPopupCard in center of screen
+            showPopupCard(
+                window.innerWidth / 2 + window.scrollX - 506 / 2,
+                window.innerHeight / 2 + window.scrollY - 226 / 2,
+                text,
+                true
+            )
+        })
     }
 
-    const rect = selection.getRangeAt(0).getBoundingClientRect()
+    // eslint-disable-next-line camelcase
+    window.__openai_translator_show_popup__ = (text?: string) => {
+        // get selection position
+        const selection = window.getSelection()
+        if (!selection) {
+            return
+        }
 
-    return showPopupCard(rect.x + 7, rect.y + 7, text ?? (window.getSelection()?.toString() ?? '').trim())
+        const rect = selection.getRangeAt(0).getBoundingClientRect()
+
+        return showPopupCard(rect.x + 7, rect.y + 7, text ?? (window.getSelection()?.toString() ?? '').trim())
+    }
 }
+
+main()

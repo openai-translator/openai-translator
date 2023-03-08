@@ -48,8 +48,6 @@ export async function translate(query: TranslateQuery) {
                     assistantPrompt = '翻譯成台灣常用用法之繁體中文白話文'
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
-                } else if (query.detectTo === 'yue') {
-                    assistantPrompt = '翻译成粤语白话文'
                 }
             }
             break

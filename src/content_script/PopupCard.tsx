@@ -8,6 +8,7 @@ import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoColorPaletteOutline } from 'react-icons/io5'
+import { TbArrowsExchange } from 'react-icons/tb'
 import { MdOutlineSummarize } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
@@ -183,6 +184,7 @@ const useStyles = createUseStyles({
 export interface IPopupCardProps {
     text: string
     engine: Styletron
+    autoFocus?: boolean
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -219,14 +221,17 @@ export function PopupCard(props: IPopupCardProps) {
     }, [props.text])
     const [detectFrom, setDetectFrom] = useState('')
     const [detectTo, setDetectTo] = useState('')
+    const stopAutomaticallyChangeDetectTo = useRef(false)
     useEffect(() => {
         ;(async () => {
-            const from = (await detectLang(props.text)) ?? 'en'
-            const settings = await getSettings()
+            const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
-            setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
+            if (translateMode === 'translate' && !stopAutomaticallyChangeDetectTo.current) {
+                const settings = await getSettings()
+                setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
+            }
         })()
-    }, [props.text])
+    }, [originalText, translateMode])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -280,7 +285,7 @@ export function PopupCard(props: IPopupCardProps) {
 
     const translateText = useCallback(
         async (text: string, signal: AbortSignal) => {
-            if (!detectFrom || !detectTo || !translateMode) {
+            if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
             startLoading()
@@ -425,10 +430,15 @@ export function PopupCard(props: IPopupCardProps) {
                                             setDetectTo(detectFrom)
                                         }}
                                     >
-                                        ↔️
+                                        <StatefulTooltip content='Exchange' placement='top' showArrow>
+                                            <div>
+                                                <TbArrowsExchange />
+                                            </div>
+                                        </StatefulTooltip>
                                     </div>
                                     <div className={styles.to}>
                                         <Select
+                                            disabled={translateMode === 'polishing'}
                                             size='mini'
                                             clearable={false}
                                             searchable={false}
@@ -441,12 +451,15 @@ export function PopupCard(props: IPopupCardProps) {
                                                     },
                                                 },
                                             }}
-                                            onChange={({ value }) => setDetectTo(value[0]?.id as string)}
+                                            onChange={({ value }) => {
+                                                stopAutomaticallyChangeDetectTo.current = true
+                                                setDetectTo(value[0]?.id as string)
+                                            }}
                                         />
                                     </div>
                                 </div>
                                 <div className={styles.popupCardHeaderButtonGroup}>
-                                    <StatefulTooltip content='Translate' placement='top'>
+                                    <StatefulTooltip content='Translate' placement='top' showArrow>
                                         <Button
                                             size='mini'
                                             kind={translateMode === 'translate' ? 'primary' : 'secondary'}
@@ -455,16 +468,19 @@ export function PopupCard(props: IPopupCardProps) {
                                             <AiOutlineTranslation />
                                         </Button>
                                     </StatefulTooltip>
-                                    <StatefulTooltip content='Polishing' placement='top'>
+                                    <StatefulTooltip content='Polishing' placement='top' showArrow>
                                         <Button
                                             size='mini'
                                             kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
-                                            onClick={() => setTranslateMode('polishing')}
+                                            onClick={() => {
+                                                setTranslateMode('polishing')
+                                                setDetectTo(detectFrom)
+                                            }}
                                         >
                                             <IoColorPaletteOutline />
                                         </Button>
                                     </StatefulTooltip>
-                                    <StatefulTooltip content='Summarize' placement='top'>
+                                    <StatefulTooltip content='Summarize' placement='top' showArrow>
                                         <Button
                                             size='mini'
                                             kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
@@ -489,6 +505,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         {editableText}
                                     </div>
                                     <Textarea
+                                        autoFocus={props.autoFocus}
                                         overrides={{
                                             Root: {
                                                 style: {
@@ -510,6 +527,9 @@ export function PopupCard(props: IPopupCardProps) {
                                             if (e.key === 'Enter') {
                                                 if (!e.shiftKey) {
                                                     e.preventDefault()
+                                                    if (!translateMode) {
+                                                        setTranslateMode('translate')
+                                                    }
                                                     setOriginalText(editableText)
                                                 }
                                             }

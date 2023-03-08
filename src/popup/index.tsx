@@ -113,6 +113,7 @@ export function Popup() {
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
+        hotkey: '',
     })
 
     const [form] = useForm()
@@ -185,14 +186,17 @@ export function Popup() {
                         <FormItem required name='apiURL' label='API URL'>
                             <Input size='compact' />
                         </FormItem>
-                        <FormItem required name='defaultTranslateMode' label='Default Translate Mode'>
+                        <FormItem name='defaultTranslateMode' label='Default Translate Mode'>
                             <TranslateModeSelector />
                         </FormItem>
-                        <FormItem required name='autoTranslate' label='Auto Translate'>
+                        <FormItem name='autoTranslate' label='Auto Translate'>
                             <AutoTranslateCheckbox />
                         </FormItem>
-                        <FormItem required name='defaultTargetLanguage' label='Default Target Language'>
+                        <FormItem name='defaultTargetLanguage' label='Default Target Language'>
                             <LanguageSelector />
+                        </FormItem>
+                        <FormItem name='hotkey' label='Hotkey'>
+                            <Input size='compact' />
                         </FormItem>
                         <div
                             style={{
