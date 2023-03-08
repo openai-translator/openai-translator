@@ -302,6 +302,7 @@ export function PopupCard(props: IPopupCardProps) {
             }
             let isStopped = false
             setTranslatedText('')
+            setErrorMessage('')
             try {
                 await translate({
                     mode: translateMode,
