@@ -9,7 +9,7 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
-import { MdOutlineSummarize } from 'react-icons/md'
+import { MdOutlineSummarize, MdCode } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
@@ -299,6 +299,9 @@ export function PopupCard(props: IPopupCardProps) {
                 case 'summarize':
                     setActionStr('Summarizing...')
                     break
+                case 'explain-code':
+                    setActionStr('Summarizing...')
+                    break
             }
             let isStopped = false
             setTranslatedText('')
@@ -490,6 +493,18 @@ export function PopupCard(props: IPopupCardProps) {
                                             }}
                                         >
                                             <MdOutlineSummarize />
+                                        </Button>
+                                    </StatefulTooltip>
+                                    <StatefulTooltip content='Summarize' placement='top' showArrow>
+                                        <Button
+                                            size='mini'
+                                            kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
+                                            onClick={() => {
+                                                setTranslateMode('explain-code')
+                                                setDetectTo(detectFrom)
+                                            }}
+                                        >
+                                            <MdCode />
                                         </Button>
                                     </StatefulTooltip>
                                 </div>

@@ -3,7 +3,7 @@ import * as utils from '../common/utils'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
-export type TranslateMode = 'translate' | 'polishing' | 'summarize'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'explain-code'
 
 export interface TranslateQuery {
     text: string
@@ -64,9 +64,22 @@ export async function translate(query: TranslateQuery) {
             if (toChinese) {
                 assistantPrompt = '用最简洁的语言使用中文总结此段文本'
             } else {
-                assistantPrompt = `summarize this text in the most concise language and muse use ${
+                assistantPrompt = `summarize this text in the most concise language and must use ${
                     lang.langMap.get(query.detectTo) || query.detectTo
                 } language!`
+            }
+            break
+
+        case 'explain-code':
+            systemPrompt =
+                'You are a code explanation engine, you can only explain the code, do not interpret or translate it.'
+            if (toChinese) {
+                assistantPrompt =
+                    '用最简洁的语言使用中文解释此段代码、正则表达式或脚本。如果内容不是代码，请返回错误提示。'
+            } else {
+                assistantPrompt = `explain the provided code, regex or script in the most concise language and must use ${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                } language! If the content is not code, return an error message.`
             }
             break
     }
