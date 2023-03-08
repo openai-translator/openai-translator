@@ -7,6 +7,7 @@ export interface ISettings {
     autoTranslate: boolean
     defaultTranslateMode: TranslateMode | 'nop'
     defaultTargetLanguage: string
+    hotkey?: string
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
@@ -20,14 +21,18 @@ export async function getApiKey(): Promise<string> {
     return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
 }
 
+// In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
+const settingKeys: Record<keyof ISettings, number> = {
+    apiKeys: 1,
+    apiURL: 1,
+    autoTranslate: 1,
+    defaultTranslateMode: 1,
+    defaultTargetLanguage: 1,
+    hotkey: 1,
+}
+
 export async function getSettings(): Promise<ISettings> {
-    const items = await browser.storage.sync.get([
-        'apiKeys',
-        'apiURL',
-        'autoTranslate',
-        'defaultTranslateMode',
-        'defaultTargetLanguage',
-    ] as Array<keyof ISettings>)
+    const items = await browser.storage.sync.get(Object.keys(settingKeys))
 
     const settings = items as ISettings
     if (!settings.apiKeys) {

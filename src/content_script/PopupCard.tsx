@@ -183,6 +183,7 @@ const useStyles = createUseStyles({
 export interface IPopupCardProps {
     text: string
     engine: Styletron
+    autoFocus?: boolean
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -280,7 +281,7 @@ export function PopupCard(props: IPopupCardProps) {
 
     const translateText = useCallback(
         async (text: string, signal: AbortSignal) => {
-            if (!detectFrom || !detectTo || !translateMode) {
+            if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
             startLoading()
@@ -489,6 +490,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         {editableText}
                                     </div>
                                     <Textarea
+                                        autoFocus={props.autoFocus}
                                         overrides={{
                                             Root: {
                                                 style: {
@@ -510,6 +512,9 @@ export function PopupCard(props: IPopupCardProps) {
                                             if (e.key === 'Enter') {
                                                 if (!e.shiftKey) {
                                                     e.preventDefault()
+                                                    if (!translateMode) {
+                                                        setTranslateMode('translate')
+                                                    }
                                                     setOriginalText(editableText)
                                                 }
                                             }
