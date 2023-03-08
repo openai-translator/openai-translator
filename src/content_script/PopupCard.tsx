@@ -189,6 +189,7 @@ export interface IPopupCardProps {
 
 export function PopupCard(props: IPopupCardProps) {
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
+    const [defaultTranslateTarget, setDefaultTranslateTarget] = useState<TranslateTarget | ''>('');
     useEffect(() => {
         ;(async () => {
             const settings = await getSettings()
@@ -300,7 +301,7 @@ export function PopupCard(props: IPopupCardProps) {
                     setActionStr('Summarizing...')
                     break
                 case 'explain-code':
-                    setActionStr('Summarizing...')
+                    setActionStr('Explaining...')
                     break
             }
             let isStopped = false
@@ -409,6 +410,7 @@ export function PopupCard(props: IPopupCardProps) {
                                 <div className={styles.popupCardHeaderActionsContainer}>
                                     <div className={styles.from}>
                                         <Select
+                                            disabled={translateMode === 'explain-code'}
                                             size='mini'
                                             clearable={false}
                                             searchable={false}
@@ -495,13 +497,13 @@ export function PopupCard(props: IPopupCardProps) {
                                             <MdOutlineSummarize />
                                         </Button>
                                     </StatefulTooltip>
-                                    <StatefulTooltip content='Summarize' placement='top' showArrow>
+                                    <StatefulTooltip content='Explain Code' placement='top' showArrow>
                                         <Button
                                             size='mini'
                                             kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
                                             onClick={() => {
                                                 setTranslateMode('explain-code')
-                                                setDetectTo(detectFrom)
+                                                // no need to change detectTo
                                             }}
                                         >
                                             <MdCode />
