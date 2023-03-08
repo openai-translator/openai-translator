@@ -27,18 +27,18 @@
     },
 
     "permissions": [
-      "storage",
-      "tts",
-      "contextMenus",
-      "scripting",
-      "activeTab",
-      "tabs"
+        "storage",
+        "tts",
+        "contextMenus",
+        "scripting",
+        "activeTab",
+        "tabs"
     ],
   
     "icons": {
-      "16": "icon.png",
-      "48": "icon.png",
-      "128": "icon.png"
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
     },
 
     "host_permissions": ["https://*.openai.com/"]

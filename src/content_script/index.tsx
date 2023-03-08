@@ -197,11 +197,11 @@ declare global {
 window.__openai_translator_show_popup__ = (text?: string) => {
     // get selection position
     const selection = window.getSelection()
-    if (!selection || !text) {
+    if (!selection) {
         return
     }
 
     const rect = selection.getRangeAt(0).getBoundingClientRect()
 
-    return showPopupCard(rect.x + 7, rect.y + 7, text)
+    return showPopupCard(rect.x + 7, rect.y + 7, text ?? (window.getSelection()?.toString() ?? '').trim())
 }
