@@ -54,7 +54,7 @@ export async function translate(query: TranslateQuery) {
             }
             break
         case 'polishing':
-            systemPrompt = "You are a text embellisher, you can only embellish the text, don't interpret it."
+            systemPrompt = 'Revise the following sentences to make them more clear, concise, and coherent.'
             if (fromChinese) {
                 assistantPrompt = `使用 ${lang.langMap.get(query.detectFrom) || query.detectFrom} 语言润色此段文本`
             } else {
