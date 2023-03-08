@@ -30,8 +30,10 @@ jobs:
         run: |
           mkdir release
           mv dist/chromium release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
+          mv dist/firefox release/openai-translator-firefox-addon-${{ steps.get_version.outputs.version-without-v }}
           cd release
           zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
+          zip -r openai-translator-firefox-addon-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-firefox-addon-${{ steps.get_version.outputs.version-without-v }}/*
 
       - name: Upload plugin to release
         uses: svenstaro/upload-release-action@v2
