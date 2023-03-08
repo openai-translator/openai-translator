@@ -4,7 +4,7 @@
   "description": "chrome-extension-typescript-starter",
   "main": "index.js",
   "scripts": {
-    "watch": "chokidar src -c 'npm run build'",
+    "watch": "chokidar src -c \"npm run build\"",
     "build": "make build",
     "clean": "rimraf dist",
     "test": "npx jest",
