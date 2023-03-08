@@ -72,14 +72,14 @@ export async function translate(query: TranslateQuery) {
 
         case 'explain-code':
             systemPrompt =
-                'You are a code explanation engine, you can only explain the code, do not interpret or translate it.'
+                'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
             if (toChinese) {
                 assistantPrompt =
-                    '用最简洁的语言使用中文解释此段代码、正则表达式或脚本。如果内容不是代码，请返回错误提示。'
+                    '用最简洁的语言使用中文解释此段代码、正则表达式或脚本。如果内容不是代码，请返回错误提示。如果代码有明显的错误，请指出。'
             } else {
                 assistantPrompt = `explain the provided code, regex or script in the most concise language and must use ${
                     lang.langMap.get(query.detectTo) || query.detectTo
-                } language! If the content is not code, return an error message.`
+                } language! If the content is not code, return an error message. If the code has obvious errors, point them out.`
             }
             break
     }
