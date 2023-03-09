@@ -7,6 +7,7 @@
         "sourceMap": false,
         "rootDir": "src",
         "outDir": "dist/js",
+        "moduleResolution": "node",
         "noEmitOnError": true,
         "jsx": "react",
         "typeRoots": [ "node_modules/@types" ]

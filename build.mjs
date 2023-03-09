@@ -17,6 +17,7 @@ async function runEsbuild() {
         treeShaking: true,
         minify: true,
         legalComments: 'none',
+        sourcemap: true,
         loader: {
             '.png': 'dataurl',
             '.jpg': 'dataurl',
@@ -48,6 +49,7 @@ async function build() {
 
     const commonFiles = [
         { src: `${outdir}/content_script/index.js`, dst: 'js/content_script.js' },
+        { src: `${outdir}/content_script/index.js.map`, dst: 'js/content_script.js.map' },
         { src: `${outdir}/background/index.js`, dst: 'js/background.js' },
         { src: `${outdir}/options/index.js`, dst: 'js/options.js' },
         { src: `${outdir}/options/index.css`, dst: 'css/options.css' },
