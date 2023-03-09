@@ -43,9 +43,9 @@ OpenAI Translator Browser Extension And Desktop Application
 
     点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
 
-    <img width="400" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+    <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
-    <img width="300" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+    <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
 # 浏览器插件安装方法
 
