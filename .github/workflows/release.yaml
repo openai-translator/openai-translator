@@ -23,7 +23,7 @@ jobs:
         id: tag
         run: |
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          echo "message=$(git tag -l --format='%(contents:subject)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
+          echo "message=$(git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
 
       - name: create release
         id: create-release
@@ -48,7 +48,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: `v${process.env.PACKAGE_VERSION}`,
-              name: `v${process.env.PACKAGE_VERSION}`,
+              name: `Desktop Apps - v${process.env.PACKAGE_VERSION}`,
               body: `${{ steps.tag.outputs.message }}`,
               draft: true,
               prerelease: false
@@ -104,7 +104,7 @@ jobs:
         id: tag
         run: |
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          echo "message=$(git tag -l --format='%(contents:subject)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
+          echo "message=$(git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: yarn install
@@ -124,7 +124,7 @@ jobs:
       - name: Upload plugin to release
         uses: svenstaro/upload-release-action@v2
         with:
-          release_name: ${{ steps.get_version.outputs.version }}
+          release_name: 'Browser Extensions - ${{ steps.get_version.outputs.version }}'
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
           asset_name: openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
