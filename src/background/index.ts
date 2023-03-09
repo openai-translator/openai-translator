@@ -43,7 +43,6 @@ if (isFirefox) {
     })
 }
 
-
 browser.runtime.onInstalled.addListener(async () => {
     if (typeof chrome !== 'undefined') {
         chrome.contextMenus.create({
