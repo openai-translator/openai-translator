@@ -4,6 +4,10 @@ OpenAI Translator Chrome Extension
 我开发了一个 Bob 的插件 [bob-plugin-openai-translator](https://github.com/yetone/bob-plugin-openai-translator) 使用 ChatGPT API 在 macOS 上进行全局划词翻译，
 但是由于很多用户并不是 macOS 用户，所以特此开发了一个浏览器插件方便非 macOS 用户使用 ChatGPT 进行划词翻译。
 
+# 既是浏览器插件也是跨平台桌面端应用！
+
+<img width="560" src="https://user-images.githubusercontent.com/1206493/223898114-985bd848-e682-4957-9b22-45f89dd55c2e.png" />
+
 # 使用截图
 
 <img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
