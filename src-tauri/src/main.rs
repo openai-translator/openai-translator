@@ -8,7 +8,7 @@ mod config;
 mod windows;
 
 use crate::config::get_config_content;
-use crate::windows::{show_translate_window, bind_hotkey};
+use crate::windows::{show_translate_window};
 use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
 use tauri::AppHandle;
@@ -29,7 +29,6 @@ fn main() {
         .setup(|app| {
             APP_HANDLE.get_or_init(|| app.handle());
             show_translate_window();
-            bind_hotkey();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![get_config_content])

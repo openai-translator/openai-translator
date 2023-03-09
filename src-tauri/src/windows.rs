@@ -1,9 +1,7 @@
 use enigo::Enigo;
 use crate::utils::copy;
 use crate::APP_HANDLE;
-use crate::config::get_config;
-use tauri::{GlobalShortcutManager, Manager, PhysicalPosition};
-use tauri::api::notification::Notification;
+use tauri::{Manager, PhysicalPosition};
 
 const TRANSLATOR_WIN_NAME: &str = "translator";
 
@@ -47,33 +45,6 @@ pub fn show_translate_window() {
 
              #[cfg(target_os = "linux")]
              set_shadow(&window, true).unwrap();
-        }
-    }
-}
-
-pub fn bind_hotkey() {
-    let handle = APP_HANDLE.get().unwrap();
-
-    let config = get_config();
-
-    match config {
-        Ok(c) => {
-            if let Some(hotkey) = c.hotkey {
-                match handle.global_shortcut_manager().register(hotkey.as_str(), show_translate_window) {
-                    Ok(_) => {}
-                    Err(err) => {
-                        Notification::new(&handle.config().tauri.bundle.identifier)
-                            .title("OpenAI Translator - Hotkey Error")
-                            .body(format!("Failed to register hotkey {}: {}", hotkey, err).as_str())
-                            .icon("icons/icon.png")
-                            .notify(handle)
-                            .unwrap();
-                    }
-                }
-            }
-        }
-        Err(err) => {
-            panic!("{}", err)
         }
     }
 }
