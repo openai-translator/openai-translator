@@ -18,13 +18,13 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - run: yarn install
-      - run: yarn build
+      - name: Install dependencies
+        run: yarn install
 
-      - name: Change version
-        run: |
-          sed -i -e "s/\"version\": \".*\"/\"version\": \"${{ steps.get_version.outputs.version-without-v }}\"/" public/manifest.json
-          sed -i -e "s/\"version\": \".*\"/\"version\": \"${{ steps.get_version.outputs.version-without-v }}\"/" public/manifest.firefox.json
+      - name: Build
+        run: make build
+        env:
+          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
 
       - name: Package plugin
         run: |
