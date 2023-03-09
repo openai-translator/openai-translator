@@ -24,7 +24,9 @@ if (isFirefox) {
 } else {
     browser.runtime.onMessage.addListener(async function (request) {
         if (request.type === 'speak') {
+            const lang = await detectLang(request.text)
             chrome.tts.speak(request.text, {
+                lang: lang ?? 'en',
                 onEvent: function (event) {
                     if (
                         event.type === 'end' ||
