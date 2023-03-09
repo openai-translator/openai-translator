@@ -7,6 +7,8 @@ const engine = new Styletron({
 })
 
 export function App() {
+    const isWindows = navigator.userAgent.indexOf('Windows') !== -1
+
     return (
         <div
             style={{
@@ -22,7 +24,7 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 containerStyle={{
-                    paddingTop: '20px',
+                    paddingTop: isWindows ? '30px' : '20px',
                 }}
             />
         </div>
