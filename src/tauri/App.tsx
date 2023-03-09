@@ -63,6 +63,7 @@ export function App() {
                 engine={engine}
                 showSettings
                 autoFocus
+                rows={10}
                 defaultShowSettings
                 containerStyle={{
                     paddingTop: '20px',

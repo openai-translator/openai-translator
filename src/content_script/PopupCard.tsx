@@ -198,6 +198,7 @@ export interface IPopupCardProps {
     showSettings?: boolean
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
+    rows?: number
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -601,7 +602,11 @@ export function PopupCard(props: IPopupCardProps) {
                                             value={editableText}
                                             size='mini'
                                             resize='vertical'
-                                            rows={Math.min(Math.max(editableText.split('\n').length, 3), 12)}
+                                            rows={
+                                                props.rows
+                                                    ? props.rows
+                                                    : Math.min(Math.max(editableText.split('\n').length, 3), 12)
+                                            }
                                             onChange={(e) => setEditableText(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
