@@ -33,13 +33,17 @@ jobs:
           RELEASE_BODY: "${{ steps.tag.outputs.message }}"
         with:
           script: |
-            const release = await github.rest.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: `v${process.env.PACKAGE_VERSION}`,
-            })
-            if (release) {
-              return release.data.id
+            try {
+              const release = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: `v${process.env.PACKAGE_VERSION}`,
+              })
+              if (release) {
+                return release.data.id
+              }
+            } catch (error) {
+              console.log(error)
             }
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
