@@ -9,7 +9,7 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
-import { MdOutlineSummarize } from 'react-icons/md'
+import { MdOutlineSummarize, MdCode } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
@@ -316,6 +316,9 @@ export function PopupCard(props: IPopupCardProps) {
                 case 'summarize':
                     setActionStr('Summarizing...')
                     break
+                case 'explain-code':
+                    setActionStr('Explaining...')
+                    break
             }
             let isStopped = false
             setTranslatedText('')
@@ -467,6 +470,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     <div className={styles.popupCardHeaderActionsContainer}>
                                         <div className={styles.from}>
                                             <Select
+                                                disabled={translateMode === 'explain-code'}
                                                 size='mini'
                                                 clearable={false}
                                                 searchable={false}
@@ -553,6 +557,18 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineSummarize />
                                             </Button>
                                         </StatefulTooltip>
+                                        <StatefulTooltip content='Explain Code' placement='top' showArrow>
+                                            <Button
+                                                size='mini'
+                                                kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
+                                                onClick={() => {
+                                                    setTranslateMode('explain-code')
+                                                    // no need to change detectTo
+                                                }}
+                                            >
+                                                <MdCode />
+                                            </Button>
+                                        </StatefulTooltip>
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
@@ -577,12 +593,15 @@ export function PopupCard(props: IPopupCardProps) {
                                                 Input: {
                                                     style: {
                                                         padding: '4px 8px',
+                                                        fontFamily:
+                                                            translateMode === 'explain-code' ? 'monospace' : 'inherit',
                                                     },
                                                 },
                                             }}
                                             value={editableText}
                                             size='mini'
                                             resize='vertical'
+                                            rows={Math.min(Math.max(editableText.split('\n').length, 3), 12)}
                                             onChange={(e) => setEditableText(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {

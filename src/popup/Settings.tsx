@@ -78,6 +78,7 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
                     { label: 'Translate', id: 'translate' },
                     { label: 'Polishing', id: 'polishing' },
                     { label: 'Summarize', id: 'summarize' },
+                    { label: 'Explain Code', id: 'explain-code' },
                     { label: 'Nop', id: 'nop' },
                 ] as {
                     label: string
