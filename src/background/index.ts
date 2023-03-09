@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill'
-import { detectLang } from '../content_script/lang'
 
 const isFirefox = /firefox/i.test(navigator.userAgent)
 
