@@ -30,7 +30,6 @@ jobs:
         uses: actions/github-script@v6
         env:
           PACKAGE_VERSION: "${{ steps.get_version.outputs.version-without-v }}"
-          RELEASE_BODY: "${{ steps.tag.outputs.message }}"
         with:
           script: |
             try {
@@ -50,7 +49,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: `v${process.env.PACKAGE_VERSION}`,
               name: `v${process.env.PACKAGE_VERSION}`,
-              body: process.env.RELEASE_BODY,
+              body: `${{ steps.tag.outputs.message }}`,
               draft: true,
               prerelease: false
             })
