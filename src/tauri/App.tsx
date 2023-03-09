@@ -9,7 +9,6 @@ const engine = new Styletron({
 
 export function App() {
     const isMacOS = navigator.userAgent.includes('Mac OS X')
-    const isWindows = navigator.userAgent.includes('Windows')
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
@@ -66,7 +65,7 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 containerStyle={{
-                    paddingTop: isWindows ? '30px' : '20px',
+                    paddingTop: '20px',
                 }}
             />
         </div>
