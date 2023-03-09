@@ -28,22 +28,32 @@ pub fn show_translate_window() {
             .skip_taskbar(true)
             .center()
             .focused(true)
-            .title("OpenAI Translator")
-            .title_bar_style(tauri::TitleBarStyle::Overlay)
-            .hidden_title(true);
+            .title("OpenAI Translator");
 
-             // if is windows or linux
              if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
                  builder = builder.decorations(false)
+             } else {
+                 builder = builder
+                     .title_bar_style(tauri::TitleBarStyle::Overlay)
+                     .hidden_title(true);
              }
 
-             let window = builder.build().unwrap();
+             #[cfg(target_os = "macos")]
+             {
+                 builder.build().unwrap();
+             }
 
              #[cfg(target_os = "windows")]
-             set_shadow(&window, true).unwrap();
+             {
+                 let window = builder.build().unwrap();
+                 set_shadow(&window, true).unwrap();
+             }
 
              #[cfg(target_os = "linux")]
-             set_shadow(&window, true).unwrap();
+             {
+                 let window = builder.build().unwrap();
+                 set_shadow(&window, true).unwrap();
+             }
         }
     }
 }
