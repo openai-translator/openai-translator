@@ -1,27 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="index.css" />
-    <script src="index.js" type="application/javascript" defer></script>
-    <title>OpenAI Translator</title>
-    <style>
-      .draggable {
-        height: 30px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        -webkit-app-region: drag;
-      }
-    </style>
-  </head>
-  <body style="position: relative; min-height: 100vh;">
-    <div id="root"></div>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="stylesheet" href="index.css" />
+        <script src="index.js" type="application/javascript" defer></script>
+        <title>OpenAI Translator</title>
+        <style>
+            .titlebar {
+                height: 30px;
+                background: transparent;
+                user-select: none;
+                display: flex;
+                justify-content: flex-end;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 2147483647;
+            }
+            .titlebar-button {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                width: 30px;
+                height: 30px;
+            }
+            .titlebar-button:hover {
+                background: #e9e9e9;
+            }
+        </style>
+    </head>
+    <body style="position: relative; min-height: 100vh">
+        <div id="root"></div>
+    </body>
 </html>
