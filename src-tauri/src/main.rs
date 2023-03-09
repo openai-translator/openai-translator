@@ -3,22 +3,21 @@
     windows_subsystem = "windows"
 )]
 
-mod utils;
 mod config;
+mod utils;
 mod windows;
 
 use crate::config::get_config_content;
-use crate::windows::{show_translate_window};
+use crate::windows::show_translate_window;
 use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
 use tauri::AppHandle;
-
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             Notification::new(&app.config().tauri.bundle.identifier)
                 .title("OpenAI Translator is already running")
                 .body("You can only run one instance of OpenAI Translator at a time.")

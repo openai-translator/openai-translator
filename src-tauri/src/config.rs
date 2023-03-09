@@ -7,6 +7,7 @@ pub struct Config {
     pub hotkey: Option<String>,
 }
 
+#[allow(unused)]
 pub fn get_config() -> Result<Config, String> {
     let config_content = match get_config_content() {
         Ok(content) => content,

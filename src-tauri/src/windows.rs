@@ -38,7 +38,6 @@ pub fn show_translate_window() {
              }
 
              let window = builder.build().unwrap();
-             window.set_position(PhysicalPosition::new(x, y)).unwrap();
 
              #[cfg(target_os = "windows")]
              set_shadow(&window, true).unwrap();
