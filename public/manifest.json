@@ -4,6 +4,12 @@
     "name": "OpenAI Translator",
     "description": "OpenAI-Translator is a Chrome extension that uses the ChatGPT API for translation.",
     "version": "0.0.14",
+    "icons": {
+        "16": "icon.png",
+        "32": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+    },
 
     "options_ui": {
         "page": "options.html"
@@ -26,7 +32,7 @@
         "service_worker": "js/background.js"
     },
 
-    "permissions": ["storage", "tts"],
+    "permissions": ["storage", "tts", "contextMenus"],
 
     "host_permissions": ["https://*.openai.com/"]
 }
