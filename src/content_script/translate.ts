@@ -84,7 +84,7 @@ export async function translate(query: TranslateQuery) {
             break
         case 'explain-indictors':
             systemPrompt =
-                '你是最专业的全科医生，你可以解释任何指标，但是你不能解释指标的意义。并告诉我指标的意义，以及指标偏离的不良影响'
+                'You are the most professional general practitioner, you can explain any indicators in the medical examination report. However, not only do you need to explain the meaning of these indicators, but also inform about the adverse consequences of deviating from them.'
             if (toChinese) {
                 assistantPrompt =
                     '用最简洁的语言使用中文解释此段指标。如果内容不是指标，请返回错误提示。如果指标有明显的错误，请指出。'
