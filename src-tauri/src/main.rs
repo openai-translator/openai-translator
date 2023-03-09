@@ -4,11 +4,10 @@
 )]
 
 mod config;
-mod window_ext;
 
 use crate::config::get_config_content;
-use crate::window_ext::WindowExt;
 use tauri::Manager;
+use window_shadows::set_shadow;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -18,12 +17,13 @@ fn greet(name: &str) -> String {
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            #[cfg(target_os = "macos")]
-            {
-                let win = app.get_window("main").unwrap();
-                win.set_transparent_titlebar(true, false);
+            // if windows or linux
+            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
+                let window = app.get_window("main").unwrap();
+                set_shadow(&window, true).unwrap();
+                window.set_decorations(false)?;
+                set_shadow(&window, true).expect("Unsupported platform!");
             }
-
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet, get_config_content])

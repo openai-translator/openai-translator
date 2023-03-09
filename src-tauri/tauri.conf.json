@@ -95,7 +95,8 @@
         "minHeight": 600,
         "resizable": true,
         "title": "OpenAI Translator",
-        "titleBarStyle": "Transparent"
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
       }
     ]
   }
