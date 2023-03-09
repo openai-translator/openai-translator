@@ -4,3 +4,6 @@ dist/
 tmp/
 .DS_Store
 *.json-e
+
+.vscode
+.idea
