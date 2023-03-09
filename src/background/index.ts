@@ -11,22 +11,20 @@ async function handleSpeakDone() {
 if (isFirefox) {
     const utterance = new SpeechSynthesisUtterance()
     utterance.addEventListener('end', handleSpeakDone)
-    browser.runtime.onMessage.addListener(async function (request) {
+    browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'speak') {
             utterance.text = request.text
-            const lang = await detectLang(request.text)
-            utterance.lang = lang ?? 'en'
+            utterance.lang = request.lang
             speechSynthesis.speak(utterance)
         } else if (request.type === 'stopSpeaking') {
             speechSynthesis.cancel()
         }
     })
 } else {
-    browser.runtime.onMessage.addListener(async function (request) {
+    browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'speak') {
-            const lang = await detectLang(request.text)
             chrome.tts.speak(request.text, {
-                lang: lang ?? 'en',
+                lang: request.lang,
                 onEvent: function (event) {
                     if (
                         event.type === 'end' ||

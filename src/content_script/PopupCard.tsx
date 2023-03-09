@@ -617,6 +617,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         browser.runtime.sendMessage({
                                                             type: 'speak',
                                                             text: editableText,
+                                                            lang: detectFrom,
                                                         })
                                                     })()
                                                 }}
@@ -700,6 +701,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     browser.runtime.sendMessage({
                                                                         type: 'speak',
                                                                         text: translatedText,
+                                                                        lang: detectTo,
                                                                     })
                                                                 })()
                                                             }}
