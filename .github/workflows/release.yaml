@@ -32,6 +32,7 @@ jobs:
         id: create-release
         uses: ncipollo/release-action@v1
         with:
+          draft: true
           name: ${{ steps.get_version.outputs.version }}
           tag: ${{ steps.get_version.outputs.version }}
           body: "${{ steps.tag.outputs.message }}"
