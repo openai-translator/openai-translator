@@ -1,8 +1,15 @@
-OpenAI Translator Chrome Extension
-----------------------------------
+OpenAI Translator Browser Extension And Desktop Application
+-----------------------------------------------------------
 
 我开发了一个 Bob 的插件 [bob-plugin-openai-translator](https://github.com/yetone/bob-plugin-openai-translator) 使用 ChatGPT API 在 macOS 上进行全局划词翻译，
 但是由于很多用户并不是 macOS 用户，所以特此开发了一个浏览器插件方便非 macOS 用户使用 ChatGPT 进行划词翻译。
+
+# 既是浏览器插件也是跨平台桌面端应用！
+
+* 注：桌面端应用暂不支持划词，但是即将支持，敬请期待！
+
+<img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
+
 
 # 使用截图
 
@@ -16,8 +23,33 @@ OpenAI Translator Chrome Extension
 4. 支持自定义翻译文本
 5. 支持一键复制
 6. 支持 TTS
+7. 有桌面端应用，全平台（Windows + macOS + Linux）支持！
 
-# 安装方法
+# 桌面应用版安装方法
+
+1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的 zip 包
+
+2. 下载完毕后解压 zip 包
+
+3. 打开解压后的文件
+
+* Windows 用户
+
+    Windows 用户双击解压出来的文件夹里的 `OpenAI Translator` 即可使用！
+    
+* macOS 用户
+
+    macOS 用户解压出来的是一个名字叫 `OpenAI Translator` 的应用，建议把解压出来的应用拖动到 `Applications` 目录中，macOS 用户第一次打开可能会遇到如下报错：
+
+    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+
+    点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
+
+    <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+
+    <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+
+# 浏览器插件安装方法
 
 由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
 
