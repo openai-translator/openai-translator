@@ -98,6 +98,52 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
     <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
+  macOS 13 is currently known to have none of these prompts, so please do as follows:
+
+  1. Trust the developer and ask for a password:
+
+  `sudo spctl --master-disable`
+
+  2. Allow OpenAI Translator
+
+  `xattr -cr /Applications/OpenAI\ Translator.app`
+
+  If prompted with the following
+
+  ```
+  option -r not recognized
+  
+  usage: xattr [-slz] file [file ...]
+         xattr -p [-slz] attr_name file [file ...]
+         xattr -w [-sz] attr_name attr_value file [file ...]
+         xattr -d [-s] attr_name file [file ...]
+         xattr -c [-s] file [file ...]
+  
+  The first form lists the names of all xattrs on the given file(s).
+  The second form (-p) prints the value of the xattr attr_name.
+  The third form (-w) sets the value of the xattr attr_name to attr_value.
+  The fourth form (-d) deletes the xattr attr_name.
+  The fifth form (-c) deletes (clears) all xattrs.
+  
+  options:
+    -h: print this help
+    -s: act on symbolic links themselves rather than their targets
+    -l: print long format (attr_name: attr_value)
+    -z: compress or decompress (if compressed) attribute value in zip format
+  ```
+
+  3. Execute commands
+
+  `xattr -c /Applications/OpenAI\ Translator.app/*`
+
+  4. If the above command still does not work, try the following command:
+
+  `sudo xattr -d com.apple.quarantine /Applications/OpenAI\ Translator.app/`
+
+# 浏览器插件安装方法
+
+由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
+
 # Installation(Browser Extension)
 
 1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install this extension.
