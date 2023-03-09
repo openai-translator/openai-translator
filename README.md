@@ -6,7 +6,7 @@ OpenAI Translator Browser Extension And Desktop Application
 
 # 既是浏览器插件也是跨平台桌面端应用！
 
-去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的 zip 包，下载完毕后解压 zip 即可使用！
+桌面应用版本去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的 zip 包，下载完毕后解压 zip 包，双击解压出来的文件夹里的 `OpenAI Translator` 即可使用！
 
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
@@ -23,7 +23,7 @@ OpenAI Translator Browser Extension And Desktop Application
 5. 支持一键复制
 6. 支持 TTS
 
-# 安装方法
+# 浏览器插件安装方法
 
 由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
 
