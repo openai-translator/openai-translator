@@ -2,6 +2,10 @@ use crate::utils::copy;
 use crate::APP_HANDLE;
 use enigo::Enigo;
 use tauri::{Manager, PhysicalPosition};
+#[cfg(target_os = "windows")]
+use window_shadows::set_shadow;
+#[cfg(target_os = "linux")]
+use window_shadows::set_shadow;
 
 const TRANSLATOR_WIN_NAME: &str = "translator";
 
