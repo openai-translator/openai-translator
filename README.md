@@ -6,7 +6,7 @@ OpenAI Translator Chrome Extension
 
 # 既是浏览器插件也是跨平台桌面端应用！
 
-<img width="560" src="https://user-images.githubusercontent.com/1206493/223898114-985bd848-e682-4957-9b22-45f89dd55c2e.png" />
+<img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
 # 使用截图
 
