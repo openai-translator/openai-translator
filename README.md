@@ -48,6 +48,12 @@ OpenAI Translator Browser Extension And Desktop Application
     <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
     <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+    
+    如果以上还是不行，可以采用一下命令行，打开终端，输入以下命令
+    ```shell
+    # 输入密码，回车即可
+    sudo xattr -r -d com.apple.quarantine /Applications/OpenAI\ Translator.app/
+    ```
 
 # 浏览器插件安装方法
 
