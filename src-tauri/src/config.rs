@@ -1,4 +1,20 @@
+use serde::{Deserialize, Serialize};
 use tauri::api::path::config_dir;
+
+#[derive(Deserialize, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Config {
+    pub hotkey: Option<String>,
+}
+
+pub fn get_config() -> Result<Config, String> {
+    let config_content = match get_config_content() {
+        Ok(content) => content,
+        Err(err) => return Err(err),
+    };
+    let config: Config = serde_json::from_str(config_content.as_str()).unwrap();
+    Ok(config)
+}
 
 #[tauri::command]
 pub fn get_config_content() -> Result<String, String> {

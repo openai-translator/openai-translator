@@ -86,18 +86,6 @@
     "updater": {
       "active": false
     },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 700,
-        "width": 600,
-        "minWidth": 560,
-        "minHeight": 600,
-        "resizable": true,
-        "title": "OpenAI Translator",
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true
-      }
-    ]
+    "windows": []
   }
 }

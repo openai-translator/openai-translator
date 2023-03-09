@@ -3,30 +3,36 @@
     windows_subsystem = "windows"
 )]
 
+mod utils;
 mod config;
+mod windows;
 
 use crate::config::get_config_content;
-use tauri::Manager;
-use window_shadows::set_shadow;
+use crate::windows::{show_translate_window, bind_hotkey};
+use once_cell::sync::OnceCell;
+use tauri::api::notification::Notification;
+use tauri::AppHandle;
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}!", name)
-}
+
+pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            Notification::new(&app.config().tauri.bundle.identifier)
+                .title("OpenAI Translator is already running")
+                .body("You can only run one instance of OpenAI Translator at a time.")
+                .icon("icons/icon.png")
+                .notify(app)
+                .unwrap();
+        }))
         .setup(|app| {
-            // if windows or linux
-            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
-                let window = app.get_window("main").unwrap();
-                set_shadow(&window, true).unwrap();
-                window.set_decorations(false)?;
-                set_shadow(&window, true).expect("Unsupported platform!");
-            }
+            APP_HANDLE.get_or_init(|| app.handle());
+            show_translate_window();
+            bind_hotkey();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, get_config_content])
+        .invoke_handler(tauri::generate_handler![get_config_content])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
