@@ -28,6 +28,11 @@ jobs:
           echo "$(git tag -l --format='%(contents)' ${{ steps.get_version.outputs.version }})" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Change Version
+        env:
+          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
+        run: make change-version
+
       - name: Create Release
         id: create-release
         uses: ncipollo/release-action@v1
