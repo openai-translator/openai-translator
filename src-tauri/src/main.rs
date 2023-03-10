@@ -18,11 +18,11 @@ fn main() {
     tauri::Builder::default()
         .setup(|app| {
             // if windows or linux
-            if cfg!(target_os = "windows") {
+            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
                 let window = app.get_window("main").unwrap();
-                set_shadow(&window, true).unwrap();
                 window.set_decorations(false)?;
-                set_shadow(&window, true).expect("Unsupported platform!");
+                // Try set shadow and ignore errors if it failed.
+                set_shadow(&window, true).unwrap_or_default();
             }
             Ok(())
         })
