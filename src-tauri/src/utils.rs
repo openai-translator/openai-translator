@@ -68,11 +68,14 @@ pub fn copy() {
 
 pub fn get_selected_text() -> String {
     let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-    let current_text = ctx.get_contents();
+    let current_text = ctx.get_contents().unwrap();
     copy();
     match ctx.get_contents() {
         Ok(selected_text) => {
-            ctx.set_contents(current_text.unwrap()).unwrap();
+            if selected_text == current_text {
+                return "".to_string();
+            }
+            ctx.set_contents(current_text).unwrap();
             selected_text
         }
         Err(_) => "failed to get selected text".to_string(),
