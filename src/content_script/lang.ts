@@ -71,6 +71,7 @@ export const supportLanguages: [string, string][] = [
     ['ka', 'ქართული'],
     ['kk', 'Қазақ'],
     ['vi', 'Vietnamese'],
+    ['tr', 'Türkçe'],
 ]
 
 export const langMap: Map<string, string> = new Map(supportLanguages)
