@@ -1,10 +1,20 @@
 import { createParser } from 'eventsource-parser'
 import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
 
+function attachEventsToContainer($container: HTMLElement) {
+    $container.addEventListener('mousedown', (event) => {
+        event.stopPropagation()
+    })
+    $container.addEventListener('mouseup', (event) => {
+        event.stopPropagation()
+    })
+}
+
 export async function getContainer(): Promise<HTMLElement> {
     let $container: HTMLElement | null = document.querySelector(containerTagName)
     if (!$container) {
         $container = document.createElement(containerTagName)
+        attachEventsToContainer($container)
         $container.style.zIndex = zIndex
         return new Promise((resolve) => {
             setTimeout(() => {

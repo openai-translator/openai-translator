@@ -85,12 +85,6 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $popupCard.style.color = '#333'
         $popupCard.style.font =
             '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
-        $popupCard.addEventListener('mousedown', (event) => {
-            event.stopPropagation()
-        })
-        $popupCard.addEventListener('mouseup', (event) => {
-            event.stopPropagation()
-        })
         const $container = await getContainer()
         $container.appendChild($popupCard)
     }
@@ -157,12 +151,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $popupThumb.style.overflow = 'hidden'
         $popupThumb.addEventListener('click', popupThumbClickHandler)
         $popupThumb.addEventListener('mousemove', (event) => {
-            event.stopPropagation()
-        })
-        $popupThumb.addEventListener('mousedown', (event) => {
-            event.stopPropagation()
-        })
-        $popupThumb.addEventListener('mouseup', (event) => {
             event.stopPropagation()
         })
         const $img = document.createElement('img')

@@ -308,11 +308,18 @@ export function PopupCard(props: IPopupCardProps) {
         if (isDesktopApp()) {
             return
         }
-
         const $header = headerRef.current
         if (!$header) {
             return undefined
         }
+
+        let $popupCard: HTMLDivElement | null = null
+        ;(async () => {
+            $popupCard = await queryPopupCardElement()
+            if (!$popupCard) {
+                return
+            }
+        })()
 
         let closed = true
 
@@ -320,16 +327,17 @@ export function PopupCard(props: IPopupCardProps) {
             closed = false
             e = e || window.event
             e.preventDefault()
-            document.addEventListener('mouseup', closeDragElement)
+            $popupCard?.addEventListener('mouseup', closeDragElement)
             document.addEventListener('mousemove', elementDrag)
+            document.addEventListener('mouseup', closeDragElement)
         }
 
         const elementDrag = async (e: MouseEvent) => {
-            const $popupCard = await queryPopupCardElement()
-            if (!$popupCard) {
+            e.stopPropagation()
+            if (closed) {
                 return
             }
-            if (closed) {
+            if (!$popupCard) {
                 return
             }
             e = e || window.event
@@ -360,8 +368,9 @@ export function PopupCard(props: IPopupCardProps) {
 
         const closeDragElement = () => {
             closed = true
-            document.removeEventListener('mouseup', closeDragElement)
+            $popupCard?.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('mousemove', elementDrag)
+            document.removeEventListener('mouseup', closeDragElement)
         }
 
         $header.addEventListener('mousedown', dragMouseDown)
