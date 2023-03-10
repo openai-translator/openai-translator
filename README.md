@@ -102,11 +102,15 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install it.
 
-2. Fill in the API Key:
+2. Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
+
+<img width="600" src="https://user-images.githubusercontent.com/1206493/223043946-0e7486ca-94d7-4324-a4f2-f62b9a3d527d.png" />
+
+3. Click on the OpenAI Translator icon in the browser extension list, and fill in the API Key in the pop-up window that appears.
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
-3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
+4. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # Buy me a coffee
 
