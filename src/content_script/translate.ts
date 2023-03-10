@@ -32,8 +32,8 @@ export async function translate(query: TranslateQuery) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
     }
-    const fromChinese = chineseLangs.indexOf(query.detectFrom) > 0
-    const toChinese = chineseLangs.indexOf(query.detectTo) > 0
+    const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
+    const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
     let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
@@ -96,7 +96,7 @@ export async function translate(query: TranslateQuery) {
                 content: systemPrompt,
             },
             {
-                role: 'assistant',
+                role: 'user',
                 content: assistantPrompt,
             },
             { role: 'user', content: `"${query.text}"` },
