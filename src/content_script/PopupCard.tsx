@@ -9,7 +9,7 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
-import { MdOutlineSummarize, MdCode } from 'react-icons/md'
+import { MdOutlineSummarize, MdOutlineAnalytics, MdCode } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
@@ -240,7 +240,7 @@ export function PopupCard(props: IPopupCardProps) {
         ;(async () => {
             const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
-            if (translateMode === 'translate' && !stopAutomaticallyChangeDetectTo.current) {
+            if ((translateMode === 'translate' || translateMode === 'analyze') && !stopAutomaticallyChangeDetectTo.current) {
                 const settings = await getSettings()
                 setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
             }
@@ -317,6 +317,9 @@ export function PopupCard(props: IPopupCardProps) {
                 case 'summarize':
                     setActionStr('Summarizing...')
                     break
+                case 'analyze':
+                    setActionStr('Analyzing...')
+                    break
                 case 'explain-code':
                     setActionStr('Explaining...')
                     break
@@ -354,6 +357,12 @@ export function PopupCard(props: IPopupCardProps) {
                                     break
                                 case 'summarize':
                                     setActionStr('Summarized')
+                                    break
+                                case 'analyze':
+                                    setActionStr('Analyzed')
+                                    break
+                                case 'explain-code':
+                                    setActionStr('Explained')
                                     break
                             }
                         }
@@ -556,6 +565,15 @@ export function PopupCard(props: IPopupCardProps) {
                                                 }}
                                             >
                                                 <MdOutlineSummarize />
+                                            </Button>
+                                        </StatefulTooltip>
+                                        <StatefulTooltip content='Analyze' placement='top' showArrow>
+                                            <Button
+                                                size='mini'
+                                                kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
+                                                onClick={() => setTranslateMode('analyze')}
+                                            >
+                                                <MdOutlineAnalytics />
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip content='Explain Code' placement='top' showArrow>
