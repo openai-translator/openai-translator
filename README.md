@@ -100,7 +100,7 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Installation(Browser Extension)
 
-1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install it.
+1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install this extension.
 
 2. Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
 
