@@ -3,22 +3,24 @@ import browser from 'webextension-polyfill'
 const isFirefox = /firefox/i.test(navigator.userAgent)
 
 async function handleSpeakDone() {
-    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
+    const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true })
     tab.id && browser.tabs.sendMessage(tab.id, { type: 'speakDone' })
 }
 
+function handleSpeak(request) {
+    if (request.type === 'speak') {
+        const utterance = new SpeechSynthesisUtterance()
+        utterance.text = request.text
+        utterance.lang = request.lang
+        utterance.addEventListener('end', handleSpeakDone)
+        speechSynthesis.speak(utterance)
+    } else if (request.type === 'stopSpeaking') {
+        speechSynthesis.cancel()
+    }
+}
+
 if (isFirefox) {
-    const utterance = new SpeechSynthesisUtterance()
-    utterance.addEventListener('end', handleSpeakDone)
-    browser.runtime.onMessage.addListener(function (request) {
-        if (request.type === 'speak') {
-            utterance.text = request.text
-            utterance.lang = request.lang
-            speechSynthesis.speak(utterance)
-        } else if (request.type === 'stopSpeaking') {
-            speechSynthesis.cancel()
-        }
-    })
+    browser.runtime.onMessage.addListener(handleSpeak)
 } else {
     browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'speak') {
