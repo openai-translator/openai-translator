@@ -184,7 +184,20 @@ export function Settings(props: IPopupProps) {
                             required
                             name='apiKeys'
                             label='API Key'
-                            caption='You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                            caption={
+                                <div>
+                                    Go to the{' '}
+                                    <a
+                                        target='_blank'
+                                        href='https://platform.openai.com/account/api-keys'
+                                        rel='noreferrer'
+                                    >
+                                        OpenAI page
+                                    </a>{' '}
+                                    to get your API Key. You can separate multiple API Keys with English commas to
+                                    achieve quota doubling and load balancing.
+                                </div>
+                            }
                         >
                             <Input autoFocus type='password' size='compact' />
                         </FormItem>
