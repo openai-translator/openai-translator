@@ -61,6 +61,7 @@
     "@types/node": "^18.14.6",
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.1",
+    "@types/tampermonkey": "^4.0.10",
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",

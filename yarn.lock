@@ -1252,6 +1252,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/tampermonkey@^4.0.10":
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/@types/tampermonkey/-/tampermonkey-4.0.10.tgz#d5f8eaedce5fd6d57f74d890c59ee6f70b4e8683"
+  integrity sha512-E3SYtXgeXG/nnq6uAPiZh7i0XA8jLbtiXraxxHTnsSjzQcQMxWBzbcoGkHgiC+zbHXxxkynUT9zt85SpF8loNw==
+
 "@types/verror@^1.10.3":
   version "1.10.6"
   resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.6.tgz#3e600c62d210c5826460858f84bcbb65805460bb"
