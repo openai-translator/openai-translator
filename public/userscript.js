@@ -7,7 +7,7 @@
 // @author          yetone,maltoze
 // @icon64          https://cdn.jsdelivr.net/gh/yetone/openai-translator@main/public/icon.png
 // @match           *://*/*
-// @require         https://cdn.jsdelivr.net/gh/yetone/openai-translator@tree/main/dist/userscript/index.js
+// @require         https://cdn.jsdelivr.net/gh/yetone/openai-translator@main/dist/userscript/index.js
 // @grant           GM.setValue
 // @grant           GM.getValue
 // @license         MIT
