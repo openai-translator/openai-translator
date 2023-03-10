@@ -4,6 +4,7 @@ import * as lang from './lang'
 import { fetchSSE } from './utils'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
+export type Provider = 'OpenAI' | 'Azure'
 
 export interface TranslateQuery {
     text: string
@@ -30,10 +31,17 @@ export async function translate(query: TranslateQuery) {
     const trimFirstQuotation = !query.selectedWord
     const settings = await utils.getSettings()
     const apiKey = await utils.getApiKey()
-    const headers = {
+    let headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
     }
+
+    switch (settings.provider) {
+        case 'OpenAI':
+            headers['Authorization'] = `Bearer ${apiKey}`
+        case 'Azure':
+            headers['api-key'] = `${apiKey}`
+    }
+
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
@@ -135,7 +143,7 @@ export async function translate(query: TranslateQuery) {
 
     let isFirst = true
 
-    await fetchSSE(`${settings.apiURL}/v1/chat/completions`, {
+    await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
