@@ -66,9 +66,6 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
-                containerStyle={{
-                    paddingTop: '20px',
-                }}
             />
         </div>
     )
