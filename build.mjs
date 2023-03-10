@@ -3,6 +3,7 @@ import esbuild from 'esbuild'
 import fs from 'fs-extra'
 
 const browserExtensionOutDir = 'dist/browser-extension'
+const userscriptOutDir = 'dist/userscript'
 
 async function esbuildBrowserExtension() {
     await esbuild.build({
@@ -75,6 +76,12 @@ async function build() {
     )
 
     await zipFolder(`./${browserExtensionOutDir}/firefox`)
+
+    // userscript
+    await copyFiles(
+        [{ src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' }],
+        `./${userscriptOutDir}`
+    )
 
     console.log('Build success.')
 }

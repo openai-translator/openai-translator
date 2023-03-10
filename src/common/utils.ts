@@ -67,6 +67,9 @@ export async function getBrowser(): Promise<IBrowser> {
     if (isTauri()) {
         return (await import('./tauri-polyfill')).tauriBrowser
     }
+    if (isUserscript()) {
+        return (await import('./userscript-polyfill')).userscriptBrowser
+    }
     return await require('webextension-polyfill')
 }
 
@@ -80,4 +83,9 @@ export const isTauri = () => {
 
 export const isDesktopApp = () => {
     return isElectron() || isTauri()
+}
+
+export const isUserscript = () => {
+    // eslint-disable-next-line camelcase
+    return typeof GM_info !== 'undefined'
 }
