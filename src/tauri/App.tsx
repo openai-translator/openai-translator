@@ -9,12 +9,13 @@ const engine = new Styletron({
 
 export function App() {
     const isMacOS = navigator.userAgent.includes('Mac OS X')
+    const isLinux = navigator.userAgent.includes('Linux')
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (isMacOS) {
+        if (isMacOS || isLinux) {
             return
         }
         function handleMinimize() {
@@ -44,7 +45,7 @@ export function App() {
             }}
         >
             <div className='titlebar' data-tauri-drag-region>
-                {!isMacOS && (
+                {!isMacOS && !isLinux && (
                     <>
                         <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
                             <img src='https://api.iconify.design/mdi:window-minimize.svg' alt='minimize' />
