@@ -100,7 +100,7 @@
 
 由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
 
-1. 去 [Chrome 应用商店](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) 安装即可
+1. 去 [Chrome 应用商店](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) 安装此插件
 
 2. 去 [OpenAI](https://platform.openai.com/account/api-keys) 获取你的 API KEY
 
