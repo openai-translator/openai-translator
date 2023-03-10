@@ -22,7 +22,7 @@
 <!-- Rust Badge -->
 <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
+<a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
 <img alt="Chrome" src="https://img.shields.io/badge/-Chrome-green?style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
 
