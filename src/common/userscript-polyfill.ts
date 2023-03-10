@@ -55,3 +55,32 @@ class Browser implements IBrowser {
 }
 
 export const userscriptBrowser = new Browser()
+
+export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<any> {
+    return new Promise((resolve) => {
+        const handle = GM_xmlhttpRequest({
+            url,
+            data: body as string,
+            headers: headers as any,
+            method: method as any,
+            responseType: 'stream' as any,
+            onreadystatechange: async function (r) {
+                Object.assign(r, { body: r.response, status: r.status })
+                if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                    if (r.status === 200) {
+                        resolve(r)
+                    } else {
+                        const reader = r.response.getReader()
+                        const { value } = await reader.read()
+                        const str = new TextDecoder().decode(value)
+                        Object.assign(r, { json: () => JSON.parse(str) })
+                        resolve(r)
+                    }
+                }
+            },
+        })
+        signal?.addEventListener('abort', () => {
+            handle.abort()
+        })
+    })
+}
