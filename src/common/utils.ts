@@ -86,5 +86,6 @@ export const isDesktopApp = () => {
 }
 
 export const isUserscript = () => {
+    // eslint-disable-next-line camelcase
     return typeof GM_info !== 'undefined'
 }
