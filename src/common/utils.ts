@@ -1,5 +1,6 @@
-import browser from 'webextension-polyfill'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TranslateMode } from '../content_script/translate'
+import { IBrowser } from './types'
 
 export interface ISettings {
     apiKeys: string
@@ -32,6 +33,7 @@ const settingKeys: Record<keyof ISettings, number> = {
 }
 
 export async function getSettings(): Promise<ISettings> {
+    const browser = await getBrowser()
     const items = await browser.storage.sync.get(Object.keys(settingKeys))
 
     const settings = items as ISettings
@@ -54,5 +56,28 @@ export async function getSettings(): Promise<ISettings> {
 }
 
 export async function setSettings(settings: ISettings) {
+    const browser = await getBrowser()
     await browser.storage.sync.set(settings)
+}
+
+export async function getBrowser(): Promise<IBrowser> {
+    if (isElectron()) {
+        return (await import('./electron-polyfill')).electronBrowser
+    }
+    if (isTauri()) {
+        return (await import('./tauri-polyfill')).tauriBrowser
+    }
+    return await require('webextension-polyfill')
+}
+
+export const isElectron = () => {
+    return navigator.userAgent.indexOf('Electron') >= 0
+}
+
+export const isTauri = () => {
+    return window['__TAURI__' as any] !== undefined
+}
+
+export const isDesktopApp = () => {
+    return isElectron() || isTauri()
 }

@@ -1,9 +1,9 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { Popup } from '../popup'
+import { Settings } from '../popup/Settings'
 
 const Options = () => {
-    return <Popup />
+    return <Settings />
 }
 
 const root = createRoot(document.getElementById('root') as HTMLElement)

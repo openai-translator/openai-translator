@@ -1,0 +1,15 @@
+mainConfig:
+  type: esbuild
+  path: esbuild.main.config.ts
+  src: src/electron/main/main.ts
+  output:
+    dir: dist/electron/main
+    filename: main.js
+rendererConfig:
+  type: esbuild
+  path: esbuild.renderer.config.ts
+  html: src/electron/renderer/index.html
+  src: src/electron/renderer/index.tsx
+  output:
+    dir: dist/electron/renderer
+    filename: index.js

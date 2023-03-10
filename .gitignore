@@ -2,5 +2,11 @@ npm-debug.log
 node_modules/
 dist/
 tmp/
+release/
+yarn-error.log
+npm-error.log
 .DS_Store
 *.json-e
+
+.vscode
+.idea

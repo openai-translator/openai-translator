@@ -172,10 +172,10 @@ async function main() {
             if (!text) {
                 if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                     const elem = event.target
-                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
+                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0).trim()
                 }
             }
-            ;(await utils.getSettings()).autoTranslate === true
+            ;(await utils.getSettings()).autoTranslate === true && text
                 ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
                 : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
         })
