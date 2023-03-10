@@ -91,7 +91,8 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = `${x}px`
+    $popupCard.style.left = x + 600 > window.innerWidth ? 'auto' : `${x}px`
+    $popupCard.style.right = x + 600 > window.innerWidth ? '18px' : 'unset'
     $popupCard.style.top = `${y}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,10 +176,10 @@ async function main() {
             if (!text) {
                 if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                     const elem = event.target
-                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
+                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0).trim()
                 }
             }
-            ;(await utils.getSettings()).autoTranslate === true
+            ;(await utils.getSettings()).autoTranslate === true && text
                 ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
                 : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
         })

@@ -9,7 +9,7 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
-import { MdOutlineSummarize, MdCode } from 'react-icons/md'
+import { MdOutlineSummarize, MdOutlineAnalytics, MdCode } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
@@ -53,6 +53,7 @@ const useStyles = createUseStyles({
         alignItems: 'center',
         padding: '5px 10px',
         borderBottom: '1px solid #e8e8e8',
+        minWidth: '510px',
     },
     'iconContainer': {
         display: 'flex',
@@ -198,6 +199,7 @@ export interface IPopupCardProps {
     showSettings?: boolean
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
+    editorRows?: number
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -239,7 +241,10 @@ export function PopupCard(props: IPopupCardProps) {
         ;(async () => {
             const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
-            if (translateMode === 'translate' && !stopAutomaticallyChangeDetectTo.current) {
+            if (
+                (translateMode === 'translate' || translateMode === 'analyze') &&
+                !stopAutomaticallyChangeDetectTo.current
+            ) {
                 const settings = await getSettings()
                 setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
             }
@@ -280,8 +285,28 @@ export function PopupCard(props: IPopupCardProps) {
             }
             e = e || window.event
             e.preventDefault()
-            $popupCard.style.top = $popupCard.offsetTop + e.movementY + 'px'
-            $popupCard.style.left = $popupCard.offsetLeft + e.movementX + 'px'
+            const [l, t] = overflowCheck($popupCard, e)
+            $popupCard.style.top = `${t}px`
+            $popupCard.style.left = `${l}px`
+            $popupCard.style.right = 'unset'
+        }
+
+        const overflowCheck = ($popupCard: HTMLDivElement, e: MouseEvent) => {
+            let left = $popupCard.offsetLeft
+            let top = $popupCard.offsetTop
+            if (
+                $popupCard.offsetLeft + e.movementX > 10 &&
+                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > 18
+            ) {
+                left = $popupCard.offsetLeft + e.movementX
+            }
+            if (
+                $popupCard.offsetTop + e.movementY > 10 &&
+                window.innerHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight > 10
+            ) {
+                top = $popupCard.offsetTop + e.movementY
+            }
+            return [left, top]
         }
 
         const closeDragElement = () => {
@@ -315,6 +340,9 @@ export function PopupCard(props: IPopupCardProps) {
                     break
                 case 'summarize':
                     setActionStr('Summarizing...')
+                    break
+                case 'analyze':
+                    setActionStr('Analyzing...')
                     break
                 case 'explain-code':
                     setActionStr('Explaining...')
@@ -353,6 +381,12 @@ export function PopupCard(props: IPopupCardProps) {
                                     break
                                 case 'summarize':
                                     setActionStr('Summarized')
+                                    break
+                                case 'analyze':
+                                    setActionStr('Analyzed')
+                                    break
+                                case 'explain-code':
+                                    setActionStr('Explained')
                                     break
                             }
                         }
@@ -557,6 +591,15 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineSummarize />
                                             </Button>
                                         </StatefulTooltip>
+                                        <StatefulTooltip content='Analyze' placement='top' showArrow>
+                                            <Button
+                                                size='mini'
+                                                kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
+                                                onClick={() => setTranslateMode('analyze')}
+                                            >
+                                                <MdOutlineAnalytics />
+                                            </Button>
+                                        </StatefulTooltip>
                                         <StatefulTooltip content='Explain Code' placement='top' showArrow>
                                             <Button
                                                 size='mini'
@@ -601,7 +644,11 @@ export function PopupCard(props: IPopupCardProps) {
                                             value={editableText}
                                             size='mini'
                                             resize='vertical'
-                                            rows={Math.min(Math.max(editableText.split('\n').length, 3), 12)}
+                                            rows={
+                                                props.editorRows
+                                                    ? props.editorRows
+                                                    : Math.min(Math.max(editableText.split('\n').length, 3), 12)
+                                            }
                                             onChange={(e) => setEditableText(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
