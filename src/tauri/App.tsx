@@ -66,6 +66,10 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
+                containerStyle={isLinux
+                    ? { paddingTop: '0px' }
+                    : { paddingTop: '20px' }
+                }
             />
         </div>
     )
