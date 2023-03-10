@@ -3,7 +3,7 @@ import * as utils from '../common/utils'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
-export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'explain-code'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
 
 export interface TranslateQuery {
     text: string
@@ -32,8 +32,8 @@ export async function translate(query: TranslateQuery) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
     }
-    const fromChinese = chineseLangs.indexOf(query.detectFrom) > 0
-    const toChinese = chineseLangs.indexOf(query.detectTo) > 0
+    const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
+    const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
     let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
@@ -69,7 +69,18 @@ export async function translate(query: TranslateQuery) {
                 } language!`
             }
             break
-
+        case 'analyze':
+            systemPrompt = 'You are a translation engine and grammar analyzer.'
+            if (toChinese) {
+                assistantPrompt = `请翻译此段文本并解析原文中的语法`
+            } else {
+                assistantPrompt = `translate this text to ${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                } and explain the grammar in the original text using ${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }`
+            }
+            break
         case 'explain-code':
             systemPrompt =
                 'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
@@ -96,7 +107,7 @@ export async function translate(query: TranslateQuery) {
                 content: systemPrompt,
             },
             {
-                role: 'assistant',
+                role: 'user',
                 content: assistantPrompt,
             },
             { role: 'user', content: `"${query.text}"` },
