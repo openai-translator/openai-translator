@@ -17,9 +17,19 @@ pub fn menu() -> SystemTray {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
-    SystemTray::new()
-        .with_menu(tray_menu)
-        .with_menu_on_left_click(false)
+    #[cfg(target_os = "macos")]
+    {
+        SystemTray::new()
+            .with_menu(tray_menu)
+            .with_menu_on_left_click(false)
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        SystemTray::new()
+            .with_menu(tray_menu)
+    }
+
 }
 
 pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
