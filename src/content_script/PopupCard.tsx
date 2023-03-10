@@ -53,6 +53,7 @@ const useStyles = createUseStyles({
         alignItems: 'center',
         padding: '5px 10px',
         borderBottom: '1px solid #e8e8e8',
+        minWidth: '510px',
     },
     'iconContainer': {
         display: 'flex',
@@ -284,8 +285,28 @@ export function PopupCard(props: IPopupCardProps) {
             }
             e = e || window.event
             e.preventDefault()
-            $popupCard.style.top = $popupCard.offsetTop + e.movementY + 'px'
-            $popupCard.style.left = $popupCard.offsetLeft + e.movementX + 'px'
+            const [l, t] = overflowCheck($popupCard, e)
+            $popupCard.style.top = `${t}px`
+            $popupCard.style.left = `${l}px`
+            $popupCard.style.right = 'unset'
+        }
+
+        const overflowCheck = ($popupCard: HTMLDivElement, e: MouseEvent) => {
+            let left = $popupCard.offsetLeft
+            let top = $popupCard.offsetTop
+            if (
+                $popupCard.offsetLeft + e.movementX > 10 &&
+                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > 18
+            ) {
+                left = $popupCard.offsetLeft + e.movementX
+            }
+            if (
+                $popupCard.offsetTop + e.movementY > 10 &&
+                window.innerHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight > 10
+            ) {
+                top = $popupCard.offsetTop + e.movementY
+            }
+            return [left, top]
         }
 
         const closeDragElement = () => {
