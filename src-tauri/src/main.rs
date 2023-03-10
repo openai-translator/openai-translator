@@ -33,14 +33,10 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| match event {
-            tauri::RunEvent::WindowEvent {
-                label,
-                event: win_event,
-                ..
-            } => match win_event {
+            tauri::RunEvent::WindowEvent { label, event, .. } => match event {
                 tauri::WindowEvent::CloseRequested { api, .. } => {
-                    let win = app.get_window(label.as_str()).unwrap();
-                    win.hide().unwrap();
+                    let window = app.get_window(label.as_str()).unwrap();
+                    window.hide().unwrap();
                     api.prevent_close();
                 }
                 _ => {}
