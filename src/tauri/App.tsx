@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react'
 import { PopupCard } from '../content_script/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
+import { emit, listen, Event } from '@tauri-apps/api/event'
+import { bindHotkey } from './utils'
 
 const engine = new Styletron({
     prefix: '__yetone-openai-translator-styletron-',
@@ -13,6 +15,24 @@ export function App() {
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
+    const [text, setText] = React.useState('')
+
+    useEffect(() => {
+        let unlisten
+        ;(async () => {
+            unlisten = await listen('change-text', async (event: Event<string>) => {
+                const selectedText = event.payload
+                if (selectedText) {
+                    setText(selectedText)
+                }
+            })
+        })()
+        return unlisten
+    }, [])
+
+    useEffect(() => {
+        bindHotkey()
+    }, [])
 
     useEffect(() => {
         if (isMacOS || isLinux) {
@@ -60,13 +80,16 @@ export function App() {
                 )}
             </div>
             <PopupCard
-                text=''
+                text={text}
                 engine={engine}
                 showSettings
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
                 containerStyle={isLinux ? undefined : { paddingTop: '20px' }}
+                onSettingsSave={() => {
+                    bindHotkey()
+                }}
             />
         </div>
     )
