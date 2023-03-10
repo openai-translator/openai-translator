@@ -275,6 +275,17 @@ export function PopupCard(props: IPopupCardProps) {
 
     const headerRef = useRef<HTMLDivElement>(null)
 
+    // Reposition the popup card to prevent it from extending beyond the screen.
+    useEffect(() => {
+        queryPopupCardElement().then(($popupCard) => {
+            if ($popupCard) {
+                const rect = $popupCard.getBoundingClientRect()
+                const x = Math.min(window.innerWidth - 600, rect.x)
+                $popupCard.style.left = x + 'px'
+            }
+        })
+    }, [])
+
     useEffect(() => {
         if (isDesktopApp()) {
             return
