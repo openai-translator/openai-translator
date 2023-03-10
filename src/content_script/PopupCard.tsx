@@ -24,6 +24,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { getBrowser, getSettings, isDesktopApp } from '../common/utils'
 import { Settings } from '../popup/Settings'
+import { calculateMaxTop } from '.'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -277,13 +278,25 @@ export function PopupCard(props: IPopupCardProps) {
 
     // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
+        const observer = new ResizeObserver((entries) => {
+            // Listen for element height changes
+            for (const entry of entries) {
+                const $popupCard = entry.target as HTMLElement
+                const maxTop = calculateMaxTop($popupCard)
+                $popupCard.style.top = `${Math.min(maxTop, $popupCard.offsetTop)}px`
+            }
+        })
         queryPopupCardElement().then(($popupCard) => {
             if ($popupCard) {
                 const rect = $popupCard.getBoundingClientRect()
                 const x = Math.min(window.innerWidth - 600, rect.x)
                 $popupCard.style.left = x + 'px'
+                observer.observe($popupCard)
             }
         })
+        return () => {
+            queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
+        }
     }, [])
 
     useEffect(() => {

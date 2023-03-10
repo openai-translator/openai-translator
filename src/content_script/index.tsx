@@ -57,6 +57,13 @@ async function hidePopupCard() {
     removeContainer()
 }
 
+export function calculateMaxTop($popupCard: HTMLElement): number {
+    const { innerHeight } = window
+    const { scrollTop } = document.documentElement
+    const { height } = $popupCard.getBoundingClientRect()
+    return scrollTop + innerHeight - height - 10
+}
+
 async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
@@ -91,9 +98,10 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = x + 600 > window.innerWidth ? 'auto' : `${x}px`
-    $popupCard.style.right = x + 600 > window.innerWidth ? '18px' : 'unset'
-    $popupCard.style.top = `${y}px`
+    $popupCard.style.left = x + popupCardMaxWidth > window.innerWidth ? 'auto' : `${x}px`
+    $popupCard.style.right = x + popupCardMaxWidth > window.innerWidth ? '18px' : 'unset'
+    const maxTop = calculateMaxTop($popupCard)
+    $popupCard.style.top = `${Math.min(maxTop, y)}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
