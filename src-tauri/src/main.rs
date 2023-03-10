@@ -4,6 +4,7 @@
 )]
 
 mod config;
+mod tray;
 
 use crate::config::get_config_content;
 use tauri::Manager;
@@ -27,6 +28,23 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet, get_config_content])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .system_tray(tray::menu())
+        .on_system_tray_event(tray::handler)
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| match event {
+            tauri::RunEvent::WindowEvent {
+                label,
+                event: win_event,
+                ..
+            } => match win_event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    let win = app.get_window(label.as_str()).unwrap();
+                    win.hide().unwrap();
+                    api.prevent_close();
+                }
+                _ => {}
+            },
+            _ => {}
+        });
 }
