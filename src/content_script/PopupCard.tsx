@@ -332,8 +332,8 @@ export function PopupCard(props: IPopupCardProps) {
                 left = $popupCard.offsetLeft + e.movementX
             }
             if (
-                $popupCard.offsetTop + e.movementY > 10 &&
-                window.innerHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight > 10
+                $popupCard.getBoundingClientRect().top + e.movementY > 10 &&
+                window.innerHeight - $popupCard.getBoundingClientRect().top - e.movementY - $popupCard.offsetHeight > 10
             ) {
                 top = $popupCard.offsetTop + e.movementY
             }
