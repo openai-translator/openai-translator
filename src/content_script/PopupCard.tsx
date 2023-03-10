@@ -203,6 +203,26 @@ export interface IPopupCardProps {
 }
 
 export function PopupCard(props: IPopupCardProps) {
+    const editorRef = useRef<HTMLTextAreaElement>(null)
+    const isCompositing = useRef(false)
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        const onCompositionStart = () => {
+            isCompositing.current = true
+        }
+        const onCompositionEnd = () => {
+            isCompositing.current = false
+        }
+        editor.addEventListener('compositionstart', onCompositionStart)
+        editor.addEventListener('compositionend', onCompositionEnd)
+        return () => {
+            editor.removeEventListener('compositionstart', onCompositionStart)
+            editor.removeEventListener('compositionend', onCompositionEnd)
+        }
+    }, [])
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
         ;(async () => {
@@ -625,6 +645,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             {editableText}
                                         </div>
                                         <Textarea
+                                            inputRef={editorRef}
                                             autoFocus={props.autoFocus}
                                             overrides={{
                                                 Root: {
