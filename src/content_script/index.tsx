@@ -10,7 +10,6 @@ import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
-import browser from 'webextension-polyfill'
 import hotkeys from 'hotkeys-js'
 
 let root: Root | null = null
@@ -47,6 +46,7 @@ async function hidePopupCard() {
     if (!$popupCard) {
         return
     }
+    const browser = await utils.getBrowser()
     browser.runtime.sendMessage({
         type: 'stopSpeaking',
     })
@@ -114,12 +114,19 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const JSS = JssProvider as any
+    const isUserscript = utils.isUserscript()
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
             <div>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <PopupCard text={text} engine={engine} autoFocus={autoFocus} />
+                    <PopupCard
+                        text={text}
+                        engine={engine}
+                        autoFocus={autoFocus}
+                        showSettings={isUserscript ? true : false}
+                        defaultShowSettings={isUserscript ? true : false}
+                    />
                 </JSS>
             </div>
         </React.StrictMode>

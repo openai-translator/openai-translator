@@ -98,6 +98,10 @@
         "titleBarStyle": "Overlay",
         "hiddenTitle": true
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/favicon.ico",
+      "iconAsTemplate": true
+    }
   }
 }
