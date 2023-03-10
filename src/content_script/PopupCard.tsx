@@ -22,7 +22,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { calculateMaxTop } from '.'
 
@@ -48,13 +48,16 @@ const useStyles = createUseStyles({
         right: '10px',
     },
     'popupCardHeaderContainer': {
-        display: 'flex',
-        flexDirection: 'row',
-        cursor: 'move',
-        alignItems: 'center',
-        padding: '5px 10px',
-        borderBottom: '1px solid #e8e8e8',
-        minWidth: '510px',
+        'display': 'flex',
+        'flexDirection': 'row',
+        'cursor': 'move',
+        'alignItems': 'center',
+        'padding': '5px 10px',
+        'borderBottom': '1px solid #e8e8e8',
+        'minWidth': '510px',
+        'user-select': 'none',
+        '-webkit-user-select': 'none',
+        '-ms-user-select': 'none',
     },
     'iconContainer': {
         display: 'flex',
@@ -72,7 +75,8 @@ const useStyles = createUseStyles({
     'iconText': {
         fontSize: '12px',
         color: '#333',
-        fontWeight: 500,
+        fontWeight: 600,
+        cursor: 'unset',
     },
     'paragraph': {
         margin: '14px 0',
@@ -201,6 +205,7 @@ export interface IPopupCardProps {
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
     editorRows?: number
+    onSettingsSave?: (settings: ISettings) => void
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -531,12 +536,18 @@ export function PopupCard(props: IPopupCardProps) {
                             </StatefulTooltip>
                         )}
                         {showSettings ? (
-                            <Settings onSave={() => setShowSettings(false)} />
+                            <Settings
+                                onSave={(settings) => {
+                                    setShowSettings(false)
+                                    props.onSettingsSave?.(settings)
+                                }}
+                            />
                         ) : (
                             <div style={props.containerStyle}>
                                 <div
                                     ref={headerRef}
                                     className={styles.popupCardHeaderContainer}
+                                    data-tauri-drag-region
                                     style={{
                                         cursor: isDesktopApp() ? 'default' : 'move',
                                     }}

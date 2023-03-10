@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import _ from 'lodash'
 import icon from './assets/images/icon.png'
 import beams from './assets/images/beams.jpg'
 import toast, { Toaster } from 'react-hot-toast'
@@ -31,13 +32,15 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 interface ILanguageSelectorProps {
     value?: string
     onChange?: (value: string) => void
+    onBlur?: () => void
 }
 
 function LanguageSelector(props: ILanguageSelectorProps) {
-    const { value, onChange } = props
+    const { value, onChange, onBlur } = props
 
     return (
         <Select
+            onBlur={onBlur}
             size='compact'
             clearable={false}
             options={langOptions}
@@ -53,17 +56,20 @@ function LanguageSelector(props: ILanguageSelectorProps) {
 interface ITranslateModeSelectorProps {
     value?: TranslateMode | 'nop'
     onChange?: (value: TranslateMode | 'nop') => void
+    onBlur?: () => void
 }
 
 interface AutoTranslateCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
+    onBlur?: () => void
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
     return (
         <Select
             size='compact'
+            onBlur={props.onBlur}
             searchable={false}
             clearable={false}
             value={
@@ -100,6 +106,7 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
             checked={props.value}
             onChange={(e) => {
                 props.onChange?.(e.target.checked)
+                props.onBlur?.()
             }}
         />
     )
@@ -109,10 +116,11 @@ const useHotkeyRecorderStyles = createUseStyles({
     'hotkeyRecorder': {
         height: '32px',
         lineHeight: '32px',
-        padding: '0 8px',
+        padding: '0 14px',
         borderRadius: '4px',
         width: '200px',
         cursor: 'pointer',
+        border: '1px dashed transparent',
         backgroundColor: 'rgb(238, 238, 238)',
     },
     'caption': {
@@ -129,6 +137,7 @@ const useHotkeyRecorderStyles = createUseStyles({
         },
         '50%': {
             backgroundColor: 'rgb(238, 238, 238)',
+            borderColor: '#999',
         },
         '100%': {
             backgroundColor: 'transparent',
@@ -139,6 +148,7 @@ const useHotkeyRecorderStyles = createUseStyles({
 interface IHotkeyRecorderProps {
     value?: string
     onChange?: (value: string) => void
+    onBlur?: () => void
 }
 
 function HotkeyRecorder(props: IHotkeyRecorderProps) {
@@ -153,27 +163,45 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                     .replace(/-/g, '+')
                     .split('+')
                     .map((k) => k.trim())
+                    .filter(Boolean)
             )
         }
     }, [props.value])
 
     useEffect(() => {
-        const keys_ = Array.from(keys)
+        let keys_ = Array.from(keys)
         if (keys_ && keys_.length > 0) {
+            keys_ = keys_.filter((k) => k.toLowerCase() !== 'meta')
             setHotKeys(keys_)
+            props.onChange?.(keys_.join('+'))
         }
     }, [keys])
 
     useEffect(() => {
         if (!isRecording) {
-            props.onChange?.(hotKeys.join(' + '))
+            props.onChange?.(hotKeys.join('+'))
         }
     }, [isRecording])
+
+    useEffect(() => {
+        const stopRecording = () => {
+            if (isRecording) {
+                stop()
+                props.onBlur?.()
+            }
+        }
+        document.addEventListener('click', stopRecording)
+        return () => {
+            document.removeEventListener('click', stopRecording)
+        }
+    }, [isRecording, props.onBlur])
 
     return (
         <div>
             <div
-                onClick={() => {
+                onClick={(e) => {
+                    e.stopPropagation()
+                    e.currentTarget.focus()
                     if (!isRecording) {
                         start()
                     } else {
@@ -186,7 +214,9 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
             >
                 {hotKeys.join(' + ')}
             </div>
-            <div className={styles.caption}>{isRecording ? 'Click to stop recording' : 'Click to record hotkey'}</div>
+            <div className={styles.caption}>
+                {isRecording ? 'Please press the hotkey you want to set.' : 'Click above to set hotkeys.'}
+            </div>
         </div>
     )
 }
@@ -209,6 +239,7 @@ export function Settings(props: IPopupProps) {
         defaultTargetLanguage: utils.defaultTargetLanguage,
         hotkey: '',
     })
+    const [prevValues, setPrevValues] = useState<utils.ISettings>(values)
 
     const [form] = useForm()
 
@@ -220,6 +251,7 @@ export function Settings(props: IPopupProps) {
         !(async () => {
             const settings = await utils.getSettings()
             setValues(settings)
+            setPrevValues(settings)
         })()
     }, [])
 
@@ -237,6 +269,13 @@ export function Settings(props: IPopupProps) {
         setLoading(false)
         props.onSave?.(data)
     }, [])
+
+    const onBlur = useCallback(async () => {
+        if (values.apiKeys && !_.isEqual(values, prevValues)) {
+            await utils.setSettings(values)
+            setPrevValues(values)
+        }
+    }, [values])
 
     return (
         <div
@@ -257,6 +296,7 @@ export function Settings(props: IPopupProps) {
                             background: `url(${beams}) no-repeat center center`,
                             gap: 10,
                         }}
+                        data-tauri-drag-region
                     >
                         <img width='22' src={icon} alt='logo' />
                         <h2>OpenAI Translator</h2>
@@ -289,22 +329,22 @@ export function Settings(props: IPopupProps) {
                                 </div>
                             }
                         >
-                            <Input autoFocus type='password' size='compact' />
+                            <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                         </FormItem>
                         <FormItem required name='apiURL' label='API URL'>
-                            <Input size='compact' />
+                            <Input size='compact' onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='defaultTranslateMode' label='Default Translate Mode'>
-                            <TranslateModeSelector />
+                            <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='autoTranslate' label='Auto Translate'>
-                            <AutoTranslateCheckbox />
+                            <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='defaultTargetLanguage' label='Default Target Language'>
-                            <LanguageSelector />
+                            <LanguageSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='hotkey' label='Hotkey'>
-                            <HotkeyRecorder />
+                            <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
                         <div
                             style={{

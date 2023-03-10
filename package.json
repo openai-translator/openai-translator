@@ -1,6 +1,6 @@
 {
   "name": "openai-translator",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "openai-translator",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "@heroicons/react": "^2.0.16",
     "@popperjs/core": "^2.11.6",
     "@tauri-apps/api": "^1.2.0",
+    "@types/lodash": "^4.14.191",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-icons": "^3.0.0",
     "@types/xregexp": "^4.4.0",
@@ -38,6 +39,7 @@
     "guesslanguage-ng": "^0.0.2",
     "hotkeys-js": "^3.10.1",
     "languagedetect": "^2.0.0",
+    "lodash": "^4.17.21",
     "rc-field-form": "^1.27.4",
     "react": "^18.0.1",
     "react-copy-to-clipboard": "^5.1.0",
