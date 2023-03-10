@@ -100,29 +100,13 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Installation(Browser Extension)
 
-Due to the extension still being reviewed by the Chrome Store, it currently requires manual download and installation. We apologize for any inconvenience this may cause.
+1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install it.
 
-1. Download from the Release page for files with the name: [openai-translator-chrome-extension-*.zip](https://github.com/yetone/openai-translator/releases)
-2. Unzip the openai-translator-chrome-extension-*.zip file
-3. Go to the Extension page of Chrome:
-
-<img width="600" src="https://user-images.githubusercontent.com/1206493/222926817-414b91ea-e90f-43f5-9fb3-e9b170b40ce8.png" />
-
-4. To install, navigate to the Extension page and enable Developer mode in the top-right corner. Then, click the Load unpacked button in the top-left corner and select the unzipped directory to complete the installation.
-
-    **Please note: If you have installed a previous version, it must be removed prior to installation.**
-
-<img width="600" src="https://user-images.githubusercontent.com/1206493/223045238-22c9b79b-205d-4f6b-a147-cc7cf4149c83.png" />
-
-5. Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
-
-<img width="600" src="https://user-images.githubusercontent.com/1206493/223043946-0e7486ca-94d7-4324-a4f2-f62b9a3d527d.png" />
-
-6. Fill in the API Key:
+2. Fill in the API Key:
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
-7. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
+3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # Buy me a coffee
 
