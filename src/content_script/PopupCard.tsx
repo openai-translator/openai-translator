@@ -240,7 +240,10 @@ export function PopupCard(props: IPopupCardProps) {
         ;(async () => {
             const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
-            if ((translateMode === 'translate' || translateMode === 'analyze') && !stopAutomaticallyChangeDetectTo.current) {
+            if (
+                (translateMode === 'translate' || translateMode === 'analyze') &&
+                !stopAutomaticallyChangeDetectTo.current
+            ) {
                 const settings = await getSettings()
                 setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
             }
