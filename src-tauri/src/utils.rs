@@ -4,15 +4,6 @@ use tauri::Manager;
 
 use crate::APP_HANDLE;
 
-static ASCII_LOWER: [char; 26] = [
-    'a', 'b', 'c', 'd', 'e', 
-    'f', 'g', 'h', 'i', 'j', 
-    'k', 'l', 'm', 'n', 'o',
-    'p', 'q', 'r', 's', 't', 
-    'u', 'v', 'w', 'x', 'y', 
-    'z',
-];
-
 #[cfg(target_os = "windows")]
 pub fn copy() {
     use enigo::*;
@@ -39,9 +30,6 @@ pub fn copy() {
     enigo.key_up(Key::Space);
     enigo.key_up(Key::Tab);
     enigo.key_up(Key::Option);
-    for c in ASCII_LOWER.iter() {
-        enigo.key_up(Key::Layout(*c));
-    }
     enigo.key_down(Key::Meta);
     enigo.key_click(Key::Layout('c'));
     // enigo.key_down(Key::Layout('c'));
