@@ -1,8 +1,7 @@
 npm-debug.log
 node_modules/
-dist/browser-extension/
-dist/electron/
-dist/tauri/
+dist/
+!dist/userscript/
 tmp/
 release/
 yarn-error.log
