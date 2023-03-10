@@ -72,7 +72,7 @@ export async function translate(query: TranslateQuery) {
         case 'analyze':
             systemPrompt = 'You are a translation engine and grammar analyzer.'
             if (toChinese) {
-                assistantPrompt = `请翻译此段文本并解析原文中的语法`
+                assistantPrompt = `请用中文翻译此段文本并解析原文中的语法`
             } else {
                 assistantPrompt = `translate this text to ${
                     lang.langMap.get(query.detectTo) || query.detectTo
