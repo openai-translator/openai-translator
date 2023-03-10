@@ -7,7 +7,7 @@
     "dev-electron": "electron-esbuild dev",
     "build-electron": "electron-esbuild build",
     "package-electron": "electron-builder",
-    "watch": "chokidar src -c 'npm run build'",
+    "watch": "chokidar src -c \"npm run build\"",
     "build": "make build",
     "clean": "rimraf dist",
     "test": "npx jest",
