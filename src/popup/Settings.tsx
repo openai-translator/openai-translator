@@ -14,6 +14,9 @@ import { TranslateMode } from '../content_script/translate'
 import { Select, Value, Option } from 'baseui/select'
 import { Checkbox } from 'baseui/checkbox'
 import { supportLanguages } from '../content_script/lang'
+import { useRecordHotkeys } from 'react-hotkeys-hook'
+import { createUseStyles } from 'react-jss'
+import clsx from 'clsx'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -99,6 +102,92 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
                 props.onChange?.(e.target.checked)
             }}
         />
+    )
+}
+
+const useHotkeyRecorderStyles = createUseStyles({
+    'hotkeyRecorder': {
+        height: '32px',
+        lineHeight: '32px',
+        padding: '0 8px',
+        borderRadius: '4px',
+        width: '200px',
+        cursor: 'pointer',
+        backgroundColor: 'rgb(238, 238, 238)',
+    },
+    'caption': {
+        marginTop: '4px',
+        fontSize: '11px',
+        color: '#999',
+    },
+    'recording': {
+        animation: '$recording 2s infinite',
+    },
+    '@keyframes recording': {
+        '0%': {
+            backgroundColor: 'transparent',
+        },
+        '50%': {
+            backgroundColor: 'rgb(238, 238, 238)',
+        },
+        '100%': {
+            backgroundColor: 'transparent',
+        },
+    },
+})
+
+interface IHotkeyRecorderProps {
+    value?: string
+    onChange?: (value: string) => void
+}
+
+function HotkeyRecorder(props: IHotkeyRecorderProps) {
+    const styles = useHotkeyRecorderStyles()
+    const [keys, { start, stop, isRecording }] = useRecordHotkeys()
+
+    const [hotKeys, setHotKeys] = useState<string[]>([])
+    useEffect(() => {
+        if (props.value) {
+            setHotKeys(
+                props.value
+                    .replace(/-/g, '+')
+                    .split('+')
+                    .map((k) => k.trim())
+            )
+        }
+    }, [props.value])
+
+    useEffect(() => {
+        const keys_ = Array.from(keys)
+        if (keys_ && keys_.length > 0) {
+            setHotKeys(keys_)
+        }
+    }, [keys])
+
+    useEffect(() => {
+        if (!isRecording) {
+            props.onChange?.(hotKeys.join(' + '))
+        }
+    }, [isRecording])
+
+    return (
+        <div>
+            <div
+                onClick={() => {
+                    if (!isRecording) {
+                        start()
+                    } else {
+                        stop()
+                    }
+                }}
+                className={clsx(styles.hotkeyRecorder, {
+                    [styles.recording]: isRecording,
+                })}
+            >
+                {hotKeys.join(' + ')}
+            </div>
+            <div className={styles.caption}>{isRecording ? 'Click to stop recording' : 'Click to record hotkey'}</div>
+        </div>
     )
 }
 
@@ -215,7 +304,7 @@ export function Settings(props: IPopupProps) {
                             <LanguageSelector />
                         </FormItem>
                         <FormItem name='hotkey' label='Hotkey'>
-                            <Input size='compact' />
+                            <HotkeyRecorder />
                         </FormItem>
                         <div
                             style={{
