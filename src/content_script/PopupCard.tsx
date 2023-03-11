@@ -27,7 +27,9 @@ import { Settings } from '../popup/Settings'
 import { calculateMaxTop } from '.'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
-import { FiUpload } from 'react-icons/fi'
+import { BsTextareaT } from 'react-icons/bs'
+import rocket from './assets/images/rocket.gif'
+import partyPopper from './assets/images/party-popper.gif'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -545,15 +547,30 @@ export function PopupCard(props: IPopupCardProps) {
         })()
     }, [props.defaultShowSettings])
 
-    const [uploadLoading, setUploadLoading] = useState(false)
+    const [isOCRProcessing, setIsOCRProcessing] = useState(false)
+    const [showOCRProcessing, setShowOCRProcessing] = useState(false)
+
+    useEffect(() => {
+        if (isOCRProcessing) {
+            setShowOCRProcessing(true)
+            return
+        }
+        const timer = setTimeout(() => {
+            setShowOCRProcessing(false)
+        }, 1500)
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [isOCRProcessing])
 
     const onDrop = async (acceptedFiles: File[]) => {
         const worker = createWorker({
             // logger: (m) => console.log(m),
         })
 
+        setOriginalText('')
         setEditableText('')
-        setUploadLoading(true)
+        setIsOCRProcessing(true)
 
         if (acceptedFiles.length !== 1) {
             alert('Please upload only one file at a time.')
@@ -578,8 +595,9 @@ export function PopupCard(props: IPopupCardProps) {
 
         const { data } = await (await worker).recognize(file)
 
+        setOriginalText(data.text)
         setEditableText(data.text)
-        setUploadLoading(false)
+        setIsOCRProcessing(false)
 
         await (await worker).terminate()
     }
@@ -752,9 +770,50 @@ export function PopupCard(props: IPopupCardProps) {
                                             {({ getRootProps, isDragActive }) => (
                                                 <div {...getRootProps()}>
                                                     {isDragActive ? (
-                                                        <p>Drop file below</p>
+                                                        <div
+                                                            style={{
+                                                                padding: '10px',
+                                                                display: 'flex',
+                                                                justifyContent: 'center',
+                                                                border: '2px dashed #eee',
+                                                                marginBottom: '10px',
+                                                                fontSize: '11px',
+                                                            }}
+                                                        >
+                                                            Drop file below
+                                                        </div>
                                                     ) : (
-                                                        uploadLoading && <p>Processing...</p>
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'row',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                gap: 8,
+                                                                opacity: showOCRProcessing ? 1 : 0,
+                                                                marginBottom: showOCRProcessing ? 10 : 0,
+                                                                fontSize: '11px',
+                                                                height: showOCRProcessing ? 26 : 0,
+                                                                transition: 'all 0.3s linear',
+                                                                overflow: 'hidden',
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    fontSize: '12px',
+                                                                }}
+                                                            >
+                                                                {isOCRProcessing ? 'OCR Processing...' : 'OCR Success'}
+                                                            </div>
+                                                            {showOCRProcessing && (
+                                                                <div>
+                                                                    <img
+                                                                        src={isOCRProcessing ? rocket : partyPopper}
+                                                                        width='20'
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     )}
                                                     <Textarea
                                                         inputRef={editorRef}
@@ -805,55 +864,61 @@ export function PopupCard(props: IPopupCardProps) {
                                         </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <div className={styles.actionButton}>
-                                                <Dropzone onDrop={onDrop}>
-                                                    {({ getRootProps, getInputProps }) => (
-                                                        <div {...getRootProps()}>
-                                                            <input {...getInputProps({ multiple: false })} />
-                                                            <FiUpload />
-                                                        </div>
-                                                    )}
-                                                </Dropzone>
-                                            </div>
-                                            <div
-                                                className={styles.actionButton}
-                                                onClick={() => {
-                                                    if (isSpeakingEditableText) {
+                                            <StatefulTooltip content='Upload images for OCR translation'>
+                                                <div className={styles.actionButton}>
+                                                    <Dropzone onDrop={onDrop}>
+                                                        {({ getRootProps, getInputProps }) => (
+                                                            <div {...getRootProps()}>
+                                                                <input {...getInputProps({ multiple: false })} />
+                                                                <BsTextareaT size={13} />
+                                                            </div>
+                                                        )}
+                                                    </Dropzone>
+                                                </div>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content='Speak'>
+                                                <div
+                                                    className={styles.actionButton}
+                                                    onClick={() => {
+                                                        if (isSpeakingEditableText) {
+                                                            ;(async () => {
+                                                                const browser = await getBrowser()
+                                                                browser.runtime.sendMessage({
+                                                                    type: 'stopSpeaking',
+                                                                })
+                                                                setIsSpeakingEditableText(false)
+                                                            })()
+                                                            return
+                                                        }
                                                         ;(async () => {
                                                             const browser = await getBrowser()
+                                                            setIsSpeakingEditableText(true)
                                                             browser.runtime.sendMessage({
-                                                                type: 'stopSpeaking',
+                                                                type: 'speak',
+                                                                text: editableText,
+                                                                lang: detectFrom,
                                                             })
-                                                            setIsSpeakingEditableText(false)
                                                         })()
-                                                        return
-                                                    }
-                                                    ;(async () => {
-                                                        const browser = await getBrowser()
-                                                        setIsSpeakingEditableText(true)
-                                                        browser.runtime.sendMessage({
-                                                            type: 'speak',
-                                                            text: editableText,
-                                                            lang: detectFrom,
-                                                        })
-                                                    })()
-                                                }}
-                                            >
-                                                <HiOutlineSpeakerWave size={13} />
-                                            </div>
-                                            <CopyToClipboard
-                                                text={editableText}
-                                                onCopy={() => {
-                                                    toast('Copied to clipboard', {
-                                                        duration: 3000,
-                                                        icon: '👏',
-                                                    })
-                                                }}
-                                            >
-                                                <div className={styles.actionButton}>
-                                                    <RxCopy size={13} />
+                                                    }}
+                                                >
+                                                    <HiOutlineSpeakerWave size={13} />
                                                 </div>
-                                            </CopyToClipboard>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content='Copy to clipboard'>
+                                                <CopyToClipboard
+                                                    text={editableText}
+                                                    onCopy={() => {
+                                                        toast('Copied to clipboard', {
+                                                            duration: 3000,
+                                                            icon: '👏',
+                                                        })
+                                                    }}
+                                                >
+                                                    <div className={styles.actionButton}>
+                                                        <RxCopy size={13} />
+                                                    </div>
+                                                </CopyToClipboard>
+                                            </StatefulTooltip>
                                         </div>
                                     </div>
                                     <div className={styles.popupCardTranslatedContainer}>
@@ -899,45 +964,49 @@ export function PopupCard(props: IPopupCardProps) {
                                                 {translatedText && (
                                                     <div className={styles.actionButtonsContainer}>
                                                         <div style={{ marginRight: 'auto' }} />
-                                                        <div
-                                                            className={styles.actionButton}
-                                                            onClick={() => {
-                                                                if (isSpeakingTranslatedText) {
+                                                        <StatefulTooltip content='Speak'>
+                                                            <div
+                                                                className={styles.actionButton}
+                                                                onClick={() => {
+                                                                    if (isSpeakingTranslatedText) {
+                                                                        ;(async () => {
+                                                                            const browser = await getBrowser()
+                                                                            browser.runtime.sendMessage({
+                                                                                type: 'stopSpeaking',
+                                                                            })
+                                                                            setIsSpeakingTranslatedText(false)
+                                                                        })()
+                                                                        return
+                                                                    }
                                                                     ;(async () => {
                                                                         const browser = await getBrowser()
+                                                                        setIsSpeakingTranslatedText(true)
                                                                         browser.runtime.sendMessage({
-                                                                            type: 'stopSpeaking',
+                                                                            type: 'speak',
+                                                                            text: translatedText,
+                                                                            lang: detectTo,
                                                                         })
-                                                                        setIsSpeakingTranslatedText(false)
                                                                     })()
-                                                                    return
-                                                                }
-                                                                ;(async () => {
-                                                                    const browser = await getBrowser()
-                                                                    setIsSpeakingTranslatedText(true)
-                                                                    browser.runtime.sendMessage({
-                                                                        type: 'speak',
-                                                                        text: translatedText,
-                                                                        lang: detectTo,
-                                                                    })
-                                                                })()
-                                                            }}
-                                                        >
-                                                            <HiOutlineSpeakerWave size={13} />
-                                                        </div>
-                                                        <CopyToClipboard
-                                                            text={translatedText}
-                                                            onCopy={() => {
-                                                                toast('Copied to clipboard', {
-                                                                    duration: 3000,
-                                                                    icon: '👏',
-                                                                })
-                                                            }}
-                                                        >
-                                                            <div className={styles.actionButton}>
-                                                                <RxCopy size={13} />
+                                                                }}
+                                                            >
+                                                                <HiOutlineSpeakerWave size={13} />
                                                             </div>
-                                                        </CopyToClipboard>
+                                                        </StatefulTooltip>
+                                                        <StatefulTooltip content='Copy to clipboard'>
+                                                            <CopyToClipboard
+                                                                text={translatedText}
+                                                                onCopy={() => {
+                                                                    toast('Copied to clipboard', {
+                                                                        duration: 3000,
+                                                                        icon: '👏',
+                                                                    })
+                                                                }}
+                                                            >
+                                                                <div className={styles.actionButton}>
+                                                                    <RxCopy size={13} />
+                                                                </div>
+                                                            </CopyToClipboard>
+                                                        </StatefulTooltip>
                                                     </div>
                                                 )}
                                             </div>
