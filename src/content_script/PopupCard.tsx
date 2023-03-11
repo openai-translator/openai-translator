@@ -622,7 +622,11 @@ export function PopupCard(props: IPopupCardProps) {
                                         </div>
                                     </div>
                                     <div className={styles.popupCardHeaderButtonGroup}>
-                                        <StatefulTooltip content='Translate' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Translate'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'translate' ? 'primary' : 'secondary'}
@@ -631,7 +635,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <AiOutlineTranslation />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Polishing' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Polishing'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
@@ -643,7 +651,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <IoColorPaletteOutline />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Summarize' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Summarize'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
@@ -655,7 +667,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineSummarize />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Analyze' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Analyze'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
@@ -664,7 +680,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineAnalytics />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Explain Code' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Explain Code'
+                                            placement={isDesktopApp() ? 'auto' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
