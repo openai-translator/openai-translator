@@ -53,8 +53,6 @@
 
 # 既是浏览器插件也是跨平台桌面端应用！
 
-* 注：桌面端应用暂不支持划词，但是即将支持，敬请期待！
-
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
 
