@@ -1,6 +1,6 @@
 use crate::utils;
 use crate::APP_HANDLE;
-use tauri::{Manager, LogicalPosition, PhysicalPosition};
+use tauri::{LogicalPosition, Manager, PhysicalPosition};
 #[cfg(target_os = "windows")]
 use window_shadows::set_shadow;
 #[cfg(target_os = "linux")]
@@ -73,6 +73,7 @@ pub fn show_main_window() {
                     .set_position(LogicalPosition::new(x as f64, y as f64))
                     .unwrap();
             } else {
+                window.unminimize().unwrap();
                 window
                     .set_position(PhysicalPosition::new(x as f64, y as f64))
                     .unwrap();
