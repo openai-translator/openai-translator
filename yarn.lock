@@ -3394,6 +3394,11 @@ esbuild-plugin-copy@^2.1.0:
     fs-extra "^10.0.1"
     globby "^11.0.3"
 
+esbuild-plugin-inline-image@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/esbuild-plugin-inline-image/-/esbuild-plugin-inline-image-0.0.9.tgz#b645ddd258c013e9f7c96fddf4e06e66f44618ae"
+  integrity sha512-pw3ZgN2phh32Z7BpKrhRDtmI+iVCl+Gc0BLOT9croXg1MnMjRuN7aXhIQirhLeK39erkIwfFlhy6xieroBGc1Q==
+
 esbuild-server@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/esbuild-server/-/esbuild-server-0.1.2.tgz#f464ff49d9e044b11ee8123d90ab2f91abd1bf18"
