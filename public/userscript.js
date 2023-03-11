@@ -10,7 +10,9 @@
 // @require         https://cdn.jsdelivr.net/gh/yetone/openai-translator@main/dist/userscript/index.js
 // @grant           GM.setValue
 // @grant           GM.getValue
+// @grant           GM_xmlhttpRequest
 // @license         MIT
 // ==/UserScript==
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 ;(function () {})()
