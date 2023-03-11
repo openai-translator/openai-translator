@@ -3,10 +3,10 @@
   <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://user-images.githubusercontent.com/1651790/224081979-d3aa7867-94a6-4a85-a5d7-603e02360cee.png">
 </picture>
 <p align="center">
-    <br> English | <a href="README-CN.md">中文</a>
+    <br> Español | <a href="README-CN.md">English</a> <a href="README-CN.md">中文</a>
 </p>
 <p align="center">
-    <em>The translator that does more than just translation - powered by OpenAI.</em>
+    <em>El traductor que hace algo más que traducir - impulsado por OpenAI.</em>
 </p>
 
 
