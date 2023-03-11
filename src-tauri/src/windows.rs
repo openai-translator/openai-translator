@@ -55,7 +55,7 @@ fn get_mouse_location() -> Result<(i32, i32), String> {
 
 #[tauri::command]
 pub fn show_main_window_with_selected_text() {
-    let selected_text = utils::get_selected_text();
+    let selected_text = utils::get_selected_text().unwrap_or_default();
     show_main_window();
     if !selected_text.is_empty() {
         utils::send_text(selected_text);
