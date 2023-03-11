@@ -34,8 +34,8 @@ export async function translate(query: TranslateQuery) {
     }
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
-    let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
-    let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
+    let systemPrompt = 'Eres un motor de traducción que solo puede traducir texto y no interpretarlo.'
+    let assistantPrompt = `traducir desde ${lang.langMap.get(query.detectFrom) || query.detectFrom} a ${
         lang.langMap.get(query.detectTo) || query.detectTo
     }`
     switch (query.mode) {
@@ -52,25 +52,25 @@ export async function translate(query: TranslateQuery) {
             }
             break
         case 'polishing':
-            systemPrompt = 'Revise the following sentences to make them more clear, concise, and coherent.'
+            systemPrompt = 'Revise las siguientes oraciones para que sean más claras, concisas y coherentes.'
             if (fromChinese) {
                 assistantPrompt = `使用 ${lang.langMap.get(query.detectFrom) || query.detectFrom} 语言润色此段文本`
             } else {
-                assistantPrompt = `polish this text in ${lang.langMap.get(query.detectFrom) || query.detectFrom}`
+                assistantPrompt = `Pulir este texto en  ${lang.langMap.get(query.detectFrom) || query.detectFrom}`
             }
             break
         case 'summarize':
-            systemPrompt = "You are a text summarizer, you can only summarize the text, don't interpret it."
+            systemPrompt = 'Eres un resumidor de texto, solo puedes resumir el texto, no interpretarlo.'
             if (toChinese) {
                 assistantPrompt = '用最简洁的语言使用中文总结此段文本'
             } else {
-                assistantPrompt = `summarize this text in the most concise language and must use ${
+                assistantPrompt = `Lo siento, no puedo traducir sin un texto específico para trabajar. Por favor proporcione el texto que desea traducir. ${
                     lang.langMap.get(query.detectTo) || query.detectTo
                 } language!`
             }
             break
         case 'analyze':
-            systemPrompt = 'You are a translation engine and grammar analyzer.'
+            systemPrompt = 'Eres un motor de traducción y analizador gramatical.'
             if (toChinese) {
                 assistantPrompt = `请用中文翻译此段文本并解析原文中的语法`
             } else {
@@ -83,14 +83,14 @@ export async function translate(query: TranslateQuery) {
             break
         case 'explain-code':
             systemPrompt =
-                'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
+                'Eres un motor de explicación de código, solo puedes explicar el código, no interpretarlo ni traducirlo. Además, por favor informa cualquier error que encuentres en el código al autor del mismo.'
             if (toChinese) {
                 assistantPrompt =
                     '用最简洁的语言使用中文解释此段代码、正则表达式或脚本。如果内容不是代码，请返回错误提示。如果代码有明显的错误，请指出。'
             } else {
-                assistantPrompt = `explain the provided code, regex or script in the most concise language and must use ${
+                assistantPrompt = `Explicar el código, regex o script proporcionado en el lenguaje más conciso y obligatoriamente utilizar. ${
                     lang.langMap.get(query.detectTo) || query.detectTo
-                } language! If the content is not code, return an error message. If the code has obvious errors, point them out.`
+                } ¡Lenguaje! Si el contenido no es código, devuelve un mensaje de error. Si el código tiene errores obvios, señálalos.`
             }
             break
     }

@@ -215,7 +215,7 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                 {hotKeys.join(' + ')}
             </div>
             <div className={styles.caption}>
-                {isRecording ? 'Please press the hotkey you want to set.' : 'Click above to set hotkeys.'}
+                {isRecording ? 'Pulse la tecla de acceso directo que desee configurar.' : 'Haz clic arriba para configurar las teclas de acceso rápido.'}
             </div>
         </div>
     )
@@ -299,7 +299,7 @@ export function Settings(props: IPopupProps) {
                         data-tauri-drag-region
                     >
                         <img width='22' src={icon} alt='logo' />
-                        <h2>OpenAI Translator</h2>
+                        <h2>Traductor OpenAI</h2>
                     </nav>
                     <Form
                         form={form}
@@ -316,16 +316,16 @@ export function Settings(props: IPopupProps) {
                             label='API Key'
                             caption={
                                 <div>
-                                    Go to the{' '}
+                                    Ir a la{' '}
                                     <a
                                         target='_blank'
                                         href='https://platform.openai.com/account/api-keys'
                                         rel='noreferrer'
                                     >
-                                        OpenAI page
+                                        Pagina OpenAI
                                     </a>{' '}
-                                    to get your API Key. You can separate multiple API Keys with English commas to
-                                    achieve quota doubling and load balancing.
+                                    para obtener su Clave API. Puede separar varias Claves de API con comas inglesas para
+                                    duplicar la cuota y equilibrar la carga..
                                 </div>
                             }
                         >
@@ -334,16 +334,16 @@ export function Settings(props: IPopupProps) {
                         <FormItem required name='apiURL' label='API URL'>
                             <Input size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='defaultTranslateMode' label='Default Translate Mode'>
+                        <FormItem name='defaultTranslateMode' label='Modo de traducción por defecto'>
                             <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='autoTranslate' label='Auto Translate'>
+                        <FormItem name='autoTranslate' label='Traducción automática'>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='defaultTargetLanguage' label='Default Target Language'>
+                        <FormItem name='defaultTargetLanguage' label='Idioma de destino por defecto'>
                             <LanguageSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='hotkey' label='Hotkey'>
+                        <FormItem name='hotkey' label='Tecla rápida'>
                             <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
                         <div

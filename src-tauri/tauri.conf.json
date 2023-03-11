@@ -8,7 +8,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "OpenAI Translator",
+    "productName": "Traductor OpenAI",
     "version": "0.1.0"
   },
   "tauri": {
@@ -94,7 +94,7 @@
         "minWidth": 560,
         "minHeight": 600,
         "resizable": true,
-        "title": "OpenAI Translator",
+        "title": "Traductor OpenAI",
         "titleBarStyle": "Overlay",
         "hiddenTitle": true
       }

@@ -93,7 +93,7 @@ pub fn show_main_window() {
             .skip_taskbar(true)
             .center()
             .focused(true)
-            .title("OpenAI Translator");
+            .title("Traductor OpenAI");
 
             if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
             } else {

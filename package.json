@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yetone/openai-translator.git"
+    "url": "https://github.com/raulgonzalezdev/openai-translator.git"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.13",
@@ -105,7 +105,7 @@
   },
   "build": {
     "appId": "xyz.yetone.apps",
-    "productName": "OpenAI Translator",
+    "productName": "Traductor OpenAI",
     "extraMetadata": {
       "name": "openai-translator",
       "main": "main.js"

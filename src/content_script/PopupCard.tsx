@@ -531,7 +531,7 @@ export function PopupCard(props: IPopupCardProps) {
                     <div className={styles.popupCard}>
                         {props.showSettings && (
                             <StatefulTooltip
-                                content={showSettings ? 'Go to Translator' : 'Go to Settings'}
+                                content={showSettings ? 'Ir al traductor' : 'Ir a la configuración'}
                                 showArrow
                                 placement='left'
                             >
@@ -563,7 +563,7 @@ export function PopupCard(props: IPopupCardProps) {
                                 >
                                     <div className={styles.iconContainer}>
                                         <img className={styles.icon} src={icon} />
-                                        <div className={styles.iconText}>OpenAI Translator</div>
+                                        <div className={styles.iconText}>Traductor OpenAI</div>
                                     </div>
                                     <div className={styles.popupCardHeaderActionsContainer}>
                                         <div className={styles.from}>
@@ -593,7 +593,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 setDetectTo(detectFrom)
                                             }}
                                         >
-                                            <StatefulTooltip content='Exchange' placement='top' showArrow>
+                                            <StatefulTooltip content='Intercambio' placement='top' showArrow>
                                                 <div>
                                                     <TbArrowsExchange />
                                                 </div>
@@ -622,7 +622,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         </div>
                                     </div>
                                     <div className={styles.popupCardHeaderButtonGroup}>
-                                        <StatefulTooltip content='Translate' placement='top' showArrow>
+                                        <StatefulTooltip content='Traducir' placement='top' showArrow>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'translate' ? 'primary' : 'secondary'}
@@ -631,7 +631,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <AiOutlineTranslation />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Polishing' placement='top' showArrow>
+                                        <StatefulTooltip content='Pulido' placement='top' showArrow>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
@@ -643,7 +643,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <IoColorPaletteOutline />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Summarize' placement='top' showArrow>
+                                        <StatefulTooltip content='Resumir' placement='top' showArrow>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
@@ -655,7 +655,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineSummarize />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Analyze' placement='top' showArrow>
+                                        <StatefulTooltip content='Analizar' placement='top' showArrow>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
@@ -664,7 +664,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineAnalytics />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Explain Code' placement='top' showArrow>
+                                        <StatefulTooltip content='Explicar Codigo' placement='top' showArrow>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}

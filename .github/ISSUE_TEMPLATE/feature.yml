@@ -10,10 +10,10 @@ body:
     attributes:
       label: Search before asking
       description: >
-        Please search [issues](https://github.com/yetone/openai-translator/issues) to check if your issue has already been reported.
+        Please search [issues](https://github.com/raulgonzalezdev/openai-translator/issues) to check if your issue has already been reported.
       options:
         - label: >
-            I searched in the [issues](https://github.com/yetone/openai-translator/issues) and found nothing similar.
+            I searched in the [issues](https://github.com/raulgonzalezdev/openai-translator/issues) and found nothing similar.
           required: true
   - type: textarea
     attributes:
@@ -36,7 +36,7 @@ body:
     attributes:
       label: Are you willing to submit a PR?
       description: >
-        We look forward to the community of developers or users helping develop OpenAI Translator features together. If you are willing to submit a PR to implement the feature, please check the box.
+        We look forward to the community of developers or users helping develop Traductor OpenAI features together. If you are willing to submit a PR to implement the feature, please check the box.
       options:
         - label: I'm willing to submit a PR!
   - type: markdown

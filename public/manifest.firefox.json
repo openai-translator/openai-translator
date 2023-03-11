@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
 
-    "name": "OpenAI Translator",
+    "name": "Traductor OpenAI",
     "description": "OpenAI-Translator is a Chrome extension that uses the ChatGPT API for translation.",
     "version": "0.1.0",
 

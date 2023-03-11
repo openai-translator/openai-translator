@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as path from 'path'
 import { format } from 'url'
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import { is } from 'electron-util'
 import Store from 'electron-store'
 import { IpcMainInvokeEvent } from 'electron/main'
@@ -67,6 +67,8 @@ async function createWindow() {
             win!.webContents.openDevTools({ mode: 'bottom' })
         }
     })
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 }
 
 app.on('ready', () => {
@@ -86,3 +88,49 @@ app.on('activate', () => {
         createWindow()
     }
 })
+
+const template: Electron.MenuItemConstructorOptions[] = [
+    {
+      label: 'Archivo',
+      submenu: [
+        { role: 'quit' },
+      ],
+    },
+    {
+      label: 'Editar',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' },
+      ],
+    },
+    
+    {
+      label: 'Ayuda',
+      submenu: [
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        {
+          label: 'Página del proyecto en Github',
+          click: async () => {
+            const { shell } = require('electron')
+            await shell.openExternal('https://github.com/raulgonzalezdev/openai-translator')
+          }
+        },
+        {
+          label: 'Mostrar README',
+          click: async () => {
+            const { shell } = require('electron')
+            await shell.openExternal('https://github.com/raulgonzalezdev/openai-translator/blob/main/README.md')
+          }
+        }
+      ],
+    },
+  ];
+  

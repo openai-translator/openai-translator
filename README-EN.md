@@ -3,12 +3,11 @@
   <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="https://user-images.githubusercontent.com/1651790/224081979-d3aa7867-94a6-4a85-a5d7-603e02360cee.png">
 </picture>
 <p align="center">
-    <br> <a href="README.md">English</a> | 中文
+    <br> English | <a href="README-CN.md">中文</a>
 </p>
 <p align="center">
     <em>The translator that does more than just translation - powered by OpenAI.</em>
 </p>
-
 
 
 <p align="center">
@@ -26,91 +25,92 @@
 <img alt="Chrome" src="https://img.shields.io/badge/-Chrome-green?style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
 
-<a href="https://github.com/raulgonzalezdev/openai-translator/releases" target="_blank">
+<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
 <img alt="Firefox" src="https://img.shields.io/badge/-Firefox-orange?style=flat-square&logo=firefox&logoColor=white" />
 </a>
 
-<a href="https://github.com/raulgonzalezdev/openai-translator/releases" target="_blank">
+<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
 <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
 </a>
 
-<a href="https://github.com/raulgonzalezdev/openai-translator/releases" target="_blank">
+<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
 <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
 </a>
 
-<a href="https://github.com/raulgonzalezdev/openai-translator/releases" target="_blank">
+<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
 <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
 </a>
 
 </p>
 
+# Why Yet another Translator
 
+I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/yetone/bob-plugin-openai-translator) that utilizes ChatGPT API to provide global word translation on macOS. However, since not all users have access to macOS to benefit from the plugin, I have created this project!
 
-# 为啥要造这个轮子？
+# More than just a browser extension
 
-我开发了一个 Bob 的插件 [bob-plugin-openai-translator](https://github.com/raulgonzalezdev/openai-translator) 使用 ChatGPT API 在 macOS 上进行全局划词翻译，
-但是由于很多用户并不是 macOS 用户，所以特此开发了一个浏览器插件方便非 macOS 用户使用 ChatGPT 进行划词翻译。
-
-# 既是浏览器插件也是跨平台桌面端应用！
+What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
 
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
+# More than just translation
 
-# 使用截图
+What began as a translation tool has now evolved to include surprisingly effective word polishing and summarization capabilities, ~~accidentally~~.
+
+
+# How to use
 
 <img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
 
-# 特性
+# Features
 
-1. 支持三种翻译模式：翻译、润色、总结
-2. 支持 55 种语言的相互翻译、润色和总结功能
-3. 支持实时翻译、润色和总结，以最快的速度响应用户，让翻译、润色和总结的过程达到前所未有的流畅和顺滑
-4. 支持自定义翻译文本
-5. 支持一键复制
-6. 支持 TTS
-7. 有桌面端应用，全平台（Windows + macOS + Linux）支持！
+1. It offers three modes: translation, polishing, and summarization.
+2. Our tool allows for mutual translation, polishing, and summarization across 55 different languages.
+3. Streaming mode is supported!
+4. It allows users to customize their translation text.
+5. One-click copying
+6. Text-to-Speech (TTS)
+7. Available on all platforms (Windows, macOS, and Linux) for both browsers and Desktop
 
-# 桌面应用版安装方法
+# Installation(Desktop App)
 
-1. 去 [Release](https://github.com/raulgonzalezdev/openai-translator/releases) 页面下载你对应的操作系统的 zip 包
+1. Download zip package per OS from  [Release](https://github.com/yetone/openai-translator/releases)
 
-2. 下载完毕后解压 zip 包
+2. Unzip it
 
-3. 打开解压后的文件
+3. Open the App!
 
-* Windows 用户
+* Windows
 
-    Windows 用户双击解压出来的文件夹里的 `Traductor OpenAI` 即可使用！
+    Double click `OpenAI Translator` will do the job!
     
-* macOS 用户
+* macOS
 
-    macOS 用户解压出来的是一个名字叫 `Traductor OpenAI` 的应用，建议把解压出来的应用拖动到 `Applications` 目录中，macOS 用户第一次打开可能会遇到如下报错：
+    Drag the `OpenAI Translator` to `Applications`, in the initial run, you may encounter this:
 
     <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
-    点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `Traductor OpenAI` 就再也不会有任何弹窗告警了 🎉
+    Click `Cancel` and then go to  `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it! 🎉
 
     <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
     <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
-# 浏览器插件安装方法
+# Installation(Browser Extension)
 
-由于此插件还在 Chrome Store 审核中，所以现在需要手动下载和安装，敬请谅解。
+1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install this extension.
 
-1. 去 [Chrome 应用商店](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) 安装此插件
-
-2. 去 [OpenAI](https://platform.openai.com/account/api-keys) 获取你的 API KEY
+2. Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/223043946-0e7486ca-94d7-4324-a4f2-f62b9a3d527d.png" />
 
-3. 点击浏览器插件列表里的 Traductor OpenAI 图标，把 API KEY 填入此插件弹出的配置界面中
+3. Click on the OpenAI Translator icon in the browser extension list, and fill in the API Key in the pop-up window that appears.
 
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
-4. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
+4. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
-# 请作者喝一杯咖啡
+# Buy me a coffee
 
 <div align="center">
 <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
