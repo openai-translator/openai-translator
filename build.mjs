@@ -20,7 +20,7 @@ async function esbuildBrowserExtension() {
         minify: true,
         legalComments: 'none',
         sourcemap: true,
-        plugins: [inlineImage()],
+        // plugins: [inlineImage()],
         loader: {
             '.png': 'dataurl',
             '.jpg': 'dataurl',
