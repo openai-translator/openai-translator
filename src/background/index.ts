@@ -46,7 +46,7 @@ if (isFirefox) {
             id: 'open-translator',
             type: 'normal',
             title: 'OpenAI Translator',
-            contexts: ['page'],
+            contexts: ['page', 'selection'],
         },
         () => {
             chrome.runtime.lastError

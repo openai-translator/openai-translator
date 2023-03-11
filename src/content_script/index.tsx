@@ -167,7 +167,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 async function main() {
-    let lastMouseEvent: MouseEvent
+    let lastMouseEvent: MouseEvent | undefined
 
     document.addEventListener('mouseup', (event: MouseEvent) => {
         lastMouseEvent = event
@@ -187,7 +187,8 @@ async function main() {
 
     browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'open-translator') {
-            showPopupCard(lastMouseEvent.pageX + 7, lastMouseEvent.pageY + 7, '')
+            const text = window.getSelection()?.toString().trim() ?? ''
+            showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
         }
     })
 

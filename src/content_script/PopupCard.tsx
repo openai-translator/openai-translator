@@ -38,7 +38,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
-        paddingBottom: '30px',
     },
     'settingsIcon': {
         position: 'absolute',
