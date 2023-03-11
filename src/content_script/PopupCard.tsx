@@ -649,7 +649,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                 disabled={translateMode === 'explain-code'}
                                                 size='mini'
                                                 clearable={false}
-                                                searchable={false}
                                                 options={langOptions}
                                                 value={[{ id: detectFrom }]}
                                                 overrides={{
@@ -659,7 +658,13 @@ export function PopupCard(props: IPopupCardProps) {
                                                         },
                                                     },
                                                 }}
-                                                onChange={({ value }) => setDetectFrom(value[0]?.id as string)}
+                                                onChange={({ value }) => {
+                                                    if (value.length > 0) {
+                                                        setDetectFrom(value[0].id as string)
+                                                    } else {
+                                                        setDetectFrom(langOptions[0].id as string)
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div
@@ -682,7 +687,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                 disabled={translateMode === 'polishing'}
                                                 size='mini'
                                                 clearable={false}
-                                                searchable={false}
                                                 options={langOptions}
                                                 value={[{ id: detectTo }]}
                                                 overrides={{
@@ -694,7 +698,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 }}
                                                 onChange={({ value }) => {
                                                     stopAutomaticallyChangeDetectTo.current = true
-                                                    setDetectTo(value[0]?.id as string)
+                                                    if (value.length > 0) {
+                                                        setDetectTo(value[0].id as string)
+                                                    } else {
+                                                        setDetectTo(langOptions[0].id as string)
+                                                    }
                                                 }}
                                             />
                                         </div>
