@@ -26,10 +26,16 @@ const config = {
     plugins: [
         copy({
             resolveFrom: 'cwd',
-            assets: {
-                from: 'src/tauri/index.html',
-                to: `${tauriOutDir}/index.html`,
-            },
+            assets: [
+                {
+                    from: 'src/tauri/index.html',
+                    to: `${tauriOutDir}/index.html`,
+                },
+                {
+                    from: 'src-tauri/get-selected-text.applescript',
+                    to: `${tauriOutDir}/get-selected-text.applescript`,
+                },
+            ],
             watch: enableWatch,
         }),
     ],

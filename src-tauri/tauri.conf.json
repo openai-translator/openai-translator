@@ -39,7 +39,8 @@
       "fs": {
         "all": false,
         "scope": [
-          "$APPCONFIG/*"
+          "$APPCONFIG/*",
+          "$RESOURCE/*"
         ],
         "writeFile": true
       }
@@ -68,7 +69,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "get-selected-text.applescript"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {
