@@ -54,20 +54,17 @@ pub fn copy() {
     enigo.key_up(Key::Control);
 }
 
-pub fn get_selected_text() -> String {
-    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-    let current_text = ctx.get_contents().unwrap();
+pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
+    let mut ctx: ClipboardContext = ClipboardProvider::new()?;
+    let current_text = ctx.get_contents()?;
     copy();
-    match ctx.get_contents() {
-        Ok(selected_text) => {
-            if selected_text == current_text {
-                return "".to_string();
-            }
-            ctx.set_contents(current_text).unwrap();
-            selected_text
+    ctx.get_contents().map(|selected_text| {
+        if selected_text == current_text {
+            Ok("".to_string())
+        } else {
+            ctx.set_contents(current_text).and_then(|_| Ok(selected_text))
         }
-        Err(_) => "failed to get selected text".to_string(),
-    }
+    })?
 }
 
 pub fn send_text(text: String) {
