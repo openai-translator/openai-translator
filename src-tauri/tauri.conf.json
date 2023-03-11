@@ -49,7 +49,7 @@
       "category": "DeveloperTool",
       "copyright": "",
       "deb": {
-        "depends": []
+        "depends": ["xdotool"]
       },
       "externalBin": [],
       "icon": [
