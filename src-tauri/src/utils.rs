@@ -46,9 +46,6 @@ pub fn copy() {
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
     enigo.key_up(Key::Space);
-    for c in ASCII_LOWER.iter() {
-        enigo.key_up(Key::Layout(*c));
-    }
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('c'));
     enigo.key_up(Key::Control);
