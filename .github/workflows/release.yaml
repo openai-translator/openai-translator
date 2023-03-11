@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: [ v\d+\.\d+\.\d+ ]
+  workflow_dispatch:
 
 jobs:
   create-release:
