@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: [ v\d+\.\d+\.\d+ ]
+  workflow_dispatch:
 
 jobs:
   create-release:
@@ -76,11 +77,23 @@ jobs:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
         run: make change-version
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri App (MacOS Universal)
+        uses: tauri-apps/tauri-action@v0
+        if: matrix.platform == 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
+          args: --target universal-apple-darwin
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        if: matrix.platform != 'macos-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          
 
   build-browser-extension:
     runs-on: ubuntu-22.04
