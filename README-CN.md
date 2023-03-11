@@ -107,7 +107,7 @@
 
 # License
 
-[MIT](./LICENSE)
+[LICENSE](./LICENSE)
 
 # 请作者喝一杯咖啡
 
