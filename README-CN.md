@@ -9,8 +9,6 @@
     <em>The translator that does more than just translation - powered by OpenAI.</em>
 </p>
 
-
-
 <p align="center">
 <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" />
@@ -44,8 +42,6 @@
 
 </p>
 
-
-
 # 为啥要造这个轮子？
 
 我开发了一个 Bob 的插件 [bob-plugin-openai-translator](https://github.com/yetone/bob-plugin-openai-translator) 使用 ChatGPT API 在 macOS 上进行全局划词翻译，
@@ -54,7 +50,6 @@
 # 既是浏览器插件也是跨平台桌面端应用！
 
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
-
 
 # 使用截图
 
@@ -78,21 +73,21 @@
 
 3. 打开解压后的文件
 
-* Windows 用户
+-   Windows 用户
 
     Windows 用户双击解压出来的文件夹里的 `OpenAI Translator` 即可使用！
-    
-* macOS 用户
+
+-   macOS 用户
 
     macOS 用户解压出来的是一个名字叫 `OpenAI Translator` 的应用，建议把解压出来的应用拖动到 `Applications` 目录中，macOS 用户第一次打开可能会遇到如下报错：
 
-    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
     点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
 
-    <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
-    <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+      <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
 # 浏览器插件安装方法
 
@@ -109,6 +104,10 @@
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
 4. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
+
+# License
+
+[MIT](./LICENSE)
 
 # 请作者喝一杯咖啡
 
