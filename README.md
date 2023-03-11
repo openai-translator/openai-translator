@@ -51,8 +51,6 @@ I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/
 
 What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
 
-* Note: Word selection is not currently supported in the desktop application, but it will be supported soon. Please stay tuned!
-
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
 # More than just translation
