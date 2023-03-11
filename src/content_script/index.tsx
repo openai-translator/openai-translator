@@ -57,7 +57,13 @@ async function hidePopupCard() {
     removeContainer()
 }
 
-async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
+async function showPopupCard(
+    x: number,
+    y: number,
+    text: string,
+    autoFocus: boolean | undefined = false,
+    isCenter: boolean | undefined = false
+) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
         $popupThumb.style.display = 'none'
@@ -66,7 +72,7 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     if (!$popupCard) {
         $popupCard = document.createElement('div')
         $popupCard.id = popupCardID
-        $popupCard.style.position = 'absolute'
+        $popupCard.style.position = 'fixed'
         $popupCard.style.zIndex = zIndex
         $popupCard.style.background = '#fff'
         $popupCard.style.borderRadius = '4px'
@@ -91,8 +97,15 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = `${x}px`
-    $popupCard.style.top = `${y}px`
+    if (isCenter) {
+        $popupCard.style.left = `50%`
+        $popupCard.style.top = `38%`
+        $popupCard.style.transform = 'translate(-50%, -50%)'
+    } else {
+        $popupCard.style.left = `${x}px`
+        $popupCard.style.top = `${y}px`
+    }
+
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
@@ -165,6 +178,14 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.top = `${y}px`
 }
 
+function listenerMessage() {
+    browser.runtime.onMessage.addListener((request) => {
+        if (request === 'show-popup-card') {
+            const text = (window.getSelection()?.toString() ?? '').trim()
+            showPopupCard(0, 0, text || '', false, true)
+        }
+    })
+}
 async function main() {
     document.addEventListener('mouseup', (event: MouseEvent) => {
         window.setTimeout(async () => {
@@ -189,6 +210,7 @@ async function main() {
     const settings = await utils.getSettings()
 
     await bindHotKey(settings.hotkey)
+    listenerMessage()
 }
 
 export async function bindHotKey(hotkey_: string | undefined) {

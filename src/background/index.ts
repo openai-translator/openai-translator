@@ -43,3 +43,11 @@ if (isFirefox) {
         }
     })
 }
+
+browser.commands.onCommand.addListener((command) => {
+    if (command === 'show-popup-card') {
+        browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+            if (tabs && tabs.length > 0 && tabs[0].id) chrome.tabs.sendMessage(tabs[0].id, 'show-popup-card')
+        })
+    }
+})
