@@ -39,7 +39,7 @@ jobs:
         run: yarn install # change this to npm or pnpm depending on which one you use
 
       - name: Build Tauri App (MacOS Universal)
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@dev
         if: matrix.platform == 'macos-latest'
         id: tauri-action-mac
         env:
@@ -49,7 +49,7 @@ jobs:
           args: --target universal-apple-darwin
 
       - name: Build Tauri App
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@dev
         if: matrix.platform != 'macos-latest'
         id: tauri-action
         env:
