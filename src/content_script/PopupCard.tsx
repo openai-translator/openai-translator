@@ -27,7 +27,7 @@ import { Settings } from '../popup/Settings'
 import { calculateMaxTop } from '.'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
-import { FcCheckmark } from 'react-icons/fc'
+import { FiUpload } from 'react-icons/fi'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -203,16 +203,14 @@ const useStyles = createUseStyles({
         'flexDirection': 'column',
         'alignItems': 'center',
         'justifyContent': 'center',
-        'padding': '5px',
+        'padding-left': '3px',
+        'padding-right': '3px',
         'border': '1px dashed #ccc',
-        'borderRadius': '2px',
+        'borderRadius': '0.75rem',
         'cursor': 'pointer',
-        'outline': 'none',
-        'margin-top': '1px',
-        'margin-bottom': '1px',
-        '&:hover': {
-            borderColor: '#999',
-        },
+        'userSelect': 'none',
+        '-webkit-user-select': 'none',
+        '-ms-user-select': 'none',
     },
 })
 
@@ -547,7 +545,6 @@ export function PopupCard(props: IPopupCardProps) {
         })()
     }, [props.defaultShowSettings])
 
-    const [imageUploaded, setImageUploaded] = useState(false)
     const [uploadLoading, setUploadLoading] = useState(false)
 
     const onDrop = async (acceptedFiles: File[]) => {
@@ -556,7 +553,6 @@ export function PopupCard(props: IPopupCardProps) {
         })
 
         setEditableText('')
-        setImageUploaded(false)
         setUploadLoading(true)
 
         if (acceptedFiles.length !== 1) {
@@ -584,7 +580,6 @@ export function PopupCard(props: IPopupCardProps) {
 
         setEditableText(data.text)
         setUploadLoading(false)
-        setImageUploaded(true)
 
         await (await worker).terminate()
     }
@@ -753,89 +748,73 @@ export function PopupCard(props: IPopupCardProps) {
                                         >
                                             {editableText}
                                         </div>
-                                        <div className={styles.dropZone}>
-                                            <Dropzone onDrop={onDrop}>
-                                                {({ getRootProps, getInputProps, isDragActive }) => (
-                                                    <div {...getRootProps()}>
-                                                        <input {...getInputProps({ multiple: false })} />
-                                                        {isDragActive ? (
-                                                            <p>Please drop a file here...</p>
-                                                        ) : (
-                                                            <div>
-                                                                {uploadLoading ? (
-                                                                    <p>Please wait. Processing the file...</p>
-                                                                ) : imageUploaded ? (
-                                                                    <p
-                                                                        style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            height: '100%',
-                                                                        }}
-                                                                    >
-                                                                        <FcCheckmark
-                                                                            style={{
-                                                                                fontSize: '20px',
-                                                                            }}
-                                                                        />
-                                                                        <span>
-                                                                            Uploaded. Click or drag and drop to upload
-                                                                            another file.
-                                                                        </span>
-                                                                    </p>
-                                                                ) : (
-                                                                    <p>
-                                                                        Drag and drop a file here or click to select a
-                                                                        file.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </Dropzone>
-                                        </div>
-                                        <Textarea
-                                            inputRef={editorRef}
-                                            autoFocus={props.autoFocus}
-                                            overrides={{
-                                                Root: {
-                                                    style: {
-                                                        width: '100%',
-                                                        borderRadius: '0px',
-                                                    },
-                                                },
-                                                Input: {
-                                                    style: {
-                                                        padding: '4px 8px',
-                                                        fontFamily:
-                                                            translateMode === 'explain-code' ? 'monospace' : 'inherit',
-                                                    },
-                                                },
-                                            }}
-                                            value={editableText}
-                                            size='mini'
-                                            resize='vertical'
-                                            rows={
-                                                props.editorRows
-                                                    ? props.editorRows
-                                                    : Math.min(Math.max(editableText.split('\n').length, 3), 12)
-                                            }
-                                            onChange={(e) => setEditableText(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    if (!e.shiftKey) {
-                                                        e.preventDefault()
-                                                        if (!translateMode) {
-                                                            setTranslateMode('translate')
+                                        <Dropzone onDrop={onDrop} noClick={true}>
+                                            {({ getRootProps, isDragActive }) => (
+                                                <div {...getRootProps()}>
+                                                    {isDragActive ? (
+                                                        <p>Drop file below</p>
+                                                    ) : (
+                                                        uploadLoading && <p>Processing...</p>
+                                                    )}
+                                                    <Textarea
+                                                        inputRef={editorRef}
+                                                        autoFocus={props.autoFocus}
+                                                        overrides={{
+                                                            Root: {
+                                                                style: {
+                                                                    width: '100%',
+                                                                    borderRadius: '0px',
+                                                                },
+                                                            },
+                                                            Input: {
+                                                                style: {
+                                                                    padding: '4px 8px',
+                                                                    fontFamily:
+                                                                        translateMode === 'explain-code'
+                                                                            ? 'monospace'
+                                                                            : 'inherit',
+                                                                },
+                                                            },
+                                                        }}
+                                                        value={editableText}
+                                                        size='mini'
+                                                        resize='vertical'
+                                                        rows={
+                                                            props.editorRows
+                                                                ? props.editorRows
+                                                                : Math.min(
+                                                                      Math.max(editableText.split('\n').length, 3),
+                                                                      12
+                                                                  )
                                                         }
-                                                        setOriginalText(editableText)
-                                                    }
-                                                }
-                                            }}
-                                        />
+                                                        onChange={(e) => setEditableText(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                if (!e.shiftKey) {
+                                                                    e.preventDefault()
+                                                                    if (!translateMode) {
+                                                                        setTranslateMode('translate')
+                                                                    }
+                                                                    setOriginalText(editableText)
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
+                                            <div className={styles.actionButton}>
+                                                <Dropzone onDrop={onDrop}>
+                                                    {({ getRootProps, getInputProps }) => (
+                                                        <div {...getRootProps()}>
+                                                            <input {...getInputProps({ multiple: false })} />
+                                                            <FiUpload />
+                                                        </div>
+                                                    )}
+                                                </Dropzone>
+                                            </div>
                                             <div
                                                 className={styles.actionButton}
                                                 onClick={() => {
