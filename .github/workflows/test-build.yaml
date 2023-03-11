@@ -36,7 +36,7 @@ jobs:
       - name: Build Tauri App (MacOS Universal)
         uses: tauri-apps/tauri-action@v0
         if: matrix.platform == 'macos-latest'
-        id: tauri-action
+        id: tauri-action-mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -57,8 +57,8 @@ jobs:
         with:
           name: tauri-client-app-artifact
           path: |
-            ${{ fromJSON(steps.tauri-action.outputs.artifactPaths)[0] }}
-            ${{ fromJSON(steps.tauri-action.outputs.artifactPaths)[1] }}
+            ${{ fromJSON(steps.tauri-action-mac.outputs.artifactPaths) }}
+            ${{ fromJSON(steps.tauri-action.outputs.artifactPaths) }}
 
 
   build-browser-extension:
