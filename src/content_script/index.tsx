@@ -4,7 +4,7 @@ import React from 'react'
 import icon from './assets/images/icon.png'
 import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
-import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+import { calculateMaxTop, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
@@ -55,13 +55,6 @@ async function hidePopupCard() {
         root = null
     }
     removeContainer()
-}
-
-export function calculateMaxTop($popupCard: HTMLElement): number {
-    const { innerHeight } = window
-    const { scrollTop } = document.documentElement
-    const { height } = $popupCard.getBoundingClientRect()
-    return scrollTop + innerHeight - height - 10
 }
 
 async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {

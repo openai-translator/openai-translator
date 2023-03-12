@@ -96,3 +96,10 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         parser.feed(str)
     }
 }
+
+export function calculateMaxTop($popupCard: HTMLElement): number {
+    const { innerHeight } = window
+    const { scrollTop } = document.documentElement
+    const { height } = $popupCard.getBoundingClientRect()
+    return scrollTop + innerHeight - height - 10
+}
