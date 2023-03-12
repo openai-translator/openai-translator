@@ -8,7 +8,7 @@
     "dev-tauri-renderer": "node build-tauri.mjs --serve",
     "build-tauri": "tauri build",
     "dev-tauri": "tauri dev",
-    "dev-browser-extension": "chokidar src -c \"npm run build\"",
+    "dev-browser-extension": "chokidar src -c \"npm run build-browser-extension\"",
     "build-browser-extension": "make build",
     "clean": "make clean",
     "test": "npx jest",
