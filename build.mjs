@@ -1,7 +1,6 @@
 import archiver from 'archiver'
 import esbuild from 'esbuild'
 import fs from 'fs-extra'
-import inlineImage from 'esbuild-plugin-inline-image'
 
 const browserExtensionOutDir = 'dist/browser-extension'
 const userscriptOutDir = 'dist/userscript'
@@ -20,7 +19,6 @@ async function esbuildBrowserExtension() {
         minify: true,
         legalComments: 'none',
         sourcemap: true,
-        plugins: [inlineImage()],
         loader: {
             '.png': 'dataurl',
             '.jpg': 'dataurl',

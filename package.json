@@ -84,7 +84,6 @@
     "electron-esbuild": "^7.0.0",
     "electron-util": "0.17.x",
     "esbuild": "^0.16.x",
-    "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-server": "^0.1.2",
     "esbuild-style-plugin": "^1.6.1",
     "eslint": "^8.35.0",
