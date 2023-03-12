@@ -75,6 +75,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     port.onMessage.addListener(async function (message) {
         if (message.type === 'abort') {
             controller.abort()
+            port.disconnect()
             return
         }
         if (message.type === 'open' && message?.details) {
@@ -114,6 +115,7 @@ browser.runtime.onConnect.addListener(async function (port) {
                 while (true) {
                     const { done, value } = await reader.read()
                     if (done) {
+                        port.disconnect()
                         break
                     }
                     const str = new TextDecoder().decode(value)
