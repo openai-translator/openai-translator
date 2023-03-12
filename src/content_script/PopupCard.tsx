@@ -46,7 +46,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
-        paddingBottom: '30px',
     },
     'settingsIcon': {
         position: 'absolute',
@@ -136,12 +135,12 @@ const useStyles = createUseStyles({
         display: 'flex',
         flexDirection: 'column',
         padding: '10px',
-        borderBottom: '1px solid #e9e9e9',
     },
     'popupCardTranslatedContainer': {
         position: 'relative',
         display: 'flex',
         padding: '16px 10px 10px 10px',
+        borderTop: '1px solid #e9e9e9',
     },
     'actionStr': {
         position: 'absolute',
@@ -453,7 +452,7 @@ export function PopupCard(props: IPopupCardProps) {
                         stopLoading()
                         if (reason !== 'stop') {
                             setActionStr('Error')
-                            setErrorMessage(`${actionStr} failed：${reason}`)
+                            setErrorMessage(`${actionStr} failed: ${reason}`)
                         } else {
                             switch (translateMode) {
                                 case 'translate':
@@ -1002,50 +1001,51 @@ export function PopupCard(props: IPopupCardProps) {
                                             </StatefulTooltip>
                                         </div>
                                     </div>
-                                    <div className={styles.popupCardTranslatedContainer}>
-                                        {actionStr && (
-                                            <div
-                                                className={clsx({
-                                                    [styles.actionStr]: true,
-                                                    [styles.error]: !!errorMessage,
-                                                })}
-                                            >
-                                                <div>{actionStr}</div>
-                                                {isLoading ? (
-                                                    <span className={styles.writing} />
-                                                ) : errorMessage ? (
-                                                    <span>😢</span>
-                                                ) : (
-                                                    <span>👍</span>
-                                                )}
-                                            </div>
-                                        )}
-                                        {errorMessage ? (
-                                            <div className={styles.errorMessage}>{errorMessage}</div>
-                                        ) : (
-                                            <div
-                                                style={{
-                                                    width: '100%',
-                                                }}
-                                            >
-                                                <div className={styles.popupCardTranslatedContentContainer}>
-                                                    <div>
-                                                        {translatedLines.map((line, i) => {
-                                                            return (
-                                                                <p className={styles.paragraph} key={`p-${i}`}>
-                                                                    {line}
-                                                                    {isLoading && i === translatedLines.length - 1 && (
-                                                                        <span className={styles.caret} />
-                                                                    )}
-                                                                </p>
-                                                            )
-                                                        })}
-                                                    </div>
+                                    {originalText !== '' && (
+                                        <div className={styles.popupCardTranslatedContainer}>
+                                            {actionStr && (
+                                                <div
+                                                    className={clsx({
+                                                        [styles.actionStr]: true,
+                                                        [styles.error]: !!errorMessage,
+                                                    })}
+                                                >
+                                                    <div>{actionStr}</div>
+                                                    {isLoading ? (
+                                                        <span className={styles.writing} />
+                                                    ) : errorMessage ? (
+                                                        <span>😢</span>
+                                                    ) : (
+                                                        <span>👍</span>
+                                                    )}
                                                 </div>
-                                                {translatedText && (
-                                                    <div className={styles.actionButtonsContainer}>
-                                                        <div style={{ marginRight: 'auto' }} />
-                                                        <StatefulTooltip content='Speak'>
+                                            )}
+                                            {errorMessage ? (
+                                                <div className={styles.errorMessage}>{errorMessage}</div>
+                                            ) : (
+                                                <div
+                                                    style={{
+                                                        width: '100%',
+                                                    }}
+                                                >
+                                                    <div className={styles.popupCardTranslatedContentContainer}>
+                                                        <div>
+                                                            {translatedLines.map((line, i) => {
+                                                                return (
+                                                                    <p className={styles.paragraph} key={`p-${i}`}>
+                                                                        {line}
+                                                                        {isLoading &&
+                                                                            i === translatedLines.length - 1 && (
+                                                                                <span className={styles.caret} />
+                                                                            )}
+                                                                    </p>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                    {translatedText && (
+                                                        <div className={styles.actionButtonsContainer}>
+                                                            <div style={{ marginRight: 'auto' }} />
                                                             <div
                                                                 className={styles.actionButton}
                                                                 onClick={() => {
@@ -1072,8 +1072,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                             >
                                                                 <HiOutlineSpeakerWave size={13} />
                                                             </div>
-                                                        </StatefulTooltip>
-                                                        <StatefulTooltip content='Copy to clipboard'>
                                                             <CopyToClipboard
                                                                 text={translatedText}
                                                                 onCopy={() => {
@@ -1087,13 +1085,13 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     <RxCopy size={13} />
                                                                 </div>
                                                             </CopyToClipboard>
-                                                        </StatefulTooltip>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                        <Toaster />
-                                    </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <Toaster />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

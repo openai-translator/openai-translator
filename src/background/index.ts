@@ -41,4 +41,24 @@ if (isFirefox) {
             chrome.tts.stop()
         }
     })
+    chrome.contextMenus.create(
+        {
+            id: 'open-translator',
+            type: 'normal',
+            title: 'OpenAI Translator',
+            contexts: ['page', 'selection'],
+        },
+        () => {
+            chrome.runtime.lastError
+        }
+    )
+    chrome.contextMenus.onClicked.addListener(function (info, tab) {
+        if (tab?.id) {
+            chrome.tabs.sendMessage(tab.id, {
+                type: 'open-translator',
+                info,
+                tab,
+            })
+        }
+    })
 }
