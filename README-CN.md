@@ -67,19 +67,21 @@
 
 # 桌面应用版安装方法
 
-1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的 zip 包
+1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的安装包
 
-2. 下载完毕后解压 zip 包
-
-3. 打开解压后的文件
+2. 安装此应用
 
 -   Windows 用户
 
-    Windows 用户双击解压出来的文件夹里的 `OpenAI Translator` 即可使用！
+    Windows 用户双击 `OpenAI Translator-*.msi` 即可进行安装！
 
 -   macOS 用户
 
-    macOS 用户解压出来的是一个名字叫 `OpenAI Translator` 的应用，建议把解压出来的应用拖动到 `Applications` 目录中，macOS 用户第一次打开可能会遇到如下报错：
+    macOS 用户需要把 `OpenAI Translator` 拖动到 `Applications` 目录中
+
+3. 打开应用
+    
+    macOS 用户第一次打开可能会遇到如下报错：
 
       <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
