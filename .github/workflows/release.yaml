@@ -87,7 +87,7 @@ jobs:
         run: make change-version
 
       - name: Build Tauri App (MacOS Universal)
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@a778402
         if: matrix.platform == 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
