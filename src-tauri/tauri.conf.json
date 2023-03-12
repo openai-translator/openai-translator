@@ -42,7 +42,13 @@
           "$APPCONFIG/*",
           "$RESOURCE/*"
         ],
-        "writeFile": true
+        "writeFile": true,
+        "readFile": true,
+        "readDir": true
+      },
+      "dialog": {
+        "all": false,
+        "message": true
       }
     },
     "bundle": {
@@ -50,7 +56,9 @@
       "category": "DeveloperTool",
       "copyright": "",
       "deb": {
-        "depends": ["xdotool"]
+        "depends": [
+          "xdotool"
+        ]
       },
       "externalBin": [],
       "icon": [

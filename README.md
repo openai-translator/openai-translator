@@ -110,7 +110,7 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # License
 
-[MIT](./LICENSE)
+[LICENSE](./LICENSE)
 
 # Buy me a coffee
 
