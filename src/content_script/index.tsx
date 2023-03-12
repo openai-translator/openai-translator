@@ -2,7 +2,7 @@ import '@webcomponents/webcomponentsjs'
 import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
-import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
+import { documentPadding, popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
 import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
@@ -57,11 +57,13 @@ async function hidePopupCard() {
     removeContainer()
 }
 
-export function calculateMaxTop($popupCard: HTMLElement): number {
-    const { innerHeight } = window
-    const { scrollTop } = document.documentElement
-    const { height } = $popupCard.getBoundingClientRect()
-    return scrollTop + innerHeight - height - 10
+export function calculateMaxXY($popupCard: HTMLElement): number[] {
+    const { innerWidth, innerHeight } = window
+    const { scrollLeft, scrollTop } = document.documentElement
+    const { width, height } = $popupCard.getBoundingClientRect()
+    const maxX = scrollLeft + innerWidth - width - documentPadding
+    const maxY = scrollTop + innerHeight - height - documentPadding
+    return [maxX, maxY]
 }
 
 async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
@@ -92,10 +94,9 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = x + popupCardMaxWidth > window.innerWidth ? 'auto' : `${x}px`
-    $popupCard.style.right = x + popupCardMaxWidth > window.innerWidth ? '18px' : 'unset'
-    const maxTop = calculateMaxTop($popupCard)
-    $popupCard.style.top = `${Math.min(maxTop, y)}px`
+    const [maxX, maxY] = calculateMaxXY($popupCard)
+    $popupCard.style.left = `${Math.min(maxX, x)}px`
+    $popupCard.style.top = `${Math.min(maxY, y)}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
