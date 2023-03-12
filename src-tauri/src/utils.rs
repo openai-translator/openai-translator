@@ -51,7 +51,6 @@ pub fn copy() {
     enigo.key_up(Key::Control);
 }
 
-#[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     let mut ctx: ClipboardContext = ClipboardProvider::new()?;
     let current_text = ctx.get_contents()?;
@@ -63,20 +62,6 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
             ctx.set_contents(current_text).and_then(|_| Ok(selected_text))
         }
     })?
-}
-
-#[cfg(target_os = "macos")]
-pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    use std::process::Command;
-    println!("get resource_path");
-    let resource_path = APP_HANDLE.get().unwrap().path_resolver()
-      .resolve_resource("get-selected-text.applescript").ok_or("no applescript resource found")?;
-    println!("resource_path: {:?}", resource_path);
-    let output = Command::new("osascript")
-        .arg(&resource_path)
-        .output()?;
-    let selected_text = String::from_utf8(output.stdout)?;
-    Ok(selected_text)
 }
 
 pub fn send_text(text: String) {
