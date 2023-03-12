@@ -88,6 +88,12 @@
       <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
       <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+    
+    如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除OpenAI Translator，然后重新添加OpenAI Translator:
+
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+      
+      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
 # 浏览器插件安装方法
 
