@@ -86,8 +86,8 @@ What began as a translation tool has now evolved to include surprisingly effecti
     
 3. Open the App!
 
-    In the initial run, you may encounter this:
-
+    When you first open it in macOS, you may encounter this problem:
+    
       <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
     Click `Cancel` and then go to `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it!
