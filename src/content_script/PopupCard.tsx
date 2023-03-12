@@ -22,15 +22,14 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp, ISettings } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
-import { listen, Event } from '@tauri-apps/api/event'
-import { fs } from '@tauri-apps/api'
+import { Event } from '@tauri-apps/api/event'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -564,55 +563,62 @@ export function PopupCard(props: IPopupCardProps) {
     }, [isOCRProcessing])
 
     useEffect(() => {
-        listen('tauri://file-drop', async (e: Event<string>) => {
-            if (e.payload.length !== 1) {
-                alert('Only one file can be uploaded at a time.')
-                return
-            }
+        if (!isTauri()) {
+            return
+        }
+        ;(async () => {
+            const { listen } = await require('@tauri-apps/api/event')
+            const { fs } = await require('@tauri-apps/api')
+            listen('tauri://file-drop', async (e: Event<string>) => {
+                if (e.payload.length !== 1) {
+                    alert('Only one file can be uploaded at a time.')
+                    return
+                }
 
-            const filePath = e.payload[0]
+                const filePath = e.payload[0]
 
-            if (!filePath) {
-                return
-            }
+                if (!filePath) {
+                    return
+                }
 
-            const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
-            if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                alert('invalid file type')
-                return
-            }
+                const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
+                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                    alert('invalid file type')
+                    return
+                }
 
-            const worker = createWorker({
-                // logger: (m) => console.log(m),
+                const worker = createWorker({
+                    // logger: (m) => console.log(m),
+                })
+
+                const binaryFile = await fs.readBinaryFile(filePath)
+
+                const file = new Blob([binaryFile.buffer], {
+                    type: `image/${fileExtension}`,
+                })
+
+                const fileSize = file.size / 1024 / 1024
+                if (fileSize > 1) {
+                    alert('File size must be less than 1MB')
+                    return
+                }
+
+                setOriginalText('')
+                setEditableText('')
+                setIsOCRProcessing(true)
+
+                await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
+                await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
+
+                const { data } = await (await worker).recognize(file)
+
+                setOriginalText(data.text)
+                setEditableText(data.text)
+                setIsOCRProcessing(false)
+
+                await (await worker).terminate()
             })
-
-            const binaryFile = await fs.readBinaryFile(filePath)
-
-            const file = new Blob([binaryFile.buffer], {
-                type: `image/${fileExtension}`,
-            })
-
-            const fileSize = file.size / 1024 / 1024
-            if (fileSize > 1) {
-                alert('File size must be less than 1MB')
-                return
-            }
-
-            setOriginalText('')
-            setEditableText('')
-            setIsOCRProcessing(true)
-
-            await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
-            await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
-
-            const { data } = await (await worker).recognize(file)
-
-            setOriginalText(data.text)
-            setEditableText(data.text)
-            setIsOCRProcessing(false)
-
-            await (await worker).terminate()
-        })
+        })()
     }, [])
 
     const onDrop = async (acceptedFiles: File[]) => {
@@ -943,7 +949,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <StatefulTooltip content='Upload images for OCR translation'>
+                                            <StatefulTooltip content='Upload images for OCR translation' showArrow>
                                                 <div className={styles.actionButton}>
                                                     <Dropzone onDrop={onDrop}>
                                                         {({ getRootProps, getInputProps }) => (
@@ -955,7 +961,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     </Dropzone>
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content='Speak'>
+                                            <StatefulTooltip content='Speak' showArrow>
                                                 <div
                                                     className={styles.actionButton}
                                                     onClick={() => {
@@ -983,20 +989,22 @@ export function PopupCard(props: IPopupCardProps) {
                                                     <HiOutlineSpeakerWave size={13} />
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content='Copy to clipboard'>
-                                                <CopyToClipboard
-                                                    text={editableText}
-                                                    onCopy={() => {
-                                                        toast('Copied to clipboard', {
-                                                            duration: 3000,
-                                                            icon: '👏',
-                                                        })
-                                                    }}
-                                                >
-                                                    <div className={styles.actionButton}>
-                                                        <RxCopy size={13} />
-                                                    </div>
-                                                </CopyToClipboard>
+                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                                <div>
+                                                    <CopyToClipboard
+                                                        text={editableText}
+                                                        onCopy={() => {
+                                                            toast('Copied to clipboard', {
+                                                                duration: 3000,
+                                                                icon: '👏',
+                                                            })
+                                                        }}
+                                                    >
+                                                        <div className={styles.actionButton}>
+                                                            <RxCopy size={13} />
+                                                        </div>
+                                                    </CopyToClipboard>
+                                                </div>
                                             </StatefulTooltip>
                                         </div>
                                     </div>
@@ -1045,45 +1053,51 @@ export function PopupCard(props: IPopupCardProps) {
                                                     {translatedText && (
                                                         <div className={styles.actionButtonsContainer}>
                                                             <div style={{ marginRight: 'auto' }} />
-                                                            <div
-                                                                className={styles.actionButton}
-                                                                onClick={() => {
-                                                                    if (isSpeakingTranslatedText) {
+                                                            <StatefulTooltip content='Speak' showArrow>
+                                                                <div
+                                                                    className={styles.actionButton}
+                                                                    onClick={() => {
+                                                                        if (isSpeakingTranslatedText) {
+                                                                            ;(async () => {
+                                                                                const browser = await getBrowser()
+                                                                                browser.runtime.sendMessage({
+                                                                                    type: 'stopSpeaking',
+                                                                                })
+                                                                                setIsSpeakingTranslatedText(false)
+                                                                            })()
+                                                                            return
+                                                                        }
                                                                         ;(async () => {
                                                                             const browser = await getBrowser()
+                                                                            setIsSpeakingTranslatedText(true)
                                                                             browser.runtime.sendMessage({
-                                                                                type: 'stopSpeaking',
+                                                                                type: 'speak',
+                                                                                text: translatedText,
+                                                                                lang: detectTo,
                                                                             })
-                                                                            setIsSpeakingTranslatedText(false)
                                                                         })()
-                                                                        return
-                                                                    }
-                                                                    ;(async () => {
-                                                                        const browser = await getBrowser()
-                                                                        setIsSpeakingTranslatedText(true)
-                                                                        browser.runtime.sendMessage({
-                                                                            type: 'speak',
-                                                                            text: translatedText,
-                                                                            lang: detectTo,
-                                                                        })
-                                                                    })()
-                                                                }}
-                                                            >
-                                                                <HiOutlineSpeakerWave size={13} />
-                                                            </div>
-                                                            <CopyToClipboard
-                                                                text={translatedText}
-                                                                onCopy={() => {
-                                                                    toast('Copied to clipboard', {
-                                                                        duration: 3000,
-                                                                        icon: '👏',
-                                                                    })
-                                                                }}
-                                                            >
-                                                                <div className={styles.actionButton}>
-                                                                    <RxCopy size={13} />
+                                                                    }}
+                                                                >
+                                                                    <HiOutlineSpeakerWave size={13} />
                                                                 </div>
-                                                            </CopyToClipboard>
+                                                            </StatefulTooltip>
+                                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                                                <div>
+                                                                    <CopyToClipboard
+                                                                        text={translatedText}
+                                                                        onCopy={() => {
+                                                                            toast('Copied to clipboard', {
+                                                                                duration: 3000,
+                                                                                icon: '👏',
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        <div className={styles.actionButton}>
+                                                                            <RxCopy size={13} />
+                                                                        </div>
+                                                                    </CopyToClipboard>
+                                                                </div>
+                                                            </StatefulTooltip>
                                                         </div>
                                                     )}
                                                 </div>
