@@ -21,7 +21,6 @@ pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 
 #[cfg(target_os = "macos")]
 fn query_accessibility_permissions() -> bool {
-    use macos_accessibility_client;
     let trusted = macos_accessibility_client::accessibility::application_is_trusted_with_prompt();
     if trusted {
         print!("Application is totally trusted!");
