@@ -22,6 +22,7 @@ async function esbuildBrowserExtension() {
         loader: {
             '.png': 'dataurl',
             '.jpg': 'dataurl',
+            '.gif': 'dataurl',
         },
     })
 }

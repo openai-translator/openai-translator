@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "node build-tauri.mjs",
-    "beforeDevCommand": "node build-tauri.mjs --serve",
+    "beforeBuildCommand": "yarn build-tauri-renderer",
+    "beforeDevCommand": "yarn dev-tauri-renderer",
     "devPath": "http://localhost:3000",
     "distDir": "../dist/tauri",
     "withGlobalTauri": true
@@ -39,9 +39,16 @@
       "fs": {
         "all": false,
         "scope": [
-          "$APPCONFIG/*"
+          "$APPCONFIG/*",
+          "$RESOURCE/*"
         ],
-        "writeFile": true
+        "writeFile": true,
+        "readFile": true,
+        "readDir": true
+      },
+      "dialog": {
+        "all": false,
+        "message": true
       }
     },
     "bundle": {
@@ -49,7 +56,9 @@
       "category": "DeveloperTool",
       "copyright": "",
       "deb": {
-        "depends": []
+        "depends": [
+          "xdotool"
+        ]
       },
       "externalBin": [],
       "icon": [
@@ -68,7 +77,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "get-selected-text.applescript"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {

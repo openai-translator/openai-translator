@@ -171,7 +171,11 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 async function main() {
+    let lastMouseEvent: MouseEvent | undefined
+    const browser = await utils.getBrowser()
+
     document.addEventListener('mouseup', (event: MouseEvent) => {
+        lastMouseEvent = event
         window.setTimeout(async () => {
             let text = (window.getSelection()?.toString() ?? '').trim()
             if (!text) {
@@ -184,6 +188,13 @@ async function main() {
                 ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
                 : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
         })
+    })
+
+    browser.runtime.onMessage.addListener(function (request) {
+        if (request.type === 'open-translator') {
+            const text = window.getSelection()?.toString().trim() ?? ''
+            showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
+        }
     })
 
     document.addEventListener('mousedown', () => {

@@ -26,10 +26,8 @@ pub fn menu() -> SystemTray {
 
     #[cfg(not(target_os = "macos"))]
     {
-        SystemTray::new()
-            .with_menu(tray_menu)
+        SystemTray::new().with_menu(tray_menu)
     }
-
 }
 
 pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
@@ -55,13 +53,16 @@ pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
             }
             "pin" => {
                 let window = app.get_window("main").unwrap();
+                let item = app.tray_handle().get_item(&id);
                 unsafe {
                     if !ALWAYS_ON_TOP {
                         window.set_always_on_top(true).unwrap();
                         ALWAYS_ON_TOP = true;
+                        item.set_selected(true).unwrap();
                     } else {
                         window.set_always_on_top(false).unwrap();
                         ALWAYS_ON_TOP = false;
+                        item.set_selected(false).unwrap();
                     }
                 }
             }
