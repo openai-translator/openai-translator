@@ -49,24 +49,60 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
       - name: setup node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libx11-dev libxdo-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+      - name: install dependencies (mac only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          rustup target add aarch64-apple-darwin
+
       - name: install frontend dependencies
         run: yarn install # change this to npm or pnpm depending on which one you use
-      - uses: tauri-apps/tauri-action@v0
+
+      - name: Change Version
+        env:
+          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
+        run: make change-version
+
+      - name: Build Tauri App (MacOS Universal)
+        uses: tauri-apps/tauri-action@v0
+        if: matrix.platform == 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
+          args: --target universal-apple-darwin
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@dev
+        if: matrix.platform != 'macos-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          
 
   build-browser-extension:
     runs-on: ubuntu-22.04
@@ -108,24 +144,24 @@ jobs:
           asset_name: openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
           asset_content_type: application/zip
 
-  publish-release:
-    permissions:
-      contents: write
-    runs-on: ubuntu-20.04
-    needs: [create-release, build-tauri, build-browser-extension]
-
-    steps:
-      - name: publish release
-        id: publish-release
-        uses: actions/github-script@v6
-        env:
-          release_id: ${{ needs.create-release.outputs.release_id }}
-        with:
-          script: |
-            github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: process.env.release_id,
-              draft: false,
-              prerelease: false
-            })
+  # publish-release:
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-20.04
+  #   needs: [create-release, build-tauri, build-browser-extension]
+  #
+  #   steps:
+  #     - name: publish release
+  #       id: publish-release
+  #       uses: actions/github-script@v6
+  #       env:
+  #         release_id: ${{ needs.create-release.outputs.release_id }}
+  #       with:
+  #         script: |
+  #           github.rest.repos.updateRelease({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             release_id: process.env.release_id,
+  #             draft: false,
+  #             prerelease: false
+  #           })

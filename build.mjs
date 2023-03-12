@@ -1,8 +1,10 @@
 import archiver from 'archiver'
 import esbuild from 'esbuild'
 import fs from 'fs-extra'
+import inlineImage from 'esbuild-plugin-inline-image'
 
 const browserExtensionOutDir = 'dist/browser-extension'
+const userscriptOutDir = 'dist/userscript'
 
 async function esbuildBrowserExtension() {
     await esbuild.build({
@@ -18,9 +20,11 @@ async function esbuildBrowserExtension() {
         minify: true,
         legalComments: 'none',
         sourcemap: true,
+        plugins: [inlineImage()],
         loader: {
             '.png': 'dataurl',
             '.jpg': 'dataurl',
+            '.gif': 'dataurl',
         },
     })
 }
@@ -75,6 +79,12 @@ async function build() {
     )
 
     await zipFolder(`./${browserExtensionOutDir}/firefox`)
+
+    // userscript
+    await copyFiles(
+        [{ src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' }],
+        `./${userscriptOutDir}`
+    )
 
     console.log('Build success.')
 }

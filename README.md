@@ -9,7 +9,6 @@
     <em>The translator that does more than just translation - powered by OpenAI.</em>
 </p>
 
-
 <p align="center">
 <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" />
@@ -21,7 +20,7 @@
 <!-- Rust Badge -->
 <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
+<a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
 <img alt="Chrome" src="https://img.shields.io/badge/-Chrome-green?style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
 
@@ -51,14 +50,11 @@ I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/
 
 What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
 
-* Note: Word selection is not currently supported in the desktop application, but it will be supported soon. Please stay tuned!
-
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
 # More than just translation
 
 What began as a translation tool has now evolved to include surprisingly effective word polishing and summarization capabilities, ~~accidentally~~.
-
 
 # How to use
 
@@ -76,27 +72,27 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Installation(Desktop App)
 
-1. Download zip package per OS from  [Release](https://github.com/yetone/openai-translator/releases)
+1. Download zip package per OS from [Release](https://github.com/yetone/openai-translator/releases)
 
 2. Unzip it
 
 3. Open the App!
 
-* Windows
+-   Windows
 
     Double click `OpenAI Translator` will do the job!
-    
-* macOS
+
+-   macOS
 
     Drag the `OpenAI Translator` to `Applications`, in the initial run, you may encounter this:
 
-    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
-    Click `Cancel` and then go to  `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it! 🎉
+    Click `Cancel` and then go to `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it! 🎉
 
-    <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
-    <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+      <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
 # Installation(Browser Extension)
 
@@ -111,6 +107,10 @@ What began as a translation tool has now evolved to include surprisingly effecti
 <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
 
 4. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
+
+# License
+
+[MIT](./LICENSE)
 
 # Buy me a coffee
 

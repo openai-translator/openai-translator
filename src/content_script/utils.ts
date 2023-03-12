@@ -1,10 +1,22 @@
 import { createParser } from 'eventsource-parser'
+import { userscriptFetch } from '../common/userscript-polyfill'
+import { isUserscript } from '../common/utils'
 import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
+
+function attachEventsToContainer($container: HTMLElement) {
+    $container.addEventListener('mousedown', (event) => {
+        event.stopPropagation()
+    })
+    $container.addEventListener('mouseup', (event) => {
+        event.stopPropagation()
+    })
+}
 
 export async function getContainer(): Promise<HTMLElement> {
     let $container: HTMLElement | null = document.querySelector(containerTagName)
     if (!$container) {
         $container = document.createElement(containerTagName)
+        attachEventsToContainer($container)
         $container.style.zIndex = zIndex
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -68,6 +80,7 @@ interface FetchSSEOptions extends RequestInit {
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
+    const fetch = isUserscript() ? userscriptFetch : window.fetch
     const resp = await fetch(input, fetchOptions)
     if (resp.status !== 200) {
         onError(await resp.json())

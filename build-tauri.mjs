@@ -2,6 +2,7 @@ import esbuild from 'esbuild'
 import { copy } from 'esbuild-plugin-copy'
 import fs from 'fs-extra'
 import esbuildServer from 'esbuild-server'
+import inlineImage from 'esbuild-plugin-inline-image'
 
 const tauriOutDir = 'dist/tauri'
 
@@ -24,12 +25,19 @@ const config = {
         '.jpg': 'dataurl',
     },
     plugins: [
+        inlineImage(),
         copy({
             resolveFrom: 'cwd',
-            assets: {
-                from: 'src/tauri/index.html',
-                to: `${tauriOutDir}/index.html`,
-            },
+            assets: [
+                {
+                    from: 'src/tauri/index.html',
+                    to: `${tauriOutDir}/index.html`,
+                },
+                {
+                    from: 'src-tauri/get-selected-text.applescript',
+                    to: `${tauriOutDir}/get-selected-text.applescript`,
+                },
+            ],
             watch: enableWatch,
         }),
     ],

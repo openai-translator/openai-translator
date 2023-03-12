@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react'
 import { PopupCard } from '../content_script/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
+import { emit, listen, Event } from '@tauri-apps/api/event'
+import { bindHotkey } from './utils'
 
 const engine = new Styletron({
     prefix: '__yetone-openai-translator-styletron-',
@@ -9,12 +11,31 @@ const engine = new Styletron({
 
 export function App() {
     const isMacOS = navigator.userAgent.includes('Mac OS X')
+    const isLinux = navigator.userAgent.includes('Linux')
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
+    const [text, setText] = React.useState('')
 
     useEffect(() => {
-        if (isMacOS) {
+        let unlisten
+        ;(async () => {
+            unlisten = await listen('change-text', async (event: Event<string>) => {
+                const selectedText = event.payload
+                if (selectedText) {
+                    setText(selectedText)
+                }
+            })
+        })()
+        return unlisten
+    }, [])
+
+    useEffect(() => {
+        bindHotkey()
+    }, [])
+
+    useEffect(() => {
+        if (isMacOS || isLinux) {
             return
         }
         function handleMinimize() {
@@ -44,7 +65,7 @@ export function App() {
             }}
         >
             <div className='titlebar' data-tauri-drag-region>
-                {!isMacOS && (
+                {!isMacOS && !isLinux && (
                     <>
                         <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
                             <img src='https://api.iconify.design/mdi:window-minimize.svg' alt='minimize' />
@@ -59,14 +80,15 @@ export function App() {
                 )}
             </div>
             <PopupCard
-                text=''
+                text={text}
                 engine={engine}
                 showSettings
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
-                containerStyle={{
-                    paddingTop: '20px',
+                containerStyle={isLinux ? undefined : { paddingTop: '20px' }}
+                onSettingsSave={() => {
+                    bindHotkey()
                 }}
             />
         </div>
