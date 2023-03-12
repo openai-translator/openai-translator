@@ -5,57 +5,27 @@ use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use window_shadows::set_shadow;
 #[cfg(target_os = "linux")]
 use window_shadows::set_shadow;
+use mouse_position::mouse_position::Mouse;
 
 pub const MAIN_WIN_NAME: &str = "main";
 
-#[cfg(target_os = "linux")]
 fn get_mouse_location() -> Result<(i32, i32), String> {
-    use std::process::Command;
-    let output: String = match Command::new("xdotool").arg("getmouselocation").output() {
-        Ok(v) => String::from_utf8(v.stdout).unwrap(),
-        Err(e) => return Err(format!("xsel failed: {}", e.to_string())),
-    };
-    let output: Vec<&str> = output.split_whitespace().collect();
-    let x = output
-        .get(0)
-        .unwrap()
-        .replace("x:", "")
-        .parse::<i32>()
-        .unwrap();
-    let y = output
-        .get(1)
-        .unwrap()
-        .replace("y:", "")
-        .parse::<i32>()
-        .unwrap();
-    return Ok((x, y));
-}
-
-#[cfg(target_os = "windows")]
-fn get_mouse_location() -> Result<(i32, i32), String> {
-    use windows::Win32::Foundation::POINT;
-    use windows::Win32::UI::WindowsAndMessaging::GetCursorPos;
-    let mut point = POINT { x: 0, y: 0 };
-    unsafe {
-        if GetCursorPos(&mut point).as_bool() {
-            return Ok((point.x, point.y));
-        } else {
-            return Err("error".to_string());
-        }
-    }
-}
-
-#[cfg(target_os = "macos")]
-fn get_mouse_location() -> Result<(i32, i32), String> {
-    use device_query::{DeviceQuery, DeviceState, MouseState};
-    let device_state = DeviceState::new();
-    let mouse: MouseState = device_state.get_mouse();
-    Ok(mouse.coords)
+    let position = Mouse::get_mouse_position();
+    match position {
+        Mouse::Position { x, y } => Ok((x, y)),
+        Mouse::Error => Err("Error getting mouse position".to_string()),
+   }
 }
 
 #[tauri::command]
 pub fn show_main_window_with_selected_text() {
-    let selected_text = utils::get_selected_text().unwrap_or_default();
+    let selected_text = match utils::get_selected_text() {
+        Ok(text) => text,
+        Err(e) => {
+            eprintln!("Error getting selected text: {}", e);
+            "".to_string()
+        }
+    };
     show_main_window();
     if !selected_text.is_empty() {
         utils::send_text(selected_text);
@@ -95,10 +65,6 @@ pub fn show_main_window() {
             .center()
             .focused(true)
             .title("OpenAI Translator");
-
-            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
-            } else {
-            }
 
             #[cfg(target_os = "macos")]
             {

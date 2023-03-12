@@ -67,19 +67,21 @@
 
 # 桌面应用版安装方法
 
-1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的 zip 包
+1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的安装包
 
-2. 下载完毕后解压 zip 包
-
-3. 打开解压后的文件
+2. 安装此应用
 
 -   Windows 用户
 
-    Windows 用户双击解压出来的文件夹里的 `OpenAI Translator` 即可使用！
+    Windows 用户双击 `OpenAI Translator-*.msi` 即可进行安装！
 
 -   macOS 用户
 
-    macOS 用户解压出来的是一个名字叫 `OpenAI Translator` 的应用，建议把解压出来的应用拖动到 `Applications` 目录中，macOS 用户第一次打开可能会遇到如下报错：
+    macOS 用户需要把 `OpenAI Translator` 拖动到 `Applications` 目录中
+
+3. 打开应用
+    
+    macOS 用户第一次打开可能会遇到如下报错：
 
       <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
@@ -88,6 +90,12 @@
       <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
       <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+    
+    如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除OpenAI Translator，然后重新添加OpenAI Translator:
+
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+      
+      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
 # 浏览器插件安装方法
 
