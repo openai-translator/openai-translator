@@ -30,6 +30,8 @@ import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
+import { listen, Event } from '@tauri-apps/api/event'
+import { fs } from '@tauri-apps/api'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -563,6 +565,58 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }, [isOCRProcessing])
 
+    useEffect(() => {
+        listen('tauri://file-drop', async (e: Event<string>) => {
+            if (e.payload.length !== 1) {
+                alert('Only one file can be uploaded at a time.')
+                return
+            }
+
+            const filePath = e.payload[0]
+
+            if (!filePath) {
+                return
+            }
+
+            const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
+            if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                alert('invalid file type')
+                return
+            }
+
+            const worker = createWorker({
+                // logger: (m) => console.log(m),
+            })
+
+            const binaryFile = await fs.readBinaryFile(filePath)
+
+            const file = new Blob([binaryFile.buffer], {
+                type: `image/${fileExtension}`,
+            })
+
+            const fileSize = file.size / 1024 / 1024
+            if (fileSize > 1) {
+                alert('File size must be less than 1MB')
+                return
+            }
+
+            setOriginalText('')
+            setEditableText('')
+            setIsOCRProcessing(true)
+
+            await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
+            await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
+
+            const { data } = await (await worker).recognize(file)
+
+            setOriginalText(data.text)
+            setEditableText(data.text)
+            setIsOCRProcessing(false)
+
+            await (await worker).terminate()
+        })
+    }, [])
+
     const onDrop = async (acceptedFiles: File[]) => {
         const worker = createWorker({
             // logger: (m) => console.log(m),
@@ -573,23 +627,22 @@ export function PopupCard(props: IPopupCardProps) {
         setIsOCRProcessing(true)
 
         if (acceptedFiles.length !== 1) {
-            alert('Please upload only one file at a time.')
+            alert('Only one file can be uploaded at a time.')
             return
         }
 
         const file = acceptedFiles[0]
         if (!file.type.startsWith('image/')) {
-            alert('File is not valid.')
+            alert('invalid file type')
             return
         }
 
         const fileSize = file.size / (1024 * 1024)
         if (fileSize > 1) {
-            alert('File size exceeds 1MB limit.')
+            alert('File size must be less than 1MB')
             return
         }
 
-        await (await worker).load()
         await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
         await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
 
