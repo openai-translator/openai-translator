@@ -249,20 +249,23 @@ export function PopupCard(props: IPopupCardProps) {
             isCompositing.current = false
         }
         const onMouseUp = () => {
-            var selectedWords = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-            console.log("selectedWords: " + selectedWords);
-            if (selectedWords?.length > 0) {
-                setSelectedWords(selectedWords)
-            }
+            const selectedWords = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWords(selectedWords)
+        }
+        const onBlur = () => {
+            setSelectedWords('')
         }
 
         editor.addEventListener('compositionstart', onCompositionStart)
         editor.addEventListener('compositionend', onCompositionEnd)
         editor.addEventListener('mouseup', onMouseUp)
+        editor.addEventListener('blur', onBlur)
+
         return () => {
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
+            editor.removeEventListener('blur', onBlur)
         }
     }, [selectedWords])
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
@@ -526,7 +529,19 @@ export function PopupCard(props: IPopupCardProps) {
         return () => {
             controller.abort()
         }
-    }, [translateText, originalText, selectedWords])
+    }, [translateText, originalText])
+
+    useEffect(() => {
+        if (selectedWords?.length == 0) {
+            return
+        }
+        const controller = new AbortController()
+        const { signal } = controller
+        translateText(originalText, selectedWords, signal)
+        return () => {
+            controller.abort()
+        }
+    }, [translateText, selectedWords])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
