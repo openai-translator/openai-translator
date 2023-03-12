@@ -68,8 +68,10 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
 #[cfg(target_os = "macos")]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     use std::process::Command;
+    println!("get resource_path");
     let resource_path = APP_HANDLE.get().unwrap().path_resolver()
       .resolve_resource("get-selected-text.applescript").ok_or("no applescript resource found")?;
+    println!("resource_path: {:?}", resource_path);
     let output = Command::new("osascript")
         .arg(&resource_path)
         .output()?;
