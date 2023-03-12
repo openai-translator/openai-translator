@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { PopupCard } from '../content_script/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
-import { emit, listen, Event } from '@tauri-apps/api/event'
+import { listen, Event } from '@tauri-apps/api/event'
 import { bindHotkey } from './utils'
 
 const engine = new Styletron({

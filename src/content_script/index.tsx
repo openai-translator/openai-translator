@@ -1,7 +1,6 @@
 import '@webcomponents/webcomponentsjs'
 import * as utils from '../common/utils'
 import React from 'react'
-import browser from 'webextension-polyfill'
 import icon from './assets/images/icon.png'
 import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
@@ -172,6 +171,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
 
 async function main() {
     let lastMouseEvent: MouseEvent | undefined
+    const browser = await utils.getBrowser()
 
     document.addEventListener('mouseup', (event: MouseEvent) => {
         lastMouseEvent = event
