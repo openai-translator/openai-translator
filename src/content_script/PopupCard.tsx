@@ -1102,12 +1102,12 @@ export function PopupCard(props: IPopupCardProps) {
                                                     )}
                                                 </div>
                                             )}
-                                            <Toaster />
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
+                        <Toaster />
                     </div>
                 </BaseProvider>
             </StyletronProvider>
