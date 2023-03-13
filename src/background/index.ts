@@ -64,6 +64,59 @@ if (isFirefox) {
     })
 }
 
+type FetchMessage = {
+    type: string
+    details: { url: string; options: RequestInit }
+}
+
+async function fethWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
+    const { url, options } = message.details
+    let response: Response | null = null
+
+    try {
+        response = await fetch(url, { ...options, signal })
+    } catch (error) {
+        if (error instanceof Error) {
+            const { message, name } = error
+            port.postMessage({
+                error: { message, name },
+            })
+        }
+        port.disconnect()
+        return
+    }
+
+    const reader = response?.body?.getReader()
+    if (!reader) {
+        port.postMessage({
+            status: response.status,
+        })
+        return
+    }
+    const parser = createParser((event) => {
+        if (event.type === 'event') {
+            port.postMessage({
+                status: response?.status,
+                response: event.data,
+            })
+        }
+    })
+    try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+                port.disconnect()
+                break
+            }
+            const str = new TextDecoder().decode(value)
+            parser.feed(str)
+        }
+    } finally {
+        reader.releaseLock()
+    }
+}
+
 browser.runtime.onConnect.addListener(async function (port) {
     if (port.name !== 'background-fetch') {
         return
@@ -73,57 +126,13 @@ browser.runtime.onConnect.addListener(async function (port) {
     const { signal } = controller
 
     port.onMessage.addListener(async function (message) {
-        if (message.type === 'abort') {
-            controller.abort()
-            port.disconnect()
-            return
-        }
-        if (message.type === 'open' && message?.details) {
-            const { url, options } = message.details
-
-            let response: Response
-            try {
-                response = await fetch(url, { ...options, signal })
-            } catch (error) {
-                if (error instanceof Error) {
-                    port.postMessage({
-                        error: { message: error.toString() },
-                    })
-                }
-                return
-            }
-
-            const reader = response?.body?.getReader()
-            if (!reader) {
-                port.postMessage({
-                    status: response.status,
-                })
-                return
-            }
-
-            const parser = createParser((event) => {
-                if (event.type === 'event') {
-                    port.postMessage({
-                        status: response.status,
-                        response: event.data,
-                    })
-                }
-            })
-
-            try {
-                // eslint-disable-next-line no-constant-condition
-                while (true) {
-                    const { done, value } = await reader.read()
-                    if (done) {
-                        port.disconnect()
-                        break
-                    }
-                    const str = new TextDecoder().decode(value)
-                    parser.feed(str)
-                }
-            } finally {
-                reader.releaseLock()
-            }
+        switch (message.type) {
+            case 'abort':
+                controller.abort()
+                break
+            case 'open':
+                fethWithStream(port, message, signal)
+                break
         }
     })
 })

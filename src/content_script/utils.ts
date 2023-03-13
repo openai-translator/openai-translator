@@ -79,27 +79,34 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
 }
 
-function handleBackgroundFetch(input: string, options: FetchSSEOptions) {
-    return new Promise((resolve) => {
+function backgroundFetch(input: string, options: FetchSSEOptions) {
+    return new Promise((_resolve, reject) => {
         const { onMessage, onError, signal, ...fetchOptions } = options
 
         const port = browser.runtime.connect({ name: 'background-fetch' })
         port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
-        port.onMessage.addListener(function (message) {
-            if (message.error) {
-                onError(message)
-                resolve('')
+        port.onMessage.addListener(function (msg) {
+            if (msg.error) {
+                const error = new Error()
+                error.message = msg.error.message
+                error.name = msg.error.name
+                reject(error)
                 return
             }
-            if (message.status !== 200) {
-                onError(message)
-                return
+            if (msg.status !== 200) {
+                onError(msg)
+            } else {
+                onMessage(msg.response)
             }
-            onMessage(message.response)
         })
-        signal?.addEventListener('abort', function () {
+
+        function handleAbort() {
             port.postMessage({ type: 'abort' })
+        }
+        port.onDisconnect.addListener(() => {
+            signal?.removeEventListener('abort', handleAbort)
         })
+        signal?.addEventListener('abort', handleAbort)
     })
 }
 
@@ -107,7 +114,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
 
     if (!isDesktopApp() && !isUserscript()) {
-        await handleBackgroundFetch(input, options)
+        await backgroundFetch(input, options)
     } else {
         const fetch = isUserscript() ? userscriptFetch : window.fetch
         const resp = await fetch(input, fetchOptions)
