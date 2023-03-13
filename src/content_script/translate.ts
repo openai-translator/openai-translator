@@ -7,6 +7,7 @@ export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' 
 
 export interface TranslateQuery {
     text: string
+    selectedWords: string
     detectFrom: string
     detectTo: string
     mode: TranslateMode
@@ -49,6 +50,22 @@ export async function translate(query: TranslateQuery) {
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
                 }
+            }
+            if (query.selectedWords?.length > 0) {
+                // 在选择的句子中，选择特定的单词。触发语境学习功能。
+                systemPrompt = `你是一位${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }词义语法专家，你在教我${lang.langMap.get(query.detectFrom) || query.detectFrom}，我给你一句${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }句子，和这个句子中的一个单词，请用${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }帮我解释一下，这个单词在句子中的意思和句子本身的意思,如果单词在这个句子中是习话的一部分，请解释这句句子中的习话，并举几个相同意思的${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }例句,并用${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }解释例句。如果你明白了请说同意，然后我们开始。`
+                assistantPrompt = '好的，我明白了，请给我这个句子和单词。'
+                query.text = `句子是：${query.text}\n单词是：${query.selectedWords}`
             }
             break
         case 'polishing':
