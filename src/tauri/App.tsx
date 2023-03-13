@@ -48,7 +48,7 @@ export function App() {
         function handlePin() {
             invoke('set_main_window_always_on_top').then((pinned) => {
                 setPinned(pinned)
-            }) 
+            })
         }
         function handleMinimize() {
             appWindow.minimize()
@@ -82,11 +82,11 @@ export function App() {
                 {!isMacOS && !isLinux && (
                     <>
                         <div className='titlebar-button' id='titlebar-pin' ref={pinIconRef}>
-                        {isPinned ? (
-                            <img src='https://api.iconify.design/ic:baseline-push-pin.svg' alt='pin' />
-                        ) : (
-                            <img src='https://api.iconify.design/ic:outline-push-pin.svg' alt='pin' />
-                        )}
+                            {isPinned ? (
+                                <img src='https://api.iconify.design/ic:baseline-push-pin.svg' alt='pin' />
+                            ) : (
+                                <img src='https://api.iconify.design/ic:outline-push-pin.svg' alt='pin' />
+                            )}
                         </div>
                         <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
                             <img src='https://api.iconify.design/mdi:window-minimize.svg' alt='minimize' />
