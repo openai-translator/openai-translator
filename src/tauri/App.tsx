@@ -3,6 +3,7 @@ import { PopupCard } from '../content_script/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
+import { invoke } from '@tauri-apps/api/tauri'
 import { bindHotkey } from './utils'
 
 const engine = new Styletron({
@@ -12,11 +13,17 @@ const engine = new Styletron({
 export function App() {
     const isMacOS = navigator.userAgent.includes('Mac OS X')
     const isLinux = navigator.userAgent.includes('Linux')
+    const pinIconRef = useRef<HTMLDivElement>(null)
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
     const [text, setText] = React.useState('')
-
+    const [isPinned, setPinned] = React.useState(false)
+    useEffect(() => {
+        invoke("get_main_window_always_on_top").then((pinned) => {
+            return setPinned(pinned)
+        });
+    });
     useEffect(() => {
         let unlisten
         ;(async () => {
@@ -38,6 +45,12 @@ export function App() {
         if (isMacOS || isLinux) {
             return
         }
+        function handlePin() {
+            console.log(isPinned);
+            invoke('set_main_window_always_on_top').then((pinned) => {
+                setPinned(pinned)
+            }) 
+        }
         function handleMinimize() {
             appWindow.minimize()
         }
@@ -45,12 +58,14 @@ export function App() {
             appWindow.maximize()
         }
         function handleClose() {
-            appWindow.close()
+            appWindow.hide()
         }
+        pinIconRef.current?.addEventListener('click', handlePin)
         minimizeIconRef.current?.addEventListener('click', handleMinimize)
         maximizeIconRef.current?.addEventListener('click', handleMaximize)
         closeIconRef.current?.addEventListener('click', handleClose)
         return () => {
+            pinIconRef.current?.removeEventListener('click', handlePin)
             minimizeIconRef.current?.removeEventListener('click', handleMinimize)
             maximizeIconRef.current?.removeEventListener('click', handleMaximize)
             closeIconRef.current?.removeEventListener('click', handleClose)
@@ -67,6 +82,15 @@ export function App() {
             <div className='titlebar' data-tauri-drag-region>
                 {!isMacOS && !isLinux && (
                     <>
+                        <div className='titlebar-button' id='titlebar-pin' ref={pinIconRef}>
+                        { 
+                            isPinned ? (
+                                <img src='https://api.iconify.design/ic:baseline-push-pin.svg' alt='pin' />
+                            ) : (
+                                <img src='https://api.iconify.design/ic:outline-push-pin.svg' alt='pin' />
+                            )
+                        }
+                        </div>
                         <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
                             <img src='https://api.iconify.design/mdi:window-minimize.svg' alt='minimize' />
                         </div>
