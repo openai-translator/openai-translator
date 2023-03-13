@@ -7,7 +7,7 @@ export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' 
 
 export interface TranslateQuery {
     text: string
-    selectedWords: string
+    selectedWord: string
     detectFrom: string
     detectTo: string
     mode: TranslateMode
@@ -27,6 +27,7 @@ export interface TranslateResult {
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
+    const trimFirstQuotation = !query.selectedWord
     const settings = await utils.getSettings()
     const apiKey = await utils.getApiKey()
     const headers = {
@@ -51,7 +52,7 @@ export async function translate(query: TranslateQuery) {
                     assistantPrompt = '翻译成简体白话文'
                 }
             }
-            if (query.selectedWords?.length > 0) {
+            if (query.selectedWord) {
                 // 在选择的句子中，选择特定的单词。触发语境学习功能。
                 systemPrompt = `你是一位${
                     lang.langMap.get(query.detectFrom) || query.detectFrom
@@ -65,7 +66,7 @@ export async function translate(query: TranslateQuery) {
                     lang.langMap.get(query.detectTo) || query.detectTo
                 }解释例句。如果你明白了请说同意，然后我们开始。`
                 assistantPrompt = '好的，我明白了，请给我这个句子和单词。'
-                query.text = `句子是：${query.text}\n单词是：${query.selectedWords}`
+                query.text = `句子是：${query.text}\n单词是：${query.selectedWord}`
             }
             break
         case 'polishing':
@@ -160,7 +161,7 @@ export async function translate(query: TranslateQuery) {
             const { content = '', role } = delta
             let targetTxt = content
 
-            if (isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+            if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
                 targetTxt = targetTxt.slice(1)
             }
 

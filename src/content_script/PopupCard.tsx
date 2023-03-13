@@ -239,7 +239,7 @@ export interface TesseractResult extends RecognizeResult {
 export function PopupCard(props: IPopupCardProps) {
     const editorRef = useRef<HTMLTextAreaElement>(null)
     const isCompositing = useRef(false)
-    const [selectedWords, setSelectedWords] = useState('')
+    const [selectedWord, setSelectedWord] = useState('')
 
     useEffect(() => {
         const editor = editorRef.current
@@ -253,11 +253,12 @@ export function PopupCard(props: IPopupCardProps) {
             isCompositing.current = false
         }
         const onMouseUp = () => {
-            const selectedWords = editor.value.substring(editor.selectionStart, editor.selectionEnd)
-            setSelectedWords(selectedWords)
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
         }
         const onBlur = () => {
-            setSelectedWords('')
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
         }
 
         editor.addEventListener('compositionstart', onCompositionStart)
@@ -271,7 +272,8 @@ export function PopupCard(props: IPopupCardProps) {
             editor.removeEventListener('mouseup', onMouseUp)
             editor.removeEventListener('blur', onBlur)
         }
-    }, [selectedWords])
+    }, [])
+
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
         ;(async () => {
@@ -452,7 +454,7 @@ export function PopupCard(props: IPopupCardProps) {
     }, [headerRef])
 
     const translateText = useCallback(
-        async (text: string, selectedWords: string, signal: AbortSignal) => {
+        async (text: string, selectedWord: string, signal: AbortSignal) => {
             if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
@@ -482,7 +484,7 @@ export function PopupCard(props: IPopupCardProps) {
                     mode: translateMode,
                     signal,
                     text,
-                    selectedWords,
+                    selectedWord,
                     detectFrom,
                     detectTo,
                     onMessage: (message) => {
@@ -554,23 +556,11 @@ export function PopupCard(props: IPopupCardProps) {
     useEffect(() => {
         const controller = new AbortController()
         const { signal } = controller
-        translateText(originalText, selectedWords, signal)
+        translateText(originalText, selectedWord, signal)
         return () => {
             controller.abort()
         }
-    }, [translateText, originalText])
-
-    useEffect(() => {
-        if (selectedWords?.length == 0) {
-            return
-        }
-        const controller = new AbortController()
-        const { signal } = controller
-        translateText(originalText, selectedWords, signal)
-        return () => {
-            controller.abort()
-        }
-    }, [translateText, selectedWords])
+    }, [translateText, originalText, selectedWord])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
