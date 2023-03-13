@@ -26,27 +26,35 @@ pub fn show_main_window_with_selected_text() {
             "".to_string()
         }
     };
-    show_main_window();
     if !selected_text.is_empty() {
+        show_main_window(false);
         utils::send_text(selected_text);
+    } else {
+        show_main_window(true);
     }
 }
 
-#[tauri::command]
-pub fn show_main_window() {
-    let (x, y): (i32, i32) = get_mouse_location().unwrap();
+pub fn show_main_window(center: bool) {
     let handle = APP_HANDLE.get().unwrap();
     match handle.get_window(MAIN_WIN_NAME) {
         Some(window) => {
-            if cfg!(target_os = "macos") {
-                window
-                    .set_position(LogicalPosition::new(x as f64, y as f64))
-                    .unwrap();
+            if !center {
+                let (x, y): (i32, i32) = get_mouse_location().unwrap();
+                if cfg!(target_os = "macos") {
+                    window
+                        .set_position(LogicalPosition::new(x as f64, y as f64))
+                        .unwrap();
+                } else {
+                    window.unminimize().unwrap();
+                    window
+                        .set_position(PhysicalPosition::new(x as f64, y as f64))
+                        .unwrap();
+                }
             } else {
-                window.unminimize().unwrap();
-                window
-                    .set_position(PhysicalPosition::new(x as f64, y as f64))
-                    .unwrap();
+                if !cfg!(target_os = "macos") {
+                    window.unminimize().unwrap();
+                }
+                window.center().unwrap();
             }
             window.set_focus().unwrap();
             window.show().unwrap();
