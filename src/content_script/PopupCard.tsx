@@ -15,8 +15,7 @@ import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy } from 'react-icons/rx'
-import { HiOutlineSpeakerWave } from 'react-icons/hi2'
+import { RxCopy, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxTop, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
@@ -30,6 +29,7 @@ import { BsTextareaT } from 'react-icons/bs'
 import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
+import SpeakerMotion from '../components/SpeakerMotion'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -184,6 +184,9 @@ const useStyles = createUseStyles({
     },
     'actionButton': {
         cursor: 'pointer',
+        display: 'flex',
+        paddingTop: '6px',
+        paddingBottom: '6px',
     },
     'writing': {
         'marginLeft': '3px',
@@ -978,16 +981,14 @@ export function PopupCard(props: IPopupCardProps) {
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
                                             <StatefulTooltip content='Upload images for OCR translation' showArrow>
-                                                <div className={styles.actionButton}>
-                                                    <Dropzone onDrop={onDrop}>
-                                                        {({ getRootProps, getInputProps }) => (
-                                                            <div {...getRootProps()}>
-                                                                <input {...getInputProps({ multiple: false })} />
-                                                                <BsTextareaT size={13} />
-                                                            </div>
-                                                        )}
-                                                    </Dropzone>
-                                                </div>
+                                                <Dropzone onDrop={onDrop}>
+                                                    {({ getRootProps, getInputProps }) => (
+                                                        <div {...getRootProps()} className={styles.actionButton}>
+                                                            <input {...getInputProps({ multiple: false })} />
+                                                            <BsTextareaT size={13} />
+                                                        </div>
+                                                    )}
+                                                </Dropzone>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Speak' showArrow>
                                                 <div
@@ -1014,7 +1015,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                         })()
                                                     }}
                                                 >
-                                                    <HiOutlineSpeakerWave size={13} />
+                                                    {isSpeakingEditableText ? (
+                                                        <SpeakerMotion />
+                                                    ) : (
+                                                        <RxSpeakerLoud size={13} />
+                                                    )}
                                                 </div>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Copy to clipboard' showArrow>
@@ -1106,7 +1111,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                                         })()
                                                                     }}
                                                                 >
-                                                                    <HiOutlineSpeakerWave size={13} />
+                                                                    {isSpeakingTranslatedText ? (
+                                                                        <SpeakerMotion />
+                                                                    ) : (
+                                                                        <RxSpeakerLoud size={13} />
+                                                                    )}
                                                                 </div>
                                                             </StatefulTooltip>
                                                             <StatefulTooltip content='Copy to clipboard' showArrow>
