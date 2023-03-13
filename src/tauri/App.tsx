@@ -45,7 +45,7 @@ export function App() {
             appWindow.maximize()
         }
         function handleClose() {
-            appWindow.close()
+            appWindow.hide()
         }
         minimizeIconRef.current?.addEventListener('click', handleMinimize)
         maximizeIconRef.current?.addEventListener('click', handleMaximize)
