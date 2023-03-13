@@ -15,7 +15,7 @@ import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy, RxSpeakerLoud, RxSpeakerModerate, RxSpeakerQuiet } from 'react-icons/rx'
+import { RxCopy, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxTop, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
@@ -29,6 +29,7 @@ import { BsTextareaT } from 'react-icons/bs'
 import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
+import SpeakerMotion from '../components/SpeakerMotion'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -214,50 +215,6 @@ const useStyles = createUseStyles({
         'userSelect': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
-    },
-    'speakerLoud': {
-        animation: '$speaker-loud-animation 2s infinite',
-    },
-    'speakerModerate': {
-        animation: '$speaker-moderate-animation 2s infinite',
-        position: 'absolute',
-    },
-    'speakerQuiet': {
-        animation: '$speaker-quiet-animation 2s infinite',
-        position: 'absolute',
-    },
-    '@keyframes speaker-loud-animation': {
-        '0%': {
-            opacity: 0,
-        },
-        '50%': {
-            opacity: 0,
-        },
-        '100%': {
-            opacity: 1,
-        },
-    },
-    '@keyframes speaker-moderate-animation': {
-        '0%': {
-            opacity: 0,
-        },
-        '50%': {
-            opacity: 1,
-        },
-        '100%': {
-            opacity: 0,
-        },
-    },
-    '@keyframes speaker-quiet-animation': {
-        '0%': {
-            opacity: 1,
-        },
-        '50%': {
-            opacity: 0,
-        },
-        '100%': {
-            opacity: 0,
-        },
     },
 })
 
@@ -1059,14 +1016,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     }}
                                                 >
                                                     {isSpeakingEditableText ? (
-                                                        <>
-                                                            <RxSpeakerLoud className={styles.speakerLoud} size={13} />
-                                                            <RxSpeakerModerate
-                                                                className={styles.speakerModerate}
-                                                                size={13}
-                                                            />
-                                                            <RxSpeakerQuiet className={styles.speakerQuiet} size={13} />
-                                                        </>
+                                                        <SpeakerMotion />
                                                     ) : (
                                                         <RxSpeakerLoud size={13} />
                                                     )}
@@ -1162,20 +1112,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     }}
                                                                 >
                                                                     {isSpeakingTranslatedText ? (
-                                                                        <>
-                                                                            <RxSpeakerLoud
-                                                                                className={styles.speakerLoud}
-                                                                                size={13}
-                                                                            />
-                                                                            <RxSpeakerModerate
-                                                                                className={styles.speakerModerate}
-                                                                                size={13}
-                                                                            />
-                                                                            <RxSpeakerQuiet
-                                                                                className={styles.speakerQuiet}
-                                                                                size={13}
-                                                                            />
-                                                                        </>
+                                                                        <SpeakerMotion />
                                                                     ) : (
                                                                         <RxSpeakerLoud size={13} />
                                                                     )}
