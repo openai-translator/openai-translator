@@ -11,7 +11,7 @@
 
 <p align="center">
 <a href="LICENSE" target="_blank">
-    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" />
+    <img alt="MIT License" src="https://img.shields.io/github/license/yetone/openai-translator.svg?style=flat-square" />
 </a>
 
 <!-- TypeScript Badge -->
