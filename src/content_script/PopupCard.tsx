@@ -15,8 +15,7 @@ import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy } from 'react-icons/rx'
-import { HiOutlineSpeakerWave } from 'react-icons/hi2'
+import { RxCopy, RxSpeakerLoud, RxSpeakerModerate, RxSpeakerQuiet } from 'react-icons/rx'
 import { calculateMaxTop, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
@@ -184,6 +183,9 @@ const useStyles = createUseStyles({
     },
     'actionButton': {
         cursor: 'pointer',
+        display: 'flex',
+        paddingTop: '6px',
+        paddingBottom: '6px',
     },
     'writing': {
         'marginLeft': '3px',
@@ -212,6 +214,50 @@ const useStyles = createUseStyles({
         'userSelect': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
+    },
+    'speakerLoud': {
+        animation: '$speaker-loud-animation 2s infinite',
+    },
+    'speakerModerate': {
+        animation: '$speaker-moderate-animation 2s infinite',
+        position: 'absolute',
+    },
+    'speakerQuiet': {
+        animation: '$speaker-quiet-animation 2s infinite',
+        position: 'absolute',
+    },
+    '@keyframes speaker-loud-animation': {
+        '0%': {
+            opacity: 0,
+        },
+        '50%': {
+            opacity: 0,
+        },
+        '100%': {
+            opacity: 1,
+        },
+    },
+    '@keyframes speaker-moderate-animation': {
+        '0%': {
+            opacity: 0,
+        },
+        '50%': {
+            opacity: 1,
+        },
+        '100%': {
+            opacity: 0,
+        },
+    },
+    '@keyframes speaker-quiet-animation': {
+        '0%': {
+            opacity: 1,
+        },
+        '50%': {
+            opacity: 0,
+        },
+        '100%': {
+            opacity: 0,
+        },
     },
 })
 
@@ -978,16 +1024,14 @@ export function PopupCard(props: IPopupCardProps) {
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
                                             <StatefulTooltip content='Upload images for OCR translation' showArrow>
-                                                <div className={styles.actionButton}>
-                                                    <Dropzone onDrop={onDrop}>
-                                                        {({ getRootProps, getInputProps }) => (
-                                                            <div {...getRootProps()}>
-                                                                <input {...getInputProps({ multiple: false })} />
-                                                                <BsTextareaT size={13} />
-                                                            </div>
-                                                        )}
-                                                    </Dropzone>
-                                                </div>
+                                                <Dropzone onDrop={onDrop}>
+                                                    {({ getRootProps, getInputProps }) => (
+                                                        <div {...getRootProps()} className={styles.actionButton}>
+                                                            <input {...getInputProps({ multiple: false })} />
+                                                            <BsTextareaT size={13} />
+                                                        </div>
+                                                    )}
+                                                </Dropzone>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Speak' showArrow>
                                                 <div
@@ -1014,7 +1058,18 @@ export function PopupCard(props: IPopupCardProps) {
                                                         })()
                                                     }}
                                                 >
-                                                    <HiOutlineSpeakerWave size={13} />
+                                                    {isSpeakingEditableText ? (
+                                                        <>
+                                                            <RxSpeakerLoud className={styles.speakerLoud} size={13} />
+                                                            <RxSpeakerModerate
+                                                                className={styles.speakerModerate}
+                                                                size={13}
+                                                            />
+                                                            <RxSpeakerQuiet className={styles.speakerQuiet} size={13} />
+                                                        </>
+                                                    ) : (
+                                                        <RxSpeakerLoud size={13} />
+                                                    )}
                                                 </div>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Copy to clipboard' showArrow>
@@ -1106,7 +1161,24 @@ export function PopupCard(props: IPopupCardProps) {
                                                                         })()
                                                                     }}
                                                                 >
-                                                                    <HiOutlineSpeakerWave size={13} />
+                                                                    {isSpeakingTranslatedText ? (
+                                                                        <>
+                                                                            <RxSpeakerLoud
+                                                                                className={styles.speakerLoud}
+                                                                                size={13}
+                                                                            />
+                                                                            <RxSpeakerModerate
+                                                                                className={styles.speakerModerate}
+                                                                                size={13}
+                                                                            />
+                                                                            <RxSpeakerQuiet
+                                                                                className={styles.speakerQuiet}
+                                                                                size={13}
+                                                                            />
+                                                                        </>
+                                                                    ) : (
+                                                                        <RxSpeakerLoud size={13} />
+                                                                    )}
                                                                 </div>
                                                             </StatefulTooltip>
                                                             <StatefulTooltip content='Copy to clipboard' showArrow>
