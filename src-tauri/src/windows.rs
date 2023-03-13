@@ -1,3 +1,4 @@
+use crate::ALWAYS_ON_TOP;
 use crate::utils;
 use crate::APP_HANDLE;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
@@ -15,6 +16,32 @@ fn get_mouse_location() -> Result<(i32, i32), String> {
         Mouse::Position { x, y } => Ok((x, y)),
         Mouse::Error => Err("Error getting mouse position".to_string()),
    }
+}
+
+#[tauri::command]
+pub fn set_main_window_always_on_top() -> bool  {
+    let handle = APP_HANDLE.get().unwrap();
+    let window = handle.get_window(MAIN_WIN_NAME).unwrap();
+    let item = handle.tray_handle().get_item("pin");
+    unsafe {
+        if !ALWAYS_ON_TOP {
+            window.set_always_on_top(true).unwrap();
+            ALWAYS_ON_TOP = true;
+            item.set_selected(true).unwrap();
+        } else {
+            window.set_always_on_top(false).unwrap();
+            ALWAYS_ON_TOP = false;
+            item.set_selected(false).unwrap();
+        }
+        ALWAYS_ON_TOP
+    }
+}
+
+#[tauri::command]
+pub fn get_main_window_always_on_top() -> bool {
+    unsafe {
+        crate::ALWAYS_ON_TOP
+    }
 }
 
 #[tauri::command]
