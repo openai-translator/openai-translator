@@ -27,7 +27,6 @@
     "@heroicons/react": "^2.0.16",
     "@popperjs/core": "^2.11.6",
     "@tauri-apps/api": "^1.2.0",
-    "@types/lodash": "^4.14.191",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dropzone": "^5.1.0",
     "@types/react-icons": "^3.0.0",
@@ -43,7 +42,6 @@
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "languagedetect": "^2.0.0",
-    "lodash": "^4.17.21",
     "rc-field-form": "^1.27.4",
     "react": "^18.0.1",
     "react-copy-to-clipboard": "^5.1.0",
@@ -58,6 +56,7 @@
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",
     "tesseract.js": "^4.0.2",
+    "underscore": "^1.13.6",
     "xregexp": "^5.1.1"
   },
   "devDependencies": {
@@ -71,6 +70,7 @@
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.1",
     "@types/tampermonkey": "^4.0.10",
+    "@types/underscore": "^1.11.4",
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
