@@ -1,7 +1,7 @@
 import { createParser } from 'eventsource-parser'
 import { userscriptFetch } from '../common/userscript-polyfill'
 import { isDesktopApp, isUserscript } from '../common/utils'
-import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
+import { containerTagName, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 import browser from 'webextension-polyfill'
 
 function attachEventsToContainer($container: HTMLElement) {
@@ -134,9 +134,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     }
 }
 
-export function calculateMaxTop($popupCard: HTMLElement): number {
-    const { innerHeight } = window
-    const { scrollTop } = document.documentElement
-    const { height } = $popupCard.getBoundingClientRect()
-    return scrollTop + innerHeight - height - 10
+export function calculateMaxXY($popupCard: HTMLElement): number[] {
+  const { innerWidth, innerHeight } = window
+  const { scrollLeft, scrollTop } = document.documentElement
+  const { width, height } = $popupCard.getBoundingClientRect()
+  const maxX = scrollLeft + innerWidth - width - documentPadding
+  const maxY = scrollTop + innerHeight - height - documentPadding
+  return [maxX, maxY]
 }

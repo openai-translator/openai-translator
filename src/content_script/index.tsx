@@ -4,7 +4,7 @@ import React from 'react'
 import icon from './assets/images/icon.png'
 import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
-import { calculateMaxTop, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
@@ -85,10 +85,9 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = x + popupCardMaxWidth > window.innerWidth ? 'auto' : `${x}px`
-    $popupCard.style.right = x + popupCardMaxWidth > window.innerWidth ? '18px' : 'unset'
-    const maxTop = calculateMaxTop($popupCard)
-    $popupCard.style.top = `${Math.min(maxTop, y)}px`
+    const [maxX, maxY] = calculateMaxXY($popupCard)
+    $popupCard.style.left = `${Math.min(maxX, x)}px`
+    $popupCard.style.top = `${Math.min(maxY, y)}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,

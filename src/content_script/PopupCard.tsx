@@ -17,13 +17,14 @@ import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { HiOutlineSpeakerWave } from 'react-icons/hi2'
-import { calculateMaxTop, queryPopupCardElement } from './utils'
+import { calculateMaxXY, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
+import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
@@ -170,6 +171,8 @@ const useStyles = createUseStyles({
     'popupCardTranslatedContentContainer': {
         marginTop: '-14px',
         padding: '4px 8px',
+        display: 'flex',
+        overflowY: 'auto',
     },
     'errorMessage': {
         display: 'flex',
@@ -318,16 +321,41 @@ export function PopupCard(props: IPopupCardProps) {
 
     const headerRef = useRef<HTMLDivElement>(null)
 
+    const editorContainerRef = useRef<HTMLDivElement>(null)
+
+    const translatedContentRef = useRef<HTMLDivElement>(null)
+
+    const actionButtonsRef = useRef<HTMLDivElement>(null)
+
     // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
-        const observer = new ResizeObserver((entries) => {
+        const calculateTranslatedContentMaxHeight = (): number => {
+            const { innerHeight } = window
+            const headerHeight = headerRef.current?.offsetHeight || 0
+            const editorHeight = editorContainerRef.current?.offsetHeight || 0
+            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
+            return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
+        }
+
+        const resizeHandle: ResizeObserverCallback = (entries) => {
             // Listen for element height changes
             for (const entry of entries) {
                 const $popupCard = entry.target as HTMLElement
-                const maxTop = calculateMaxTop($popupCard)
-                $popupCard.style.top = `${Math.min(maxTop, $popupCard.offsetTop)}px`
+                const [maxX, maxY] = calculateMaxXY($popupCard)
+                const yList = [maxY, $popupCard.offsetTop].filter((item) => item > documentPadding)
+                $popupCard.style.top = `${Math.min(...yList) || documentPadding}px`
+                const xList = [maxX, $popupCard.offsetLeft].filter((item) => item > documentPadding)
+                $popupCard.style.left = `${Math.min(...xList) || documentPadding}px`
+
+                const $translatedContent = translatedContentRef.current
+                if ($translatedContent) {
+                    const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
+                    $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
+                }
             }
-        })
+        }
+
+        const observer = new ResizeObserver(resizeHandle)
         queryPopupCardElement().then(($popupCard) => {
             if ($popupCard) {
                 const rect = $popupCard.getBoundingClientRect()
@@ -382,21 +410,21 @@ export function PopupCard(props: IPopupCardProps) {
             const [l, t] = overflowCheck($popupCard, e)
             $popupCard.style.top = `${t}px`
             $popupCard.style.left = `${l}px`
-            $popupCard.style.right = 'unset'
         }
 
         const overflowCheck = ($popupCard: HTMLDivElement, e: MouseEvent) => {
             let left = $popupCard.offsetLeft
             let top = $popupCard.offsetTop
             if (
-                $popupCard.offsetLeft + e.movementX > 10 &&
-                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > 18
+                $popupCard.offsetLeft + e.movementX > documentPadding &&
+                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > documentPadding
             ) {
                 left = $popupCard.offsetLeft + e.movementX
             }
             if (
-                $popupCard.getBoundingClientRect().top + e.movementY > 10 &&
-                window.innerHeight - $popupCard.getBoundingClientRect().top - e.movementY - $popupCard.offsetHeight > 10
+                $popupCard.offsetTop + e.movementY > documentPadding &&
+                document.documentElement.offsetHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight >
+                    documentPadding
             ) {
                 top = $popupCard.offsetTop + e.movementY
             }
@@ -870,7 +898,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
-                                    <div className={styles.popupCardEditorContainer}>
+                                    <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
                                         <div
                                             style={{
                                                 height: 0,
@@ -1063,7 +1091,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         width: '100%',
                                                     }}
                                                 >
-                                                    <div className={styles.popupCardTranslatedContentContainer}>
+                                                    <div ref={translatedContentRef} className={styles.popupCardTranslatedContentContainer}>
                                                         <div>
                                                             {translatedLines.map((line, i) => {
                                                                 return (
@@ -1079,7 +1107,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         </div>
                                                     </div>
                                                     {translatedText && (
-                                                        <div className={styles.actionButtonsContainer}>
+                                                        <div ref={actionButtonsRef} className={styles.actionButtonsContainer}>
                                                             <div style={{ marginRight: 'auto' }} />
                                                             <StatefulTooltip content='Speak' showArrow>
                                                                 <div
