@@ -69,7 +69,7 @@ type FetchMessage = {
     details: { url: string; options: RequestInit }
 }
 
-async function fethWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
+async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
     const { url, options } = message.details
     let response: Response | null = null
 
@@ -131,7 +131,7 @@ browser.runtime.onConnect.addListener(async function (port) {
                 controller.abort()
                 break
             case 'open':
-                fethWithStream(port, message, signal)
+                fetchWithStream(port, message, signal)
                 break
         }
     })
