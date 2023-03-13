@@ -3,7 +3,7 @@
 
     "name": "OpenAI Translator",
     "description": "OpenAI-Translator is a Chrome extension that uses the ChatGPT API for translation.",
-    "version": "0.1.0",
+    "version": "0.0.21",
 
     "icons": {
         "16": "icon.png",

@@ -56,7 +56,7 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     let current_text = ctx.get_contents()?;
     copy();
     ctx.get_contents().map(|selected_text| {
-        if selected_text == current_text {
+        if selected_text.trim() == current_text.trim() {
             Ok("".to_string())
         } else {
             ctx.set_contents(current_text).and_then(|_| Ok(selected_text))

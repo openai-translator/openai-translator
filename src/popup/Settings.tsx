@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import _ from 'lodash'
+import _ from 'underscore'
 import icon from './assets/images/icon.png'
 import beams from './assets/images/beams.jpg'
 import toast, { Toaster } from 'react-hot-toast'

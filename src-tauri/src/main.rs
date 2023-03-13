@@ -10,7 +10,10 @@ mod utils;
 mod windows;
 
 use crate::config::get_config_content;
+
 use crate::windows::{show_main_window, MAIN_WIN_NAME, show_main_window_with_selected_text, get_main_window_always_on_top, set_main_window_always_on_top};
+
+
 use once_cell::sync::OnceCell;
 use tauri::AppHandle;
 use tauri::Manager;
@@ -61,7 +64,6 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             get_config_content,
-            show_main_window,
             show_main_window_with_selected_text,
             get_main_window_always_on_top,
             set_main_window_always_on_top,
