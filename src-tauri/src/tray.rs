@@ -3,12 +3,17 @@ use tauri::{
     AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
 
+use crate::ALWAYS_ON_TOP;
+use crate::windows::set_main_window_always_on_top;
+
 pub fn menu() -> SystemTray {
     let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "Show");
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
-    let pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
+    let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-
+    unsafe {
+        pin.selected = ALWAYS_ON_TOP;
+    }
     let tray_menu = SystemTrayMenu::new()
         .add_item(show)
         .add_item(hide)
@@ -31,7 +36,7 @@ pub fn menu() -> SystemTray {
 }
 
 pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
-    static mut ALWAYS_ON_TOP: bool = false;
+    
 
     match event {
         SystemTrayEvent::LeftClick {
@@ -52,19 +57,7 @@ pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
                 window.hide().unwrap();
             }
             "pin" => {
-                let window = app.get_window("main").unwrap();
-                let item = app.tray_handle().get_item(&id);
-                unsafe {
-                    if !ALWAYS_ON_TOP {
-                        window.set_always_on_top(true).unwrap();
-                        ALWAYS_ON_TOP = true;
-                        item.set_selected(true).unwrap();
-                    } else {
-                        window.set_always_on_top(false).unwrap();
-                        ALWAYS_ON_TOP = false;
-                        item.set_selected(false).unwrap();
-                    }
-                }
+                set_main_window_always_on_top();
             }
             "quit" => app.exit(0),
             _ => {}
