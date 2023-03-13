@@ -135,10 +135,10 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
 }
 
 export function calculateMaxXY($popupCard: HTMLElement): number[] {
-  const { innerWidth, innerHeight } = window
-  const { scrollLeft, scrollTop } = document.documentElement
-  const { width, height } = $popupCard.getBoundingClientRect()
-  const maxX = scrollLeft + innerWidth - width - documentPadding
-  const maxY = scrollTop + innerHeight - height - documentPadding
-  return [maxX, maxY]
+    const { innerWidth, innerHeight } = window
+    const { scrollLeft, scrollTop } = document.documentElement
+    const { width, height } = $popupCard.getBoundingClientRect()
+    const maxX = scrollLeft + innerWidth - width - documentPadding
+    const maxY = scrollTop + innerHeight - height - documentPadding
+    return [maxX, maxY]
 }

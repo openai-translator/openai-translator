@@ -1091,7 +1091,10 @@ export function PopupCard(props: IPopupCardProps) {
                                                         width: '100%',
                                                     }}
                                                 >
-                                                    <div ref={translatedContentRef} className={styles.popupCardTranslatedContentContainer}>
+                                                    <div
+                                                        ref={translatedContentRef}
+                                                        className={styles.popupCardTranslatedContentContainer}
+                                                    >
                                                         <div>
                                                             {translatedLines.map((line, i) => {
                                                                 return (
@@ -1107,7 +1110,10 @@ export function PopupCard(props: IPopupCardProps) {
                                                         </div>
                                                     </div>
                                                     {translatedText && (
-                                                        <div ref={actionButtonsRef} className={styles.actionButtonsContainer}>
+                                                        <div
+                                                            ref={actionButtonsRef}
+                                                            className={styles.actionButtonsContainer}
+                                                        >
                                                             <div style={{ marginRight: 'auto' }} />
                                                             <StatefulTooltip content='Speak' showArrow>
                                                                 <div
