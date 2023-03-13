@@ -1,7 +1,8 @@
 import { createParser } from 'eventsource-parser'
 import { userscriptFetch } from '../common/userscript-polyfill'
-import { isUserscript } from '../common/utils'
+import { isDesktopApp, isUserscript } from '../common/utils'
 import { containerTagName, popupCardID, popupThumbID, zIndex } from './consts'
+import browser from 'webextension-polyfill'
 
 function attachEventsToContainer($container: HTMLElement) {
     $container.addEventListener('mousedown', (event) => {
@@ -78,22 +79,58 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
 }
 
+function backgroundFetch(input: string, options: FetchSSEOptions) {
+    return new Promise((_resolve, reject) => {
+        const { onMessage, onError, signal, ...fetchOptions } = options
+
+        const port = browser.runtime.connect({ name: 'background-fetch' })
+        port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
+        port.onMessage.addListener(function (msg) {
+            if (msg.error) {
+                const error = new Error()
+                error.message = msg.error.message
+                error.name = msg.error.name
+                reject(error)
+                return
+            }
+            if (msg.status !== 200) {
+                onError(msg)
+            } else {
+                onMessage(msg.response)
+            }
+        })
+
+        function handleAbort() {
+            port.postMessage({ type: 'abort' })
+        }
+        port.onDisconnect.addListener(() => {
+            signal?.removeEventListener('abort', handleAbort)
+        })
+        signal?.addEventListener('abort', handleAbort)
+    })
+}
+
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
-    const fetch = isUserscript() ? userscriptFetch : window.fetch
-    const resp = await fetch(input, fetchOptions)
-    if (resp.status !== 200) {
-        onError(await resp.json())
-        return
-    }
-    const parser = createParser((event) => {
-        if (event.type === 'event') {
-            onMessage(event.data)
+
+    if (!isDesktopApp() && !isUserscript()) {
+        await backgroundFetch(input, options)
+    } else {
+        const fetch = isUserscript() ? userscriptFetch : window.fetch
+        const resp = await fetch(input, fetchOptions)
+        if (resp.status !== 200) {
+            onError(await resp.json())
+            return
         }
-    })
-    for await (const chunk of streamAsyncIterator[Symbol.asyncIterator](resp.body)) {
-        const str = new TextDecoder().decode(chunk)
-        parser.feed(str)
+        const parser = createParser((event) => {
+            if (event.type === 'event') {
+                onMessage(event.data)
+            }
+        })
+        for await (const chunk of streamAsyncIterator[Symbol.asyncIterator](resp.body)) {
+            const str = new TextDecoder().decode(chunk)
+            parser.feed(str)
+        }
     }
 }
 
