@@ -22,7 +22,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp, ISettings } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
@@ -564,55 +564,56 @@ export function PopupCard(props: IPopupCardProps) {
     }, [isOCRProcessing])
 
     useEffect(() => {
-        listen('tauri://file-drop', async (e: Event<string>) => {
-            if (e.payload.length !== 1) {
-                alert('Only one file can be uploaded at a time.')
-                return
-            }
+        isTauri() &&
+            listen('tauri://file-drop', async (e: Event<string>) => {
+                if (e.payload.length !== 1) {
+                    alert('Only one file can be uploaded at a time.')
+                    return
+                }
 
-            const filePath = e.payload[0]
+                const filePath = e.payload[0]
 
-            if (!filePath) {
-                return
-            }
+                if (!filePath) {
+                    return
+                }
 
-            const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
-            if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                alert('invalid file type')
-                return
-            }
+                const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
+                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                    alert('invalid file type')
+                    return
+                }
 
-            const worker = createWorker({
-                // logger: (m) => console.log(m),
+                const worker = createWorker({
+                    // logger: (m) => console.log(m),
+                })
+
+                const binaryFile = await fs.readBinaryFile(filePath)
+
+                const file = new Blob([binaryFile.buffer], {
+                    type: `image/${fileExtension}`,
+                })
+
+                const fileSize = file.size / 1024 / 1024
+                if (fileSize > 1) {
+                    alert('File size must be less than 1MB')
+                    return
+                }
+
+                setOriginalText('')
+                setEditableText('')
+                setIsOCRProcessing(true)
+
+                await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
+                await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
+
+                const { data } = await (await worker).recognize(file)
+
+                setOriginalText(data.text)
+                setEditableText(data.text)
+                setIsOCRProcessing(false)
+
+                await (await worker).terminate()
             })
-
-            const binaryFile = await fs.readBinaryFile(filePath)
-
-            const file = new Blob([binaryFile.buffer], {
-                type: `image/${fileExtension}`,
-            })
-
-            const fileSize = file.size / 1024 / 1024
-            if (fileSize > 1) {
-                alert('File size must be less than 1MB')
-                return
-            }
-
-            setOriginalText('')
-            setEditableText('')
-            setIsOCRProcessing(true)
-
-            await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
-            await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
-
-            const { data } = await (await worker).recognize(file)
-
-            setOriginalText(data.text)
-            setEditableText(data.text)
-            setIsOCRProcessing(false)
-
-            await (await worker).terminate()
-        })
     }, [])
 
     const onDrop = async (acceptedFiles: File[]) => {
