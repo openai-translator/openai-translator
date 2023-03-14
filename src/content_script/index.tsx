@@ -183,7 +183,7 @@ async function main() {
 
     browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'open-translator') {
-            const text = window.getSelection()?.toString().trim() ?? ''
+            const text = request.info.selectionText ?? ''
             showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
         }
     })
