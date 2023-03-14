@@ -69,9 +69,12 @@ type FetchMessage = {
     details: { url: string; options: RequestInit }
 }
 
+const portSet = new Set()
+
 async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
     const { url, options } = message.details
     let response: Response | null = null
+    const tabId = port.sender?.tab?.id
 
     try {
         response = await fetch(url, { ...options, signal })
@@ -82,6 +85,7 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
                 error: { message, name },
             })
         }
+        tabId && portSet.delete(tabId)
         port.disconnect()
         return
     }
@@ -113,6 +117,7 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
             parser.feed(str)
         }
     } finally {
+        tabId && portSet.delete(tabId)
         reader.releaseLock()
     }
 }
@@ -121,7 +126,16 @@ browser.runtime.onConnect.addListener(async function (port) {
     if (port.name !== 'background-fetch') {
         return
     }
+    const tabId = port.sender?.tab?.id
+    if (!tabId) {
+        return
+    }
+    // only one port is allowed per tab.
+    if (portSet.has(tabId)) {
+        return
+    }
 
+    portSet.add(tabId)
     const controller = new AbortController()
     const { signal } = controller
 
