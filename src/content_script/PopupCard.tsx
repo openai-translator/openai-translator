@@ -711,7 +711,12 @@ export function PopupCard(props: IPopupCardProps) {
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
                 <BaseProvider theme={LightTheme}>
-                    <div className={styles.popupCard}>
+                    <div
+                        className={styles.popupCard}
+                        style={{
+                            paddingBottom: showSettings ? '0px' : '30px',
+                        }}
+                    >
                         {props.showSettings && (
                             <StatefulTooltip
                                 content={showSettings ? 'Go to Translator' : 'Go to Settings'}
