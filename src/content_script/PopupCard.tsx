@@ -32,6 +32,16 @@ import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import { HighlightInTextarea } from '../common/highlight-in-textarea'
+import LRUCache from 'lru-cache'
+
+const cache = new LRUCache({
+    max: 500,
+    maxSize: 5000,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    sizeCalculation: (_value, _key) => {
+        return 1
+    },
+})
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -486,27 +496,62 @@ export function PopupCard(props: IPopupCardProps) {
             if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
-            startLoading()
-            switch (translateMode) {
-                case 'translate':
-                    setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
-                    break
-                case 'polishing':
-                    setActionStr('Polishing...')
-                    break
-                case 'summarize':
-                    setActionStr('Summarizing...')
-                    break
-                case 'analyze':
-                    setActionStr('Analyzing...')
-                    break
-                case 'explain-code':
-                    setActionStr('Explaining...')
-                    break
+            const beforeTranslate = () => {
+                switch (translateMode) {
+                    case 'translate':
+                        setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
+                        break
+                    case 'polishing':
+                        setActionStr('Polishing...')
+                        break
+                    case 'summarize':
+                        setActionStr('Summarizing...')
+                        break
+                    case 'analyze':
+                        setActionStr('Analyzing...')
+                        break
+                    case 'explain-code':
+                        setActionStr('Explaining...')
+                        break
+                }
+                setTranslatedText('')
+                setErrorMessage('')
+                startLoading()
+            }
+            const afterTranslate = (reason: string) => {
+                stopLoading()
+                if (reason !== 'stop') {
+                    setActionStr('Error')
+                    setErrorMessage(`${actionStr} failed: ${reason}`)
+                } else {
+                    switch (translateMode) {
+                        case 'translate':
+                            setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
+                            break
+                        case 'polishing':
+                            setActionStr('Polished')
+                            break
+                        case 'summarize':
+                            setActionStr('Summarized')
+                            break
+                        case 'analyze':
+                            setActionStr('Analyzed')
+                            break
+                        case 'explain-code':
+                            setActionStr('Explained')
+                            break
+                    }
+                }
+            }
+            beforeTranslate()
+            const cachedKey = `translate:${translateMode}:${detectFrom}:${detectTo}:${text}:${selectedWord}`
+            const cachedValue = cache.get(cachedKey)
+            if (cachedValue) {
+                afterTranslate('stop')
+                setTranslatedText(cachedValue as string)
+                return
             }
             let isStopped = false
-            setTranslatedText('')
-            setErrorMessage('')
             try {
                 await translate({
                     mode: translateMode,
@@ -524,37 +569,17 @@ export function PopupCard(props: IPopupCardProps) {
                         })
                     },
                     onFinish: (reason) => {
-                        stopLoading()
-                        if (reason !== 'stop') {
-                            setActionStr('Error')
-                            setErrorMessage(`${actionStr} failed: ${reason}`)
-                        } else {
-                            switch (translateMode) {
-                                case 'translate':
-                                    setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
-                                    break
-                                case 'polishing':
-                                    setActionStr('Polished')
-                                    break
-                                case 'summarize':
-                                    setActionStr('Summarized')
-                                    break
-                                case 'analyze':
-                                    setActionStr('Analyzed')
-                                    break
-                                case 'explain-code':
-                                    setActionStr('Explained')
-                                    break
-                            }
-                        }
+                        afterTranslate(reason)
                         setTranslatedText((translatedText) => {
+                            let result = translatedText
                             if (
                                 translatedText &&
                                 ['”', '"', '」'].indexOf(translatedText[translatedText.length - 1]) >= 0
                             ) {
-                                return translatedText.slice(0, -1)
+                                result = translatedText.slice(0, -1)
                             }
-                            return translatedText
+                            cache.set(cachedKey, result)
+                            return result
                         })
                     },
                     onError: (error) => {

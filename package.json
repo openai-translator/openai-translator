@@ -42,6 +42,7 @@
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "languagedetect": "^2.0.0",
+    "lru-cache": "^8.0.0",
     "rc-field-form": "^1.27.4",
     "react": "^18.0.1",
     "react-copy-to-clipboard": "^5.1.0",
