@@ -5,3 +5,4 @@ export const containerTagName = 'yetone-openai-translator'
 export const popupCardMinWidth = 200
 export const popupCardMaxWidth = 600
 export const documentPadding = 10
+export const pricePerToken = 0.000002

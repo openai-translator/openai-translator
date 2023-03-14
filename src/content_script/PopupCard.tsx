@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
@@ -23,7 +23,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
-import { documentPadding } from './consts'
+import { documentPadding, pricePerToken } from './consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
@@ -31,6 +31,7 @@ import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
+import { encode } from '@nem035/gpt-3-encoder'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -183,7 +184,6 @@ const useStyles = createUseStyles({
         flexDirection: 'row',
         alignItems: 'center',
         gap: '12px',
-        marginTop: '10px',
     },
     'actionButton': {
         cursor: 'pointer',
@@ -218,6 +218,10 @@ const useStyles = createUseStyles({
         'userSelect': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
+    },
+    'tokenCountContainer': {
+        paddingTop: '2px',
+        fontSize: '12px',
     },
 })
 
@@ -708,6 +712,8 @@ export function PopupCard(props: IPopupCardProps) {
         await (await worker).terminate()
     }
 
+    const tokenCount = useMemo(() => encode(editableText).length, [editableText])
+
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
@@ -996,6 +1002,9 @@ export function PopupCard(props: IPopupCardProps) {
                                                 </div>
                                             )}
                                         </Dropzone>
+                                        <div className={styles.tokenCountContainer}>
+                                            {tokenCount} tokens ≈ ${(tokenCount * pricePerToken).toFixed(6)}
+                                        </div>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
                                             <StatefulTooltip content='Upload images for OCR translation' showArrow>

@@ -25,6 +25,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.16",
+    "@nem035/gpt-3-encoder": "^1.1.7",
     "@popperjs/core": "^2.11.6",
     "@tauri-apps/api": "^1.2.0",
     "@types/react-copy-to-clipboard": "^5.0.4",

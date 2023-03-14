@@ -800,6 +800,11 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
+"@nem035/gpt-3-encoder@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@nem035/gpt-3-encoder/-/gpt-3-encoder-1.1.7.tgz#34f27863c22230fbfbcf1c8413d849c6f51cc2bb"
+  integrity sha512-dtOenP4ZAmsKXkobTDUCcbkQvPJbuJ6Kp/LHqWDYLK//XNgGs3Re8ymcQzyVhtph8JckdI3K8FR5Q+6mX7HnpQ==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
