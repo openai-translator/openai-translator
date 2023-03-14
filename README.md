@@ -72,6 +72,14 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Installation(Desktop App)
 
+## Install it from [winget](https://github.com/microsoft/winget-cli)(windows only)
+
+```sh
+winget install yetone.OpenAITranslator
+```
+
+## Install it manually
+
 1. Download zip package per OS from [Release](https://github.com/yetone/openai-translator/releases)
 
 2. Install the App!

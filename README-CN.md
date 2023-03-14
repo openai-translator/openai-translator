@@ -67,6 +67,14 @@
 
 # 桌面应用版安装方法
 
+## 通过 [winget](https://github.com/microsoft/winget-cli)安装 (仅支持 windows)
+
+```sh
+winget install yetone.OpenAITranslator
+```
+
+## 手动安装
+
 1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的安装包
 
 2. 安装此应用
