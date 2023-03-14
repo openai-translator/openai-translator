@@ -230,7 +230,10 @@ export class HighlightInTextarea {
         const strLower = str.toLowerCase()
         let index = 0
         while (((index = inputLower.indexOf(strLower, index)), index !== -1)) {
-            if (!/\w/.test(inputLower[index - 1]) && !/\w/.test(inputLower[index + strLower.length])) {
+            if (
+                (index === 0 || !/\w/.test(inputLower[index - 1])) &&
+                (index + strLower.length === inputLower.length || !/\w/.test(inputLower[index + strLower.length]))
+            ) {
                 ranges.push([index, index + strLower.length])
             }
             index += strLower.length
