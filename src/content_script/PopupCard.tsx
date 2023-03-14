@@ -881,7 +881,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                 kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
                                                 onClick={() => {
                                                     setTranslateMode('summarize')
-                                                    setDetectTo(detectFrom)
                                                 }}
                                             >
                                                 <MdOutlineSummarize />
