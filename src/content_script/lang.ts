@@ -70,7 +70,8 @@ export const supportLanguages: [string, string][] = [
     ['jw', 'Jawa'],
     ['ka', 'ქართული'],
     ['kk', 'Қазақ'],
-    ['vi', 'Vietnamese'],
+    ['mn', 'Монгол хэл'],
+    ['vi', 'Tiếng Việt'],
     ['tr', 'Türkçe'],
 ]
 

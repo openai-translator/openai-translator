@@ -151,6 +151,7 @@ const useStyles = createUseStyles({
         display: 'flex',
         padding: '16px 10px 10px 10px',
         borderTop: '1px solid #e9e9e9',
+        userSelect: 'none',
     },
     'actionStr': {
         position: 'absolute',
@@ -1050,15 +1051,17 @@ export function PopupCard(props: IPopupCardProps) {
                                         </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <StatefulTooltip content='Upload images for OCR translation' showArrow>
-                                                <Dropzone onDrop={onDrop}>
-                                                    {({ getRootProps, getInputProps }) => (
-                                                        <div {...getRootProps()} className={styles.actionButton}>
-                                                            <input {...getInputProps({ multiple: false })} />
-                                                            <BsTextareaT size={13} />
-                                                        </div>
-                                                    )}
-                                                </Dropzone>
+                                            <StatefulTooltip content='Upload an image for OCR translation' showArrow>
+                                                <div className={styles.actionButton}>
+                                                    <Dropzone onDrop={onDrop}>
+                                                        {({ getRootProps, getInputProps }) => (
+                                                            <div {...getRootProps()} className={styles.actionButton}>
+                                                                <input {...getInputProps({ multiple: false })} />
+                                                                <BsTextareaT size={13} />
+                                                            </div>
+                                                        )}
+                                                    </Dropzone>
+                                                </div>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Speak' showArrow>
                                                 <div
