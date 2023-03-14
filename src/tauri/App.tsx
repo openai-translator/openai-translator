@@ -20,7 +20,8 @@ export function App() {
     const [text, setText] = React.useState('')
     const [isPinned, setPinned] = React.useState(false)
     useEffect(() => {
-        invoke('get_main_window_always_on_top').then((pinned) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoke('get_main_window_always_on_top').then((pinned: any) => {
             return setPinned(pinned)
         })
     }, [])
@@ -46,7 +47,8 @@ export function App() {
             return
         }
         function handlePin() {
-            invoke('set_main_window_always_on_top').then((pinned) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            invoke('set_main_window_always_on_top').then((pinned: any) => {
                 setPinned(pinned)
             })
         }
@@ -59,7 +61,7 @@ export function App() {
         function handleClose() {
             appWindow.hide()
         }
-        pinIconRef.current?.addEventLiner('click', handlePin)
+        pinIconRef.current?.addEventListener('click', handlePin)
         minimizeIconRef.current?.addEventListener('click', handleMinimize)
         maximizeIconRef.current?.addEventListener('click', handleMaximize)
         closeIconRef.current?.addEventListener('click', handleClose)
