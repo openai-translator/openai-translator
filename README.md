@@ -62,73 +62,68 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Features
 
-1. It offers three modes: translation, polishing, and summarization.
-2. Our tool allows for mutual translation, polishing, and summarization across 55 different languages.
+1. It offers three modes: translation, polishing and summarization.
+2. Our tool allows for mutual translation, polishing and summarization across 55 different languages.
 3. Streaming mode is supported!
 4. It allows users to customize their translation text.
 5. One-click copying
 6. Text-to-Speech (TTS)
 7. Available on all platforms (Windows, macOS, and Linux) for both browsers and Desktop
 
-# Installation(Desktop App)
+# Preparation
 
-## Install it from [winget](https://github.com/microsoft/winget-cli)(windows only)
+-   (required) Apply for an OpenAI API key [here](https://platform.openai.com/account/api-keys)
+-   (optional) If you cannot access OpenAI, you can use the OpenAI API Proxy.
+
+# Installation
+
+## Windows
+
+### Install via [winget](https://github.com/microsoft/winget-cli)
 
 ```sh
 winget install yetone.OpenAITranslator
 ```
 
-## Install it manually
+### Install Manually
 
-### 1. Download zip package per OS from [Release](https://github.com/yetone/openai-translator/releases)
+1. Download the installation package ending in `.msi` from the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page.
+2. Double click the downloaded file to install it.
+3. If prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation.
+4. Ready to use!
 
-### 2. Install the App!
+## MacOS
 
--   Windows
+### Install Manually
 
-    Double click `OpenAI Translator-*.msi` will do the job!
+1. Go to the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page and download the corresponding chip's `.dmg` installation package.
+2. Double click the downloaded file to install it.
+3. Ready to use!
 
--   macOS
+### Troubleshooting
 
-    Drag the `OpenAI Translator` to `Applications`
-    
-### 3. Open the App!
+-   "OpenAI Translator" can’t be opened because the developer cannot be verified.
+    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
-When you first open it in macOS, you may encounter this problem:
+    -   Click the `Cancel` button, then go to the `Settings` -> `Privacy and Security` page, click the `Still Open` button, and then click the `Open` button in the pop-up window. After that, there will be no more pop-up warnings when opening `OpenAI Translator`. 🎉
+        <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
-  <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+    -   If you cannot find the above options in `Privacy & Security`. Open `Terminal.app` and enter the following command (you may need to enter a password halfway through), then restart `OpenAI Translator`:
 
-Click `Cancel` and then go to `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it!
+        ```sh
+        sudo xattr -d com.apple.quarantine /Applications/OpenAI\ Translator.app
+        ```
 
-  <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+-   If you encounter a permission prompt every time you open it, or if you cannot perform a shortcut translation, please go to `Settings` -> `Privacy & Security` -> `Supporting Features` to remove OpenAI Translator, and then re-add OpenAI Translator.
+    <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+    <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
-  <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+## Browser Extension
 
-If there is still an error, please execute this command in the `Terminal`:
-
-```bash
-sudo xattr -rd com.apple.quarantine /Applications/OpenAI\ Translator.app
-```
-
-If you encounter permission prompts every time you open it, or cannot perform shortcut key word translation, please go to the permission settings page to delete OpenAI Translator and then re-add OpenAI Translator.
-
-  <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-  
-  <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
-
-# Installation(Browser Extension)
-
-1. Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) and install this extension.
-
-2. Get your [OpenAI](https://platform.openai.com/account/api-keys) API Keys
-
-<img width="600" src="https://user-images.githubusercontent.com/1206493/223043946-0e7486ca-94d7-4324-a4f2-f62b9a3d527d.png" />
-
-3. Click on the OpenAI Translator icon in the browser extension list, and fill in the API Key in the pop-up window that appears.
-
-<img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
-
-4. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
+1. Visit the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) to install this plugin.
+2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
+   <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # License
 
