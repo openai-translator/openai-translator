@@ -105,7 +105,7 @@ macOS 用户第一次打开可能会遇到如下报错：
 sudo xattr -rd com.apple.quarantine /Applications/OpenAI\ Translator.app
 ```
 
-如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除OpenAI Translator，然后重新添加OpenAI Translator:
+如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除 OpenAI Translator，然后重新添加 OpenAI Translator:
 
   <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
   
