@@ -79,34 +79,37 @@ interface FetchSSEOptions extends RequestInit {
 }
 
 async function backgroundFetch(input: string, options: FetchSSEOptions) {
-    const { onMessage, onError, signal, ...fetchOptions } = options
+    return new Promise(async (_resolve, reject) => {
+        const { onMessage, onError, signal, ...fetchOptions } = options
 
-    const browser = await require('webextension-polyfill')
-    const port = browser.runtime.connect({ name: 'background-fetch' })
-    port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
-    port.onMessage.addListener(
-        (msg: { error: { message: string; name: string }; status: number; response: string }) => {
-            if (msg.error) {
-                const error = new Error()
-                error.message = msg.error.message
-                error.name = msg.error.name
-                throw error
+        const browser = await require('webextension-polyfill')
+        const port = browser.runtime.connect({ name: 'background-fetch' })
+        port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
+        port.onMessage.addListener(
+            (msg: { error: { message: string; name: string }; status: number; response: string }) => {
+                if (msg.error) {
+                    const error = new Error()
+                    error.message = msg.error.message
+                    error.name = msg.error.name
+                    reject(error)
+                    return
+                }
+                if (msg.status !== 200) {
+                    onError(msg)
+                } else {
+                    onMessage(msg.response)
+                }
             }
-            if (msg.status !== 200) {
-                onError(msg)
-            } else {
-                onMessage(msg.response)
-            }
+        )
+
+        function handleAbort() {
+            port.postMessage({ type: 'abort' })
         }
-    )
-
-    function handleAbort() {
-        port.postMessage({ type: 'abort' })
-    }
-    port.onDisconnect.addListener(() => {
-        signal?.removeEventListener('abort', handleAbort)
+        port.onDisconnect.addListener(() => {
+            signal?.removeEventListener('abort', handleAbort)
+        })
+        signal?.addEventListener('abort', handleAbort)
     })
-    signal?.addEventListener('abort', handleAbort)
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
