@@ -110,14 +110,16 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
         while (true) {
             const { done, value } = await reader.read()
             if (done) {
-                port.disconnect()
                 break
             }
             const str = new TextDecoder().decode(value)
             parser.feed(str)
         }
+    } catch (error) {
+        console.log(error)
     } finally {
         tabId && portSet.delete(tabId)
+        port.disconnect()
         reader.releaseLock()
     }
 }
@@ -139,7 +141,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     const controller = new AbortController()
     const { signal } = controller
 
-    port.onMessage.addListener(async function (message) {
+    port.onMessage.addListener(function (message) {
         switch (message.type) {
             case 'abort':
                 controller.abort()
