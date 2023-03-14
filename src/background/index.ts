@@ -69,7 +69,7 @@ type FetchMessage = {
     details: { url: string; options: RequestInit }
 }
 
-const portMap = new Map<number, browser.Runtime.Port>()
+const portSet = new Set()
 
 async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
     const { url, options } = message.details
@@ -85,7 +85,7 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
                 error: { message, name },
             })
         }
-        tabId && portMap.delete(tabId)
+        tabId && portSet.delete(tabId)
         port.disconnect()
         return
     }
@@ -117,7 +117,7 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
             parser.feed(str)
         }
     } finally {
-        tabId && portMap.delete(tabId)
+        tabId && portSet.delete(tabId)
         reader.releaseLock()
     }
 }
@@ -131,11 +131,11 @@ browser.runtime.onConnect.addListener(async function (port) {
         return
     }
     // only one port is allowed per tab.
-    if (portMap.get(tabId)) {
+    if (portSet.has(tabId)) {
         return
     }
 
-    portMap.set(tabId, port)
+    portSet.add(tabId)
     const controller = new AbortController()
     const { signal } = controller
 
