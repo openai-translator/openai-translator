@@ -4,13 +4,21 @@ module.exports = {
         es2021: true,
         jest: true,
     },
-    extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
+    extends: [
+        'eslint:recommended',
+        'plugin:react/recommended',
+        'plugin:@typescript-eslint/recommended',
+        'prettier',
+    ],
     overrides: [],
     parser: '@typescript-eslint/parser',
     parserOptions: {
+        project: true,
+        tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',
     },
+    root: true,
     plugins: ['react', 'react-hooks', '@typescript-eslint', 'prettier', 'baseui'],
     rules: {
         'react/react-in-jsx-scope': 'off',

@@ -31,6 +31,7 @@ import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
+import { HighlightInTextarea } from '../common/highlight-in-textarea'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -255,6 +256,9 @@ export function PopupCard(props: IPopupCardProps) {
         const onMouseUp = () => {
             const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
             setSelectedWord(selectedWord_)
+            // setTimeout(() => {
+            //     editor.focus()
+            // }, 300)
         }
         const onBlur = () => {
             const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
@@ -273,6 +277,27 @@ export function PopupCard(props: IPopupCardProps) {
             editor.removeEventListener('blur', onBlur)
         }
     }, [])
+
+    const highlightRef = useRef<HighlightInTextarea | null>(null)
+
+    useEffect(() => {
+        if (highlightRef.current) {
+            return
+        }
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        highlightRef.current = new HighlightInTextarea(editor, { highlight: '' })
+    }, [])
+
+    useEffect(() => {
+        if (!highlightRef.current?.highlight) {
+            return
+        }
+        highlightRef.current.highlight.highlight = selectedWord
+        highlightRef.current.handleInput()
+    }, [selectedWord])
 
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
