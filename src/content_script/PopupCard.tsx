@@ -302,9 +302,12 @@ export function PopupCard(props: IPopupCardProps) {
         setIsLoading(false)
     }, [])
     useEffect(() => {
-        setEditableText(props.text)
         setOriginalText(props.text)
     }, [props.text])
+    useEffect(() => {
+        setEditableText(originalText)
+        setSelectedWord('')
+    }, [originalText])
     const [detectFrom, setDetectFrom] = useState('')
     const [detectTo, setDetectTo] = useState('')
     const stopAutomaticallyChangeDetectTo = useRef(false)
@@ -653,7 +656,6 @@ export function PopupCard(props: IPopupCardProps) {
                 }
 
                 setOriginalText('')
-                setEditableText('')
                 setIsOCRProcessing(true)
 
                 await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
@@ -662,7 +664,6 @@ export function PopupCard(props: IPopupCardProps) {
                 const { data } = await (await worker).recognize(file)
 
                 setOriginalText(data.text)
-                setEditableText(data.text)
                 setIsOCRProcessing(false)
 
                 await (await worker).terminate()
@@ -676,7 +677,6 @@ export function PopupCard(props: IPopupCardProps) {
         })
 
         setOriginalText('')
-        setEditableText('')
         setIsOCRProcessing(true)
 
         if (acceptedFiles.length !== 1) {
@@ -702,7 +702,6 @@ export function PopupCard(props: IPopupCardProps) {
         const { data } = await (await worker).recognize(file)
 
         setOriginalText(data.text)
-        setEditableText(data.text)
         setIsOCRProcessing(false)
 
         await (await worker).terminate()
@@ -776,7 +775,6 @@ export function PopupCard(props: IPopupCardProps) {
                                         <div
                                             className={styles.arrow}
                                             onClick={() => {
-                                                setEditableText(translatedText)
                                                 setOriginalText(translatedText)
                                                 setDetectFrom(detectTo)
                                                 setDetectTo(detectFrom)
