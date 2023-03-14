@@ -61,12 +61,31 @@ export async function setSettings(settings: ISettings) {
 }
 
 export async function getBrowser(): Promise<IBrowser> {
-    if (isDesktopApp()) {
+    if (isElectron()) {
         return (await import('./electron-polyfill')).electronBrowser
+    }
+    if (isTauri()) {
+        return (await import('./tauri-polyfill')).tauriBrowser
+    }
+    if (isUserscript()) {
+        return (await import('./userscript-polyfill')).userscriptBrowser
     }
     return await require('webextension-polyfill')
 }
 
-export const isDesktopApp = () => {
+export const isElectron = () => {
     return navigator.userAgent.indexOf('Electron') >= 0
+}
+
+export const isTauri = () => {
+    return window['__TAURI__' as any] !== undefined
+}
+
+export const isDesktopApp = () => {
+    return isElectron() || isTauri()
+}
+
+export const isUserscript = () => {
+    // eslint-disable-next-line camelcase
+    return typeof GM_info !== 'undefined'
 }

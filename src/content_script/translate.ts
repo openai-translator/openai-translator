@@ -3,10 +3,11 @@ import * as utils from '../common/utils'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
-export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'explain-code'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
 
 export interface TranslateQuery {
     text: string
+    selectedWord: string
     detectFrom: string
     detectTo: string
     mode: TranslateMode
@@ -26,14 +27,15 @@ export interface TranslateResult {
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
+    const trimFirstQuotation = !query.selectedWord
     const settings = await utils.getSettings()
     const apiKey = await utils.getApiKey()
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
     }
-    const fromChinese = chineseLangs.indexOf(query.detectFrom) > 0
-    const toChinese = chineseLangs.indexOf(query.detectTo) > 0
+    const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
+    const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
     let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
@@ -49,6 +51,22 @@ export async function translate(query: TranslateQuery) {
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
                 }
+            }
+            if (query.selectedWord) {
+                // 在选择的句子中，选择特定的单词。触发语境学习功能。
+                systemPrompt = `你是一位${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }词义语法专家，你在教我${lang.langMap.get(query.detectFrom) || query.detectFrom}，我给你一句${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }句子，和这个句子中的一个单词，请用${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }帮我解释一下，这个单词在句子中的意思和句子本身的意思,如果单词在这个句子中是习话的一部分，请解释这句句子中的习话，并举几个相同意思的${
+                    lang.langMap.get(query.detectFrom) || query.detectFrom
+                }例句,并用${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }解释例句。如果你明白了请说同意，然后我们开始。`
+                assistantPrompt = '好的，我明白了，请给我这个句子和单词。'
+                query.text = `句子是：${query.text}\n单词是：${query.selectedWord}`
             }
             break
         case 'polishing':
@@ -69,7 +87,18 @@ export async function translate(query: TranslateQuery) {
                 } language!`
             }
             break
-
+        case 'analyze':
+            systemPrompt = 'You are a translation engine and grammar analyzer.'
+            if (toChinese) {
+                assistantPrompt = `请用中文翻译此段文本并解析原文中的语法`
+            } else {
+                assistantPrompt = `translate this text to ${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                } and explain the grammar in the original text using ${
+                    lang.langMap.get(query.detectTo) || query.detectTo
+                }`
+            }
+            break
         case 'explain-code':
             systemPrompt =
                 'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
@@ -96,7 +125,7 @@ export async function translate(query: TranslateQuery) {
                 content: systemPrompt,
             },
             {
-                role: 'assistant',
+                role: 'user',
                 content: assistantPrompt,
             },
             { role: 'user', content: `"${query.text}"` },
@@ -132,7 +161,7 @@ export async function translate(query: TranslateQuery) {
             const { content = '', role } = delta
             let targetTxt = content
 
-            if (isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+            if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
                 targetTxt = targetTxt.slice(1)
             }
 

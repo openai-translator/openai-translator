@@ -9,21 +9,28 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
-import { MdOutlineSummarize, MdCode } from 'react-icons/md'
+import { MdOutlineSummarize, MdOutlineAnalytics, MdCode } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy } from 'react-icons/rx'
-import { HiOutlineSpeakerWave } from 'react-icons/hi2'
-import { queryPopupCardElement } from './utils'
+import { RxCopy, RxSpeakerLoud } from 'react-icons/rx'
+import { calculateMaxXY, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
+import { documentPadding } from './consts'
+import Dropzone from 'react-dropzone'
+import { RecognizeResult, createWorker } from 'tesseract.js'
+import { BsTextareaT } from 'react-icons/bs'
+import rocket from './assets/images/rocket.gif'
+import partyPopper from './assets/images/party-popper.gif'
+import { Event } from '@tauri-apps/api/event'
+import SpeakerMotion from '../components/SpeakerMotion'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -38,7 +45,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
-        paddingBottom: '30px',
     },
     'settingsIcon': {
         position: 'absolute',
@@ -47,12 +53,16 @@ const useStyles = createUseStyles({
         right: '10px',
     },
     'popupCardHeaderContainer': {
-        display: 'flex',
-        flexDirection: 'row',
-        cursor: 'move',
-        alignItems: 'center',
-        padding: '5px 10px',
-        borderBottom: '1px solid #e8e8e8',
+        'display': 'flex',
+        'flexDirection': 'row',
+        'cursor': 'move',
+        'alignItems': 'center',
+        'padding': '5px 10px',
+        'borderBottom': '1px solid #e8e8e8',
+        'minWidth': '510px',
+        'user-select': 'none',
+        '-webkit-user-select': 'none',
+        '-ms-user-select': 'none',
     },
     'iconContainer': {
         display: 'flex',
@@ -70,7 +80,8 @@ const useStyles = createUseStyles({
     'iconText': {
         fontSize: '12px',
         color: '#333',
-        fontWeight: 500,
+        fontWeight: 600,
+        cursor: 'unset',
     },
     'paragraph': {
         margin: '14px 0',
@@ -123,12 +134,12 @@ const useStyles = createUseStyles({
         display: 'flex',
         flexDirection: 'column',
         padding: '10px',
-        borderBottom: '1px solid #e9e9e9',
     },
     'popupCardTranslatedContainer': {
         position: 'relative',
         display: 'flex',
         padding: '16px 10px 10px 10px',
+        borderTop: '1px solid #e9e9e9',
     },
     'actionStr': {
         position: 'absolute',
@@ -160,6 +171,8 @@ const useStyles = createUseStyles({
     'popupCardTranslatedContentContainer': {
         marginTop: '-14px',
         padding: '4px 8px',
+        display: 'flex',
+        overflowY: 'auto',
     },
     'errorMessage': {
         display: 'flex',
@@ -174,6 +187,9 @@ const useStyles = createUseStyles({
     },
     'actionButton': {
         cursor: 'pointer',
+        display: 'flex',
+        paddingTop: '6px',
+        paddingBottom: '6px',
     },
     'writing': {
         'marginLeft': '3px',
@@ -189,6 +205,20 @@ const useStyles = createUseStyles({
             marginBottom: '-3px',
         },
     },
+    'dropZone': {
+        'display': 'flex',
+        'flexDirection': 'column',
+        'alignItems': 'center',
+        'justifyContent': 'center',
+        'padding-left': '3px',
+        'padding-right': '3px',
+        'border': '1px dashed #ccc',
+        'borderRadius': '0.75rem',
+        'cursor': 'pointer',
+        'userSelect': 'none',
+        '-webkit-user-select': 'none',
+        '-ms-user-select': 'none',
+    },
 })
 
 export interface IPopupCardProps {
@@ -198,9 +228,52 @@ export interface IPopupCardProps {
     showSettings?: boolean
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
+    editorRows?: number
+    onSettingsSave?: (settings: ISettings) => void
+}
+
+export interface TesseractResult extends RecognizeResult {
+    text: string
 }
 
 export function PopupCard(props: IPopupCardProps) {
+    const editorRef = useRef<HTMLTextAreaElement>(null)
+    const isCompositing = useRef(false)
+    const [selectedWord, setSelectedWord] = useState('')
+
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        const onCompositionStart = () => {
+            isCompositing.current = true
+        }
+        const onCompositionEnd = () => {
+            isCompositing.current = false
+        }
+        const onMouseUp = () => {
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
+        }
+        const onBlur = () => {
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
+        }
+
+        editor.addEventListener('compositionstart', onCompositionStart)
+        editor.addEventListener('compositionend', onCompositionEnd)
+        editor.addEventListener('mouseup', onMouseUp)
+        editor.addEventListener('blur', onBlur)
+
+        return () => {
+            editor.removeEventListener('compositionstart', onCompositionStart)
+            editor.removeEventListener('compositionend', onCompositionEnd)
+            editor.removeEventListener('mouseup', onMouseUp)
+            editor.removeEventListener('blur', onBlur)
+        }
+    }, [])
+
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
         ;(async () => {
@@ -239,7 +312,10 @@ export function PopupCard(props: IPopupCardProps) {
         ;(async () => {
             const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
-            if (translateMode === 'translate' && !stopAutomaticallyChangeDetectTo.current) {
+            if (
+                (translateMode === 'translate' || translateMode === 'analyze') &&
+                !stopAutomaticallyChangeDetectTo.current
+            ) {
                 const settings = await getSettings()
                 setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
             }
@@ -250,15 +326,70 @@ export function PopupCard(props: IPopupCardProps) {
 
     const headerRef = useRef<HTMLDivElement>(null)
 
+    const editorContainerRef = useRef<HTMLDivElement>(null)
+
+    const translatedContentRef = useRef<HTMLDivElement>(null)
+
+    const actionButtonsRef = useRef<HTMLDivElement>(null)
+
+    // Reposition the popup card to prevent it from extending beyond the screen.
+    useEffect(() => {
+        const calculateTranslatedContentMaxHeight = (): number => {
+            const { innerHeight } = window
+            const headerHeight = headerRef.current?.offsetHeight || 0
+            const editorHeight = editorContainerRef.current?.offsetHeight || 0
+            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
+            return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
+        }
+
+        const resizeHandle: ResizeObserverCallback = (entries) => {
+            // Listen for element height changes
+            for (const entry of entries) {
+                const $popupCard = entry.target as HTMLElement
+                const [maxX, maxY] = calculateMaxXY($popupCard)
+                const yList = [maxY, $popupCard.offsetTop].filter((item) => item > documentPadding)
+                $popupCard.style.top = `${Math.min(...yList) || documentPadding}px`
+                const xList = [maxX, $popupCard.offsetLeft].filter((item) => item > documentPadding)
+                $popupCard.style.left = `${Math.min(...xList) || documentPadding}px`
+
+                const $translatedContent = translatedContentRef.current
+                if ($translatedContent) {
+                    const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
+                    $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
+                }
+            }
+        }
+
+        const observer = new ResizeObserver(resizeHandle)
+        queryPopupCardElement().then(($popupCard) => {
+            if ($popupCard) {
+                const rect = $popupCard.getBoundingClientRect()
+                const x = Math.min(window.innerWidth - 600, rect.x)
+                $popupCard.style.left = x + 'px'
+                observer.observe($popupCard)
+            }
+        })
+        return () => {
+            queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
+        }
+    }, [])
+
     useEffect(() => {
         if (isDesktopApp()) {
             return
         }
-
         const $header = headerRef.current
         if (!$header) {
             return undefined
         }
+
+        let $popupCard: HTMLDivElement | null = null
+        ;(async () => {
+            $popupCard = await queryPopupCardElement()
+            if (!$popupCard) {
+                return
+            }
+        })()
 
         let closed = true
 
@@ -266,28 +397,50 @@ export function PopupCard(props: IPopupCardProps) {
             closed = false
             e = e || window.event
             e.preventDefault()
-            document.addEventListener('mouseup', closeDragElement)
+            $popupCard?.addEventListener('mouseup', closeDragElement)
             document.addEventListener('mousemove', elementDrag)
+            document.addEventListener('mouseup', closeDragElement)
         }
 
         const elementDrag = async (e: MouseEvent) => {
-            const $popupCard = await queryPopupCardElement()
-            if (!$popupCard) {
+            e.stopPropagation()
+            if (closed) {
                 return
             }
-            if (closed) {
+            if (!$popupCard) {
                 return
             }
             e = e || window.event
             e.preventDefault()
-            $popupCard.style.top = $popupCard.offsetTop + e.movementY + 'px'
-            $popupCard.style.left = $popupCard.offsetLeft + e.movementX + 'px'
+            const [l, t] = overflowCheck($popupCard, e)
+            $popupCard.style.top = `${t}px`
+            $popupCard.style.left = `${l}px`
+        }
+
+        const overflowCheck = ($popupCard: HTMLDivElement, e: MouseEvent) => {
+            let left = $popupCard.offsetLeft
+            let top = $popupCard.offsetTop
+            if (
+                $popupCard.offsetLeft + e.movementX > documentPadding &&
+                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > documentPadding
+            ) {
+                left = $popupCard.offsetLeft + e.movementX
+            }
+            if (
+                $popupCard.offsetTop + e.movementY > documentPadding &&
+                document.documentElement.offsetHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight >
+                    documentPadding
+            ) {
+                top = $popupCard.offsetTop + e.movementY
+            }
+            return [left, top]
         }
 
         const closeDragElement = () => {
             closed = true
-            document.removeEventListener('mouseup', closeDragElement)
+            $popupCard?.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('mousemove', elementDrag)
+            document.removeEventListener('mouseup', closeDragElement)
         }
 
         $header.addEventListener('mousedown', dragMouseDown)
@@ -301,7 +454,7 @@ export function PopupCard(props: IPopupCardProps) {
     }, [headerRef])
 
     const translateText = useCallback(
-        async (text: string, signal: AbortSignal) => {
+        async (text: string, selectedWord: string, signal: AbortSignal) => {
             if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
@@ -316,6 +469,9 @@ export function PopupCard(props: IPopupCardProps) {
                 case 'summarize':
                     setActionStr('Summarizing...')
                     break
+                case 'analyze':
+                    setActionStr('Analyzing...')
+                    break
                 case 'explain-code':
                     setActionStr('Explaining...')
                     break
@@ -328,6 +484,7 @@ export function PopupCard(props: IPopupCardProps) {
                     mode: translateMode,
                     signal,
                     text,
+                    selectedWord,
                     detectFrom,
                     detectTo,
                     onMessage: (message) => {
@@ -342,7 +499,7 @@ export function PopupCard(props: IPopupCardProps) {
                         stopLoading()
                         if (reason !== 'stop') {
                             setActionStr('Error')
-                            setErrorMessage(`${actionStr} failed：${reason}`)
+                            setErrorMessage(`${actionStr} failed: ${reason}`)
                         } else {
                             switch (translateMode) {
                                 case 'translate':
@@ -353,6 +510,12 @@ export function PopupCard(props: IPopupCardProps) {
                                     break
                                 case 'summarize':
                                     setActionStr('Summarized')
+                                    break
+                                case 'analyze':
+                                    setActionStr('Analyzed')
+                                    break
+                                case 'explain-code':
+                                    setActionStr('Explained')
                                     break
                             }
                         }
@@ -393,11 +556,11 @@ export function PopupCard(props: IPopupCardProps) {
     useEffect(() => {
         const controller = new AbortController()
         const { signal } = controller
-        translateText(originalText, signal)
+        translateText(originalText, selectedWord, signal)
         return () => {
             controller.abort()
         }
-    }, [translateText, originalText])
+    }, [translateText, originalText, selectedWord])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -432,6 +595,119 @@ export function PopupCard(props: IPopupCardProps) {
         })()
     }, [props.defaultShowSettings])
 
+    const [isOCRProcessing, setIsOCRProcessing] = useState(false)
+    const [showOCRProcessing, setShowOCRProcessing] = useState(false)
+
+    useEffect(() => {
+        if (isOCRProcessing) {
+            setShowOCRProcessing(true)
+            return
+        }
+        const timer = setTimeout(() => {
+            setShowOCRProcessing(false)
+        }, 1500)
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [isOCRProcessing])
+
+    useEffect(() => {
+        if (!isTauri()) {
+            return
+        }
+        ;(async () => {
+            const { listen } = await require('@tauri-apps/api/event')
+            const { fs } = await require('@tauri-apps/api')
+            listen('tauri://file-drop', async (e: Event<string>) => {
+                if (e.payload.length !== 1) {
+                    alert('Only one file can be uploaded at a time.')
+                    return
+                }
+
+                const filePath = e.payload[0]
+
+                if (!filePath) {
+                    return
+                }
+
+                const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
+                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                    alert('invalid file type')
+                    return
+                }
+
+                const worker = createWorker({
+                    // logger: (m) => console.log(m),
+                })
+
+                const binaryFile = await fs.readBinaryFile(filePath)
+
+                const file = new Blob([binaryFile.buffer], {
+                    type: `image/${fileExtension}`,
+                })
+
+                const fileSize = file.size / 1024 / 1024
+                if (fileSize > 1) {
+                    alert('File size must be less than 1MB')
+                    return
+                }
+
+                setOriginalText('')
+                setEditableText('')
+                setIsOCRProcessing(true)
+
+                await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
+                await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
+
+                const { data } = await (await worker).recognize(file)
+
+                setOriginalText(data.text)
+                setEditableText(data.text)
+                setIsOCRProcessing(false)
+
+                await (await worker).terminate()
+            })
+        })()
+    }, [])
+
+    const onDrop = async (acceptedFiles: File[]) => {
+        const worker = createWorker({
+            // logger: (m) => console.log(m),
+        })
+
+        setOriginalText('')
+        setEditableText('')
+        setIsOCRProcessing(true)
+
+        if (acceptedFiles.length !== 1) {
+            alert('Only one file can be uploaded at a time.')
+            return
+        }
+
+        const file = acceptedFiles[0]
+        if (!file.type.startsWith('image/')) {
+            alert('invalid file type')
+            return
+        }
+
+        const fileSize = file.size / (1024 * 1024)
+        if (fileSize > 1) {
+            alert('File size must be less than 1MB')
+            return
+        }
+
+        await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
+        await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
+
+        const { data } = await (await worker).recognize(file)
+
+        setOriginalText(data.text)
+        setEditableText(data.text)
+        setIsOCRProcessing(false)
+
+        await (await worker).terminate()
+    }
+
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
@@ -453,12 +729,18 @@ export function PopupCard(props: IPopupCardProps) {
                             </StatefulTooltip>
                         )}
                         {showSettings ? (
-                            <Settings onSave={() => setShowSettings(false)} />
+                            <Settings
+                                onSave={(settings) => {
+                                    setShowSettings(false)
+                                    props.onSettingsSave?.(settings)
+                                }}
+                            />
                         ) : (
                             <div style={props.containerStyle}>
                                 <div
                                     ref={headerRef}
                                     className={styles.popupCardHeaderContainer}
+                                    data-tauri-drag-region
                                     style={{
                                         cursor: isDesktopApp() ? 'default' : 'move',
                                     }}
@@ -473,7 +755,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                 disabled={translateMode === 'explain-code'}
                                                 size='mini'
                                                 clearable={false}
-                                                searchable={false}
                                                 options={langOptions}
                                                 value={[{ id: detectFrom }]}
                                                 overrides={{
@@ -483,7 +764,13 @@ export function PopupCard(props: IPopupCardProps) {
                                                         },
                                                     },
                                                 }}
-                                                onChange={({ value }) => setDetectFrom(value[0]?.id as string)}
+                                                onChange={({ value }) => {
+                                                    if (value.length > 0) {
+                                                        setDetectFrom(value[0].id as string)
+                                                    } else {
+                                                        setDetectFrom(langOptions[0].id as string)
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div
@@ -506,7 +793,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                 disabled={translateMode === 'polishing'}
                                                 size='mini'
                                                 clearable={false}
-                                                searchable={false}
                                                 options={langOptions}
                                                 value={[{ id: detectTo }]}
                                                 overrides={{
@@ -518,13 +804,21 @@ export function PopupCard(props: IPopupCardProps) {
                                                 }}
                                                 onChange={({ value }) => {
                                                     stopAutomaticallyChangeDetectTo.current = true
-                                                    setDetectTo(value[0]?.id as string)
+                                                    if (value.length > 0) {
+                                                        setDetectTo(value[0].id as string)
+                                                    } else {
+                                                        setDetectTo(langOptions[0].id as string)
+                                                    }
                                                 }}
                                             />
                                         </div>
                                     </div>
                                     <div className={styles.popupCardHeaderButtonGroup}>
-                                        <StatefulTooltip content='Translate' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Translate'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'translate' ? 'primary' : 'secondary'}
@@ -533,7 +827,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <AiOutlineTranslation />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Polishing' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Polishing'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
@@ -545,7 +843,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <IoColorPaletteOutline />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Summarize' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Summarize'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
@@ -557,7 +859,24 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <MdOutlineSummarize />
                                             </Button>
                                         </StatefulTooltip>
-                                        <StatefulTooltip content='Explain Code' placement='top' showArrow>
+                                        <StatefulTooltip
+                                            content='Analyze'
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                            showArrow
+                                        >
+                                            <Button
+                                                size='mini'
+                                                kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
+                                                onClick={() => setTranslateMode('analyze')}
+                                            >
+                                                <MdOutlineAnalytics />
+                                            </Button>
+                                        </StatefulTooltip>
+                                        <StatefulTooltip
+                                            content='Explain Code'
+                                            placement={isDesktopApp() ? 'auto' : 'top'}
+                                            showArrow
+                                        >
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
@@ -572,7 +891,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
-                                    <div className={styles.popupCardEditorContainer}>
+                                    <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
                                         <div
                                             style={{
                                                 height: 0,
@@ -581,174 +900,275 @@ export function PopupCard(props: IPopupCardProps) {
                                         >
                                             {editableText}
                                         </div>
-                                        <Textarea
-                                            autoFocus={props.autoFocus}
-                                            overrides={{
-                                                Root: {
-                                                    style: {
-                                                        width: '100%',
-                                                        borderRadius: '0px',
-                                                    },
-                                                },
-                                                Input: {
-                                                    style: {
-                                                        padding: '4px 8px',
-                                                        fontFamily:
-                                                            translateMode === 'explain-code' ? 'monospace' : 'inherit',
-                                                    },
-                                                },
-                                            }}
-                                            value={editableText}
-                                            size='mini'
-                                            resize='vertical'
-                                            rows={Math.min(Math.max(editableText.split('\n').length, 3), 12)}
-                                            onChange={(e) => setEditableText(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    if (!e.shiftKey) {
-                                                        e.preventDefault()
-                                                        if (!translateMode) {
-                                                            setTranslateMode('translate')
+                                        <Dropzone onDrop={onDrop} noClick={true}>
+                                            {({ getRootProps, isDragActive }) => (
+                                                <div {...getRootProps()}>
+                                                    {isDragActive ? (
+                                                        <div
+                                                            style={{
+                                                                padding: '10px',
+                                                                display: 'flex',
+                                                                justifyContent: 'center',
+                                                                border: '2px dashed #eee',
+                                                                marginBottom: '10px',
+                                                                fontSize: '11px',
+                                                            }}
+                                                        >
+                                                            Drop file below
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'row',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                gap: 8,
+                                                                opacity: showOCRProcessing ? 1 : 0,
+                                                                marginBottom: showOCRProcessing ? 10 : 0,
+                                                                fontSize: '11px',
+                                                                height: showOCRProcessing ? 26 : 0,
+                                                                transition: 'all 0.3s linear',
+                                                                overflow: 'hidden',
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    fontSize: '12px',
+                                                                }}
+                                                            >
+                                                                {isOCRProcessing ? 'OCR Processing...' : 'OCR Success'}
+                                                            </div>
+                                                            {showOCRProcessing && (
+                                                                <div>
+                                                                    <img
+                                                                        src={isOCRProcessing ? rocket : partyPopper}
+                                                                        width='20'
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <Textarea
+                                                        inputRef={editorRef}
+                                                        autoFocus={props.autoFocus}
+                                                        overrides={{
+                                                            Root: {
+                                                                style: {
+                                                                    width: '100%',
+                                                                    borderRadius: '0px',
+                                                                },
+                                                            },
+                                                            Input: {
+                                                                style: {
+                                                                    padding: '4px 8px',
+                                                                    fontFamily:
+                                                                        translateMode === 'explain-code'
+                                                                            ? 'monospace'
+                                                                            : 'inherit',
+                                                                },
+                                                            },
+                                                        }}
+                                                        value={editableText}
+                                                        size='mini'
+                                                        resize='vertical'
+                                                        rows={
+                                                            props.editorRows
+                                                                ? props.editorRows
+                                                                : Math.min(
+                                                                      Math.max(editableText.split('\n').length, 3),
+                                                                      12
+                                                                  )
                                                         }
-                                                        setOriginalText(editableText)
-                                                    }
-                                                }
-                                            }}
-                                        />
+                                                        onChange={(e) => setEditableText(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                if (!e.shiftKey) {
+                                                                    e.preventDefault()
+                                                                    if (!translateMode) {
+                                                                        setTranslateMode('translate')
+                                                                    }
+                                                                    setOriginalText(editableText)
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <div
-                                                className={styles.actionButton}
-                                                onClick={() => {
-                                                    if (isSpeakingEditableText) {
+                                            <StatefulTooltip content='Upload images for OCR translation' showArrow>
+                                                <Dropzone onDrop={onDrop}>
+                                                    {({ getRootProps, getInputProps }) => (
+                                                        <div {...getRootProps()} className={styles.actionButton}>
+                                                            <input {...getInputProps({ multiple: false })} />
+                                                            <BsTextareaT size={13} />
+                                                        </div>
+                                                    )}
+                                                </Dropzone>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content='Speak' showArrow>
+                                                <div
+                                                    className={styles.actionButton}
+                                                    onClick={() => {
+                                                        if (isSpeakingEditableText) {
+                                                            ;(async () => {
+                                                                const browser = await getBrowser()
+                                                                browser.runtime.sendMessage({
+                                                                    type: 'stopSpeaking',
+                                                                })
+                                                                setIsSpeakingEditableText(false)
+                                                            })()
+                                                            return
+                                                        }
                                                         ;(async () => {
                                                             const browser = await getBrowser()
+                                                            setIsSpeakingEditableText(true)
                                                             browser.runtime.sendMessage({
-                                                                type: 'stopSpeaking',
+                                                                type: 'speak',
+                                                                text: editableText,
+                                                                lang: detectFrom,
                                                             })
-                                                            setIsSpeakingEditableText(false)
                                                         })()
-                                                        return
-                                                    }
-                                                    ;(async () => {
-                                                        const browser = await getBrowser()
-                                                        setIsSpeakingEditableText(true)
-                                                        browser.runtime.sendMessage({
-                                                            type: 'speak',
-                                                            text: editableText,
-                                                            lang: detectFrom,
-                                                        })
-                                                    })()
-                                                }}
-                                            >
-                                                <HiOutlineSpeakerWave size={13} />
-                                            </div>
-                                            <CopyToClipboard
-                                                text={editableText}
-                                                onCopy={() => {
-                                                    toast('Copied to clipboard', {
-                                                        duration: 3000,
-                                                        icon: '👏',
-                                                    })
-                                                }}
-                                            >
-                                                <div className={styles.actionButton}>
-                                                    <RxCopy size={13} />
+                                                    }}
+                                                >
+                                                    {isSpeakingEditableText ? (
+                                                        <SpeakerMotion />
+                                                    ) : (
+                                                        <RxSpeakerLoud size={13} />
+                                                    )}
                                                 </div>
-                                            </CopyToClipboard>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                                <div>
+                                                    <CopyToClipboard
+                                                        text={editableText}
+                                                        onCopy={() => {
+                                                            toast('Copied to clipboard', {
+                                                                duration: 3000,
+                                                                icon: '👏',
+                                                            })
+                                                        }}
+                                                    >
+                                                        <div className={styles.actionButton}>
+                                                            <RxCopy size={13} />
+                                                        </div>
+                                                    </CopyToClipboard>
+                                                </div>
+                                            </StatefulTooltip>
                                         </div>
                                     </div>
-                                    <div className={styles.popupCardTranslatedContainer}>
-                                        {actionStr && (
-                                            <div
-                                                className={clsx({
-                                                    [styles.actionStr]: true,
-                                                    [styles.error]: !!errorMessage,
-                                                })}
-                                            >
-                                                <div>{actionStr}</div>
-                                                {isLoading ? (
-                                                    <span className={styles.writing} />
-                                                ) : errorMessage ? (
-                                                    <span>😢</span>
-                                                ) : (
-                                                    <span>👍</span>
-                                                )}
-                                            </div>
-                                        )}
-                                        {errorMessage ? (
-                                            <div className={styles.errorMessage}>{errorMessage}</div>
-                                        ) : (
-                                            <div
-                                                style={{
-                                                    width: '100%',
-                                                }}
-                                            >
-                                                <div className={styles.popupCardTranslatedContentContainer}>
-                                                    <div>
-                                                        {translatedLines.map((line, i) => {
-                                                            return (
-                                                                <p className={styles.paragraph} key={`p-${i}`}>
-                                                                    {line}
-                                                                    {isLoading && i === translatedLines.length - 1 && (
-                                                                        <span className={styles.caret} />
-                                                                    )}
-                                                                </p>
-                                                            )
-                                                        })}
-                                                    </div>
+                                    {originalText !== '' && (
+                                        <div className={styles.popupCardTranslatedContainer}>
+                                            {actionStr && (
+                                                <div
+                                                    className={clsx({
+                                                        [styles.actionStr]: true,
+                                                        [styles.error]: !!errorMessage,
+                                                    })}
+                                                >
+                                                    <div>{actionStr}</div>
+                                                    {isLoading ? (
+                                                        <span className={styles.writing} />
+                                                    ) : errorMessage ? (
+                                                        <span>😢</span>
+                                                    ) : (
+                                                        <span>👍</span>
+                                                    )}
                                                 </div>
-                                                {translatedText && (
-                                                    <div className={styles.actionButtonsContainer}>
-                                                        <div style={{ marginRight: 'auto' }} />
-                                                        <div
-                                                            className={styles.actionButton}
-                                                            onClick={() => {
-                                                                if (isSpeakingTranslatedText) {
-                                                                    ;(async () => {
-                                                                        const browser = await getBrowser()
-                                                                        browser.runtime.sendMessage({
-                                                                            type: 'stopSpeaking',
-                                                                        })
-                                                                        setIsSpeakingTranslatedText(false)
-                                                                    })()
-                                                                    return
-                                                                }
-                                                                ;(async () => {
-                                                                    const browser = await getBrowser()
-                                                                    setIsSpeakingTranslatedText(true)
-                                                                    browser.runtime.sendMessage({
-                                                                        type: 'speak',
-                                                                        text: translatedText,
-                                                                        lang: detectTo,
-                                                                    })
-                                                                })()
-                                                            }}
-                                                        >
-                                                            <HiOutlineSpeakerWave size={13} />
+                                            )}
+                                            {errorMessage ? (
+                                                <div className={styles.errorMessage}>{errorMessage}</div>
+                                            ) : (
+                                                <div
+                                                    style={{
+                                                        width: '100%',
+                                                    }}
+                                                >
+                                                    <div
+                                                        ref={translatedContentRef}
+                                                        className={styles.popupCardTranslatedContentContainer}
+                                                    >
+                                                        <div>
+                                                            {translatedLines.map((line, i) => {
+                                                                return (
+                                                                    <p className={styles.paragraph} key={`p-${i}`}>
+                                                                        {line}
+                                                                        {isLoading &&
+                                                                            i === translatedLines.length - 1 && (
+                                                                                <span className={styles.caret} />
+                                                                            )}
+                                                                    </p>
+                                                                )
+                                                            })}
                                                         </div>
-                                                        <CopyToClipboard
-                                                            text={translatedText}
-                                                            onCopy={() => {
-                                                                toast('Copied to clipboard', {
-                                                                    duration: 3000,
-                                                                    icon: '👏',
-                                                                })
-                                                            }}
-                                                        >
-                                                            <div className={styles.actionButton}>
-                                                                <RxCopy size={13} />
-                                                            </div>
-                                                        </CopyToClipboard>
                                                     </div>
-                                                )}
-                                            </div>
-                                        )}
-                                        <Toaster />
-                                    </div>
+                                                    {translatedText && (
+                                                        <div
+                                                            ref={actionButtonsRef}
+                                                            className={styles.actionButtonsContainer}
+                                                        >
+                                                            <div style={{ marginRight: 'auto' }} />
+                                                            <StatefulTooltip content='Speak' showArrow>
+                                                                <div
+                                                                    className={styles.actionButton}
+                                                                    onClick={() => {
+                                                                        if (isSpeakingTranslatedText) {
+                                                                            ;(async () => {
+                                                                                const browser = await getBrowser()
+                                                                                browser.runtime.sendMessage({
+                                                                                    type: 'stopSpeaking',
+                                                                                })
+                                                                                setIsSpeakingTranslatedText(false)
+                                                                            })()
+                                                                            return
+                                                                        }
+                                                                        ;(async () => {
+                                                                            const browser = await getBrowser()
+                                                                            setIsSpeakingTranslatedText(true)
+                                                                            browser.runtime.sendMessage({
+                                                                                type: 'speak',
+                                                                                text: translatedText,
+                                                                                lang: detectTo,
+                                                                            })
+                                                                        })()
+                                                                    }}
+                                                                >
+                                                                    {isSpeakingTranslatedText ? (
+                                                                        <SpeakerMotion />
+                                                                    ) : (
+                                                                        <RxSpeakerLoud size={13} />
+                                                                    )}
+                                                                </div>
+                                                            </StatefulTooltip>
+                                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                                                <div>
+                                                                    <CopyToClipboard
+                                                                        text={translatedText}
+                                                                        onCopy={() => {
+                                                                            toast('Copied to clipboard', {
+                                                                                duration: 3000,
+                                                                                icon: '👏',
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        <div className={styles.actionButton}>
+                                                                            <RxCopy size={13} />
+                                                                        </div>
+                                                                    </CopyToClipboard>
+                                                                </div>
+                                                            </StatefulTooltip>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
+                        <Toaster />
                     </div>
                 </BaseProvider>
             </StyletronProvider>

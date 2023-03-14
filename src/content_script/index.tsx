@@ -2,15 +2,14 @@ import '@webcomponents/webcomponentsjs'
 import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
-import { popupCardID, popupThumbID, zIndex } from './consts'
+import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
-import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
-import browser from 'webextension-polyfill'
 import hotkeys from 'hotkeys-js'
 
 let root: Root | null = null
@@ -47,6 +46,7 @@ async function hidePopupCard() {
     if (!$popupCard) {
         return
     }
+    const browser = await utils.getBrowser()
     browser.runtime.sendMessage({
         type: 'stopSpeaking',
     })
@@ -71,19 +71,13 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $popupCard.style.background = '#fff'
         $popupCard.style.borderRadius = '4px'
         $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
-        $popupCard.style.minWidth = '200px'
-        $popupCard.style.maxWidth = '600px'
+        $popupCard.style.minWidth = `${popupCardMinWidth}px`
+        $popupCard.style.maxWidth = `${popupCardMaxWidth}px`
         $popupCard.style.lineHeight = '1.6'
         $popupCard.style.fontSize = '13px'
         $popupCard.style.color = '#333'
         $popupCard.style.font =
             '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
-        $popupCard.addEventListener('mousedown', (event) => {
-            event.stopPropagation()
-        })
-        $popupCard.addEventListener('mouseup', (event) => {
-            event.stopPropagation()
-        })
         const $container = await getContainer()
         $container.appendChild($popupCard)
     }
@@ -91,8 +85,9 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     $popupCard.style.width = 'auto'
     $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
-    $popupCard.style.left = `${x}px`
-    $popupCard.style.top = `${y}px`
+    const [maxX, maxY] = calculateMaxXY($popupCard)
+    $popupCard.style.left = `${Math.min(maxX, x)}px`
+    $popupCard.style.top = `${Math.min(maxY, y)}px`
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
@@ -105,12 +100,19 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const JSS = JssProvider as any
+    const isUserscript = utils.isUserscript()
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
             <div>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <PopupCard text={text} engine={engine} autoFocus={autoFocus} />
+                    <PopupCard
+                        text={text}
+                        engine={engine}
+                        autoFocus={autoFocus}
+                        showSettings={isUserscript ? true : false}
+                        defaultShowSettings={isUserscript ? true : false}
+                    />
                 </JSS>
             </div>
         </React.StrictMode>
@@ -143,12 +145,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $popupThumb.addEventListener('mousemove', (event) => {
             event.stopPropagation()
         })
-        $popupThumb.addEventListener('mousedown', (event) => {
-            event.stopPropagation()
-        })
-        $popupThumb.addEventListener('mouseup', (event) => {
-            event.stopPropagation()
-        })
         const $img = document.createElement('img')
         $img.src = icon
         $img.style.display = 'block'
@@ -166,19 +162,30 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 async function main() {
+    let lastMouseEvent: MouseEvent | undefined
+    const browser = await utils.getBrowser()
+
     document.addEventListener('mouseup', (event: MouseEvent) => {
+        lastMouseEvent = event
         window.setTimeout(async () => {
             let text = (window.getSelection()?.toString() ?? '').trim()
             if (!text) {
                 if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                     const elem = event.target
-                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
+                    text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0).trim()
                 }
             }
-            ;(await utils.getSettings()).autoTranslate === true
+            ;(await utils.getSettings()).autoTranslate === true && text
                 ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
                 : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
         })
+    })
+
+    browser.runtime.onMessage.addListener(function (request) {
+        if (request.type === 'open-translator') {
+            const text = window.getSelection()?.toString().trim() ?? ''
+            showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
+        }
     })
 
     document.addEventListener('mousedown', () => {
