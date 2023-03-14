@@ -55,8 +55,12 @@ export function App() {
         function handleMinimize() {
             appWindow.minimize()
         }
-        function handleMaximize() {
-            appWindow.maximize()
+        async function handleMaximize() {
+            if (await appWindow.isMaximized()) {
+                await appWindow.unmaximize()
+            } else {
+                await appWindow.maximize()
+            }
         }
         function handleClose() {
             appWindow.hide()
