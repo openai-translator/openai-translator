@@ -75,9 +75,9 @@ winget install yetone.OpenAITranslator
 
 ## 手动安装
 
-1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的安装包
+### 1. 去 [Release](https://github.com/yetone/openai-translator/releases) 页面下载你对应的操作系统的安装包
 
-2. 安装此应用
+### 2. 安装此应用
 
 -   Windows 用户
 
@@ -87,23 +87,29 @@ winget install yetone.OpenAITranslator
 
     macOS 用户需要把 `OpenAI Translator` 拖动到 `Applications` 目录中
 
-3. 打开应用
-    
-    macOS 用户第一次打开可能会遇到如下报错：
+### 3. 打开应用
 
-      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+macOS 用户第一次打开可能会遇到如下报错：
 
-    点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
+  <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
-      <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+点击 `Cancel` 按钮，然后去 `Settings` -> `Privacy & Security` 页面，点击 `Open Anyway` 按钮，然后在弹出窗口里点击 `Open` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
 
-      <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
-    
-    如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除OpenAI Translator，然后重新添加OpenAI Translator:
+  <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
 
-      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-      
-      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
+  <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+
+如果还报错，请在「终端」中执行这个命令：
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/OpenAI\ Translator.app
+```
+
+如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往权限设置页面删除OpenAI Translator，然后重新添加OpenAI Translator:
+
+  <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+  
+  <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
 # 浏览器插件安装方法
 

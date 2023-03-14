@@ -80,9 +80,9 @@ winget install yetone.OpenAITranslator
 
 ## Install it manually
 
-1. Download zip package per OS from [Release](https://github.com/yetone/openai-translator/releases)
+### 1. Download zip package per OS from [Release](https://github.com/yetone/openai-translator/releases)
 
-2. Install the App!
+### 2. Install the App!
 
 -   Windows
 
@@ -92,23 +92,29 @@ winget install yetone.OpenAITranslator
 
     Drag the `OpenAI Translator` to `Applications`
     
-3. Open the App!
+### 3. Open the App!
 
-    When you first open it in macOS, you may encounter this problem:
-    
-      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+When you first open it in macOS, you may encounter this problem:
 
-    Click `Cancel` and then go to `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it!
+  <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
-      <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+Click `Cancel` and then go to `Settings` -> `Privacy & Security` and click `Open Anyway` and finally click `Open`, and that's it!
 
-      <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
-    
-    If you encounter permission prompts every time you open it, or cannot perform shortcut key word translation, please go to the permission settings page to delete OpenAI Translator and then re-add OpenAI Translator.
-    
-      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-      
-      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
+  <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" />
+
+  <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+
+If there is still an error, please execute this command in the `Terminal`:
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/OpenAI\ Translator.app
+```
+
+If you encounter permission prompts every time you open it, or cannot perform shortcut key word translation, please go to the permission settings page to delete OpenAI Translator and then re-add OpenAI Translator.
+
+  <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+  
+  <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
 # Installation(Browser Extension)
 
