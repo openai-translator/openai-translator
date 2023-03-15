@@ -123,7 +123,9 @@ winget install yetone.OpenAITranslator
 
 1. Visit the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) to install this plugin.
 2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
+   
    <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+   
 3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # License
