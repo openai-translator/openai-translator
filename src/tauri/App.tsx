@@ -80,6 +80,8 @@ export function App() {
 
     const { themeType } = useTheme()
 
+    const svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+
     return (
         <div
             style={{
@@ -92,20 +94,38 @@ export function App() {
                 {!isMacOS && !isLinux && (
                     <>
                         <div className='titlebar-button' id='titlebar-pin' ref={pinIconRef}>
-                            {isPinned ? (
-                                <img src='https://api.iconify.design/ic:baseline-push-pin.svg' alt='pin' />
-                            ) : (
-                                <img src='https://api.iconify.design/ic:outline-push-pin.svg' alt='pin' />
-                            )}
+                            <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
+                                {isPinned ? (
+                                    <path
+                                        fill={svgPathColor}
+                                        fillRule='evenodd'
+                                        d='M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1l1-1v-7H19v-2c-1.66 0-3-1.34-3-3z'
+                                    />
+                                ) : (
+                                    <path
+                                        fill={svgPathColor}
+                                        d='M14 4v5c0 1.12.37 2.16 1 3H9c.65-.86 1-1.9 1-3V4h4m3-2H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1l1-1v-7H19v-2c-1.66 0-3-1.34-3-3V4h1c.55 0 1-.45 1-1s-.45-1-1-1z'
+                                    />
+                                )}
+                            </svg>
                         </div>
                         <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
-                            <img src='https://api.iconify.design/mdi:window-minimize.svg' alt='minimize' />
+                            <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
+                                <path fill={svgPathColor} d='M20 14H4v-4h16' />
+                            </svg>
                         </div>
                         <div className='titlebar-button' id='titlebar-maximize' ref={maximizeIconRef}>
-                            <img src='https://api.iconify.design/mdi:window-maximize.svg' alt='maximize' />
+                            <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
+                                <path fill={svgPathColor} d='M4 4h16v16H4V4m2 4v10h12V8H6Z' />
+                            </svg>
                         </div>
                         <div className='titlebar-button' id='titlebar-close' ref={closeIconRef}>
-                            <img src='https://api.iconify.design/mdi:close.svg' alt='close' />
+                            <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
+                                <path
+                                    fill={svgPathColor}
+                                    d='M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z'
+                                />
+                            </svg>
                         </div>
                     </>
                 )}
