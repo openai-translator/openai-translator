@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { LightTheme, BaseProvider } from 'baseui'
+import { LightTheme, DarkTheme, BaseProvider } from 'baseui'
 import { Textarea } from 'baseui/textarea'
 import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri, isDarkMode } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
@@ -58,6 +58,7 @@ const useStyles = createUseStyles({
         height: '100%',
     },
     'settingsIcon': {
+        color: (theme) => theme.contentSecondary,
         position: 'absolute',
         cursor: 'pointer',
         bottom: '10px',
@@ -69,7 +70,7 @@ const useStyles = createUseStyles({
         'cursor': 'move',
         'alignItems': 'center',
         'padding': '5px 10px',
-        'borderBottom': '1px solid #e8e8e8',
+        'borderBottom': (theme) => `1px solid ${theme.borderTransparent}`,
         'minWidth': '510px',
         'user-select': 'none',
         '-webkit-user-select': 'none',
@@ -89,8 +90,8 @@ const useStyles = createUseStyles({
         userSelect: 'none',
     },
     'iconText': {
+        color: (theme) => theme.contentPrimary,
         fontSize: '12px',
-        color: '#333',
         fontWeight: 600,
         cursor: 'unset',
     },
@@ -150,7 +151,7 @@ const useStyles = createUseStyles({
         position: 'relative',
         display: 'flex',
         padding: '16px 10px 10px 10px',
-        borderTop: '1px solid #e9e9e9',
+        borderTop: (theme) => `1px solid ${theme.borderTransparent}`,
         userSelect: 'none',
     },
     'actionStr': {
@@ -163,9 +164,10 @@ const useStyles = createUseStyles({
         left: '50%',
         transform: 'translateX(-50%) translateY(-50%)',
         fontSize: '10px',
-        color: '#333',
         padding: '2px 12px',
-        background: '#eee',
+        borderRadius: '4px',
+        background: (theme) => theme.backgroundTertiary,
+        color: (theme) => theme.contentSecondary,
     },
     'error': {
         background: '#f8d7da',
@@ -185,6 +187,7 @@ const useStyles = createUseStyles({
         padding: '4px 8px',
         display: 'flex',
         overflowY: 'auto',
+        color: (theme) => theme.contentPrimary,
     },
     'errorMessage': {
         display: 'flex',
@@ -198,6 +201,7 @@ const useStyles = createUseStyles({
         marginTop: '10px',
     },
     'actionButton': {
+        color: (theme) => theme.contentSecondary,
         cursor: 'pointer',
         display: 'flex',
         paddingTop: '6px',
@@ -224,12 +228,27 @@ const useStyles = createUseStyles({
         'justifyContent': 'center',
         'padding-left': '3px',
         'padding-right': '3px',
-        'border': '1px dashed #ccc',
         'borderRadius': '0.75rem',
         'cursor': 'pointer',
         'userSelect': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
+        'border': (theme) => `1px dashed ${theme.borderTransparent}`,
+        'background': (theme) => theme.backgroundTertiary,
+        'color': (theme) => theme.contentSecondary,
+    },
+    'fileDragArea': {
+        padding: '10px',
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '10px',
+        fontSize: '11px',
+        border: (theme) => `2px dashed ${theme.borderTransparent}`,
+        background: (theme) => theme.backgroundTertiary,
+        color: (theme) => theme.contentSecondary,
+    },
+    'OCRStatusBar': {
+        color: (theme) => theme.contentSecondary,
     },
 })
 
@@ -348,7 +367,9 @@ export function PopupCard(props: IPopupCardProps) {
             editor.removeEventListener('blur', onBlur)
         }
     }, [isTranslate])
-    const styles = useStyles()
+
+    const theme = isDarkMode() ? DarkTheme : LightTheme
+    const styles = useStyles(theme.colors)
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
@@ -767,7 +788,7 @@ export function PopupCard(props: IPopupCardProps) {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
-                <BaseProvider theme={LightTheme}>
+                <BaseProvider theme={isDarkMode() ? DarkTheme : LightTheme}>
                     <div
                         className={styles.popupCard}
                         style={{
@@ -963,20 +984,10 @@ export function PopupCard(props: IPopupCardProps) {
                                             {({ getRootProps, isDragActive }) => (
                                                 <div {...getRootProps()}>
                                                     {isDragActive ? (
-                                                        <div
-                                                            style={{
-                                                                padding: '10px',
-                                                                display: 'flex',
-                                                                justifyContent: 'center',
-                                                                border: '2px dashed #eee',
-                                                                marginBottom: '10px',
-                                                                fontSize: '11px',
-                                                            }}
-                                                        >
-                                                            Drop file below
-                                                        </div>
+                                                        <div className={styles.fileDragArea}> Drop file below </div>
                                                     ) : (
                                                         <div
+                                                            className={styles.OCRStatusBar}
                                                             style={{
                                                                 display: 'flex',
                                                                 flexDirection: 'row',
