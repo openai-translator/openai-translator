@@ -21,6 +21,7 @@ import clsx from 'clsx'
 import { IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { useThemeType } from '../common/hooks/useThemeType'
+import { IoCloseCircle } from 'react-icons/io5'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -165,6 +166,7 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
 
 const useHotkeyRecorderStyles = createUseStyles({
     'hotkeyRecorder': (props: IThemedStyleProps) => ({
+        position: 'relative',
         height: '32px',
         lineHeight: '32px',
         padding: '0 14px',
@@ -174,6 +176,11 @@ const useHotkeyRecorderStyles = createUseStyles({
         border: '1px dashed transparent',
         backgroundColor: props.theme.colors.backgroundTertiary,
     }),
+    'clearHotkey': {
+        position: 'absolute',
+        top: '10px',
+        right: '12px',
+    },
     'caption': {
         marginTop: '4px',
         fontSize: '11px',
@@ -249,6 +256,11 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
         }
     }, [isRecording, props.onBlur])
 
+    function clearHotkey() {
+        props.onChange?.('')
+        setHotKeys([])
+    }
+
     return (
         <div>
             <div
@@ -266,6 +278,15 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                 })}
             >
                 {hotKeys.join(' + ')}
+                {!isRecording && hotKeys.length > 0 ? (
+                    <IoCloseCircle
+                        className={styles.clearHotkey}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            clearHotkey()
+                        }}
+                    />
+                ) : null}
             </div>
             <div className={styles.caption}>
                 {isRecording ? 'Please press the hotkey you want to set.' : 'Click above to set hotkeys.'}
@@ -308,7 +329,7 @@ const engine = new Styletron()
 const { Form, FormItem, useForm } = createForm<utils.ISettings>()
 
 interface IPopupProps {
-    onSave?: (settings: utils.ISettings) => void
+    onSave?: (oldSettings: utils.ISettings) => void
 }
 
 export function Settings(props: IPopupProps) {
@@ -348,6 +369,7 @@ export function Settings(props: IPopupProps) {
 
     const onSubmmit = useCallback(async (data: utils.ISettings) => {
         setLoading(true)
+        const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
         toast('Saved', {
             icon: '👍',
@@ -357,7 +379,7 @@ export function Settings(props: IPopupProps) {
         if (data.themeType) {
             setThemeType(data.themeType)
         }
-        props.onSave?.(data)
+        props.onSave?.(oldSettings)
     }, [])
 
     const onBlur = useCallback(async () => {

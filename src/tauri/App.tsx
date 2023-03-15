@@ -138,8 +138,8 @@ export function App() {
                 defaultShowSettings
                 editorRows={10}
                 containerStyle={isLinux ? undefined : { paddingTop: '20px' }}
-                onSettingsSave={() => {
-                    bindHotkey()
+                onSettingsSave={(oldSettings) => {
+                    bindHotkey(oldSettings.hotkey)
                 }}
             />
         </div>

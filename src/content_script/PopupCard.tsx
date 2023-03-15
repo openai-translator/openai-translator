@@ -295,7 +295,7 @@ export interface IPopupCardProps {
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
     editorRows?: number
-    onSettingsSave?: (settings: ISettings) => void
+    onSettingsSave?: (oldSettings: ISettings) => void
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -829,9 +829,9 @@ export function PopupCard(props: IPopupCardProps) {
                         )}
                         {showSettings ? (
                             <Settings
-                                onSave={(settings) => {
+                                onSave={(oldSettings) => {
                                     setShowSettings(false)
-                                    props.onSettingsSave?.(settings)
+                                    props.onSettingsSave?.(oldSettings)
                                 }}
                             />
                         ) : (
