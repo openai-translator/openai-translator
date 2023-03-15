@@ -28,7 +28,7 @@
 
     "permissions": ["storage"],
 
-    "host_permissions": ["https://*.openai.com/"],
+    "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com"],
 
     "browser_specific_settings": {
         "gecko": {
