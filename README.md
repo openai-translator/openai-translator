@@ -50,6 +50,8 @@ I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/
 
 What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
 
+**Attention! The desktop application does not support the pop-up icon after word selection. You must press the shortcut key to trigger the translation after selecting a word.**
+
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 
 # More than just translation
