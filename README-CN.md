@@ -99,9 +99,11 @@ winget install yetone.OpenAITranslator
 ### 故障排除
 
 -   "OpenAI Translator" can’t be opened because the developer cannot be verified.
+    
     <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
 
     -   点击 `Cancel` 按钮，然后去 `设置` -> `隐私与安全性` 页面，点击 `仍要打开` 按钮，然后在弹出窗口里点击 `打开` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
+        
         <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
 
     -   如果在 `隐私与安全性` 中找不到以上选项。打开 `Terminal.app`，并输入以下命令（中途可能需要输入密码），然后重启 `OpenAI Translator` 即可：
@@ -111,6 +113,7 @@ winget install yetone.OpenAITranslator
         ```
 
 -   如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往 `设置` -> `隐私与安全性` -> `辅助功能` 中删除 OpenAI Translator，然后重新添加 OpenAI Translator:
+    
     <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
     <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
