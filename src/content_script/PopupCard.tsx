@@ -281,42 +281,6 @@ export function PopupCard(props: IPopupCardProps) {
     const isCompositing = useRef(false)
     const [selectedWord, setSelectedWord] = useState('')
 
-    useEffect(() => {
-        const editor = editorRef.current
-        if (!editor) {
-            return undefined
-        }
-        const onCompositionStart = () => {
-            isCompositing.current = true
-        }
-        const onCompositionEnd = () => {
-            isCompositing.current = false
-        }
-        const onMouseUp = () => {
-            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
-            setSelectedWord(selectedWord_)
-            // setTimeout(() => {
-            //     editor.focus()
-            // }, 300)
-        }
-        const onBlur = () => {
-            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
-            setSelectedWord(selectedWord_)
-        }
-
-        editor.addEventListener('compositionstart', onCompositionStart)
-        editor.addEventListener('compositionend', onCompositionEnd)
-        editor.addEventListener('mouseup', onMouseUp)
-        editor.addEventListener('blur', onBlur)
-
-        return () => {
-            editor.removeEventListener('compositionstart', onCompositionStart)
-            editor.removeEventListener('compositionend', onCompositionEnd)
-            editor.removeEventListener('mouseup', onMouseUp)
-            editor.removeEventListener('blur', onBlur)
-        }
-    }, [])
-
     const highlightRef = useRef<HighlightInTextarea | null>(null)
 
     useEffect(() => {
@@ -347,6 +311,43 @@ export function PopupCard(props: IPopupCardProps) {
             }
         })()
     }, [])
+    const isTranslate = translateMode === 'translate'
+    useEffect(() => {
+        if (!isTranslate) {
+            setSelectedWord('')
+            return undefined
+        }
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        const onCompositionStart = () => {
+            isCompositing.current = true
+        }
+        const onCompositionEnd = () => {
+            isCompositing.current = false
+        }
+        const onMouseUp = () => {
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
+        }
+        const onBlur = () => {
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            setSelectedWord(selectedWord_)
+        }
+
+        editor.addEventListener('compositionstart', onCompositionStart)
+        editor.addEventListener('compositionend', onCompositionEnd)
+        editor.addEventListener('mouseup', onMouseUp)
+        editor.addEventListener('blur', onBlur)
+
+        return () => {
+            editor.removeEventListener('compositionstart', onCompositionStart)
+            editor.removeEventListener('compositionend', onCompositionEnd)
+            editor.removeEventListener('mouseup', onMouseUp)
+            editor.removeEventListener('blur', onBlur)
+        }
+    }, [isTranslate])
     const styles = useStyles()
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
