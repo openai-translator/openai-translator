@@ -56,7 +56,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
-        background: (theme) => theme.backgroundSecondary,
     },
     'settingsIcon': {
         color: (theme) => theme.contentSecondary,
@@ -66,7 +65,6 @@ const useStyles = createUseStyles({
         right: '10px',
     },
     'popupCardHeaderContainer': {
-        'background': (theme) => theme.backgroundSecondary,
         'display': 'flex',
         'flexDirection': 'row',
         'cursor': 'move',
@@ -145,7 +143,6 @@ const useStyles = createUseStyles({
         gap: '10px',
     },
     'popupCardEditorContainer': {
-        background: (theme) => theme.backgroundSecondary,
         display: 'flex',
         flexDirection: 'column',
         padding: '10px',
