@@ -350,11 +350,11 @@ export function PopupCard(props: IPopupCardProps) {
             isCompositing.current = false
         }
         const onMouseUp = () => {
-            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd).trim()
             setSelectedWord(selectedWord_)
         }
         const onBlur = () => {
-            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd)
+            const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd).trim()
             setSelectedWord(selectedWord_)
         }
 
