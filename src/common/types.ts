@@ -1,3 +1,5 @@
+import { Theme } from 'baseui/theme'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
     get(keys: string[]): Promise<Record<string, any>>
@@ -21,4 +23,12 @@ interface IRuntime {
 export interface IBrowser {
     storage: IStorage
     runtime: IRuntime
+}
+
+export type BaseThemeType = 'light' | 'dark'
+export type ThemeType = BaseThemeType | 'followTheSystem'
+
+export interface IThemedStyleProps {
+    theme: Theme
+    themeType: BaseThemeType
 }

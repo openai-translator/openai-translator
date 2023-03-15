@@ -68,7 +68,6 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $popupCard.id = popupCardID
         $popupCard.style.position = 'absolute'
         $popupCard.style.zIndex = zIndex
-        $popupCard.style.background = '#fff'
         $popupCard.style.borderRadius = '4px'
         $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
         $popupCard.style.minWidth = `${popupCardMinWidth}px`
@@ -126,13 +125,14 @@ async function showPopupThumb(text: string, x: number, y: number) {
     if (hidePopupThumbTimer) {
         clearTimeout(hidePopupThumbTimer)
     }
+    const isDark = await utils.isDarkMode()
     let $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if (!$popupThumb) {
         $popupThumb = document.createElement('div')
         $popupThumb.id = popupThumbID
         $popupThumb.style.position = 'absolute'
         $popupThumb.style.zIndex = zIndex
-        $popupThumb.style.background = '#fff'
+        $popupThumb.style.background = isDark ? '#1f1f1f' : '#fff'
         $popupThumb.style.padding = '2px'
         $popupThumb.style.borderRadius = '4px'
         $popupThumb.style.boxShadow = '0 0 4px rgba(0,0,0,.2)'

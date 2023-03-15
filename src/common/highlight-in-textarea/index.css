@@ -47,7 +47,12 @@
     padding: 1px 2px !important;
     margin-left: -2px !important;
     margin-top: 1px !important;
-    color: inherit;
+    color: #000;
     border-radius: 0.2rem;
     background-color: #F8C3CD !important;
+}
+
+.yetone-dark .yetone-hit-content mark {
+    color: rgb(203, 203, 203);
+    background-color: #B5495B !important;
 }

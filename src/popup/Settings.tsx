@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import * as utils from '../common/utils'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { LightTheme, BaseProvider, DarkTheme } from 'baseui'
+import { BaseProvider } from 'baseui'
 import { Input } from 'baseui/input'
 import { createForm } from '../components/Form'
 import { Button } from 'baseui/button'
@@ -18,6 +18,9 @@ import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
+import { IThemedStyleProps, ThemeType } from '../common/types'
+import { useTheme } from '../common/hooks/useTheme'
+import { useThemeType } from '../common/hooks/useThemeType'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -59,12 +62,6 @@ interface ITranslateModeSelectorProps {
     onBlur?: () => void
 }
 
-interface AutoTranslateCheckboxProps {
-    value?: boolean
-    onChange?: (value: boolean) => void
-    onBlur?: () => void
-}
-
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
     return (
         <Select
@@ -99,6 +96,49 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
     )
 }
 
+interface IThemeTypeSelectorProps {
+    value?: TranslateMode | 'nop'
+    onChange?: (value: TranslateMode | 'nop') => void
+    onBlur?: () => void
+}
+
+function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
+    return (
+        <Select
+            size='compact'
+            onBlur={props.onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                props.value && [
+                    {
+                        id: props.value,
+                    },
+                ]
+            }
+            onChange={(params) => {
+                props.onChange?.(params.value[0].id as TranslateMode | 'nop')
+            }}
+            options={
+                [
+                    { label: 'Follow the System', id: 'followTheSystem' },
+                    { label: 'Dark', id: 'dark' },
+                    { label: 'Light', id: 'light' },
+                ] as {
+                    label: string
+                    id: ThemeType
+                }[]
+            }
+        />
+    )
+}
+
+interface AutoTranslateCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
 function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
     return (
         <Checkbox
@@ -113,7 +153,7 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
 }
 
 const useHotkeyRecorderStyles = createUseStyles({
-    'hotkeyRecorder': {
+    'hotkeyRecorder': (props: IThemedStyleProps) => ({
         height: '32px',
         lineHeight: '32px',
         padding: '0 14px',
@@ -121,8 +161,8 @@ const useHotkeyRecorderStyles = createUseStyles({
         width: '200px',
         cursor: 'pointer',
         border: '1px dashed transparent',
-        backgroundColor: (theme) => theme.backgroundTertiary,
-    },
+        backgroundColor: props.theme.colors.backgroundTertiary,
+    }),
     'caption': {
         marginTop: '4px',
         fontSize: '11px',
@@ -152,8 +192,9 @@ interface IHotkeyRecorderProps {
 }
 
 function HotkeyRecorder(props: IHotkeyRecorderProps) {
-    const theme = utils.isDarkMode() ? DarkTheme : LightTheme
-    const styles = useHotkeyRecorderStyles(theme.colors)
+    const { theme, themeType } = useTheme()
+
+    const styles = useHotkeyRecorderStyles({ themeType, theme })
     const [keys, { start, stop, isRecording }] = useRecordHotkeys()
 
     const [hotKeys, setHotKeys] = useState<string[]>([])
@@ -231,6 +272,9 @@ interface IPopupProps {
 }
 
 export function Settings(props: IPopupProps) {
+    const { theme } = useTheme()
+    const { setThemeType } = useThemeType()
+
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<utils.ISettings>({
         apiKeys: '',
@@ -268,6 +312,9 @@ export function Settings(props: IPopupProps) {
             duration: 3000,
         })
         setLoading(false)
+        if (data.themeType) {
+            setThemeType(data.themeType)
+        }
         props.onSave?.(data)
     }, [])
 
@@ -278,14 +325,17 @@ export function Settings(props: IPopupProps) {
         }
     }, [values])
 
+    const { themeType } = useTheme()
+
     return (
         <div
             style={{
+                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
                 minWidth: 400,
             }}
         >
             <StyletronProvider value={engine}>
-                <BaseProvider theme={utils.isDarkMode() ? DarkTheme : LightTheme}>
+                <BaseProvider theme={theme}>
                     <nav
                         style={{
                             position: 'relative',
@@ -343,6 +393,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='defaultTargetLanguage' label='Default Target Language'>
                             <LanguageSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='themeType' label='Theme'>
+                            <ThemeTypeSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='hotkey' label='Hotkey'>
                             <HotkeyRecorder onBlur={onBlur} />

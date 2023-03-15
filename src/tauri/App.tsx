@@ -5,6 +5,7 @@ import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
 import { bindHotkey } from './utils'
+import { useTheme } from '../common/hooks/useTheme'
 
 const engine = new Styletron({
     prefix: '__yetone-openai-translator-styletron-',
@@ -77,11 +78,14 @@ export function App() {
         }
     }, [])
 
+    const { themeType } = useTheme()
+
     return (
         <div
             style={{
+                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
-                height: '100%',
+                height: '100vh',
             }}
         >
             <div className='titlebar' data-tauri-drag-region>

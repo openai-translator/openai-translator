@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TranslateMode } from '../content_script/translate'
-import { IBrowser } from './types'
+import { IBrowser, ThemeType } from './types'
 
 export interface ISettings {
     apiKeys: string
@@ -9,6 +9,7 @@ export interface ISettings {
     defaultTranslateMode: TranslateMode | 'nop'
     defaultTargetLanguage: string
     hotkey?: string
+    themeType?: ThemeType
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
@@ -30,6 +31,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
     hotkey: 1,
+    themeType: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -55,7 +57,7 @@ export async function getSettings(): Promise<ISettings> {
     return settings
 }
 
-export async function setSettings(settings: ISettings) {
+export async function setSettings(settings: Partial<ISettings>) {
     const browser = await getBrowser()
     await browser.storage.sync.set(settings)
 }
@@ -90,6 +92,10 @@ export const isUserscript = () => {
     return typeof GM_info !== 'undefined'
 }
 
-export const isDarkMode = () => {
-    return matchMedia('(prefers-color-scheme: dark)').matches
+export const isDarkMode = async () => {
+    const settings = await getSettings()
+    if (settings.themeType === 'followTheSystem') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
+    return settings.themeType === 'dark'
 }

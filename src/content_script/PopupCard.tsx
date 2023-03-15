@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { LightTheme, DarkTheme, BaseProvider } from 'baseui'
+import { BaseProvider } from 'baseui'
 import { Textarea } from 'baseui/textarea'
 import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri, isDarkMode } from '../common/utils'
+import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
@@ -33,6 +33,8 @@ import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import { HighlightInTextarea } from '../common/highlight-in-textarea'
 import LRUCache from 'lru-cache'
+import { IThemedStyleProps } from '../common/types'
+import { useTheme } from '../common/hooks/useTheme'
 
 const cache = new LRUCache({
     max: 500,
@@ -57,25 +59,25 @@ const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
     },
-    'settingsIcon': {
-        color: (theme) => theme.contentSecondary,
+    'settingsIcon': (props: IThemedStyleProps) => ({
+        color: props.theme.colors.contentSecondary,
         position: 'absolute',
         cursor: 'pointer',
         bottom: '10px',
         right: '10px',
-    },
-    'popupCardHeaderContainer': {
+    }),
+    'popupCardHeaderContainer': (props: IThemedStyleProps) => ({
         'display': 'flex',
         'flexDirection': 'row',
         'cursor': 'move',
         'alignItems': 'center',
         'padding': '5px 10px',
-        'borderBottom': (theme) => `1px solid ${theme.borderTransparent}`,
+        'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
         'minWidth': '510px',
         'user-select': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
-    },
+    }),
     'iconContainer': {
         display: 'flex',
         alignItems: 'center',
@@ -89,12 +91,12 @@ const useStyles = createUseStyles({
         height: '16px',
         userSelect: 'none',
     },
-    'iconText': {
-        color: (theme) => theme.contentPrimary,
+    'iconText': (props: IThemedStyleProps) => ({
+        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
         fontSize: '12px',
         fontWeight: 600,
         cursor: 'unset',
-    },
+    }),
     'paragraph': {
         margin: '14px 0',
     },
@@ -147,14 +149,14 @@ const useStyles = createUseStyles({
         flexDirection: 'column',
         padding: '10px',
     },
-    'popupCardTranslatedContainer': {
+    'popupCardTranslatedContainer': (props: IThemedStyleProps) => ({
         position: 'relative',
         display: 'flex',
         padding: '16px 10px 10px 10px',
-        borderTop: (theme) => `1px solid ${theme.borderTransparent}`,
+        borderTop: `1px solid ${props.theme.colors.borderTransparent}`,
         userSelect: 'none',
-    },
-    'actionStr': {
+    }),
+    'actionStr': (props: IThemedStyleProps) => ({
         position: 'absolute',
         display: 'flex',
         flexDirection: 'row',
@@ -166,9 +168,9 @@ const useStyles = createUseStyles({
         fontSize: '10px',
         padding: '2px 12px',
         borderRadius: '4px',
-        background: (theme) => theme.backgroundTertiary,
-        color: (theme) => theme.contentSecondary,
-    },
+        background: props.theme.colors.backgroundTertiary,
+        color: props.theme.colors.contentSecondary,
+    }),
     'error': {
         background: '#f8d7da',
     },
@@ -182,13 +184,13 @@ const useStyles = createUseStyles({
             borderColor: 'transparent',
         },
     },
-    'popupCardTranslatedContentContainer': {
+    'popupCardTranslatedContentContainer': (props: IThemedStyleProps) => ({
         marginTop: '-14px',
         padding: '4px 8px',
         display: 'flex',
         overflowY: 'auto',
-        color: (theme) => theme.contentPrimary,
-    },
+        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+    }),
     'errorMessage': {
         display: 'flex',
         color: 'red',
@@ -200,13 +202,13 @@ const useStyles = createUseStyles({
         gap: '12px',
         marginTop: '10px',
     },
-    'actionButton': {
-        color: (theme) => theme.contentSecondary,
+    'actionButton': (props: IThemedStyleProps) => ({
+        color: props.theme.colors.contentSecondary,
         cursor: 'pointer',
         display: 'flex',
         paddingTop: '6px',
         paddingBottom: '6px',
-    },
+    }),
     'writing': {
         'marginLeft': '3px',
         'width': '10px',
@@ -221,7 +223,7 @@ const useStyles = createUseStyles({
             marginBottom: '-3px',
         },
     },
-    'dropZone': {
+    'dropZone': (props: IThemedStyleProps) => ({
         'display': 'flex',
         'flexDirection': 'column',
         'alignItems': 'center',
@@ -233,23 +235,23 @@ const useStyles = createUseStyles({
         'userSelect': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
-        'border': (theme) => `1px dashed ${theme.borderTransparent}`,
-        'background': (theme) => theme.backgroundTertiary,
-        'color': (theme) => theme.contentSecondary,
-    },
-    'fileDragArea': {
+        'border': `1px dashed ${props.theme.colors.borderTransparent}`,
+        'background': props.theme.colors.backgroundTertiary,
+        'color': props.theme.colors.contentSecondary,
+    }),
+    'fileDragArea': (props: IThemedStyleProps) => ({
         padding: '10px',
         display: 'flex',
         justifyContent: 'center',
         marginBottom: '10px',
         fontSize: '11px',
-        border: (theme) => `2px dashed ${theme.borderTransparent}`,
-        background: (theme) => theme.backgroundTertiary,
-        color: (theme) => theme.contentSecondary,
-    },
-    'OCRStatusBar': {
-        color: (theme) => theme.contentSecondary,
-    },
+        border: `2px dashed ${props.theme.colors.borderTransparent}`,
+        background: props.theme.colors.backgroundTertiary,
+        color: props.theme.colors.contentSecondary,
+    }),
+    'OCRStatusBar': (props: IThemedStyleProps) => ({
+        color: props.theme.colors.contentSecondary,
+    }),
 })
 
 interface IActionStrItem {
@@ -368,8 +370,9 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }, [isTranslate])
 
-    const theme = isDarkMode() ? DarkTheme : LightTheme
-    const styles = useStyles(theme.colors)
+    const { theme, themeType } = useTheme()
+
+    const styles = useStyles({ theme, themeType })
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
@@ -788,10 +791,13 @@ export function PopupCard(props: IPopupCardProps) {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
-                <BaseProvider theme={isDarkMode() ? DarkTheme : LightTheme}>
+                <BaseProvider theme={theme}>
                     <div
-                        className={styles.popupCard}
+                        className={clsx(styles.popupCard, {
+                            'yetone-dark': themeType === 'dark',
+                        })}
                         style={{
+                            background: themeType === 'dark' ? '#1f1f1f' : '#fff',
                             paddingBottom: showSettings ? '0px' : '30px',
                         }}
                     >
@@ -1027,11 +1033,16 @@ export function PopupCard(props: IPopupCardProps) {
                                                                 style: {
                                                                     width: '100%',
                                                                     borderRadius: '0px',
+                                                                    borderWidth: '1px',
                                                                 },
                                                             },
                                                             Input: {
                                                                 style: {
                                                                     padding: '4px 8px',
+                                                                    color:
+                                                                        themeType === 'dark'
+                                                                            ? theme.colors.contentSecondary
+                                                                            : theme.colors.contentPrimary,
                                                                     fontFamily:
                                                                         translateMode === 'explain-code'
                                                                             ? 'monospace'
