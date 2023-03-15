@@ -4,6 +4,7 @@ import * as lang from './lang'
 import { fetchSSE } from './utils'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
+export type Provider = 'OpenAI' | 'Azure'
 
 export interface TranslateQuery {
     text: string
@@ -29,11 +30,6 @@ const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 export async function translate(query: TranslateQuery) {
     const trimFirstQuotation = !query.selectedWord
     const settings = await utils.getSettings()
-    const apiKey = await utils.getApiKey()
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-    }
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
@@ -112,6 +108,7 @@ export async function translate(query: TranslateQuery) {
             }
             break
     }
+
     const body = {
         model: 'gpt-3.5-turbo',
         temperature: 0,
@@ -119,23 +116,42 @@ export async function translate(query: TranslateQuery) {
         top_p: 1,
         frequency_penalty: 1,
         presence_penalty: 1,
-        messages: [
-            {
-                role: 'system',
-                content: systemPrompt,
-            },
-            {
-                role: 'user',
-                content: assistantPrompt,
-            },
-            { role: 'user', content: `"${query.text}"` },
-        ],
         stream: true,
+    }
+
+    const apiKey = await utils.getApiKey()
+    const headers = {
+        'Content-Type': 'application/json',
+    }
+
+    switch (settings.provider) {
+        case 'OpenAI':
+            headers['Authorization'] = `Bearer ${apiKey}`
+            body['messages'] = [
+                {
+                    role: 'system',
+                    content: systemPrompt,
+                },
+                {
+                    role: 'user',
+                    content: assistantPrompt,
+                },
+                { role: 'user', content: `"${query.text}"` },
+            ]
+            break
+
+        case 'Azure':
+            headers['api-key'] = `${apiKey}`
+            body[
+                'prompt'
+            ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
+            body['stop'] = ['<|im_end|>']
+            break
     }
 
     let isFirst = true
 
-    await fetchSSE(`${settings.apiURL}/v1/chat/completions`, {
+    await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
@@ -153,23 +169,40 @@ export async function translate(query: TranslateQuery) {
             if (!choices || choices.length === 0) {
                 return { error: 'No result' }
             }
-            const { delta, finish_reason: finishReason } = choices[0]
+            const { finish_reason: finishReason } = choices[0]
             if (finishReason) {
                 query.onFinish(finishReason)
                 return
             }
-            const { content = '', role } = delta
-            let targetTxt = content
 
-            if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
-                targetTxt = targetTxt.slice(1)
+            let targetTxt = ''
+            switch (settings.provider) {
+                case 'OpenAI': {
+                    const { content = '', role } = choices[0].delta
+                    targetTxt = content
+
+                    if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+                        targetTxt = targetTxt.slice(1)
+                    }
+
+                    if (!role) {
+                        isFirst = false
+                    }
+
+                    query.onMessage({ content: targetTxt, role })
+                    break
+                }
+                case 'Azure':
+                    targetTxt = choices[0].text
+                    console.log(resp)
+
+                    if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+                        targetTxt = targetTxt.slice(1)
+                    }
+
+                    query.onMessage({ content: targetTxt, role: '' })
+                    break
             }
-
-            if (!role) {
-                isFirst = false
-            }
-
-            query.onMessage({ content: targetTxt, role })
         },
         onError: (err) => {
             const { error } = err

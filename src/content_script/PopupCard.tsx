@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { BaseProvider } from 'baseui'
+import { BaseProvider, Theme } from 'baseui'
 import { Textarea } from 'baseui/textarea'
 import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
@@ -416,6 +416,16 @@ export function PopupCard(props: IPopupCardProps) {
     }, [originalText, translateMode])
 
     const [actionStr, setActionStr] = useState('')
+
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) return
+        editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(detectFrom) ? 'rtl' : 'ltr'
+    }, [detectFrom, actionStr])
+    const [translatedLanguageDirection, setTranslatedLanguageDirection] = useState<Theme['direction']>('ltr')
+    useEffect(() => {
+        setTranslatedLanguageDirection(['ar', 'fa', 'he', 'ug', 'ur'].includes(detectTo) ? 'rtl' : 'ltr')
+    }, [detectTo])
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -1048,6 +1058,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                         translateMode === 'explain-code'
                                                                             ? 'monospace'
                                                                             : 'inherit',
+                                                                    textalign: 'start',
                                                                 },
                                                             },
                                                         }}
@@ -1173,7 +1184,10 @@ export function PopupCard(props: IPopupCardProps) {
                                         </div>
                                     </div>
                                     {originalText !== '' && (
-                                        <div className={styles.popupCardTranslatedContainer}>
+                                        <div
+                                            className={styles.popupCardTranslatedContainer}
+                                            dir={translatedLanguageDirection}
+                                        >
                                             {actionStr && (
                                                 <div
                                                     className={clsx({

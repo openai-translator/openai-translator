@@ -66,6 +66,7 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     if (!$popupCard) {
         $popupCard = document.createElement('div')
         $popupCard.id = popupCardID
+        $popupCard.style.overflow = 'hidden'
         $popupCard.style.position = 'absolute'
         $popupCard.style.zIndex = zIndex
         $popupCard.style.borderRadius = '4px'
