@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import * as utils from '../common/utils'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { LightTheme, BaseProvider } from 'baseui'
+import { LightTheme, BaseProvider, DarkTheme } from 'baseui'
 import { Input } from 'baseui/input'
 import { createForm } from '../components/Form'
 import { Button } from 'baseui/button'
@@ -121,7 +121,7 @@ const useHotkeyRecorderStyles = createUseStyles({
         width: '200px',
         cursor: 'pointer',
         border: '1px dashed transparent',
-        backgroundColor: 'rgb(238, 238, 238)',
+        backgroundColor: (theme) => theme.backgroundTertiary,
     },
     'caption': {
         marginTop: '4px',
@@ -152,7 +152,8 @@ interface IHotkeyRecorderProps {
 }
 
 function HotkeyRecorder(props: IHotkeyRecorderProps) {
-    const styles = useHotkeyRecorderStyles()
+    const theme = utils.isDarkMode() ? DarkTheme : LightTheme
+    const styles = useHotkeyRecorderStyles(theme.colors)
     const [keys, { start, stop, isRecording }] = useRecordHotkeys()
 
     const [hotKeys, setHotKeys] = useState<string[]>([])
@@ -284,7 +285,7 @@ export function Settings(props: IPopupProps) {
             }}
         >
             <StyletronProvider value={engine}>
-                <BaseProvider theme={LightTheme}>
+                <BaseProvider theme={utils.isDarkMode() ? DarkTheme : LightTheme}>
                     <nav
                         style={{
                             position: 'relative',
