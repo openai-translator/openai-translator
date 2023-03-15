@@ -289,7 +289,7 @@ const engine = new Styletron()
 const { Form, FormItem, useForm } = createForm<utils.ISettings>()
 
 interface IPopupProps {
-    onSave?: (settings: utils.ISettings) => void
+    onSave?: (oldSettings: utils.ISettings) => void
 }
 
 export function Settings(props: IPopupProps) {
@@ -327,6 +327,7 @@ export function Settings(props: IPopupProps) {
 
     const onSubmmit = useCallback(async (data: utils.ISettings) => {
         setLoading(true)
+        const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
         toast('Saved', {
             icon: '👍',
@@ -336,7 +337,7 @@ export function Settings(props: IPopupProps) {
         if (data.themeType) {
             setThemeType(data.themeType)
         }
-        props.onSave?.(data)
+        props.onSave?.(oldSettings)
     }, [])
 
     const onBlur = useCallback(async () => {
