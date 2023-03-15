@@ -1,76 +1,70 @@
 name: Bug report
 description: Problems with the software
-title: "[Bug] "
-labels: ["bug"]
+title: '[Bug] '
+labels: ['bug']
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thank you very much for your feedback!
-        
-        有关讨论、建议或者咨询的内容请去往[讨论区](https://github.com/yetone/openai-translator/discussions)。
+    - type: markdown
+      attributes:
+          value: |
+            **非常感谢您的反馈！Thank you very much for your feedback!**
 
-        For suggestions or help, please consider using [Github Discussion](https://github.com/yetone/openai-translator/discussions) instead.
-  - type: checkboxes
-    attributes:
-      label: Search before asking
-      description: |
-        辛苦提 Bug 前，检索一下[问题](https://github.com/yetone/openai-translator/issues?q=)列表是否已经存在类似问题。麻烦提供系统版本、录屏或者截图、复现步骤，有助于更好的解决问题。
+            有关讨论、建议或者咨询的内容请去往[讨论区](https://github.com/yetone/openai-translator/discussions)。
 
-        非 Bug 相关，烦请移步[讨论区](https://github.com/yetone/openai-translator/discussions)找寻有关讨论。
+            For suggestions or help, please consider using [Github Discussion](https://github.com/yetone/openai-translator/discussions) instead.
+    - type: checkboxes
+      attributes:
+          label: Please search before asking
+          description: |
+            辛苦提 Bug 前，检索一下[问题](https://github.com/yetone/openai-translator/issues?q=)列表是否已经存在类似问题。麻烦提供系统版本、录屏或者截图、复现步骤，有助于更好的解决问题。
 
-        Please search [issues](https://github.com/yetone/openai-translator/issues) to check if your issue has already been reported.
-      options:
-        - label: >
-            I searched in the [issues](https://github.com/yetone/openai-translator/issues) and found nothing similar.
+            非 Bug 相关，烦请移步[讨论区](https://github.com/yetone/openai-translator/discussions)找寻有关讨论。
+
+            Please search [issues](https://github.com/yetone/openai-translator/issues) to check if your issue has already been reported.
+          options:
+              - label: >
+                    I searched in the [issues](https://github.com/yetone/openai-translator/issues) and found nothing similar.
+                required: true
+    - type: input
+      attributes:
+          label: OpenAI Translator version
+          description: >
+            请提供您正在使用的 OpenAI Translator 的版本。Please provide the version of OpenAI Translator you are using. For example, `v0.1.0`.
+      validations:
           required: true
-  - type: textarea
-    attributes:
-      label: OpenAI Translator version
-      description: >
-        Please provide the version of OpenAI Translator you are using. If you are using the main branch, please provide the commit id.
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: System version
-      description: >
-        Please provide the version of System you are using. If not applicable, please fill in `n/a`.
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Browser version
-      description: >
-        Please provide the version of Browser you are using. If not applicable, please fill in `n/a`.
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Minimal reproduce step
-      description: Please try to give reproducing steps to facilitate quick location of the problem.
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: What did you expect to see?
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: What did you see instead?
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Anything else?
-  - type: checkboxes
-    attributes:
-      label: Are you willing to submit a PR?
-      description: >
-        We look forward to the community of developers or users helping solve OpenAI Translator problems together. If you are willing to submit a PR to fix this problem, please check the box.
-      options:
-        - label: I'm willing to submit a PR!
-  - type: markdown
-    attributes:
-      value: "Thanks for completing our form!"
+    - type: input
+      attributes:
+          label: 系统/浏览器版本 System/Browser version
+          description: >
+            请提供您正在使用的系统/浏览器版本。Please provide the version of the System/Browser you are using. For example, `macOS 11.2.3` or `Chrome 89.0.4389.114`.
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 复现步骤 Reproduce step
+          description: >
+            请提供完整且简明的复现步骤，以方便及时定位并解决问题。Please provide complete and concise reproduction steps to facilitate timely identification and resolution of the issue.
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 你看到了什么错误？What errors do you see?
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 你期望看到什么？What did you expect to see?
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 还有其他的内容吗？Anything else?
+    - type: checkboxes
+      attributes:
+          label: 你是否愿意提交一份 PR 来修改这个错误？Are you willing to submit a PR?
+          description: >
+            我们期待开发人员和用户的帮助，以解决在 OpenAI Translator 中发现的任何问题。 如果您愿意通过提交 PR 来解决此问题，请勾选。We eagerly anticipate developers' and users' support and collaboration in resolving any issues found in OpenAI Translator. If you are willing to offer a solution by submitting a PR to fix this matter, kindly mark the checkbox provided.
+          options:
+              - label: 我愿意提供 PR! I'm willing to submit a PR!
+    - type: markdown
+      attributes:
+          value: '非常感谢您的反馈！Thank you very much for your feedback!'
