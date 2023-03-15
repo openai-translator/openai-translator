@@ -117,7 +117,7 @@ async function backgroundFetch(input: string, options: FetchSSEOptions) {
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
 
-    if (!isDesktopApp() && !isUserscript()) {
+    if (!isDesktopApp() && !isUserscript() && location.protocol !== 'chrome-extension:') {
         await backgroundFetch(input, options)
     } else {
         const fetch = isUserscript() ? userscriptFetch : window.fetch
