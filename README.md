@@ -115,6 +115,7 @@ winget install yetone.OpenAITranslator
         ```
 
 -   If you encounter a permission prompt every time you open it, or if you cannot perform a shortcut translation, please go to `Settings` -> `Privacy & Security` -> `Supporting Features` to remove OpenAI Translator, and then re-add OpenAI Translator.
+
     <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
     <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
 
