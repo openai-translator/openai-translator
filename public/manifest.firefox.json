@@ -18,7 +18,8 @@
         {
             "matches": ["<all_urls>"],
             "all_frames": true,
-            "js": ["js/content_script.js"]
+            "js": ["js/content_script.js"],
+            "css": ["css/content_script.css"]
         }
     ],
 
@@ -26,7 +27,7 @@
         "scripts": ["js/background.js"]
     },
 
-    "permissions": ["storage"],
+    "permissions": ["storage", "contextMenus"],
 
     "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com/"],
 
