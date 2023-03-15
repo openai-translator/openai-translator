@@ -123,7 +123,7 @@ export async function detectLang(text: string): Promise<string | null> {
 export async function _detectLang(text: string): Promise<string | null> {
     const lang = await langGuesser.detect(text)
     if (lang !== 'unknown') {
-        if (lang !== 'en' && lang !== 'zh' && lang !== 'zh-TW') {
+        if (!["en", "zh", "zh-TW", "ko", "ja"].includes(lang)) {
             const res = langDetector.detect(text, 1)
             if (res.length > 0) {
                 return res[0][0]
