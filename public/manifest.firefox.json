@@ -26,7 +26,7 @@
         "scripts": ["js/background.js"]
     },
 
-    "permissions": ["storage"],
+    "permissions": ["storage", "contextMenus"],
 
     "host_permissions": ["https://*.openai.com/"],
 
