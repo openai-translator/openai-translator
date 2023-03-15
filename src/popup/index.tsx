@@ -11,6 +11,6 @@ const root = createRoot(document.getElementById('root') as HTMLElement)
 
 root.render(
     <React.StrictMode>
-        <PopupCard showSettings defaultShowSettings text='' engine={engine} autoFocus={true} />
+        <PopupCard showSettings defaultShowSettings text='' engine={engine} autoFocus />
     </React.StrictMode>
 )
