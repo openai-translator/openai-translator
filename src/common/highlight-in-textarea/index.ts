@@ -20,6 +20,7 @@ export class HighlightInTextarea {
         this.highlights = null
         this.ID = 'yetone-hit'
         this.el = el
+        el.style.position = 'relative'
         this.browser = 'chrome'
 
         this.highlight = config

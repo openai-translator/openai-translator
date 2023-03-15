@@ -47,7 +47,7 @@
     padding: 1px 2px !important;
     margin-left: -2px !important;
     margin-top: 1px !important;
-    color: #000;
+    color: transparent !important;
     border-radius: 0.2rem;
     background-color: #F8C3CD !important;
 }

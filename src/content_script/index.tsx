@@ -11,6 +11,7 @@ import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
+import './index.css'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -66,7 +67,6 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     if (!$popupCard) {
         $popupCard = document.createElement('div')
         $popupCard.id = popupCardID
-        $popupCard.style.overflow = 'hidden'
         $popupCard.style.position = 'absolute'
         $popupCard.style.zIndex = zIndex
         $popupCard.style.borderRadius = '4px'
