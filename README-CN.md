@@ -121,7 +121,9 @@ winget install yetone.OpenAITranslator
 
 1. 访问 [Chrome 应用商店](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) 安装此插件
 2. 点击浏览器插件列表里的 OpenAI Translator 图标，把获取的 API KEY 填入此插件弹出的配置界面中
+
    <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+   
 3. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
 
 # License
