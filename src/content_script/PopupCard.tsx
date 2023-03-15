@@ -233,6 +233,38 @@ const useStyles = createUseStyles({
     },
 })
 
+interface IActionStrItem {
+    beforeStr: string
+    afterStr: string
+}
+
+const actionStrItems: Record<TranslateMode, IActionStrItem> = {
+    'analyze': {
+        beforeStr: 'Analyzing...',
+        afterStr: 'Analyzed',
+    },
+    'polishing': {
+        beforeStr: 'Polishing...',
+        afterStr: 'Polished',
+    },
+    'translate': {
+        beforeStr: 'Translating...',
+        afterStr: 'Translated',
+    },
+    'summarize': {
+        beforeStr: 'Summarizing...',
+        afterStr: 'Summarized',
+    },
+    'explain-code': {
+        beforeStr: 'Explaining...',
+        afterStr: 'Explained',
+    },
+}
+
+export interface TesseractResult extends RecognizeResult {
+    text: string
+}
+
 export interface IPopupCardProps {
     text: string
     engine: Styletron
@@ -242,10 +274,6 @@ export interface IPopupCardProps {
     containerStyle?: React.CSSProperties
     editorRows?: number
     onSettingsSave?: (settings: ISettings) => void
-}
-
-export interface TesseractResult extends RecognizeResult {
-    text: string
 }
 
 export function PopupCard(props: IPopupCardProps) {
@@ -497,24 +525,13 @@ export function PopupCard(props: IPopupCardProps) {
             if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
+            const actionStrItem = actionStrItems[translateMode]
             const beforeTranslate = () => {
-                switch (translateMode) {
-                    case 'translate':
-                        setActionStr(detectFrom === detectTo ? 'Polishing...' : 'Translating...')
-                        break
-                    case 'polishing':
-                        setActionStr('Polishing...')
-                        break
-                    case 'summarize':
-                        setActionStr('Summarizing...')
-                        break
-                    case 'analyze':
-                        setActionStr('Analyzing...')
-                        break
-                    case 'explain-code':
-                        setActionStr('Explaining...')
-                        break
+                let actionStr = actionStrItem.beforeStr
+                if (translateMode === 'translate' && detectFrom == detectTo) {
+                    actionStr = 'Polishing...'
                 }
+                setActionStr(actionStr)
                 setTranslatedText('')
                 setErrorMessage('')
                 startLoading()
@@ -525,23 +542,11 @@ export function PopupCard(props: IPopupCardProps) {
                     setActionStr('Error')
                     setErrorMessage(`${actionStr} failed: ${reason}`)
                 } else {
-                    switch (translateMode) {
-                        case 'translate':
-                            setActionStr(detectFrom === detectTo ? 'Polished' : 'Translated')
-                            break
-                        case 'polishing':
-                            setActionStr('Polished')
-                            break
-                        case 'summarize':
-                            setActionStr('Summarized')
-                            break
-                        case 'analyze':
-                            setActionStr('Analyzed')
-                            break
-                        case 'explain-code':
-                            setActionStr('Explained')
-                            break
+                    let actionStr = actionStrItem.afterStr
+                    if (translateMode === 'translate' && detectFrom == detectTo) {
+                        actionStr = 'Polished'
                     }
+                    setActionStr(actionStr)
                 }
             }
             beforeTranslate()
@@ -1046,6 +1051,35 @@ export function PopupCard(props: IPopupCardProps) {
                                                             }
                                                         }}
                                                     />
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
+                                                            paddingTop:
+                                                                editableText && editableText !== originalText ? 4 : 0,
+                                                            height:
+                                                                editableText && editableText !== originalText ? 18 : 0,
+                                                            transition: 'all 0.3s linear',
+                                                            overflow: 'hidden',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                marginRight: 'auto',
+                                                            }}
+                                                        />
+                                                        <div
+                                                            style={{
+                                                                color: '#999',
+                                                                fontSize: '11px',
+                                                                transform: 'scale(0.9)',
+                                                                marginRight: '-20px',
+                                                            }}
+                                                        >
+                                                            {`Please press <Enter> key to ${translateMode}. Press <Shift+Enter> to start a new line.`}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )}
                                         </Dropzone>
