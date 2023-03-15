@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TranslateMode, Provider  } from '../content_script/translate'
+import { TranslateMode, Provider } from '../content_script/translate'
 import { IBrowser, ThemeType } from './types'
 
 export interface ISettings {
