@@ -86,18 +86,8 @@ jobs:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
         run: make change-version
 
-      - name: Build Tauri App (MacOS Universal)
-        uses: tauri-apps/tauri-action@a778402ba7c66b8a6c7c3ce0a6b9978e867936b5
-        if: matrix.platform == 'macos-latest'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseId: ${{ needs.create-release.outputs.release_id }}
-          args: --target universal-apple-darwin
-
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@dev
-        if: matrix.platform != 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
