@@ -58,6 +58,7 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
+        position: 'relative',
     },
     'settingsIcon': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,

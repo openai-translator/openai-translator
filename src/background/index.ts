@@ -5,7 +5,12 @@ const isFirefox = /firefox/i.test(navigator.userAgent)
 
 async function handleSpeakDone() {
     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
-    tab.id && browser.tabs.sendMessage(tab.id, { type: 'speakDone' })
+    if (tab?.id) {
+        browser.tabs.sendMessage(tab.id, { type: 'speakDone' })
+    } else {
+        // popup doesn't have tab id
+        browser.runtime.sendMessage({ type: 'speakDone' })
+    }
 }
 
 if (isFirefox) {
