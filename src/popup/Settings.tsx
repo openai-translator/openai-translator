@@ -258,6 +258,8 @@ interface IHotkeyRecorderProps {
 function HotkeyRecorder(props: IHotkeyRecorderProps) {
     const { theme, themeType } = useTheme()
 
+    const { t } = useTranslation()
+
     const styles = useHotkeyRecorderStyles({ themeType, theme })
     const [keys, { start, stop, isRecording }] = useRecordHotkeys()
 
@@ -335,7 +337,7 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                 ) : null}
             </div>
             <div className={styles.caption}>
-                {isRecording ? 'Please press the hotkey you want to set.' : 'Click above to set hotkeys.'}
+                {isRecording ? t('Please press the hotkey you want to set.') : t('Click above to set hotkeys.')}
             </div>
         </div>
     )
@@ -381,6 +383,8 @@ interface IPopupProps {
 export function Settings(props: IPopupProps) {
     const { theme } = useTheme()
     const { setThemeType } = useThemeType()
+
+    const { t } = useTranslation()
 
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<utils.ISettings>({
@@ -472,52 +476,53 @@ export function Settings(props: IPopupProps) {
                         initialValues={values}
                         onValuesChange={onChange}
                     >
-                        <FormItem name='provider' label='Default Service Provider'>
+                        <FormItem name='provider' label={t('Default Service Provider')}>
                             <ProviderSelector />
                         </FormItem>
                         <FormItem
                             required
                             name='apiKeys'
-                            label='API Key'
+                            label={t('API Key')}
                             caption={
                                 <div>
-                                    Go to the{' '}
+                                    {t('Go to the')}{' '}
                                     <a
                                         target='_blank'
                                         href='https://platform.openai.com/account/api-keys'
                                         rel='noreferrer'
                                     >
-                                        OpenAI page
+                                        {t('OpenAI page')}
                                     </a>{' '}
-                                    to get your API Key. You can separate multiple API Keys with English commas to
-                                    achieve quota doubling and load balancing.
+                                    {t(
+                                        'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                    )}
                                 </div>
                             }
                         >
                             <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem required name='apiURL' label='API URL'>
+                        <FormItem required name='apiURL' label={t('API URL')}>
                             <Input size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem required name='apiURLPath' label='API URL Path'>
+                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
                             <Input size='compact' />
                         </FormItem>
-                        <FormItem name='defaultTranslateMode' label='Default Translate Mode'>
+                        <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                             <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='autoTranslate' label='Auto Translate'>
+                        <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='defaultTargetLanguage' label='Default Target Language'>
+                        <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                             <LanguageSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='themeType' label='Theme'>
+                        <FormItem name='themeType' label={t('Theme')}>
                             <ThemeTypeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='i18n' label='i18n'>
+                        <FormItem name='i18n' label={t('i18n')}>
                             <Ii18nSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='hotkey' label='Hotkey'>
+                        <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
                         <div
@@ -534,7 +539,7 @@ export function Settings(props: IPopupProps) {
                                 }}
                             />
                             <Button isLoading={loading} size='compact'>
-                                Save
+                                {t('Save')}
                             </Button>
                         </div>
                         <Toaster />
