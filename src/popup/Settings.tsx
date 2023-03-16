@@ -22,6 +22,7 @@ import { IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
+import { useTranslation } from 'react-i18next'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -75,6 +76,8 @@ interface IProviderSelectorProps {
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
+    const { t } = useTranslation()
+
     return (
         <Select
             size='compact'
@@ -93,12 +96,12 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
             }}
             options={
                 [
-                    { label: 'Translate', id: 'translate' },
-                    { label: 'Polishing', id: 'polishing' },
-                    { label: 'Summarize', id: 'summarize' },
-                    { label: 'Analyze', id: 'analyze' },
-                    { label: 'Explain Code', id: 'explain-code' },
-                    { label: 'Nop', id: 'nop' },
+                    { label: t('Translate'), id: 'translate' },
+                    { label: t('Polishing'), id: 'polishing' },
+                    { label: t('Summarize'), id: 'summarize' },
+                    { label: t('Analyze'), id: 'analyze' },
+                    { label: t('Explain Code'), id: 'explain-code' },
+                    { label: t('Nop'), id: 'nop' },
                 ] as {
                     label: string
                     id: TranslateMode
@@ -115,6 +118,8 @@ interface IThemeTypeSelectorProps {
 }
 
 function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
+    const { t } = useTranslation()
+
     return (
         <Select
             size='compact'
@@ -133,14 +138,55 @@ function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
             }}
             options={
                 [
-                    { label: 'Follow the System', id: 'followTheSystem' },
-                    { label: 'Dark', id: 'dark' },
-                    { label: 'Light', id: 'light' },
+                    { label: t('Follow the System'), id: 'followTheSystem' },
+                    { label: t('Dark'), id: 'dark' },
+                    { label: t('Light'), id: 'light' },
                 ] as {
                     label: string
                     id: ThemeType
                 }[]
             }
+        />
+    )
+}
+
+interface Ii18nSelectorProps {
+    value?: string
+    onChange?: (value: string) => void
+    onBlur?: () => void
+}
+
+function Ii18nSelector(props: Ii18nSelectorProps) {
+    const { i18n } = useTranslation()
+
+    const options = [
+        { label: 'English', id: 'en' },
+        { label: '简体中文', id: 'zh-Hans' },
+        { label: '繁體中文', id: 'zh-Hant' },
+        { label: '日本語', id: 'ja' },
+    ]
+
+    return (
+        <Select
+            size='compact'
+            onBlur={props.onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                props.value
+                    ? [
+                          {
+                              id: props.value,
+                              label: options.find((option) => option.id === props.value)?.label || 'en',
+                          },
+                      ]
+                    : undefined
+            }
+            onChange={(params) => {
+                props.onChange?.(params.value[0].id as string)
+                i18n.changeLanguage(params.value[0].id as string)
+            }}
+            options={options}
         />
     )
 }
@@ -346,6 +392,7 @@ export function Settings(props: IPopupProps) {
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
         hotkey: '',
+        i18n: utils.defaulti18n,
     })
     const [prevValues, setPrevValues] = useState<utils.ISettings>(values)
 
@@ -466,6 +513,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='themeType' label='Theme'>
                             <ThemeTypeSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='i18n' label='i18n'>
+                            <Ii18nSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='hotkey' label='Hotkey'>
                             <HotkeyRecorder onBlur={onBlur} />

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
@@ -27,8 +28,8 @@ import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
-import rocket from './assets/images/rocket.gif'
-import partyPopper from './assets/images/party-popper.gif'
+// import rocket from './assets/images/rocket.gif'
+// import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import { HighlightInTextarea } from '../common/highlight-in-textarea'
@@ -305,6 +306,8 @@ export function PopupCard(props: IPopupCardProps) {
     const [selectedWord, setSelectedWord] = useState('')
 
     const highlightRef = useRef<HighlightInTextarea | null>(null)
+
+    const { t, i18n } = useTranslation()
 
     useEffect(() => {
         if (highlightRef.current) {
@@ -928,7 +931,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip
-                                            content='Summarize'
+                                            content={t('Summarize')}
                                             placement={isDesktopApp() ? 'bottom' : 'top'}
                                             showArrow
                                         >
@@ -1014,10 +1017,10 @@ export function PopupCard(props: IPopupCardProps) {
                                                             </div>
                                                             {showOCRProcessing && (
                                                                 <div>
-                                                                    <img
+                                                                    {/* <img
                                                                         src={isOCRProcessing ? rocket : partyPopper}
                                                                         width='20'
-                                                                    />
+                                                                    /> */}
                                                                 </div>
                                                             )}
                                                         </div>
