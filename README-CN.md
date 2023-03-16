@@ -83,6 +83,14 @@
 winget install yetone.OpenAITranslator
 ```
 
+
+### 通过 [Scoop](https://scoop.sh)
+
+```powershell
+scoop bucket add extras
+scoop install openai-translator
+```
+
 ### 手动安装
 
 1. 在 [Latest Release](https://github.com/yetone/openai-translator/releases/latest) 页面下载以 `.msi` 结尾的安装包
