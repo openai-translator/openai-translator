@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getBrowser, getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
+import { getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
@@ -35,6 +35,7 @@ import { HighlightInTextarea } from '../common/highlight-in-textarea'
 import LRUCache from 'lru-cache'
 import { IThemedStyleProps } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
+import { speak } from '../common/tts'
 
 const cache = new LRUCache({
     max: 500,
@@ -657,25 +658,10 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }, [translateText, originalText, selectedWord])
 
-    useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const messageHandler = (request: any) => {
-            if (request.type === 'speakDone') {
-                setIsSpeakingEditableText(false)
-                setIsSpeakingTranslatedText(false)
-            }
-        }
-        ;(async () => {
-            const browser = await getBrowser()
-            browser.runtime.onMessage.addListener(messageHandler)
-        })()
-        return () => {
-            ;(async () => {
-                const browser = await getBrowser()
-                browser.runtime.onMessage.removeListener(messageHandler)
-            })()
-        }
-    }, [])
+    const handleSpeakDone = () => {
+        setIsSpeakingEditableText(false)
+        setIsSpeakingTranslatedText(false)
+    }
 
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
@@ -1137,24 +1123,16 @@ export function PopupCard(props: IPopupCardProps) {
                                                     className={styles.actionButton}
                                                     onClick={() => {
                                                         if (isSpeakingEditableText) {
-                                                            ;(async () => {
-                                                                const browser = await getBrowser()
-                                                                browser.runtime.sendMessage({
-                                                                    type: 'stopSpeaking',
-                                                                })
-                                                                setIsSpeakingEditableText(false)
-                                                            })()
+                                                            speechSynthesis.cancel()
+                                                            setIsSpeakingEditableText(false)
                                                             return
                                                         }
-                                                        ;(async () => {
-                                                            const browser = await getBrowser()
-                                                            setIsSpeakingEditableText(true)
-                                                            browser.runtime.sendMessage({
-                                                                type: 'speak',
-                                                                text: editableText,
-                                                                lang: detectFrom,
-                                                            })
-                                                        })()
+                                                        setIsSpeakingEditableText(true)
+                                                        speak({
+                                                            text: editableText,
+                                                            lang: detectFrom,
+                                                            onFinish: handleSpeakDone,
+                                                        })
                                                     }}
                                                 >
                                                     {isSpeakingEditableText ? (
@@ -1242,24 +1220,16 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     className={styles.actionButton}
                                                                     onClick={() => {
                                                                         if (isSpeakingTranslatedText) {
-                                                                            ;(async () => {
-                                                                                const browser = await getBrowser()
-                                                                                browser.runtime.sendMessage({
-                                                                                    type: 'stopSpeaking',
-                                                                                })
-                                                                                setIsSpeakingTranslatedText(false)
-                                                                            })()
+                                                                            speechSynthesis.cancel()
+                                                                            setIsSpeakingTranslatedText(false)
                                                                             return
                                                                         }
-                                                                        ;(async () => {
-                                                                            const browser = await getBrowser()
-                                                                            setIsSpeakingTranslatedText(true)
-                                                                            browser.runtime.sendMessage({
-                                                                                type: 'speak',
-                                                                                text: translatedText,
-                                                                                lang: detectTo,
-                                                                            })
-                                                                        })()
+                                                                        setIsSpeakingTranslatedText(true)
+                                                                        speak({
+                                                                            text: translatedText,
+                                                                            lang: detectTo,
+                                                                            onFinish: handleSpeakDone,
+                                                                        })
                                                                     }}
                                                                 >
                                                                     {isSpeakingTranslatedText ? (

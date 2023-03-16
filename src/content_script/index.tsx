@@ -47,10 +47,7 @@ async function hidePopupCard() {
     if (!$popupCard) {
         return
     }
-    const browser = await utils.getBrowser()
-    browser.runtime.sendMessage({
-        type: 'stopSpeaking',
-    })
+    speechSynthesis.cancel()
     if (root) {
         root.unmount()
         root = null
