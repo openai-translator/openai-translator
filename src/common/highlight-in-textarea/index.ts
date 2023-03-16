@@ -1,4 +1,4 @@
-import './index.css'
+import styles from 'inline:./index.css'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface IConfig {
@@ -47,6 +47,9 @@ export class HighlightInTextarea {
         this.container = document.createElement('div')
         this.container.classList.add(this.ID + '-container')
         this.el.parentNode?.insertBefore(this.container, this.el.nextSibling)
+        const style = document.createElement('style')
+        style.textContent = styles
+        this.el.parentNode?.insertBefore(style, this.el.nextSibling)
 
         this.container.append(this.backdrop)
         this.container.append(this.el) // moves el into container

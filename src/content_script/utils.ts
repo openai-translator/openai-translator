@@ -1,7 +1,7 @@
 import { createParser } from 'eventsource-parser'
 import { userscriptFetch } from '../common/userscript-polyfill'
 import { isDesktopApp, isUserscript } from '../common/utils'
-import { containerTagName, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
+import { containerID, containerTagName, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 
 function attachEventsToContainer($container: HTMLElement) {
     $container.addEventListener('mousedown', (event) => {
@@ -16,6 +16,7 @@ export async function getContainer(): Promise<HTMLElement> {
     let $container: HTMLElement | null = document.querySelector(containerTagName)
     if (!$container) {
         $container = document.createElement(containerTagName)
+        $container.id = containerID
         attachEventsToContainer($container)
         $container.style.zIndex = zIndex
         return new Promise((resolve) => {
@@ -42,12 +43,12 @@ export async function getContainer(): Promise<HTMLElement> {
 
 export async function queryPopupThumbElement(): Promise<HTMLDivElement | null> {
     const $container = await getContainer()
-    return $container.querySelector(`#${popupThumbID}`) as HTMLDivElement | null
+    return $container.shadowRoot?.querySelector(`#${popupThumbID}`) as HTMLDivElement | null
 }
 
 export async function queryPopupCardElement(): Promise<HTMLDivElement | null> {
     const $container = await getContainer()
-    return $container.querySelector(`#${popupCardID}`) as HTMLDivElement | null
+    return $container.shadowRoot?.querySelector(`#${popupCardID}`) as HTMLDivElement | null
 }
 
 export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | null) {

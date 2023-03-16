@@ -59,6 +59,10 @@ class BrowserRuntime {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     sendMessage(_message: any): void {}
+
+    getURL(path: string): string {
+        return path
+    }
 }
 
 class Browser implements IBrowser {

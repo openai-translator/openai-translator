@@ -2,6 +2,7 @@ import esbuild from 'esbuild'
 import { copy } from 'esbuild-plugin-copy'
 import fs from 'fs-extra'
 import esbuildServer from 'esbuild-server'
+import inlineImportPlugin from 'esbuild-plugin-inline-import'
 
 const tauriOutDir = 'dist/tauri'
 
@@ -25,6 +26,7 @@ const config = {
         '.gif': 'dataurl',
     },
     plugins: [
+        inlineImportPlugin(),
         copy({
             resolveFrom: 'cwd',
             assets: [
