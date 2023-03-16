@@ -65,7 +65,8 @@ const useStyles = createUseStyles({
         position: 'absolute',
         cursor: 'pointer',
         bottom: '10px',
-        right: '10px',
+        left: '10px',
+        lineHeight: '1',
     }),
     'popupCardHeaderContainer': (props: IThemedStyleProps) => ({
         'display': 'flex',
