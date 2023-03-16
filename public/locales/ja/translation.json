@@ -21,11 +21,13 @@
   "Please press the hotkey you want to set.": "設定したいホットキーを押してください。",
   "Click above to set hotkeys.": "ホットキーを設定するには上をクリックしてください。",
   "Save": "保存",
+  "Saved": "正常に保存されました",
   "Go to Translator": "翻訳に行く",
   "Go to Settings": "設定に行く",
   "API Key": "API キー",
   "API URL": "API URL",
   "API URL Path": "API URL パス",
+  "is required.": "は必須です。",
   "Go to the": "に行く",
   "OpenAI page": "OpenAI ページ",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "APIキーを取得するには、英語のカンマで複数のAPIキーを区切って、クォータの倍増と負荷分散を実現できます。"

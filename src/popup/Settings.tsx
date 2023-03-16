@@ -422,7 +422,7 @@ export function Settings(props: IPopupProps) {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
-        toast('Saved', {
+        toast(t('Saved'), {
             icon: '👍',
             duration: 3000,
         })

@@ -21,11 +21,13 @@
   "Please press the hotkey you want to set.": "Please press the hotkey you want to set.",
   "Click above to set hotkeys.": "Click above to set hotkeys.",
   "Save": "Save",
+  "Saved": "Saved",
   "Go to Translator": "Go to Translator",
   "Go to Settings": "Go to Settings",
   "API Key": "API Key",
   "API URL": "API URL",
   "API URL Path": "API URL Path",
+  "is required": "is required",
   "Go to the": "Go to the",
   "OpenAI page": "OpenAI page",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing."

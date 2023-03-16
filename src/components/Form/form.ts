@@ -12,6 +12,7 @@ import { Validator, compose as composeValidator } from './validators'
 import { FormItem as RcField } from './item'
 import { NamePath, Paths, PathType } from './typings'
 import styles from './index.module.css'
+import { useTranslation } from 'react-i18next'
 
 export type FormInstance<S extends {} = Store, K extends keyof S = keyof S> = {
     getFieldValue(name: K): S[K]
@@ -117,6 +118,8 @@ export function createForm<S extends {} = Store>({
 }: Partial<FormItemProps<S>> & { itemClassName?: FormItemClassName } = {}) {
     const ClassNames = { ...defaultFormItemClassName, ...itemClassName }
 
+    const { t } = useTranslation()
+
     const FormItemLabel: React.FC<{ label: string; children: ReactNode }> = ({ children, label }) =>
         React.createElement(
             'div',
@@ -156,7 +159,7 @@ export function createForm<S extends {} = Store>({
         // eslint-disable-next-line react/destructuring-assignment
         // eslint-disable-next-line react/prop-types
         if (props.required) {
-            rules.push({ required: true, message: `${label} is required` })
+            rules.push({ required: true, message: `${label} ${t('is required')}` })
         }
 
         return React.createElement(

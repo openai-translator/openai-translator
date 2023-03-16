@@ -21,11 +21,13 @@
   "Please press the hotkey you want to set.": "请按您要设置的快捷键。",
   "Click above to set hotkeys.": "点击上面设置快捷键。",
   "Save": "保存",
+  "Saved": "保存成功",
   "Go to Translator": "前往翻译器",
   "Go to Settings": "前往设置",
   "API Key": "API 密钥",
   "API URL": "API URL",
   "API URL Path": "API URL 路径",
+  "is required": "是必填项",
   "Go to the": "前往",
   "OpenAI page": "OpenAI 页面",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "获取您的 API 密钥。您可以使用英文逗号分隔多个 API 密钥，以实现配额加倍和负载均衡。"
