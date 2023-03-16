@@ -1,5 +1,5 @@
-use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
+use clipboard::ClipboardProvider;
 use tauri::Manager;
 
 use crate::APP_HANDLE;
@@ -59,7 +59,8 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
         if selected_text.trim() == current_text.trim() {
             Ok("".to_string())
         } else {
-            ctx.set_contents(current_text).and_then(|_| Ok(selected_text))
+            ctx.set_contents(current_text)
+                .and_then(|_| Ok(selected_text))
         }
     })?
 }
