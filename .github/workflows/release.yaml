@@ -136,7 +136,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload userscript to release
-        id: upload-release-asset
+        id: upload-userscript-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
