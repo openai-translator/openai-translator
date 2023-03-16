@@ -8,6 +8,7 @@ yarn-error.log
 npm-error.log
 .DS_Store
 *.json-e
+*.js-e
 
 .vscode
 .idea

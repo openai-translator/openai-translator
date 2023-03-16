@@ -81,7 +81,10 @@ async function build() {
 
     // userscript
     await copyFiles(
-        [{ src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' }],
+        [
+            { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' },
+            { src: `${browserExtensionOutDir}/content_script/index.css`, dst: 'index.css' },
+        ],
         `./${userscriptOutDir}`
     )
 
