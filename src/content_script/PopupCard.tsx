@@ -74,7 +74,7 @@ const useStyles = createUseStyles({
         'alignItems': 'center',
         'padding': '5px 10px',
         'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-        'minWidth': '510px',
+        'minWidth': '550px',
         'user-select': 'none',
         '-webkit-user-select': 'none',
         '-ms-user-select': 'none',
