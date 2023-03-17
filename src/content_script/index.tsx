@@ -1,8 +1,7 @@
-import '@webcomponents/webcomponentsjs'
 import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
-import { containerTagName, popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
+import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { PopupCard } from './PopupCard'
 import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
@@ -163,18 +162,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
 
 async function main() {
     const browser = await utils.getBrowser()
-
-    customElements.define(
-        containerTagName,
-        class extends HTMLElement {
-            constructor() {
-                super()
-                const shadowRoot = this.attachShadow({ mode: 'open' })
-                const $container = document.createElement('div')
-                shadowRoot.appendChild($container)
-            }
-        }
-    )
 
     let lastMouseEvent: MouseEvent | undefined
 

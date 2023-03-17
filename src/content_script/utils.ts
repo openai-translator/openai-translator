@@ -1,7 +1,7 @@
 import { createParser } from 'eventsource-parser'
 import { userscriptFetch } from '../common/userscript-polyfill'
 import { isDesktopApp, isUserscript } from '../common/utils'
-import { containerID, containerTagName, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
+import { containerID, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 
 function attachEventsToContainer($container: HTMLElement) {
     $container.addEventListener('mousedown', (event) => {
@@ -13,26 +13,33 @@ function attachEventsToContainer($container: HTMLElement) {
 }
 
 export async function getContainer(): Promise<HTMLElement> {
-    let $container: HTMLElement | null = document.querySelector(containerTagName)
+    let $container: HTMLElement | null = document.getElementById(containerID)
     if (!$container) {
-        $container = document.createElement(containerTagName)
+        $container = document.createElement('div')
         $container.id = containerID
         attachEventsToContainer($container)
         $container.style.zIndex = zIndex
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             setTimeout(() => {
-                const $container_: HTMLElement | null = document.querySelector(containerTagName)
+                const $container_: HTMLElement | null = document.getElementById(containerID)
                 if ($container_) {
                     resolve($container_)
                     return
                 }
+                if (!$container) {
+                    reject(new Error('Failed to create container'))
+                    return
+                }
+                const shadowRoot = $container.attachShadow({ mode: 'open' })
+                const $inner = document.createElement('div')
+                shadowRoot.appendChild($inner)
                 const $html = document.body.parentElement
                 if ($html) {
                     $html.appendChild($container as HTMLElement)
                 } else {
                     document.appendChild($container as HTMLElement)
                 }
-                resolve($container as HTMLElement)
+                resolve($container)
             }, 100)
         })
     }
