@@ -1044,12 +1044,10 @@ export function PopupCard(props: IPopupCardProps) {
                                                                 style: {
                                                                     width: '100%',
                                                                     borderRadius: '0px',
-                                                                    borderWidth: '2px',
                                                                 },
                                                             },
                                                             Input: {
                                                                 style: {
-                                                                    height: '100%',
                                                                     padding: '4px 8px',
                                                                     color:
                                                                         themeType === 'dark'
