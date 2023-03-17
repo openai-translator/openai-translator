@@ -5,3 +5,9 @@ html, body {
     padding: 0;
     margin: 0;
 }
+
+@media (prefers-color-scheme: dark) {
+    .popup {
+        background: #1f1f1f;
+    }
+}
