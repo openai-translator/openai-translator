@@ -21,11 +21,11 @@
 <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
 <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
-<img alt="Chrome" src="https://img.shields.io/badge/-Chrome-green?style=flat-square&logo=google-chrome&logoColor=white" />
+<img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
-<img alt="Firefox" src="https://img.shields.io/badge/-Firefox-orange?style=flat-square&logo=firefox&logoColor=white" />
+<a href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/" target="_blank">
+<img alt="Firefox" src="https://img.shields.io/amo/stars/openai-translator?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
 </a>
 
 <a href="https://github.com/yetone/openai-translator/releases" target="_blank">
@@ -130,7 +130,17 @@ scoop install openai-translator
 
 ## Browser Extension
 
-1. Visit the [Chrome Web Store](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) to install this plugin.
+1. Visit your Browser Extension Store to install this plugin:
+
+<p align="center">
+<a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
+<img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
+</a>
+<a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
+<img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
+</a>
+</p>
+
 2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
    
    <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
