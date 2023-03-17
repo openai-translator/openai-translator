@@ -21,11 +21,11 @@
 <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
 <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
-<img alt="Chrome" src="https://img.shields.io/badge/-Chrome-green?style=flat-square&logo=google-chrome&logoColor=white" />
+<img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
-<img alt="Firefox" src="https://img.shields.io/badge/-Firefox-orange?style=flat-square&logo=firefox&logoColor=white" />
+<a href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/" target="_blank">
+<img alt="Firefox" src="https://img.shields.io/amo/stars/openai-translator?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
 </a>
 
 <a href="https://github.com/yetone/openai-translator/releases" target="_blank">
@@ -52,11 +52,15 @@
 
 **请注意！桌面端应用不支持划词后弹出图标，划词后必须按下快捷键才能够触发划词翻译**
 
+<p align="center">
 <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
+</p>
 
 # 使用截图
 
+<p align="center">
 <img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
+</p>
 
 # 特性
 
@@ -110,11 +114,15 @@ scoop install openai-translator
 
 -   "OpenAI Translator" can’t be opened because the developer cannot be verified.
     
-    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+    <p align="center">
+      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+    </p>
 
     -   点击 `Cancel` 按钮，然后去 `设置` -> `隐私与安全性` 页面，点击 `仍要打开` 按钮，然后在弹出窗口里点击 `打开` 按钮即可，以后打开 `OpenAI Translator` 就再也不会有任何弹窗告警了 🎉
         
-        <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+        <p align="center">
+          <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+        </p>
 
     -   如果在 `隐私与安全性` 中找不到以上选项。打开 `Terminal.app`，并输入以下命令（中途可能需要输入密码），然后重启 `OpenAI Translator` 即可：
 
@@ -123,16 +131,30 @@ scoop install openai-translator
         ```
 
 -   如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往 `设置` -> `隐私与安全性` -> `辅助功能` 中删除 OpenAI Translator，然后重新添加 OpenAI Translator:
-    
-    <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-    <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
+   
+    <p align="center">
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
+    </p>
 
 ## 浏览器插件
 
-1. 访问 [Chrome 应用商店](https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc) 安装此插件
+1. 访问你使用的浏览器的插件市场安装此插件：
+
+   <p align="center">
+     <a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
+       <img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
+     </a>
+     <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
+       <img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
+     </a>
+   </p>
+
 2. 点击浏览器插件列表里的 OpenAI Translator 图标，把获取的 API KEY 填入此插件弹出的配置界面中
 
-   <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+   <p align="center">
+     <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+   </p>
    
 3. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
 
@@ -149,4 +171,8 @@ scoop install openai-translator
 
 # Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yetone/openai-translator&type=Date)](https://star-history.com/#yetone/openai-translator&Date)
+<p align="center">
+  <a target="_blank" href="https://star-history.com/#yetone/openai-translator&Date">
+    <img src="https://api.star-history.com/svg?repos=yetone/openai-translator&type=Date" />
+  </a>
+</p>
