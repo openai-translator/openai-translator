@@ -6,6 +6,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 
 import ENtranslation from './i18n/locales/en/translation.json'
 import JAtranslation from './i18n/locales/ja/translation.json'
+import THtranslation from './i18n/locales/th/translation.json'
 import zhHanstranslation from './i18n/locales/zh-Hans/translation.json'
 import zhHanttranslation from './i18n/locales/zh-Hant/translation.json'
 
@@ -21,6 +22,9 @@ const resources = {
     },
     'ja': {
         translation: JAtranslation,
+    },
+    'th': {
+        translation: THtranslation,
     },
 }
 
