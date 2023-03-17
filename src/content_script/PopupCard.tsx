@@ -116,7 +116,6 @@ const useStyles = createUseStyles({
         display: 'flex',
         flexShrink: 0,
         flexDirection: 'row',
-        cursor: 'move',
         alignItems: 'center',
         padding: '5px 10px',
         gap: '10px',
@@ -851,9 +850,11 @@ export function PopupCard(props: IPopupCardProps) {
                                         cursor: isDesktopApp() ? 'default' : 'move',
                                     }}
                                 >
-                                    <div className={styles.iconContainer}>
-                                        <img className={styles.icon} src={icon} />
-                                        <div className={styles.iconText}>OpenAI Translator</div>
+                                    <div data-tauri-drag-region className={styles.iconContainer}>
+                                        <img data-tauri-drag-region className={styles.icon} src={icon} />
+                                        <div data-tauri-drag-region className={styles.iconText}>
+                                            OpenAI Translator
+                                        </div>
                                     </div>
                                     <div className={styles.popupCardHeaderActionsContainer}>
                                         <div className={styles.from}>
