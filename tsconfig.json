@@ -10,6 +10,9 @@
         "moduleResolution": "node",
         "noEmitOnError": true,
         "jsx": "react",
-        "typeRoots": [ "node_modules/@types" ]
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "resolveJsonModule": true
     }
 }

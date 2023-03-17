@@ -23,6 +23,7 @@ import { IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
+import { useTranslation } from 'react-i18next'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -76,6 +77,8 @@ interface IProviderSelectorProps {
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
+    const { t } = useTranslation()
+
     return (
         <Select
             size='compact'
@@ -94,12 +97,12 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
             }}
             options={
                 [
-                    { label: 'Translate', id: 'translate' },
-                    { label: 'Polishing', id: 'polishing' },
-                    { label: 'Summarize', id: 'summarize' },
-                    { label: 'Analyze', id: 'analyze' },
-                    { label: 'Explain Code', id: 'explain-code' },
-                    { label: 'Nop', id: 'nop' },
+                    { label: t('Translate'), id: 'translate' },
+                    { label: t('Polishing'), id: 'polishing' },
+                    { label: t('Summarize'), id: 'summarize' },
+                    { label: t('Analyze'), id: 'analyze' },
+                    { label: t('Explain Code'), id: 'explain-code' },
+                    { label: t('Nop'), id: 'nop' },
                 ] as {
                     label: string
                     id: TranslateMode
@@ -116,6 +119,8 @@ interface IThemeTypeSelectorProps {
 }
 
 function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
+    const { t } = useTranslation()
+
     return (
         <Select
             size='compact'
@@ -134,14 +139,55 @@ function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
             }}
             options={
                 [
-                    { label: 'Follow the System', id: 'followTheSystem' },
-                    { label: 'Dark', id: 'dark' },
-                    { label: 'Light', id: 'light' },
+                    { label: t('Follow the System'), id: 'followTheSystem' },
+                    { label: t('Dark'), id: 'dark' },
+                    { label: t('Light'), id: 'light' },
                 ] as {
                     label: string
                     id: ThemeType
                 }[]
             }
+        />
+    )
+}
+
+interface Ii18nSelectorProps {
+    value?: string
+    onChange?: (value: string) => void
+    onBlur?: () => void
+}
+
+function Ii18nSelector(props: Ii18nSelectorProps) {
+    const { i18n } = useTranslation()
+
+    const options = [
+        { label: 'English', id: 'en' },
+        { label: '简体中文', id: 'zh-Hans' },
+        { label: '繁體中文', id: 'zh-Hant' },
+        { label: '日本語', id: 'ja' },
+    ]
+
+    return (
+        <Select
+            size='compact'
+            onBlur={props.onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                props.value
+                    ? [
+                          {
+                              id: props.value,
+                              label: options.find((option) => option.id === props.value)?.label || 'en',
+                          },
+                      ]
+                    : undefined
+            }
+            onChange={(params) => {
+                props.onChange?.(params.value[0].id as string)
+                i18n.changeLanguage(params.value[0].id as string)
+            }}
+            options={options}
         />
     )
 }
@@ -212,6 +258,8 @@ interface IHotkeyRecorderProps {
 
 function HotkeyRecorder(props: IHotkeyRecorderProps) {
     const { theme, themeType } = useTheme()
+
+    const { t } = useTranslation()
 
     const styles = useHotkeyRecorderStyles({ themeType, theme })
     const [keys, { start, stop, isRecording }] = useRecordHotkeys()
@@ -290,7 +338,7 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                 ) : null}
             </div>
             <div className={styles.caption}>
-                {isRecording ? 'Please press the hotkey you want to set.' : 'Click above to set hotkeys.'}
+                {isRecording ? t('Please press the hotkey you want to set.') : t('Click above to set hotkeys.')}
             </div>
         </div>
     )
@@ -337,6 +385,8 @@ export function Settings(props: IPopupProps) {
     const { theme } = useTheme()
     const { setThemeType } = useThemeType()
 
+    const { t } = useTranslation()
+
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<utils.ISettings>({
         apiKeys: '',
@@ -347,6 +397,7 @@ export function Settings(props: IPopupProps) {
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
         hotkey: '',
+        i18n: utils.defaulti18n,
     })
     const [prevValues, setPrevValues] = useState<utils.ISettings>(values)
 
@@ -372,7 +423,7 @@ export function Settings(props: IPopupProps) {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
-        toast('Saved', {
+        toast(t('Saved'), {
             icon: '👍',
             duration: 3000,
         })
@@ -427,49 +478,53 @@ export function Settings(props: IPopupProps) {
                         initialValues={values}
                         onValuesChange={onChange}
                     >
-                        <FormItem name='provider' label='Default Service Provider'>
+                        <FormItem name='provider' label={t('Default Service Provider')}>
                             <ProviderSelector />
                         </FormItem>
                         <FormItem
                             required
                             name='apiKeys'
-                            label='API Key'
+                            label={t('API Key')}
                             caption={
                                 <div>
-                                    Go to the{' '}
+                                    {t('Go to the')}{' '}
                                     <a
                                         target='_blank'
                                         href='https://platform.openai.com/account/api-keys'
                                         rel='noreferrer'
                                     >
-                                        OpenAI page
+                                        {t('OpenAI page')}
                                     </a>{' '}
-                                    to get your API Key. You can separate multiple API Keys with English commas to
-                                    achieve quota doubling and load balancing.
+                                    {t(
+                                        'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                    )}
                                 </div>
                             }
                         >
                             <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem required name='apiURL' label='API URL'>
+                        <FormItem required name='apiURL' label={t('API URL')}>
                             <Input size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem required name='apiURLPath' label='API URL Path'>
+                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
                             <Input size='compact' />
                         </FormItem>
-                        <FormItem name='defaultTranslateMode' label='Default Translate Mode'>
+                        <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                             <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='autoTranslate' label='Auto Translate'>
+                        <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='defaultTargetLanguage' label='Default Target Language'>
+                        <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                             <LanguageSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='themeType' label='Theme'>
+                        <FormItem name='themeType' label={t('Theme')}>
                             <ThemeTypeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='hotkey' label='Hotkey'>
+                        <FormItem name='i18n' label={t('i18n')}>
+                            <Ii18nSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
                         <div
@@ -486,7 +541,7 @@ export function Settings(props: IPopupProps) {
                                 }}
                             />
                             <Button isLoading={loading} size='compact'>
-                                Save
+                                {t('Save')}
                             </Button>
                         </div>
                         <Toaster />

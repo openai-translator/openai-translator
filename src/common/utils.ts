@@ -12,6 +12,7 @@ export interface ISettings {
     defaultTargetLanguage: string
     hotkey?: string
     themeType?: ThemeType
+    i18n?: string
 }
 
 export const defaultAPIURL = 'https://api.openai.com'
@@ -20,6 +21,8 @@ export const defaultProvider = 'OpenAI'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
+
+export const defaulti18n = 'en'
 
 export async function getApiKey(): Promise<string> {
     const settings = await getSettings()
@@ -38,6 +41,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     defaultTargetLanguage: 1,
     hotkey: 1,
     themeType: 1,
+    i18n: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -65,6 +69,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.defaultTargetLanguage) {
         settings.defaultTargetLanguage = defaultTargetLanguage
+    }
+    if (!settings.i18n) {
+        settings.i18n = defaulti18n
     }
     return settings
 }

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
@@ -310,6 +311,8 @@ export function PopupCard(props: IPopupCardProps) {
     const [selectedWord, setSelectedWord] = useState('')
 
     const highlightRef = useRef<HighlightInTextarea | null>(null)
+
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (highlightRef.current) {
@@ -805,7 +808,7 @@ export function PopupCard(props: IPopupCardProps) {
                     >
                         {props.showSettings && (
                             <StatefulTooltip
-                                content={showSettings ? 'Go to Translator' : 'Go to Settings'}
+                                content={showSettings ? t('Go to Translator') : t('Go to Settings')}
                                 showArrow
                                 placement='left'
                             >
@@ -904,7 +907,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     </div>
                                     <div className={styles.popupCardHeaderButtonGroup}>
                                         <StatefulTooltip
-                                            content='Translate'
+                                            content={t('Translate')}
                                             placement={isDesktopApp() ? 'bottom' : 'top'}
                                             showArrow
                                         >
@@ -917,7 +920,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip
-                                            content='Polishing'
+                                            content={t('Polishing')}
                                             placement={isDesktopApp() ? 'bottom' : 'top'}
                                             showArrow
                                         >
@@ -933,7 +936,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip
-                                            content='Summarize'
+                                            content={t('Summarize')}
                                             placement={isDesktopApp() ? 'bottom' : 'top'}
                                             showArrow
                                         >
@@ -948,7 +951,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip
-                                            content='Analyze'
+                                            content={t('Analyze')}
                                             placement={isDesktopApp() ? 'bottom' : 'top'}
                                             showArrow
                                         >
@@ -961,7 +964,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Button>
                                         </StatefulTooltip>
                                         <StatefulTooltip
-                                            content='Explain Code'
+                                            content={t('Explain Code')}
                                             placement={isDesktopApp() ? 'auto' : 'top'}
                                             showArrow
                                         >
@@ -1110,7 +1113,10 @@ export function PopupCard(props: IPopupCardProps) {
                                         </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <StatefulTooltip content='Upload an image for OCR translation' showArrow>
+                                            <StatefulTooltip
+                                                content={t('Upload an image for OCR translation')}
+                                                showArrow
+                                            >
                                                 <div className={styles.actionButton}>
                                                     <Dropzone onDrop={onDrop}>
                                                         {({ getRootProps, getInputProps }) => (
@@ -1122,7 +1128,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     </Dropzone>
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content='Speak' showArrow>
+                                            <StatefulTooltip content={t('Speak')} showArrow>
                                                 <div
                                                     className={styles.actionButton}
                                                     onClick={() => {
@@ -1146,12 +1152,12 @@ export function PopupCard(props: IPopupCardProps) {
                                                     )}
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                            <StatefulTooltip content={t('Copy to clipboard')} showArrow>
                                                 <div>
                                                     <CopyToClipboard
                                                         text={editableText}
                                                         onCopy={() => {
-                                                            toast('Copied to clipboard', {
+                                                            toast(t('Copy to clipboard'), {
                                                                 duration: 3000,
                                                                 icon: '👏',
                                                             })
@@ -1219,7 +1225,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             className={styles.actionButtonsContainer}
                                                         >
                                                             <div style={{ marginRight: 'auto' }} />
-                                                            <StatefulTooltip content='Speak' showArrow>
+                                                            <StatefulTooltip content={t('Speak')} showArrow>
                                                                 <div
                                                                     className={styles.actionButton}
                                                                     onClick={() => {
@@ -1243,12 +1249,12 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     )}
                                                                 </div>
                                                             </StatefulTooltip>
-                                                            <StatefulTooltip content='Copy to clipboard' showArrow>
+                                                            <StatefulTooltip content={t('Copy to clipboard')} showArrow>
                                                                 <div>
                                                                     <CopyToClipboard
                                                                         text={translatedText}
                                                                         onCopy={() => {
-                                                                            toast('Copied to clipboard', {
+                                                                            toast(t('Copy to clipboard'), {
                                                                                 duration: 3000,
                                                                                 icon: '👏',
                                                                             })
