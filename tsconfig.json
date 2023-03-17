@@ -1,18 +1,24 @@
 {
     "compilerOptions": {
         "strict": true,
-        "module": "commonjs",
-        "target": "es2018",
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "target": "ESNext",
+        "skipLibCheck": true,
         "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
         "sourceMap": false,
         "rootDir": "src",
         "outDir": "dist/js",
         "moduleResolution": "node",
+        "noEmit": true,
         "noEmitOnError": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "typeRoots": [
             "node_modules/@types"
         ],
         "resolveJsonModule": true
-    }
+    },
+    "include": ["src", "src-tauri"]
 }

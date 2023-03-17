@@ -109,7 +109,8 @@ export async function translate(query: TranslateQuery) {
             break
     }
 
-    const body = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body: Record<string, any> = {
         model: 'gpt-3.5-turbo',
         temperature: 0,
         max_tokens: 1000,
@@ -120,7 +121,7 @@ export async function translate(query: TranslateQuery) {
     }
 
     const apiKey = await utils.getApiKey()
-    const headers = {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
     }
 

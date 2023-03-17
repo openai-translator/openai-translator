@@ -185,7 +185,8 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
             }
             onChange={(params) => {
                 props.onChange?.(params.value[0].id as string)
-                i18n.changeLanguage(params.value[0].id as string)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ;(i18n as any).changeLanguage(params.value[0].id as string)
             }}
             options={options}
         />
