@@ -12,9 +12,9 @@
     "build-browser-extension": "make build",
     "clean": "make clean",
     "test": "npx jest",
-    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint": "eslint src/**/*.{ts,tsx} --cache",
     "lint:fix": "eslint --fix 'src/**/*.{ts,tsx}'",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc --cache"
   },
   "author": "",
   "license": "MIT",

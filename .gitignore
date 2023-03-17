@@ -12,3 +12,4 @@ npm-error.log
 
 .vscode
 .idea
+.eslintcache
