@@ -13,10 +13,6 @@
         "typeRoots": [
             "node_modules/@types"
         ],
-        "paths": {
-            "@/*": [
-                "./*"
-            ]
-        }
+        "resolveJsonModule": true
     }
 }

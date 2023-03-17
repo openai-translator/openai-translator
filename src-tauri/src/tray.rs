@@ -3,8 +3,8 @@ use tauri::{
     AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
 
-use crate::windows::set_main_window_always_on_top;
 use crate::ALWAYS_ON_TOP;
+use crate::windows::set_main_window_always_on_top;
 
 pub fn menu() -> SystemTray {
     let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "Show");
@@ -36,6 +36,8 @@ pub fn menu() -> SystemTray {
 }
 
 pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
+    
+
     match event {
         SystemTrayEvent::LeftClick {
             position: _,

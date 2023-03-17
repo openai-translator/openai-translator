@@ -3,7 +3,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 
-import '@/src/i18n'
+import '../../i18n.js'
 
 const root = createRoot(document.getElementById('root')!)
 
