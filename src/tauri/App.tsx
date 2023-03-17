@@ -85,9 +85,10 @@ export function App() {
     return (
         <div
             style={{
+                position: 'relative',
                 background: themeType === 'dark' ? '#1f1f1f' : '#fff',
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
-                height: '100vh',
+                minHeight: '100vh',
             }}
         >
             <div className='titlebar' data-tauri-drag-region>

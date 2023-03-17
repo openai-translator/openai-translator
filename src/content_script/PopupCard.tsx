@@ -60,7 +60,6 @@ const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
-        position: 'relative',
     },
     'settingsIcon': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,
@@ -314,8 +313,16 @@ export function PopupCard(props: IPopupCardProps) {
 
     const { t } = useTranslation()
 
+    const [autoFocus, setAutoFocus] = useState(false)
+
     useEffect(() => {
         if (highlightRef.current) {
+            if (props.autoFocus) {
+                setAutoFocus(false)
+                setTimeout(() => {
+                    setAutoFocus(true)
+                }, 500)
+            }
             return
         }
         const editor = editorRef.current
@@ -323,7 +330,13 @@ export function PopupCard(props: IPopupCardProps) {
             return undefined
         }
         highlightRef.current = new HighlightInTextarea(editor, { highlight: '' })
-    }, [])
+        if (props.autoFocus) {
+            setAutoFocus(false)
+            setTimeout(() => {
+                setAutoFocus(true)
+            }, 500)
+        }
+    }, [props.autoFocus])
 
     useEffect(() => {
         if (!highlightRef.current?.highlight) {
@@ -1032,7 +1045,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     )}
                                                     <Textarea
                                                         inputRef={editorRef}
-                                                        autoFocus={props.autoFocus}
+                                                        autoFocus={autoFocus}
                                                         overrides={{
                                                             Root: {
                                                                 style: {
