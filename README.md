@@ -10,36 +10,35 @@
 </p>
 
 <p align="center">
-<a href="LICENSE" target="_blank">
+  <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/github/license/yetone/openai-translator.svg?style=flat-square" />
-</a>
+  </a>
 
-<!-- TypeScript Badge -->
-<img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
+  <!-- TypeScript Badge -->
+  <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
 
-<!-- Rust Badge -->
-<img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
+  <!-- Rust Badge -->
+  <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
-<a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
-<img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
-</a>
+  <a href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc" target="_blank">
+    <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/ogjibjphoadhljaoicdnjnmgokohngcc?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
+  </a>
 
-<a href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/" target="_blank">
-<img alt="Firefox" src="https://img.shields.io/amo/stars/openai-translator?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
-</a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/" target="_blank">
+    <img alt="Firefox" src="https://img.shields.io/amo/stars/openai-translator?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
+  </a>
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
-<img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
-</a>
+  <a href="https://github.com/yetone/openai-translator/releases" target="_blank">
+    <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
+  </a>
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
-<img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
-</a>
+  <a href="https://github.com/yetone/openai-translator/releases" target="_blank">
+    <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
+  </a>
 
-<a href="https://github.com/yetone/openai-translator/releases" target="_blank">
-<img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
-</a>
-
+  <a href="https://github.com/yetone/openai-translator/releases" target="_blank">
+    <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
+  </a>
 </p>
 
 # Why Yet another Translator
@@ -52,7 +51,9 @@ What began as a Chrome extension has now evolved into a multi-platform desktop a
 
 **Attention! The desktop application does not support the pop-up icon after word selection. You must press the shortcut key to trigger the translation after selecting a word.**
 
-<img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
+<p align="center">
+  <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
+</p>
 
 # More than just translation
 
@@ -60,7 +61,9 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # How to use
 
-<img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
+<p align="center">
+  <img width="800" src="https://user-images.githubusercontent.com/1206493/223200182-6a1d2a02-3fe0-4723-bdae-99d8b7212a33.gif" />
+</p>
 
 # Features
 
@@ -112,11 +115,16 @@ scoop install openai-translator
 ### Troubleshooting
 
 -   "OpenAI Translator" can’t be opened because the developer cannot be verified.
-    <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
-
+    
+    <p align="center">
+      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
+    </p>
+  
     -   Click the `Cancel` button, then go to the `Settings` -> `Privacy and Security` page, click the `Still Open` button, and then click the `Open` button in the pop-up window. After that, there will be no more pop-up warnings when opening `OpenAI Translator`. 🎉
-        <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
-
+        <p align="center">
+          <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
+        </p>
+  
     -   If you cannot find the above options in `Privacy & Security`. Open `Terminal.app` and enter the following command (you may need to enter a password halfway through), then restart `OpenAI Translator`:
 
         ```sh
@@ -125,26 +133,30 @@ scoop install openai-translator
 
 -   If you encounter a permission prompt every time you open it, or if you cannot perform a shortcut translation, please go to `Settings` -> `Privacy & Security` -> `Supporting Features` to remove OpenAI Translator, and then re-add OpenAI Translator.
 
-    <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-    <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
-
+    <p align="center">
+      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
+      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
+    </p>
+  
 ## Browser Extension
 
 1. Visit your Browser Extension Store to install this plugin:
 
-<p align="center">
-<a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
-<img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
-</a>
-<a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
-<img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
-</a>
-</p>
+   <p align="center">
+     <a target="_blank" href="https://chrome.google.com/webstore/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc">
+       <img src="https://img.shields.io/chrome-web-store/v/ogjibjphoadhljaoicdnjnmgokohngcc?label=Chrome%20Web%20Store&style=for-the-badge&color=blue&logo=google-chrome&logoColor=white" />
+     </a>
+     <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/openai-translator/">
+       <img src="https://img.shields.io/amo/v/openai-translator?label=Firefox%20Add-on&style=for-the-badge&color=orange&logo=firefox&logoColor=white" />
+     </a>
+   </p>
 
 2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
    
-   <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
-   
+   <p align="center">
+     <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
+   </p>
+  
 3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # License
@@ -153,11 +165,15 @@ scoop install openai-translator
 
 # Buy me a coffee
 
-<div align="center">
-<img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
-<img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
-</div>
+<p align="center">
+  <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
+  <img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
+</p>
 
 # Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yetone/openai-translator&type=Date)](https://star-history.com/#yetone/openai-translator&Date)
+<p align="center">
+  <a target="_blank" href="https://star-history.com/#yetone/openai-translator&Date">
+    <img src="https://api.star-history.com/svg?repos=yetone/openai-translator&type=Date" />
+  </a>
+</p>
