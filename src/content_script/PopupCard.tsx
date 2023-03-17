@@ -1243,7 +1243,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                             className={styles.actionButtonsContainer}
                                                         >
                                                             <div style={{ marginRight: 'auto' }} />
-                                                            <StatefulTooltip content={t('Speak')} showArrow>
+                                                            <StatefulTooltip
+                                                                content={t('Speak')}
+                                                                showArrow
+                                                                placement='left'
+                                                            >
                                                                 <div
                                                                     className={styles.actionButton}
                                                                     onClick={() => {
@@ -1267,7 +1271,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                                     )}
                                                                 </div>
                                                             </StatefulTooltip>
-                                                            <StatefulTooltip content={t('Copy to clipboard')} showArrow>
+                                                            <StatefulTooltip
+                                                                content={t('Copy to clipboard')}
+                                                                showArrow
+                                                                placement='left'
+                                                            >
                                                                 <div>
                                                                     <CopyToClipboard
                                                                         text={translatedText}
