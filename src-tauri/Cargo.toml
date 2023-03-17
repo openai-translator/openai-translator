@@ -24,6 +24,7 @@ clipboard = "0.5.0"
 enigo = {git = "https://github.com/enigo-rs/enigo"}
 mouse_position = "0.1.3"
 rdev = "0.5.2"
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev", version = "0.1.0" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"

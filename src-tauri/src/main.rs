@@ -11,7 +11,7 @@ mod windows;
 
 use crate::config::get_config_content;
 
-use crate::windows::{show_main_window, MAIN_WIN_NAME, show_main_window_with_selected_text, get_main_window_always_on_top, set_main_window_always_on_top};
+use crate::windows::{MAIN_WIN_NAME, show_main_window_with_selected_text, get_main_window_always_on_top, set_main_window_always_on_top};
 
 
 use once_cell::sync::OnceCell;
@@ -22,6 +22,12 @@ use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 pub static mut ALWAYS_ON_TOP: bool = false;
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    args: Vec<String>,
+    cwd: String,
+}
 
 #[cfg(target_os = "macos")]
 fn query_accessibility_permissions() -> bool {
@@ -41,6 +47,17 @@ fn query_accessibility_permissions() -> bool {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            println!("{}, {argv:?}, {cwd}", app.package_info().name);
+            Notification::new(&app.config().tauri.bundle.identifier)
+                .title("This app is already running!")
+                .body("You can find it in the tray menu.")
+                .icon("icon")
+                .notify(app)
+                .unwrap();
+            app.emit_all("single-instance", Payload { args: argv, cwd })
+                .unwrap();
+        }))
         .setup(|app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle());
