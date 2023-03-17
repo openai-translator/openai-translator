@@ -1,4 +1,4 @@
-import { Theme } from 'baseui/theme'
+import { Theme } from 'baseui-sd/theme'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
@@ -18,6 +18,7 @@ interface IRuntimeOnMessage {
 interface IRuntime {
     onMessage: IRuntimeOnMessage
     sendMessage(message: any): void
+    getURL(path: string): string
 }
 
 export interface IBrowser {

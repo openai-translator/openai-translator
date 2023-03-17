@@ -1,4 +1,4 @@
-import { DarkTheme, LightTheme } from 'baseui/themes'
+import { DarkTheme, LightTheme } from 'baseui-sd/themes'
 import { useCurrentThemeType } from './useCurrentThemeType'
 
 export const useTheme = () => {

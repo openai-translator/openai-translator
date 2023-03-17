@@ -6,6 +6,10 @@
     width: 100% !important;
 }
 
+.yetone-hit-container textarea {
+    display: block;
+}
+
 .yetone-hit-backdrop {
     position: absolute !important;
     top: 0 !important;

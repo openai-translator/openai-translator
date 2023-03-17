@@ -1,4 +1,3 @@
-import '@webcomponents/webcomponentsjs'
 import * as utils from '../common/utils'
 import React from 'react'
 import icon from './assets/images/icon.png'
@@ -11,7 +10,6 @@ import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
-import './index.css'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -76,7 +74,7 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $popupCard.style.font =
             '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
         const $container = await getContainer()
-        $container.appendChild($popupCard)
+        $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
     $popupCard.style.width = 'auto'
@@ -150,7 +148,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $img.style.height = '100%'
         $popupThumb.appendChild($img)
         const $container = await getContainer()
-        $container.appendChild($popupThumb)
+        $container.shadowRoot?.querySelector('div')?.appendChild($popupThumb)
     }
     $popupThumb.dataset['text'] = text
     $popupThumb.style.display = 'block'
@@ -160,8 +158,9 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 async function main() {
-    let lastMouseEvent: MouseEvent | undefined
     const browser = await utils.getBrowser()
+
+    let lastMouseEvent: MouseEvent | undefined
 
     document.addEventListener('mouseup', (event: MouseEvent) => {
         lastMouseEvent = event

@@ -6,14 +6,15 @@ import toast, { Toaster } from 'react-hot-toast'
 import * as utils from '../common/utils'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { BaseProvider } from 'baseui'
-import { Input } from 'baseui/input'
+import { BaseProvider } from 'baseui-sd'
+import { Input } from 'baseui-sd/input'
 import { createForm } from '../components/Form'
-import { Button } from 'baseui/button'
+import formStyles from 'inline:../components/Form/index.module.css'
+import { Button } from 'baseui-sd/button'
 import './index.css'
 import { TranslateMode, Provider } from '../content_script/translate'
-import { Select, Value, Option } from 'baseui/select'
-import { Checkbox } from 'baseui/checkbox'
+import { Select, Value, Option } from 'baseui-sd/select'
+import { Checkbox } from 'baseui-sd/checkbox'
 import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
@@ -398,6 +399,7 @@ export function Settings(props: IPopupProps) {
                 minWidth: 400,
             }}
         >
+            <style>{formStyles}</style>
             <StyletronProvider value={engine}>
                 <BaseProvider theme={theme}>
                     <nav

@@ -1,6 +1,7 @@
 import archiver from 'archiver'
 import esbuild from 'esbuild'
 import fs from 'fs-extra'
+import inlineImportPlugin from 'esbuild-plugin-inline-import'
 
 const browserExtensionOutDir = 'dist/browser-extension'
 const userscriptOutDir = 'dist/userscript'
@@ -24,6 +25,9 @@ async function esbuildBrowserExtension() {
             '.jpg': 'dataurl',
             '.gif': 'dataurl',
         },
+        plugins: [
+            inlineImportPlugin(),
+        ],
     })
 }
 

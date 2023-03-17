@@ -2,23 +2,23 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { BaseProvider, Theme } from 'baseui'
-import { Textarea } from 'baseui/textarea'
+import { BaseProvider, Theme } from 'baseui-sd'
+import { Textarea } from 'baseui-sd/textarea'
 import icon from './assets/images/icon.png'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode } from 'react-icons/md'
-import { StatefulTooltip } from 'baseui/tooltip'
+import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
-import { Select, Value, Option } from 'baseui/select'
+import { Select, Value, Option } from 'baseui-sd/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { RxCopy, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxXY, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
-import { Button } from 'baseui/button'
+import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { getSettings, isDesktopApp, ISettings, isTauri } from '../common/utils'
@@ -1035,7 +1035,6 @@ export function PopupCard(props: IPopupCardProps) {
                                                                 style: {
                                                                     width: '100%',
                                                                     borderRadius: '0px',
-                                                                    borderWidth: '1px',
                                                                 },
                                                             },
                                                             Input: {
