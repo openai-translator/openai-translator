@@ -78,6 +78,11 @@ jobs:
         run: |
           rustup target add aarch64-apple-darwin
 
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
       - name: install frontend dependencies
         run: yarn install # change this to npm or pnpm depending on which one you use
 
@@ -107,6 +112,11 @@ jobs:
       - name: Get version
         id: get_version
         uses: battila7/get-version-action@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn install

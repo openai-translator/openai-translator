@@ -34,5 +34,8 @@ jobs:
       - name: Install packages
         run: yarn
 
+      - name: Run type check
+        run: yarn tsc
+
       - name: Run eslint
         run: yarn lint
