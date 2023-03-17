@@ -536,10 +536,7 @@ export function PopupCard(props: IPopupCardProps) {
 
         const elementDrag = async (e: MouseEvent) => {
             e.stopPropagation()
-            if (closed) {
-                return
-            }
-            if (!$popupCard) {
+            if (closed || !$popupCard) {
                 return
             }
             e = e || window.event
