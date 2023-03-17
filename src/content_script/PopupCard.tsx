@@ -978,7 +978,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         </StatefulTooltip>
                                         <StatefulTooltip
                                             content={t('Explain Code')}
-                                            placement={isDesktopApp() ? 'auto' : 'top'}
+                                            placement={isDesktopApp() ? 'left' : 'top'}
                                             showArrow
                                         >
                                             <Button
@@ -1129,6 +1129,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             <StatefulTooltip
                                                 content={t('Upload an image for OCR translation')}
                                                 showArrow
+                                                placement='left'
                                             >
                                                 <div className={styles.actionButton}>
                                                     <Dropzone onDrop={onDrop}>
@@ -1141,7 +1142,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     </Dropzone>
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content={t('Speak')} showArrow>
+                                            <StatefulTooltip content={t('Speak')} showArrow placement='left'>
                                                 <div
                                                     className={styles.actionButton}
                                                     onClick={() => {
@@ -1165,7 +1166,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                     )}
                                                 </div>
                                             </StatefulTooltip>
-                                            <StatefulTooltip content={t('Copy to clipboard')} showArrow>
+                                            <StatefulTooltip
+                                                content={t('Copy to clipboard')}
+                                                showArrow
+                                                placement='left'
+                                            >
                                                 <div>
                                                     <CopyToClipboard
                                                         text={editableText}
