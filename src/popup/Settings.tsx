@@ -447,8 +447,9 @@ export function Settings(props: IPopupProps) {
     return (
         <div
             style={{
+                paddingTop: '98px',
+                paddingBottom: '32px',
                 background: themeType === 'dark' ? '#1f1f1f' : '#fff',
-                minWidth: 400,
             }}
         >
             <style>{formStyles}</style>
@@ -456,7 +457,11 @@ export function Settings(props: IPopupProps) {
                 <BaseProvider theme={theme}>
                     <nav
                         style={{
-                            position: 'relative',
+                            position: 'fixed',
+                            left: 0,
+                            top: 0,
+                            zIndex: 1,
+                            width: '100%',
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',

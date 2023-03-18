@@ -6,6 +6,7 @@ import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
 import { bindHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
+import { useMemoWindow } from '../common/hooks/useMemoWindow'
 
 const engine = new Styletron({
     prefix: '__yetone-openai-translator-styletron-',
@@ -20,6 +21,9 @@ export function App() {
     const closeIconRef = useRef<HTMLDivElement>(null)
     const [text, setText] = React.useState('')
     const [isPinned, setPinned] = React.useState(false)
+
+    useMemoWindow({ size: true, position: true })
+
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         invoke('get_main_window_always_on_top').then((pinned: any) => {
