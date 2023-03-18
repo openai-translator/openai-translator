@@ -1,19 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TranslateMode, Provider } from '../content_script/translate'
-import { IBrowser, ThemeType } from './types'
-
-export interface ISettings {
-    apiKeys: string
-    apiURL: string
-    apiURLPath: string
-    provider: Provider | 'OpenAI'
-    autoTranslate: boolean
-    defaultTranslateMode: TranslateMode | 'nop'
-    defaultTargetLanguage: string
-    hotkey?: string
-    themeType?: ThemeType
-    i18n?: string
-}
+import { IBrowser, ISettings } from './types'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -42,6 +28,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     hotkey: 1,
     themeType: 1,
     i18n: 1,
+    restorePreviousPosition: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

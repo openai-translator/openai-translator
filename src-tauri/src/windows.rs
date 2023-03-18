@@ -1,5 +1,6 @@
 use crate::ALWAYS_ON_TOP;
 use crate::utils;
+use crate::config;
 use crate::APP_HANDLE;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 #[cfg(target_os = "windows")]
@@ -65,23 +66,37 @@ pub fn show_main_window(center: bool) {
     let handle = APP_HANDLE.get().unwrap();
     match handle.get_window(MAIN_WIN_NAME) {
         Some(window) => {
-            if !center {
-                let (x, y): (i32, i32) = get_mouse_location().unwrap();
-                if cfg!(target_os = "macos") {
-                    window
-                        .set_position(LogicalPosition::new(x as f64, y as f64))
-                        .unwrap();
-                } else {
-                    window.unminimize().unwrap();
-                    window
-                        .set_position(PhysicalPosition::new(x as f64, y as f64))
-                        .unwrap();
+            let restore_previous_position = match config::get_config() {
+                Ok(config) => config.restore_previous_position.unwrap_or(false),
+                Err(e) => {
+                    eprintln!("Error getting config: {}", e);
+                    false
                 }
-            } else {
+            };
+
+            if restore_previous_position {
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
                 }
-                window.center().unwrap();
+            } else {
+                if !center {
+                    let (x, y): (i32, i32) = get_mouse_location().unwrap();
+                    if cfg!(target_os = "macos") {
+                        window
+                            .set_position(LogicalPosition::new(x as f64, y as f64))
+                            .unwrap();
+                    } else {
+                        window.unminimize().unwrap();
+                        window
+                            .set_position(PhysicalPosition::new(x as f64, y as f64))
+                            .unwrap();
+                    }
+                } else {
+                    if !cfg!(target_os = "macos") {
+                        window.unminimize().unwrap();
+                    }
+                    window.center().unwrap();
+                }
             }
             window.set_focus().unwrap();
             window.show().unwrap();

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
+    pub restore_previous_position: Option<bool>,
 }
 
 pub fn get_config() -> Result<Config, Box<dyn std::error::Error>> {

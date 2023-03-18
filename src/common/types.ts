@@ -1,4 +1,5 @@
 import { Theme } from 'baseui-sd/theme'
+import { TranslateMode, Provider } from '../content_script/translate'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
@@ -32,4 +33,18 @@ export type ThemeType = BaseThemeType | 'followTheSystem'
 export interface IThemedStyleProps {
     theme: Theme
     themeType: BaseThemeType
+}
+
+export interface ISettings {
+    apiKeys: string
+    apiURL: string
+    apiURLPath: string
+    provider: Provider | 'OpenAI'
+    autoTranslate: boolean
+    defaultTranslateMode: TranslateMode | 'nop'
+    defaultTargetLanguage: string
+    hotkey?: string
+    themeType?: ThemeType
+    i18n?: string
+    restorePreviousPosition?: boolean
 }

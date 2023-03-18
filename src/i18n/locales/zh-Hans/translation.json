@@ -30,5 +30,6 @@
   "is required": "是必填项",
   "Go to the": "前往",
   "OpenAI page": "OpenAI 页面",
-  "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "获取您的 API 密钥。您可以使用英文逗号分隔多个 API 密钥，以实现配额加倍和负载均衡。"
+  "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "获取您的 API 密钥。您可以使用英文逗号分隔多个 API 密钥，以实现配额加倍和负载均衡。",
+  "Restore Previous Position": "恢复上次位置"
 }

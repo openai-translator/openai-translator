@@ -19,7 +19,7 @@ import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { IThemedStyleProps, ThemeType } from '../common/types'
+import { ISettings, IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
@@ -213,6 +213,25 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
     )
 }
 
+interface RestorePreviousPositionCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function RestorePreviousPositionCheckbox(props: RestorePreviousPositionCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={props.value}
+            onChange={(e) => {
+                props.onChange?.(e.target.checked)
+                props.onBlur?.()
+            }}
+        />
+    )
+}
+
 const useHotkeyRecorderStyles = createUseStyles({
     'hotkeyRecorder': (props: IThemedStyleProps) => ({
         position: 'relative',
@@ -377,10 +396,10 @@ function ProviderSelector(props: IProviderSelectorProps) {
 
 const engine = new Styletron()
 
-const { Form, FormItem, useForm } = createForm<utils.ISettings>()
+const { Form, FormItem, useForm } = createForm<ISettings>()
 
 interface IPopupProps {
-    onSave?: (oldSettings: utils.ISettings) => void
+    onSave?: (oldSettings: ISettings) => void
 }
 
 export function Settings(props: IPopupProps) {
@@ -390,7 +409,7 @@ export function Settings(props: IPopupProps) {
     const { t } = useTranslation()
 
     const [loading, setLoading] = useState(false)
-    const [values, setValues] = useState<utils.ISettings>({
+    const [values, setValues] = useState<ISettings>({
         apiKeys: '',
         apiURL: utils.defaultAPIURL,
         apiURLPath: utils.defaultAPIURLPath,
@@ -400,8 +419,9 @@ export function Settings(props: IPopupProps) {
         defaultTargetLanguage: utils.defaultTargetLanguage,
         hotkey: '',
         i18n: utils.defaulti18n,
+        restorePreviousPosition: false,
     })
-    const [prevValues, setPrevValues] = useState<utils.ISettings>(values)
+    const [prevValues, setPrevValues] = useState<ISettings>(values)
 
     const [form] = useForm()
 
@@ -417,11 +437,11 @@ export function Settings(props: IPopupProps) {
         })()
     }, [])
 
-    const onChange = useCallback((_changes: Partial<utils.ISettings>, values_: utils.ISettings) => {
+    const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
     }, [])
 
-    const onSubmmit = useCallback(async (data: utils.ISettings) => {
+    const onSubmmit = useCallback(async (data: ISettings) => {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
@@ -521,6 +541,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
+                            <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                             <LanguageSelector onBlur={onBlur} />
