@@ -175,7 +175,7 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
             clearable={false}
             value={
                 props.value
-                    ?[
+                    ? [
                           {
                               id: props.value,
                               label: options.find((option) => option.id === props.value)?.label || 'en',
