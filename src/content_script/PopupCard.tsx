@@ -116,7 +116,6 @@ const useStyles = createUseStyles({
         display: 'flex',
         flexShrink: 0,
         flexDirection: 'row',
-        cursor: 'move',
         alignItems: 'center',
         padding: '5px 10px',
         gap: '10px',
@@ -304,6 +303,11 @@ export interface IPopupCardProps {
     onSettingsSave?: (oldSettings: ISettings) => void
 }
 
+export interface MovementXY {
+    x: number
+    y: number
+}
+
 export function PopupCard(props: IPopupCardProps) {
     const editorRef = useRef<HTMLTextAreaElement>(null)
     const isCompositing = useRef(false)
@@ -457,6 +461,8 @@ export function PopupCard(props: IPopupCardProps) {
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
 
+    const scrollYRef = useRef<number>(0)
+
     // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
         const calculateTranslatedContentMaxHeight = (): number => {
@@ -529,36 +535,51 @@ export function PopupCard(props: IPopupCardProps) {
 
         const elementDrag = async (e: MouseEvent) => {
             e.stopPropagation()
-            if (closed) {
-                return
-            }
-            if (!$popupCard) {
+            if (closed || !$popupCard) {
                 return
             }
             e = e || window.event
             e.preventDefault()
-            const [l, t] = overflowCheck($popupCard, e)
+            const { movementX, movementY } = e
+            const [l, t] = overflowCheck($popupCard, { x: movementX, y: movementY })
             $popupCard.style.top = `${t}px`
             $popupCard.style.left = `${l}px`
         }
 
-        const overflowCheck = ($popupCard: HTMLDivElement, e: MouseEvent) => {
+        const overflowCheck = ($popupCard: HTMLDivElement, movementXY: MovementXY): number[] => {
             let left = $popupCard.offsetLeft
             let top = $popupCard.offsetTop
+            const { x: movementX, y: movementY } = movementXY
             if (
-                $popupCard.offsetLeft + e.movementX > documentPadding &&
-                window.innerWidth - $popupCard.offsetLeft - e.movementX - $popupCard.offsetWidth > documentPadding
+                $popupCard.offsetLeft + movementX > documentPadding &&
+                window.innerWidth - $popupCard.offsetLeft - movementX - $popupCard.offsetWidth > documentPadding
             ) {
-                left = $popupCard.offsetLeft + e.movementX
+                left = $popupCard.offsetLeft + movementX
             }
             if (
-                $popupCard.offsetTop + e.movementY > documentPadding &&
-                document.documentElement.offsetHeight - $popupCard.offsetTop - e.movementY - $popupCard.offsetHeight >
+                $popupCard.offsetTop + movementY > documentPadding &&
+                document.documentElement.offsetHeight - $popupCard.offsetTop - movementY - $popupCard.offsetHeight >
                     documentPadding
             ) {
-                top = $popupCard.offsetTop + e.movementY
+                top = $popupCard.offsetTop + movementY
             }
             return [left, top]
+        }
+
+        const elementScroll = async (e: globalThis.Event) => {
+            e.stopPropagation()
+            if (closed || !$popupCard) {
+                scrollYRef.current = window.scrollY
+                return
+            }
+            e = e || window.event
+            e.preventDefault()
+            const { scrollY } = window
+            const movementY = scrollY - scrollYRef.current
+            const [l, t] = overflowCheck($popupCard, { x: 0, y: movementY })
+            $popupCard.style.top = `${t}px`
+            $popupCard.style.left = `${l}px`
+            scrollYRef.current = scrollY
         }
 
         const closeDragElement = () => {
@@ -570,10 +591,12 @@ export function PopupCard(props: IPopupCardProps) {
 
         $header.addEventListener('mousedown', dragMouseDown)
         $header.addEventListener('mouseup', closeDragElement)
+        document.addEventListener('scroll', elementScroll)
 
         return () => {
             $header.removeEventListener('mousedown', dragMouseDown)
             $header.removeEventListener('mouseup', closeDragElement)
+            document.removeEventListener('scroll', elementScroll)
             closeDragElement()
         }
     }, [headerRef])
@@ -851,9 +874,11 @@ export function PopupCard(props: IPopupCardProps) {
                                         cursor: isDesktopApp() ? 'default' : 'move',
                                     }}
                                 >
-                                    <div className={styles.iconContainer}>
-                                        <img className={styles.icon} src={icon} />
-                                        <div className={styles.iconText}>OpenAI Translator</div>
+                                    <div data-tauri-drag-region className={styles.iconContainer}>
+                                        <img data-tauri-drag-region className={styles.icon} src={icon} />
+                                        <div data-tauri-drag-region className={styles.iconText}>
+                                            OpenAI Translator
+                                        </div>
                                     </div>
                                     <div className={styles.popupCardHeaderActionsContainer}>
                                         <div className={styles.from}>
