@@ -61,37 +61,61 @@ const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
     },
-    'footer': (props: IThemedStyleProps) => ({
-        color: props.theme.colors.contentSecondary,
-        position: 'fixed',
-        width: '100%',
-        height: '32px',
-        cursor: 'pointer',
-        left: '0',
-        bottom: '0',
-        paddingLeft: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
-    }),
-    'popupCardHeaderContainer': (props: IThemedStyleProps) => ({
-        'position': 'fixed',
-        'zIndex': 1,
-        'left': 0,
-        'top': '0',
-        'width': '100%',
-        'boxSizing': 'border-box',
-        'padding': '30px  10px 5px',
-        'background': props.themeType === 'dark' ? '#1f1f1f' : '#fff',
-        'display': 'flex',
-        'flexDirection': 'row',
-        'cursor': 'move',
-        'alignItems': 'center',
-        'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-        '-ms-user-select': 'none',
-        '-webkit-user-select': 'none',
-        'user-select': 'none',
-    }),
+    'footer': (props: IThemedStyleProps) =>
+        props.isDesktopApp
+            ? {
+                  color: props.theme.colors.contentSecondary,
+                  position: 'fixed',
+                  width: '100%',
+                  height: '32px',
+                  cursor: 'pointer',
+                  left: '0',
+                  bottom: '0',
+                  paddingLeft: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+              }
+            : {
+                  color: props.theme.colors.contentSecondary,
+                  position: 'absolute',
+                  cursor: 'pointer',
+                  bottom: '10px',
+                  left: '10px',
+                  lineHeight: '1',
+              },
+    'popupCardHeaderContainer': (props: IThemedStyleProps) =>
+        props.isDesktopApp
+            ? {
+                  'position': 'fixed',
+                  'zIndex': 1,
+                  'left': 0,
+                  'top': '0',
+                  'width': '100%',
+                  'boxSizing': 'border-box',
+                  'padding': '30px  10px 5px',
+                  'background': props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              }
+            : {
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'padding': '5px 10px',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  'minWidth': '550px',
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              },
     'iconContainer': {
         display: 'flex',
         alignItems: 'center',
@@ -148,11 +172,11 @@ const useStyles = createUseStyles({
         fontSize: '12px',
         flexShrink: 0,
     },
-    'popupCardContentContainer': {
-        paddingTop: '52px',
+    'popupCardContentContainer': (props: IThemedStyleProps) => ({
+        paddingTop: props.isDesktopApp ? '52px' : undefined,
         display: 'flex',
         flexDirection: 'column',
-    },
+    }),
     'loadingContainer': {
         margin: '0 auto',
         display: 'flex',
@@ -270,20 +294,26 @@ const useStyles = createUseStyles({
     'OCRStatusBar': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,
     }),
-    '@media screen and (max-width: 570px)': {
-        iconText: {
-            display: 'none',
-        },
-    },
-    '@media screen and (max-width: 460px)': {
-        popupCardHeaderActionsContainer: {
-            padding: '5px 0',
-            gap: '5px',
-        },
-        popupCardHeaderButtonGroup: {
-            marginLeft: '5px',
-        },
-    },
+    '@media screen and (max-width: 570px)': (props: IThemedStyleProps) =>
+        props.isDesktopApp
+            ? {
+                  iconText: {
+                      display: 'none',
+                  },
+              }
+            : undefined,
+    '@media screen and (max-width: 460px)': (props: IThemedStyleProps) =>
+        props.isDesktopApp
+            ? {
+                  popupCardHeaderActionsContainer: {
+                      padding: '5px 0',
+                      gap: '5px',
+                  },
+                  popupCardHeaderButtonGroup: {
+                      marginLeft: '5px',
+                  },
+              }
+            : undefined,
 })
 
 interface IActionStrItem {
@@ -425,7 +455,7 @@ export function PopupCard(props: IPopupCardProps) {
 
     const { theme, themeType } = useTheme()
 
-    const styles = useStyles({ theme, themeType })
+    const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
