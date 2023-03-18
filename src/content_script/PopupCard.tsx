@@ -75,19 +75,19 @@ const useStyles = createUseStyles({
         background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
     }),
     'popupCardHeaderContainer': (props: IThemedStyleProps) => ({
-        position: 'fixed',
-        zIndex: 1,
-        left: 0,
-        top: '0',
-        width: '100%',
-        boxSizing: 'border-box',
-        padding: '30px  10px 5px',
-        background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
-        display: 'flex',
-        flexDirection: 'row',
-        cursor: 'move',
-        alignItems: 'center',
-        borderBottom: `1px solid ${props.theme.colors.borderTransparent}`,
+        'position': 'fixed',
+        'zIndex': 1,
+        'left': 0,
+        'top': '0',
+        'width': '100%',
+        'boxSizing': 'border-box',
+        'padding': '30px  10px 5px',
+        'background': props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+        'display': 'flex',
+        'flexDirection': 'row',
+        'cursor': 'move',
+        'alignItems': 'center',
+        'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
         '-ms-user-select': 'none',
         '-webkit-user-select': 'none',
         'user-select': 'none',
@@ -271,16 +271,16 @@ const useStyles = createUseStyles({
         color: props.theme.colors.contentSecondary,
     }),
     '@media screen and (max-width: 570px)': {
-        'iconText': {
-            display: 'none'
-        }
+        iconText: {
+            display: 'none',
+        },
     },
     '@media screen and (max-width: 460px)': {
-        'popupCardHeaderActionsContainer': {
+        popupCardHeaderActionsContainer: {
             padding: '5px 0',
             gap: '5px',
         },
-        'popupCardHeaderButtonGroup': {
+        popupCardHeaderButtonGroup: {
             marginLeft: '5px',
         },
     },
@@ -378,7 +378,7 @@ export function PopupCard(props: IPopupCardProps) {
 
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
-        ; (async () => {
+        (async () => {
             const settings = await getSettings()
             if (settings.defaultTranslateMode !== 'nop') {
                 setTranslateMode(settings.defaultTranslateMode)
@@ -454,7 +454,7 @@ export function PopupCard(props: IPopupCardProps) {
     const [detectTo, setDetectTo] = useState('')
     const stopAutomaticallyChangeDetectTo = useRef(false)
     useEffect(() => {
-        ; (async () => {
+        (async () => {
             const from = (await detectLang(originalText)) ?? 'en'
             setDetectFrom(from)
             if (
@@ -540,13 +540,13 @@ export function PopupCard(props: IPopupCardProps) {
             return undefined
         }
 
-        let $popupCard: HTMLDivElement | null = null
-            ; (async () => {
-                $popupCard = await queryPopupCardElement()
-                if (!$popupCard) {
-                    return
-                }
-            })()
+        let $popupCard: HTMLDivElement | null = null;
+        (async () => {
+            $popupCard = await queryPopupCardElement()
+            if (!$popupCard) {
+                return
+            }
+        })()
 
         let closed = true
 
@@ -584,8 +584,7 @@ export function PopupCard(props: IPopupCardProps) {
             }
             if (
                 $popupCard.offsetTop + movementY > documentPadding &&
-                document.documentElement.offsetHeight - $popupCard.offsetTop - movementY - $popupCard.offsetHeight >
-                documentPadding
+                document.documentElement.offsetHeight - $popupCard.offsetTop - movementY - $popupCard.offsetHeight > documentPadding
             ) {
                 top = $popupCard.offsetTop + movementY
             }
@@ -738,7 +737,7 @@ export function PopupCard(props: IPopupCardProps) {
         if (!props.defaultShowSettings) {
             return
         }
-        ; (async () => {
+        (async () => {
             const settings = await getSettings()
             if (!settings.apiKeys) {
                 setShowSettings(true)
@@ -766,7 +765,7 @@ export function PopupCard(props: IPopupCardProps) {
         if (!isTauri()) {
             return
         }
-        ; (async () => {
+        (async () => {
             const { listen } = await require('@tauri-apps/api/event')
             const { fs } = await require('@tauri-apps/api')
             listen('tauri://file-drop', async (e: Event<string>) => {
@@ -1110,10 +1109,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         rows={
                                                             props.editorRows
                                                                 ? props.editorRows
-                                                                : Math.min(
-                                                                    Math.max(editableText.split('\n').length, 3),
-                                                                    12
-                                                                )
+                                                                : Math.min(Math.max(editableText.split('\n').length, 3), 12)
                                                         }
                                                         onChange={(e) => setEditableText(e.target.value)}
                                                         onKeyDown={(e) => {

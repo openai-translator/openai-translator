@@ -22,7 +22,7 @@ export function App() {
     const [text, setText] = React.useState('')
     const [isPinned, setPinned] = React.useState(false)
 
-    useMemoWindow({ size: true, position: true });
+    useMemoWindow({ size: true, position: true })
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,14 +32,14 @@ export function App() {
     }, [])
     useEffect(() => {
         let unlisten
-            ; (async () => {
-                unlisten = await listen('change-text', async (event: Event<string>) => {
-                    const selectedText = event.payload
-                    if (selectedText) {
-                        setText(selectedText)
-                    }
-                })
-            })()
+        (async () => {
+            unlisten = await listen('change-text', async (event: Event<string>) => {
+                const selectedText = event.payload
+                if (selectedText) {
+                    setText(selectedText)
+                }
+            })
+        })()
         return unlisten
     }, [])
 
