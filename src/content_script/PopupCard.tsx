@@ -1111,7 +1111,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             props.editorRows
                                                                 ? props.editorRows
                                                                 : Math.min(
-                                                                      Math.max(editableText.split('\n').length,3),
+                                                                      Math.max(editableText.split('\n').length, 3),
                                                                       12
                                                                   )
                                                         }
