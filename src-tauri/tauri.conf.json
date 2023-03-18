@@ -107,7 +107,8 @@
         "resizable": true,
         "title": "OpenAI Translator",
         "titleBarStyle": "Overlay",
-        "hiddenTitle": true
+        "hiddenTitle": true,
+        "visible": false
       }
     ],
     "systemTray": {
