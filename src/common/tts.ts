@@ -34,17 +34,16 @@ const langMap: Record<string, string> = {
     'vi': 'vi-VN',
 }
 
+const supportedVoices = speechSynthesis.getVoices()
+
 export function speak({ text, lang, onFinish }: SpeakOptions) {
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
-    utterance.text = text
     const langTag = langMap[lang ?? 'en'] ?? 'en-US'
-    const voices = speechSynthesis.getVoices().filter((v) => v.lang === langTag && v.default)
+    utterance.text = text
     utterance.lang = langTag
-    if (voices.length > 0) {
-        utterance.voice = voices[0]
-    }
+    utterance.voice = supportedVoices.find((v) => v.lang === langTag) ?? null
     speechSynthesis.speak(utterance)
 }
