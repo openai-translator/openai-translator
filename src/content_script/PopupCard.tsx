@@ -258,16 +258,18 @@ const useStyles = createUseStyles({
         color: props.theme.colors.contentSecondary,
     }),
     '@media screen and (max-width: 570px)': {
-        'popupCardHeaderActionsContainer':{
-            padding:'5px 0',
+        'iconText': {
+            display: 'none'
+        }
+    },
+    '@media screen and (max-width: 460px)': {
+        'popupCardHeaderActionsContainer': {
+            padding: '5px 0',
             gap: '5px',
         },
         'popupCardHeaderButtonGroup': {
             marginLeft: '5px',
         },
-        'iconText':{
-            display:'none'
-        }
     },
 })
 
