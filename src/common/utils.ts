@@ -7,6 +7,7 @@ export const defaultProvider = 'OpenAI'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
+export const defaultAlwaysShowIcons = true
 
 export const defaulti18n = 'en'
 
@@ -25,6 +26,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
+    alwaysShowIcons: 1,
     hotkey: 1,
     themeType: 1,
     i18n: 1,
@@ -56,6 +58,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.defaultTargetLanguage) {
         settings.defaultTargetLanguage = defaultTargetLanguage
+    }
+    if (settings.alwaysShowIcons === undefined || settings.alwaysShowIcons === null) {
+        settings.alwaysShowIcons = defaultAlwaysShowIcons
     }
     if (!settings.i18n) {
         settings.i18n = defaulti18n
