@@ -17,7 +17,6 @@ root.render(
             className='popup'
             style={{
                 position: 'relative',
-                minHeight: '100vh',
             }}
         >
             <PopupCard showSettings defaultShowSettings text='' engine={engine} autoFocus />
