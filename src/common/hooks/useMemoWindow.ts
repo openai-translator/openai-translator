@@ -1,6 +1,6 @@
-import { listen, TauriEvent } from '@tauri-apps/api/event';
-import { appWindow, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window';
-import { useEffect, useLayoutEffect } from 'react';
+import { listen, TauriEvent } from '@tauri-apps/api/event'
+import { appWindow, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window'
+import { useEffect, useLayoutEffect } from 'react'
 
 export type WindowMemoProps = {
     size: boolean
@@ -30,7 +30,7 @@ export const useMemoWindow = (props: WindowMemoProps) => {
         } else {
             localStorage.removeItem('_size')
         }
-        appWindow.show();
+        appWindow.show()
     }, [])
 
     useEffect(() => {
@@ -43,6 +43,6 @@ export const useMemoWindow = (props: WindowMemoProps) => {
         return () => {
             unListenMove.then
             unListenResize.then
-        };
+        }
     }, [])
 }

@@ -174,10 +174,15 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
             searchable={false}
             clearable={false}
             value={
-                props.value ? [{
-                    id: props.value,
-                    label: options.find((option) => option.id === props.value)?.label || 'en',
-                }] : undefined
+                props.value
+                    ?
+                    [
+                        {
+                            id: props.value,
+                            label: options.find((option) => option.id === props.value)?.label || 'en',
+                        },
+                    ]
+                    : undefined
             }
             onChange={(params) => {
                 props.onChange?.(params.value[0].id as string);

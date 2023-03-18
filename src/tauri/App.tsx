@@ -32,7 +32,7 @@ export function App() {
     }, [])
     useEffect(() => {
         let unlisten
-        (async () => {
+        ;(async () => {
             unlisten = await listen('change-text', async (event: Event<string>) => {
                 const selectedText = event.payload
                 if (selectedText) {
