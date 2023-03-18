@@ -58,28 +58,6 @@ export async function queryPopupCardElement(): Promise<HTMLDivElement | null> {
     return $container.shadowRoot?.querySelector(`#${popupCardID}`) as HTMLDivElement | null
 }
 
-export async function* streamAsyncIterable(stream: ReadableStream<Uint8Array> | null) {
-    if (!stream) {
-        return
-    }
-    const reader = stream.getReader()
-    try {
-        while (true) {
-            const { done, value } = await reader.read()
-            if (done) {
-                return
-            }
-            yield value
-        }
-    } finally {
-        reader.releaseLock()
-    }
-}
-
-const streamAsyncIterator = {
-    [Symbol.asyncIterator]: streamAsyncIterable,
-}
-
 interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,9 +117,19 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 onMessage(event.data)
             }
         })
-        for await (const chunk of streamAsyncIterator[Symbol.asyncIterator](resp.body)) {
-            const str = new TextDecoder().decode(chunk)
-            parser.feed(str)
+        const reader = resp.body.getReader()
+        try {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) {
+                    break
+                }
+                const str = new TextDecoder().decode(value)
+                parser.feed(str)
+            }
+        } finally {
+            reader.releaseLock()
         }
     }
 }
