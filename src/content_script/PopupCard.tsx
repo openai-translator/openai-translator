@@ -61,21 +61,33 @@ const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
     },
-    'settingsIcon': (props: IThemedStyleProps) => ({
+    'footer': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,
-        position: 'absolute',
+        position: 'fixed',
+        width: '100%',
+        height: '32px',
         cursor: 'pointer',
-        bottom: '10px',
-        left: '10px',
-        lineHeight: '1',
+        left: '0',
+        bottom: '0',
+        paddingLeft: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
     }),
     'popupCardHeaderContainer': (props: IThemedStyleProps) => ({
-        'display': 'flex',
-        'flexDirection': 'row',
-        'cursor': 'move',
-        'alignItems': 'center',
-        'padding': '5px 10px',
-        'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+        position: 'fixed',
+        zIndex: 1,
+        left: 0,
+        top: '0',
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '30px  10px 5px',
+        background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+        display: 'flex',
+        flexDirection: 'row',
+        cursor: 'move',
+        alignItems: 'center',
+        borderBottom: `1px solid ${props.theme.colors.borderTransparent}`,
         '-ms-user-select': 'none',
         '-webkit-user-select': 'none',
         'user-select': 'none',
@@ -137,6 +149,7 @@ const useStyles = createUseStyles({
         flexShrink: 0,
     },
     'popupCardContentContainer': {
+        paddingTop: '52px',
         display: 'flex',
         flexDirection: 'column',
     },
@@ -855,21 +868,6 @@ export function PopupCard(props: IPopupCardProps) {
                             paddingBottom: showSettings ? '0px' : '30px',
                         }}
                     >
-                        {props.showSettings && (
-                            <StatefulTooltip
-                                content={showSettings ? t('Go to Translator') : t('Go to Settings')}
-                                showArrow
-                                placement='left'
-                            >
-                                <div className={styles.settingsIcon} onClick={() => setShowSettings((s) => !s)}>
-                                    {showSettings ? (
-                                        <AiOutlineTranslation size='14' />
-                                    ) : (
-                                        <IoSettingsOutline size='14' />
-                                    )}
-                                </div>
-                            </StatefulTooltip>
-                        )}
                         {showSettings ? (
                             <Settings
                                 onSave={(oldSettings) => {
@@ -1337,6 +1335,23 @@ export function PopupCard(props: IPopupCardProps) {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        )}
+                        {props.showSettings && (
+                            <div className={styles.footer}>
+                                <StatefulTooltip
+                                    content={showSettings ? t('Go to Translator') : t('Go to Settings')}
+                                    showArrow
+                                    placement='right'
+                                >
+                                    <div onClick={() => setShowSettings((s) => !s)}>
+                                        {showSettings ? (
+                                            <AiOutlineTranslation size='14' />
+                                        ) : (
+                                            <IoSettingsOutline size='14' />
+                                        )}
+                                    </div>
+                                </StatefulTooltip>
                             </div>
                         )}
                         <Toaster />

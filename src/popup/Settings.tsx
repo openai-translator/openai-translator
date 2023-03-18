@@ -176,17 +176,17 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
             value={
                 props.value
                     ? [
-                          {
-                              id: props.value,
-                              label: options.find((option) => option.id === props.value)?.label || 'en',
-                          },
-                      ]
+                        {
+                            id: props.value,
+                            label: options.find((option) => option.id === props.value)?.label || 'en',
+                        },
+                    ]
                     : undefined
             }
             onChange={(params) => {
                 props.onChange?.(params.value[0].id as string)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ;(i18n as any).changeLanguage(params.value[0].id as string)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ; (i18n as any).changeLanguage(params.value[0].id as string)
             }}
             options={options}
         />
@@ -447,8 +447,9 @@ export function Settings(props: IPopupProps) {
     return (
         <div
             style={{
-                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
-                minWidth: 400,
+                paddingTop: '98px',
+                paddingBottom: "32px",
+                background: themeType === 'dark' ? '#1f1f1f' : '#fff'
             }}
         >
             <style>{formStyles}</style>
@@ -456,7 +457,11 @@ export function Settings(props: IPopupProps) {
                 <BaseProvider theme={theme}>
                     <nav
                         style={{
-                            position: 'relative',
+                            position: 'fixed',
+                            left: 0,
+                            top: 0,
+                            zIndex:1,
+                            width: '100%',
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
