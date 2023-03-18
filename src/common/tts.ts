@@ -9,7 +9,8 @@ const langMap: Record<string, string> = {
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
     'yue': 'zh-HK',
-    'jp': 'jp-JP',
+    'wyw': 'zh-CN',
+    'ja': 'ja-JP',
     'ko': 'ko-KR',
     'fr': 'fr-FR',
     'de': 'de-DE',
@@ -39,6 +40,11 @@ export function speak({ text, lang, onFinish }: SpeakOptions) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
     utterance.text = text
-    utterance.lang = langMap[lang ?? 'en'] ?? 'en-US'
+    const langTag = langMap[lang ?? 'en'] ?? 'en-US'
+    const voices = speechSynthesis.getVoices().filter((v) => v.lang === langTag && v.default)
+    utterance.lang = langTag
+    if (voices.length > 0) {
+        utterance.voice = voices[0]
+    }
     speechSynthesis.speak(utterance)
 }
