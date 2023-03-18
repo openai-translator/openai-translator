@@ -165,6 +165,7 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
         { label: '简体中文', id: 'zh-Hans' },
         { label: '繁體中文', id: 'zh-Hant' },
         { label: '日本語', id: 'ja' },
+        { label: 'ไทย', id: 'th' },
     ]
 
     return (
