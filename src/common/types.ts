@@ -33,6 +33,7 @@ export type ThemeType = BaseThemeType | 'followTheSystem'
 export interface IThemedStyleProps {
     theme: Theme
     themeType: BaseThemeType
+    isDesktopApp?: boolean
 }
 
 export interface ISettings {

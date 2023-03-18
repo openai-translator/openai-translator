@@ -465,12 +465,15 @@ export function Settings(props: IPopupProps) {
 
     const { themeType } = useTheme()
 
+    const isDesktopApp = utils.isDesktopApp()
+
     return (
         <div
             style={{
-                paddingTop: '98px',
-                paddingBottom: '32px',
+                paddingTop: isDesktopApp ? '98px' : undefined,
+                paddingBottom: isDesktopApp ? '32px' : undefined,
                 background: themeType === 'dark' ? '#1f1f1f' : '#fff',
+                minWidth: isDesktopApp ? undefined : 400,
             }}
         >
             <style>{formStyles}</style>
@@ -478,9 +481,9 @@ export function Settings(props: IPopupProps) {
                 <BaseProvider theme={theme}>
                     <nav
                         style={{
-                            position: 'fixed',
-                            left: 0,
-                            top: 0,
+                            position: isDesktopApp ? 'fixed' : undefined,
+                            left: isDesktopApp ? 0 : undefined,
+                            top: isDesktopApp ? 0 : undefined,
                             zIndex: 1,
                             width: '100%',
                             display: 'flex',
