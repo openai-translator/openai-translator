@@ -25,8 +25,7 @@
         {
             "matches": ["<all_urls>"],
             "all_frames": true,
-            "js": ["js/content_script.js"],
-            "css": ["css/content_script.css"]
+            "js": ["js/content_script.js"]
         }
     ],
 
