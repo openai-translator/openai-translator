@@ -583,6 +583,9 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
+                        <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
+                            <HotkeyRecorder onBlur={onBlur} />
+                        </FormItem>
                         <div
                             style={{
                                 display: 'flex',

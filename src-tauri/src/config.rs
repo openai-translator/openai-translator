@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
+    pub ocr_hotkey: Option<String>,
     pub restore_previous_position: Option<bool>,
 }
 

@@ -19,6 +19,7 @@
   "Theme": "主题",
   "i18n": "语言",
   "Hotkey": "快捷键",
+  "OCR Hotkey": "OCR 快捷键",
   "Please press the hotkey you want to set.": "请按您要设置的快捷键。",
   "Click above to set hotkeys.": "点击上面设置快捷键。",
   "Save": "保存",

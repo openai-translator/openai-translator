@@ -28,6 +28,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     defaultTargetLanguage: 1,
     alwaysShowIcons: 1,
     hotkey: 1,
+    ocrHotkey: 1,
     themeType: 1,
     i18n: 1,
     restorePreviousPosition: 1,

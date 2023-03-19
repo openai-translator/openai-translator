@@ -46,6 +46,7 @@ export interface ISettings {
     defaultTargetLanguage: string
     alwaysShowIcons: boolean
     hotkey?: string
+    ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
     restorePreviousPosition?: boolean

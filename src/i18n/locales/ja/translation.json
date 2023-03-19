@@ -19,6 +19,7 @@
   "Theme": "テーマ",
   "i18n": "語言",
   "Hotkey": "ホットキー",
+  "OCR Hotkey": "OCRホットキー",
   "Please press the hotkey you want to set.": "設定したいホットキーを押してください。",
   "Click above to set hotkeys.": "ホットキーを設定するには上をクリックしてください。",
   "Save": "保存",

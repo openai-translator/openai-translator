@@ -4,7 +4,7 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
-import { bindHotkey } from './utils'
+import { bindHotkey, bindOCRHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
 
@@ -45,6 +45,7 @@ export function App() {
 
     useEffect(() => {
         bindHotkey()
+        bindOCRHotkey()
     }, [])
 
     useEffect(() => {
@@ -145,6 +146,7 @@ export function App() {
                 containerStyle={isLinux ? undefined : { paddingTop: '20px' }}
                 onSettingsSave={(oldSettings) => {
                     bindHotkey(oldSettings.hotkey)
+                    bindOCRHotkey(oldSettings.ocrHotkey)
                 }}
             />
         </div>
