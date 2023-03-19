@@ -78,7 +78,7 @@
         "signingIdentity": null
       },
       "resources": [
-        "get-selected-text.applescript"
+        "resources/*"
       ],
       "shortDescription": "",
       "targets": "all",

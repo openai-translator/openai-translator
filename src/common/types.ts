@@ -45,6 +45,7 @@ export interface ISettings {
     defaultTranslateMode: TranslateMode | 'nop'
     defaultTargetLanguage: string
     hotkey?: string
+    ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
     restorePreviousPosition?: boolean
