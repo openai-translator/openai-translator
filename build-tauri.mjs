@@ -20,6 +20,7 @@ const config = {
     minify: true,
     legalComments: 'none',
     sourcemap: true,
+    target: "es2015",
     loader: {
         '.png': 'dataurl',
         '.jpg': 'dataurl',
