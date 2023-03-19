@@ -9,11 +9,6 @@
 // @icon            https://cdn.jsdelivr.net/gh/yetone/openai-translator@v0.1.0/public/icon.png
 // @match           *://*/*
 // @require         https://cdn.jsdelivr.net/gh/yetone/openai-translator@v0.1.0/dist/userscript/index.js
-// @grant           GM.setValue
-// @grant           GM.getValue
-// @grant           GM_xmlhttpRequest
-// @grant           GM_addStyle
-// @grant           GM_getResourceText
 // @license         MIT
 // ==/UserScript==
 
