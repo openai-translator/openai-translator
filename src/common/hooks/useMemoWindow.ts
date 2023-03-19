@@ -30,6 +30,8 @@ export const useMemoWindow = (props: WindowMemoProps) => {
         } else {
             localStorage.removeItem('_size')
         }
+        appWindow.unminimize()
+        appWindow.setFocus()
         appWindow.show()
     }, [])
 

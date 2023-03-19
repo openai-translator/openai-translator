@@ -18,6 +18,7 @@
   "Theme": "ธีม",
   "i18n": "ภาษา",
   "Hotkey": "ปุ่มลัด",
+  "OCR Hotkey": "ปุ่มลัด OCR",
   "Please press the hotkey you want to set.": "โปรดกดปุ่มลัดที่คุณต้องการกำหนดมัน",
   "Click above to set hotkeys.": "คลิกด้านบนเพื่อตั้งค่าปุ่มลัด",
   "Save": "บันทึก",

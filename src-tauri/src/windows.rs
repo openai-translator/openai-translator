@@ -98,6 +98,7 @@ pub fn show_main_window(center: bool) {
                     window.center().unwrap();
                 }
             }
+            window.unminimize().unwrap();
             window.set_focus().unwrap();
             window.show().unwrap();
         }

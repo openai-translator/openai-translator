@@ -4,9 +4,17 @@ use tauri::{
 };
 
 use crate::ALWAYS_ON_TOP;
-use crate::windows::set_main_window_always_on_top;
+use crate::config::get_config;
+use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
+use crate::ocr::ocr;
 
 pub fn menu() -> SystemTray {
+    let config = get_config().unwrap();
+    let mut ocr_text = String::from("OCR");
+    if let Some(ocr_hotkey) = config.ocr_hotkey {
+        ocr_text = format!("OCR ({})", ocr_hotkey);
+    }
+    let ocr: CustomMenuItem = CustomMenuItem::new("ocr".to_string(), ocr_text);
     let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "Show");
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
     let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
@@ -15,6 +23,8 @@ pub fn menu() -> SystemTray {
         pin.selected = ALWAYS_ON_TOP;
     }
     let tray_menu = SystemTrayMenu::new()
+        .add_item(ocr)
+        .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(show)
         .add_item(hide)
         .add_native_item(SystemTrayMenuItem::Separator)
@@ -36,24 +46,30 @@ pub fn menu() -> SystemTray {
 }
 
 pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
-    
-
     match event {
         SystemTrayEvent::LeftClick {
             position: _,
             size: _,
             ..
         } => {
-            let window = app.get_window("main").unwrap();
+            let window = app.get_window(MAIN_WIN_NAME).unwrap();
+            window.set_focus().unwrap();
+            window.unminimize().unwrap();
             window.show().unwrap();
         }
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+            "ocr" => {
+                ocr();
+            }
             "show" => {
-                let window = app.get_window("main").unwrap();
+                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                window.set_focus().unwrap();
                 window.show().unwrap();
             }
             "hide" => {
-                let window = app.get_window("main").unwrap();
+                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                window.set_focus().unwrap();
+                window.unminimize().unwrap();
                 window.hide().unwrap();
             }
             "pin" => {

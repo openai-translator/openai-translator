@@ -12,3 +12,14 @@ export async function bindHotkey(oldHotKey?: string) {
         invoke('show_main_window_with_selected_text')
     })
 }
+
+export async function bindOCRHotkey(oldOCRHotKey?: string) {
+    if (oldOCRHotKey && (await isRegistered(oldOCRHotKey))) {
+        await unregister(oldOCRHotKey)
+    }
+    const settings = await getSettings()
+    if (!settings.ocrHotkey) return
+    await register(settings.ocrHotkey, () => {
+        invoke('ocr')
+    })
+}
