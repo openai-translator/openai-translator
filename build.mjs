@@ -57,7 +57,6 @@ async function build() {
     const commonFiles = [
         { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'js/content_script.js' },
         { src: `${browserExtensionOutDir}/content_script/index.js.map`, dst: 'js/content_script.js.map' },
-        { src: `${browserExtensionOutDir}/content_script/index.css`, dst: 'css/content_script.css' },
         { src: `${browserExtensionOutDir}/background/index.js`, dst: 'js/background.js' },
         { src: `${browserExtensionOutDir}/options/index.js`, dst: 'js/options.js' },
         { src: `${browserExtensionOutDir}/options/index.css`, dst: 'css/options.css' },
@@ -87,8 +86,7 @@ async function build() {
     // userscript
     await copyFiles(
         [
-            { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' },
-            { src: `${browserExtensionOutDir}/content_script/index.css`, dst: 'index.css' },
+            { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' }
         ],
         `./${userscriptOutDir}`
     )
