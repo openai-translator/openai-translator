@@ -8,6 +8,7 @@ const userscriptOutDir = 'dist/userscript'
 
 async function esbuildBrowserExtension() {
     await esbuild.build({
+        target: ['es2015', 'safari11'],
         entryPoints: [
             'src/content_script/index.tsx',
             'src/background/index.ts',
@@ -56,7 +57,6 @@ async function build() {
     const commonFiles = [
         { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'js/content_script.js' },
         { src: `${browserExtensionOutDir}/content_script/index.js.map`, dst: 'js/content_script.js.map' },
-        { src: `${browserExtensionOutDir}/content_script/index.css`, dst: 'css/content_script.css' },
         { src: `${browserExtensionOutDir}/background/index.js`, dst: 'js/background.js' },
         { src: `${browserExtensionOutDir}/options/index.js`, dst: 'js/options.js' },
         { src: `${browserExtensionOutDir}/options/index.css`, dst: 'css/options.css' },
@@ -86,8 +86,7 @@ async function build() {
     // userscript
     await copyFiles(
         [
-            { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' },
-            { src: `${browserExtensionOutDir}/content_script/index.css`, dst: 'index.css' },
+            { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'index.js' }
         ],
         `./${userscriptOutDir}`
     )

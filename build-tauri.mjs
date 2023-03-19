@@ -13,6 +13,7 @@ const enableServe = process.argv.includes('--serve')
 
 const config = {
     entryPoints: ['src/tauri/index.tsx'],
+    target: ['es2015', 'safari11'],
     bundle: true,
     outdir: tauriOutDir,
     watch: enableWatch,
