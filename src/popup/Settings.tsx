@@ -65,6 +65,25 @@ interface ITranslateModeSelectorProps {
     onBlur?: () => void
 }
 
+interface AlwaysShowIconsCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function AlwaysShowIconsCheckbox(props: AlwaysShowIconsCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={props.value}
+            onChange={(e) => {
+                props.onChange?.(e.target.checked)
+                props.onBlur?.()
+            }}
+        />
+    )
+}
+
 interface AutoTranslateCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -457,6 +476,7 @@ export function Settings(props: IPopupProps) {
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
+        alwaysShowIcons: utils.defaultAlwaysShowIcons,
         hotkey: '',
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
@@ -481,7 +501,7 @@ export function Settings(props: IPopupProps) {
         setValues(values_)
     }, [])
 
-    const onSubmmit = useCallback(async (data: ISettings) => {
+    const onSubmit = useCallback(async (data: ISettings) => {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         await utils.setSettings(data)
@@ -544,7 +564,7 @@ export function Settings(props: IPopupProps) {
                         style={{
                             padding: '20px 25px',
                         }}
-                        onFinish={onSubmmit}
+                        onFinish={onSubmit}
                         initialValues={values}
                         onValuesChange={onChange}
                     >
@@ -584,6 +604,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                             <TranslateModeSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='alwaysShowIcons' label={t('Always show icons')}>
+                            <AlwaysShowIconsCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />

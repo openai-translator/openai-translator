@@ -171,10 +171,14 @@ async function main() {
                     const elem = event.target
                     text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0).trim()
                 }
+            } else {
+                const settings = await utils.getSettings()
+                if (settings.autoTranslate === true) {
+                    showPopupCard(event.pageX + 7, event.pageY + 7, text)
+                } else if (settings.alwaysShowIcons === true) {
+                    showPopupThumb(text, event.pageX + 7, event.pageY + 7)
+                }
             }
-            ;(await utils.getSettings()).autoTranslate === true && text
-                ? showPopupCard(event.pageX + 7, event.pageY + 7, text)
-                : showPopupThumb(text, event.pageX + 7, event.pageY + 7)
         })
     })
 

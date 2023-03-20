@@ -45,6 +45,7 @@ export interface ISettings {
     autoTranslate: boolean
     defaultTranslateMode: TranslateMode | 'nop'
     defaultTargetLanguage: string
+    alwaysShowIcons: boolean
     hotkey?: string
     ocrHotkey?: string
     themeType?: ThemeType
