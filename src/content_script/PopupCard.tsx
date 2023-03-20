@@ -1246,6 +1246,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                 icon: '👏',
                                                             })
                                                         }}
+                                                        options={{format: 'text/plain'}}
                                                     >
                                                         <div className={styles.actionButton}>
                                                             <RxCopy size={13} />
@@ -1351,6 +1352,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                                 icon: '👏',
                                                                             })
                                                                         }}
+                                                                        options={{format: 'text/plain'}}
                                                                     >
                                                                         <div className={styles.actionButton}>
                                                                             <RxCopy size={13} />
