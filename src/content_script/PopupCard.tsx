@@ -1239,7 +1239,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <div>
                                                     <CopyToClipboard
-                                                        format='text/plain'
+                                                        format={'text/plain'}
                                                         text={editableText}
                                                         onCopy={() => {
                                                             toast(t('Copy to clipboard'), {
