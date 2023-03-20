@@ -376,10 +376,10 @@ export function PopupCard(props: IPopupCardProps) {
 
     const { t, i18n } = useTranslation()
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const settings = await getSettings()
-            if (settings.i18n !== i18n.language) {
-                i18n.changeLanguage(settings.i18n)
+            if (settings.i18n !== (i18n as any).language) {
+                ;(i18n as any).changeLanguage(settings.i18n)
             }
         })()
     }, [])
