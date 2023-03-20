@@ -4,6 +4,7 @@ import { IBrowser, ISettings } from './types'
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
 export const defaultProvider = 'OpenAI'
+export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
@@ -21,6 +22,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     apiKeys: 1,
     apiURL: 1,
     apiURLPath: 1,
+    apiModel: 1,
     provider: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
@@ -45,6 +47,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.apiURLPath) {
         settings.apiURLPath = defaultAPIURLPath
+    }
+    if (!settings.apiModel) {
+        settings.apiModel = defaultAPIModel
     }
     if (!settings.provider) {
         settings.provider = defaultProvider

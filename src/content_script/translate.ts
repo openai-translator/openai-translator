@@ -5,6 +5,7 @@ import { fetchSSE } from './utils'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
 export type Provider = 'OpenAI' | 'Azure'
+export type APIModel = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0301' | 'gpt-4' | 'gpt-4-0314' | 'gpt-4-32k' | 'gpt-4-32k-0314'
 
 export interface TranslateQuery {
     text: string
@@ -111,7 +112,7 @@ export async function translate(query: TranslateQuery) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body: Record<string, any> = {
-        model: 'gpt-3.5-turbo',
+        model: settings.apiModel,
         temperature: 0,
         max_tokens: 1000,
         top_p: 1,
