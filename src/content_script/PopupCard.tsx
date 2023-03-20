@@ -371,7 +371,15 @@ export function PopupCard(props: IPopupCardProps) {
 
     const highlightRef = useRef<HighlightInTextarea | null>(null)
 
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    useEffect(() => {
+        ; (async () => {
+            const settings = await getSettings()
+            if (settings.i18n !== i18n.language) {
+                i18n.changeLanguage(settings.i18n)
+            }
+        })()
+    }, [])
 
     const [autoFocus, setAutoFocus] = useState(false)
 

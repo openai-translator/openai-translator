@@ -39,6 +39,10 @@ i18n.use(Backend)
         interpolation: {
             escapeValue: false,
         },
+        // prevent creating i18nextLng in localStorage for each domain
+        detection: {
+            caches: []
+        }
     })
 
 export default i18n
