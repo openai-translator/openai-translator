@@ -10,6 +10,7 @@ import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
+import '../i18n.js'
 
 let root: Root | null = null
 const generateId = createGenerateId()
