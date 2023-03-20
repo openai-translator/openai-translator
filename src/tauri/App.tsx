@@ -143,7 +143,7 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
-                containerStyle={isLinux ? undefined : { paddingTop: '20px' }}
+                containerStyle={isLinux ? undefined : { paddingTop: '26px' }}
                 onSettingsSave={(oldSettings) => {
                     bindHotkey(oldSettings.hotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)

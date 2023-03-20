@@ -88,15 +88,17 @@ const useStyles = createUseStyles({
         props.isDesktopApp
             ? {
                   'position': 'fixed',
+                  'backdropFilter': 'blur(10px)',
                   'zIndex': 1,
                   'left': 0,
-                  'top': '0',
+                  'top': 0,
                   'width': '100%',
                   'boxSizing': 'border-box',
                   'padding': '30px  10px 5px',
-                  'background': props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+                  'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
                   'display': 'flex',
                   'flexDirection': 'row',
+                  'flexFlow': 'row nowrap',
                   'cursor': 'move',
                   'alignItems': 'center',
                   'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
@@ -935,7 +937,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 overrides={{
                                                     Root: {
                                                         style: {
-                                                            minWidth: '100px',
+                                                            minWidth: '110px',
                                                         },
                                                     },
                                                 }}
@@ -972,7 +974,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 overrides={{
                                                     Root: {
                                                         style: {
-                                                            minWidth: '100px',
+                                                            minWidth: '110px',
                                                         },
                                                     },
                                                 }}
