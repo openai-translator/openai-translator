@@ -138,7 +138,7 @@ const useStyles = createUseStyles({
         cursor: 'unset',
     }),
     'paragraph': {
-        margin: '14px 0',
+        margin: '0.5em 0',
     },
     'popupCardHeaderButtonGroup': {
         display: 'flex',
