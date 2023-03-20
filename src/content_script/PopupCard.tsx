@@ -138,7 +138,10 @@ const useStyles = createUseStyles({
         cursor: 'unset',
     }),
     'paragraph': {
-        margin: '14px 0',
+        'margin': '0.5em 0',
+        '-ms-user-select': 'text',
+        '-webkit-user-select': 'text',
+        'user-select': 'text',
     },
     'popupCardHeaderButtonGroup': {
         display: 'flex',
@@ -1254,6 +1257,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                 icon: '👏',
                                                             })
                                                         }}
+                                                        options={{ format: 'text/plain' }}
                                                     >
                                                         <div className={styles.actionButton}>
                                                             <RxCopy size={13} />
@@ -1359,6 +1363,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                                 icon: '👏',
                                                                             })
                                                                         }}
+                                                                        options={{ format: 'text/plain' }}
                                                                     >
                                                                         <div className={styles.actionButton}>
                                                                             <RxCopy size={13} />

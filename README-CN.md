@@ -106,7 +106,7 @@ scoop install openai-translator
 
 ### 手动安装
 
-1.  去 [Latest Release](https://github.com/yetone/openai-translator/releases/latest) 页面下载对应芯片以 `.dmg` 的安装包
+1.  去 [Latest Release](https://github.com/yetone/openai-translator/releases/latest) 页面下载对应芯片以 `.dmg` 的安装包（Apple Silicon机器请使用aarch64版本，并注意执行下文`xattr`指令）
 2.  下载完成后双击安装包进行安装，然后将 `OpenAI Translator` 拖动到 `Applications` 文件夹。
 3.  开始使用吧！
 
@@ -124,7 +124,7 @@ scoop install openai-translator
           <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
         </p>
 
-    -   如果在 `隐私与安全性` 中找不到以上选项。打开 `Terminal.app`，并输入以下命令（中途可能需要输入密码），然后重启 `OpenAI Translator` 即可：
+    -   如果在 `隐私与安全性` 中找不到以上选项，或启动时提示文件损坏（Apple Silicon版本）。打开 `Terminal.app`，并输入以下命令（中途可能需要输入密码），然后重启 `OpenAI Translator` 即可：
 
         ```sh
         sudo xattr -d com.apple.quarantine /Applications/OpenAI\ Translator.app

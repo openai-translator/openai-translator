@@ -12,7 +12,7 @@ import { createForm } from '../components/Form'
 import formStyles from 'inline:../components/Form/index.module.css'
 import { Button } from 'baseui-sd/button'
 import './index.css'
-import { TranslateMode, Provider } from '../content_script/translate'
+import { TranslateMode, Provider, APIModel } from '../content_script/translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { supportLanguages } from '../content_script/lang'
@@ -188,6 +188,45 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
                 props.onChange?.(params.value[0].id as string)
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ;(i18n as any).changeLanguage(params.value[0].id as string)
+            }}
+            options={options}
+        />
+    )
+}
+
+interface APIModelSelectorProps {
+    value?: string
+    onChange?: (value: string) => void
+    onBlur?: () => void
+}
+
+function APIModelSelector(props: APIModelSelectorProps) {
+    const options = [
+        { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
+        { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
+        { label: 'gpt-4', id: 'gpt-4' },
+        { label: 'gpt-4-0314', id: 'gpt-4-0314' },
+        { label: 'gpt-4-32k', id: 'gpt-4-32k' },
+        { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
+    ]
+
+    return (
+        <Select
+            size='compact'
+            onBlur={props.onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                props.value
+                    ? [
+                          {
+                              id: props.value,
+                          },
+                      ]
+                    : undefined
+            }
+            onChange={(params) => {
+                props.onChange?.(params.value[0].id as APIModel)
             }}
             options={options}
         />
@@ -413,6 +452,7 @@ export function Settings(props: IPopupProps) {
         apiKeys: '',
         apiURL: utils.defaultAPIURL,
         apiURLPath: utils.defaultAPIURLPath,
+        apiModel: utils.defaultAPIModel,
         provider: utils.defaultProvider,
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
@@ -532,6 +572,9 @@ export function Settings(props: IPopupProps) {
                             }
                         >
                             <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='apiModel' label={t('API Model')}>
+                            <APIModelSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem required name='apiURL' label={t('API URL')}>
                             <Input size='compact' onBlur={onBlur} />
