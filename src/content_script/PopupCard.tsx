@@ -138,7 +138,10 @@ const useStyles = createUseStyles({
         cursor: 'unset',
     }),
     'paragraph': {
-        margin: '14px 0',
+        'margin': '0.5em 0',
+        '-ms-user-select': 'text',
+        '-webkit-user-select': 'text',
+        'user-select': 'text',
     },
     'popupCardHeaderButtonGroup': {
         display: 'flex',
