@@ -34,5 +34,6 @@
   "OpenAI page": "OpenAI page",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.",
   "Restore Previous Position": "Restore Previous Position",
-  "API Model": "API Model"
+  "API Model": "API Model",
+  "Chars Limited": "The number of characters exceeds the limit"
 }

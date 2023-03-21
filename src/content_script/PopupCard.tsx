@@ -679,8 +679,15 @@ export function PopupCard(props: IPopupCardProps) {
             const afterTranslate = (reason: string) => {
                 stopLoading()
                 if (reason !== 'stop') {
-                    setActionStr('Error')
-                    setErrorMessage(`${actionStr} failed: ${reason}`)
+                    if (reason == 'length') {
+                        toast(t('Chars Limited'), {
+                            duration: 5000,
+                            icon: '👏',
+                        })
+                    } else {
+                        setActionStr('Error')
+                        setErrorMessage(`${actionStr} failed: ${reason}`)
+                    }
                 } else {
                     let actionStr = actionStrItem.afterStr
                     if (translateMode === 'translate' && detectFrom == detectTo) {
