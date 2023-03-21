@@ -34,5 +34,6 @@
   "OpenAI page": "OpenAI 頁面",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "獲取您的 API 密鑰。您可以使用英文逗號分隔多個 API 密鑰，以實現配額加倍和負載均衡。",
   "Restore Previous Position": "恢復上次位置",
-  "API Model": "API 模型"
+  "API Model": "API 模型",
+  "Chars Limited": "字數超出限制"
 }

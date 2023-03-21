@@ -34,5 +34,6 @@
   "OpenAI page": "OpenAIのページ",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "にアクセスして、APIキーを取得してください。複数のAPIキーをカンマで区切ることで、利用制限を緩和し、システムへの負荷を軽減することができます。",
   "Restore Previous Position": "以前の位置を復元",
-  "API Model": "API モデル"
+  "API Model": "API モデル",
+  "Chars Limited": "文字数が制限を超えています"
 }
