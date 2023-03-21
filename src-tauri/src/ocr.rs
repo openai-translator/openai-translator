@@ -20,7 +20,7 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
 
 
     let output = std::process::Command::new(bin_path)
-        .args(&["-l", "zh-Hans"])
+        .args(&["-l", "zh"])
         .output()
         .expect("failed to execute ocr binary");
 
