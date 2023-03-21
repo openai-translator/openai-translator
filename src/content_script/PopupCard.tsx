@@ -682,7 +682,7 @@ export function PopupCard(props: IPopupCardProps) {
                     if (reason == 'length') {
                         toast(t('Chars Limited'), {
                             duration: 5000,
-                            icon: '👏',
+                            icon: '😥',
                         })
                     } else {
                         setActionStr('Error')
