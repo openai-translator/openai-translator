@@ -10,7 +10,7 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "sourceMap": false,
-        "rootDir": "src",
+        "rootDir": ".",
         "outDir": "dist/js",
         "moduleResolution": "node",
         "noEmit": true,
