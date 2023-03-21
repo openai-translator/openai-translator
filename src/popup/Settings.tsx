@@ -533,7 +533,7 @@ export function Settings(props: IPopupProps) {
                 paddingTop: isDesktopApp ? '98px' : undefined,
                 paddingBottom: isDesktopApp ? '32px' : undefined,
                 background: themeType === 'dark' ? '#1f1f1f' : '#fff',
-                minWidth: isDesktopApp ? undefined : 400,
+                minWidth: isDesktopApp ? 450 : 400,
             }}
         >
             <style>{formStyles}</style>

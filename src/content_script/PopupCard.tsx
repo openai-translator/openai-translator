@@ -134,10 +134,13 @@ const useStyles = createUseStyles({
         'user-select': 'none',
     },
     'iconText': (props: IThemedStyleProps) => ({
-        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
-        fontSize: '12px',
-        fontWeight: 600,
-        cursor: 'unset',
+        'color': props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        'fontSize': '12px',
+        'fontWeight': 600,
+        'cursor': 'unset',
+        '@media screen and (max-width: 570px)': {
+            display: props.isDesktopApp ? 'none' : undefined,
+        },
     }),
     'paragraph': {
         'margin': '0.5em 0',
@@ -145,21 +148,28 @@ const useStyles = createUseStyles({
         '-webkit-user-select': 'text',
         'user-select': 'text',
     },
-    'popupCardHeaderButtonGroup': {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: '5px',
-        marginLeft: '10px',
-    },
-    'popupCardHeaderActionsContainer': {
-        display: 'flex',
-        flexShrink: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: '5px 10px',
-        gap: '10px',
-    },
+    'popupCardHeaderButtonGroup': (props: IThemedStyleProps) => ({
+        'display': 'flex',
+        'flexDirection': 'row',
+        'alignItems': 'center',
+        'gap': '5px',
+        'marginLeft': '10px',
+        '@media screen and (max-width: 460px)': {
+            marginLeft: props.isDesktopApp ? '5px' : undefined,
+        },
+    }),
+    'popupCardHeaderActionsContainer': (props: IThemedStyleProps) => ({
+        'display': 'flex',
+        'flexShrink': 0,
+        'flexDirection': 'row',
+        'alignItems': 'center',
+        'padding': '5px 10px',
+        'gap': '10px',
+        '@media screen and (max-width: 460px)': {
+            padding: props.isDesktopApp ? '5px 0' : undefined,
+            gap: props.isDesktopApp ? '5px' : undefined,
+        },
+    }),
     'from': {
         display: 'flex',
         color: '#999',
@@ -299,26 +309,6 @@ const useStyles = createUseStyles({
     'OCRStatusBar': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,
     }),
-    '@media screen and (max-width: 570px)': (props: IThemedStyleProps) =>
-        props.isDesktopApp
-            ? {
-                  iconText: {
-                      display: 'none',
-                  },
-              }
-            : undefined,
-    '@media screen and (max-width: 460px)': (props: IThemedStyleProps) =>
-        props.isDesktopApp
-            ? {
-                  popupCardHeaderActionsContainer: {
-                      padding: '5px 0',
-                      gap: '5px',
-                  },
-                  popupCardHeaderButtonGroup: {
-                      marginLeft: '5px',
-                  },
-              }
-            : undefined,
 })
 
 interface IActionStrItem {
