@@ -24,6 +24,7 @@ import { useTheme } from '../common/hooks/useTheme'
 import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
+import AppConfig from '../../package.json'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -557,7 +558,24 @@ export function Settings(props: IPopupProps) {
                         data-tauri-drag-region
                     >
                         <img width='22' src={icon} alt='logo' />
-                        <h2>OpenAI Translator</h2>
+                        <h2>
+                            OpenAI Translator
+                            {AppConfig?.version ? (
+                                <a
+                                    href='https://github.com/yetone/openai-translator/releases'
+                                    target='_blank'
+                                    rel='noreferrer'
+                                    style={{
+                                        fontSize: '0.65em',
+                                        marginLeft: '5px',
+                                        color: 'unset',
+                                        textDecoration: 'none',
+                                    }}
+                                >
+                                    {AppConfig.version}
+                                </a>
+                            ) : null}
+                        </h2>
                     </nav>
                     <Form
                         form={form}
