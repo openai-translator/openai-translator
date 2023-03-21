@@ -1273,11 +1273,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 >
                                                     <div>{actionStr}</div>
                                                     {isLoading ? (
-                                                        <span className={styles.writing} />
+                                                        <span className={styles.writing} key={'1'} />
                                                     ) : errorMessage ? (
-                                                        <span>😢</span>
+                                                        <span key={'2'}>😢</span>
                                                     ) : (
-                                                        <span>👍</span>
+                                                        <span key={'3'}>👍</span>
                                                     )}
                                                 </div>
                                             )}
