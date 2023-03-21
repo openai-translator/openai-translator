@@ -50,6 +50,7 @@ dependencies = [
  "mouse_position",
  "objc",
  "once_cell",
+ "parking_lot",
  "rdev",
  "serde",
  "serde_json",

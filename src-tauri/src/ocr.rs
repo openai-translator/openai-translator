@@ -8,10 +8,8 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
     use crate::{CPU_VENDOR, APP_HANDLE};
 
     let mut rel_path = "resources/bin/ocr_intel".to_string();
-    unsafe {
-        if CPU_VENDOR == "Apple" {
-            rel_path = "resources/bin/ocr_apple".to_string();
-        }
+    if *CPU_VENDOR.lock() == "Apple" {
+        rel_path = "resources/bin/ocr_apple".to_string();
     }
 
     let bin_path = APP_HANDLE.get().unwrap().path_resolver()

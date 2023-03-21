@@ -8,6 +8,7 @@ use window_shadows::set_shadow;
 #[cfg(target_os = "linux")]
 use window_shadows::set_shadow;
 use mouse_position::mouse_position::Mouse;
+use std::sync::atomic::Ordering;
 
 pub const MAIN_WIN_NAME: &str = "main";
 
@@ -24,25 +25,24 @@ pub fn set_main_window_always_on_top() -> bool  {
     let handle = APP_HANDLE.get().unwrap();
     let window = handle.get_window(MAIN_WIN_NAME).unwrap();
     let item = handle.tray_handle().get_item("pin");
-    unsafe {
-        if !ALWAYS_ON_TOP {
-            window.set_always_on_top(true).unwrap();
-            ALWAYS_ON_TOP = true;
-            item.set_selected(true).unwrap();
-        } else {
-            window.set_always_on_top(false).unwrap();
-            ALWAYS_ON_TOP = false;
-            item.set_selected(false).unwrap();
-        }
-        ALWAYS_ON_TOP
+
+    let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
+
+    if !always_on_top {
+        window.set_always_on_top(true).unwrap();
+        ALWAYS_ON_TOP.store(true, Ordering::Release);
+        item.set_selected(true).unwrap();
+    } else {
+        window.set_always_on_top(false).unwrap();
+        ALWAYS_ON_TOP.store(false, Ordering::Release);
+        item.set_selected(false).unwrap();
     }
+    ALWAYS_ON_TOP.load(Ordering::Acquire)
 }
 
 #[tauri::command]
 pub fn get_main_window_always_on_top() -> bool {
-    unsafe {
-        crate::ALWAYS_ON_TOP
-    }
+    ALWAYS_ON_TOP.load(Ordering::Acquire)
 }
 
 #[tauri::command]
