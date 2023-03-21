@@ -1159,7 +1159,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                   )
                                                         }
                                                         onChange={(e) => setEditableText(e.target.value)}
-                                                        onKeyDown={(e) => {
+                                                        onKeyPress={(e) => {
                                                             if (e.key === 'Enter') {
                                                                 if (!e.shiftKey) {
                                                                     e.preventDefault()
