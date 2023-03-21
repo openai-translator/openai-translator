@@ -47,7 +47,25 @@ export async function translate(query: TranslateQuery) {
                     assistantPrompt = '翻譯成台灣常用用法之繁體中文白話文'
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
+                } else if (query.text.length < 5 && settings.defaultTargetLanguage === 'zh-Hans') {
+                    // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
+                    systemPrompt = `你是一个翻译引擎，请将给到的文本翻译成${
+                        lang.langMap.get(query.detectTo) || query.detectTo
+                    }.请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标、词性、双语示例。按照下面格式用中文阐述：
+                        <序号><单词或短语> · /<音标>/
+                        [<词性缩写>] <适用语境（用中文阐述）>
+                        例句：<例句>(例句翻译)`
+                    assistantPrompt = ''
                 }
+            }
+            if (toChinese) {
+                // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
+                systemPrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，请严格按照下面格式给到翻译结果：
+                <原始文本>
+                [<语种>] · / <单词音标> /
+                [<词性缩写>] <中文含义>]
+                例句：
+                <序号><例句>(例句翻译)`
             }
             if (query.selectedWord) {
                 // 在选择的句子中，选择特定的单词。触发语境学习功能。
