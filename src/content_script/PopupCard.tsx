@@ -32,6 +32,7 @@ import rocket from './assets/images/rocket.gif'
 import partyPopper from './assets/images/party-popper.gif'
 import { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
+import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../common/highlight-in-textarea'
 import LRUCache from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../common/types'
@@ -1071,6 +1072,9 @@ export function PopupCard(props: IPopupCardProps) {
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
+                                    <div>
+                                        <IpLocationNotification />
+                                    </div>
                                     <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
                                         <div
                                             style={{
