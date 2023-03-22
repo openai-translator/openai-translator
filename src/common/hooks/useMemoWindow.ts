@@ -12,33 +12,38 @@ export type WindowMemoProps = {
  * memorized window props
  */
 export const useMemoWindow = (props: WindowMemoProps) => {
-    useLayoutEffect(() => {
-        try {
-            if (props.position) {
-                const storagePosition = localStorage.getItem('_position')
-                if (storagePosition) {
-                    const { x, y } = JSON.parse(storagePosition)
-                    appWindow.setPosition(new PhysicalPosition(x, y))
+    useEffect(() => {
+        const initWindow = async () => {
+            try {
+                if (props.position) {
+                    const storagePosition = localStorage.getItem('_position')
+                    if (storagePosition) {
+                        const { x, y } = JSON.parse(storagePosition)
+                        await appWindow.setPosition(new PhysicalPosition(x, y))
+                    } else {
+                        await appWindow.center()
+                    }
+                } else {
+                    localStorage.removeItem('_position')
                 }
-            } else {
-                localStorage.removeItem('_position')
-            }
-            if (props.size) {
-                const storageSize = localStorage.getItem('_size')
-                if (storageSize) {
-                    const { height, width } = JSON.parse(storageSize)
-                    appWindow.setSize(new PhysicalSize(width, height))
+                if (props.size) {
+                    const storageSize = localStorage.getItem('_size')
+                    if (storageSize) {
+                        const { height, width } = JSON.parse(storageSize)
+                        await appWindow.setSize(new PhysicalSize(width, height))
+                    }
+                } else {
+                    localStorage.removeItem('_size')
                 }
-            } else {
-                localStorage.removeItem('_size')
+            } catch (e) {
+                console.error(e)
+            } finally {
+                await appWindow.unminimize()
+                await appWindow.setFocus()
+                await appWindow.show()
             }
-        } catch (e) {
-            console.error(e)
-        } finally {
-            appWindow.unminimize()
-            appWindow.setFocus()
-            appWindow.show()
         }
+        initWindow()
     }, [])
 
     useEffect(() => {
