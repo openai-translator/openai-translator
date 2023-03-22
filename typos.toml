@@ -2,4 +2,4 @@
 [default.extend-words]
 Readed = "Readed"
 [files]
-extend-exclude = ["public/*", "dist/*", "src/common/geo-data.ts"]
+extend-exclude = ["public/*", "dist/*"]
