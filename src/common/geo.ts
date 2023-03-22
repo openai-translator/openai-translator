@@ -1,6 +1,6 @@
 import { userscriptFetch } from './userscript-polyfill'
 import { isUserscript } from './utils'
-import { ALLOWED_COUNTRY_CODES } from './geo-data'
+import { ALLOWED_COUNTRY_CODES } from './geo-data' // a separate file for bypassing spell check
 
 export interface IpLocation {
     supported: boolean
@@ -34,34 +34,42 @@ interface GeoPluginData {
     geoplugin_currencyConverter: number
 }
 
+function parseResponse(response: string): Record<string, string> {
+    console.log(response)
+    const params: Record<string, string> = {}
+    const pairs = response.split('\n')
+    for (const pair of pairs) {
+        const [key, value] = pair.split('=')
+        if (key && value) {
+            params[key.trim()] = value.trim()
+        }
+    }
+    return params
+}
+
 export async function getIpLocationInfo(): Promise<IpLocation> {
     const fetch = isUserscript() ? userscriptFetch : window.fetch
 
-    const geoPluginPromise = fetch('http://www.geoplugin.net/json.gp', { cache: 'no-store' })
+    // GeoPlugin is accessible in China, so try this first.
+    // Promise.All will take a long time to wait for timeout when OpenAI is blocked.
+    const [geoPluginCode, geoPluginName] = await fetch('http://www.geoplugin.net/json.gp', { cache: 'no-store' })
         .then((response) => response.json() as GeoPluginData)
         .then((data) => [data.geoplugin_countryCode, data.geoplugin_countryName])
-        .catch((_) => ['', ''])
+        .catch(() => ['', ''])
+    if (geoPluginCode !== '' && !ALLOWED_COUNTRY_CODES.has(geoPluginCode))
+        return { supported: false, name: geoPluginName }
 
-    const openAiPromise = fetch('https://chat.openai.com/cdn-cgi/trace', { cache: 'no-store' })
+    // GeoPlugin's data is less accurate. Some unsupported IP addresses can only be detected by OpenAI.
+    const openAiCode = await fetch(
+        'https://chat.openai.com/cdn-cgi/trace', // API endpoint of OpenAI's CDN that returns location information. No authentication needed.
+        { cache: 'no-store' }
+    )
         .then((response) => response.text() as string)
-        .then((body) => {
-            const match = body.match(/loc=(.*)/)
-            if (match && match[1]) {
-                return match[1]
-            }
-            return ''
-        })
+        .then(parseResponse)
+        .then((o) => o['loc'] || '')
         .catch(() => '')
-    // API endpoint of OpenAI's CDN that returns location information. No authentication needed.
-
-    const [geoPluginData, openAiCode] = await Promise.all([geoPluginPromise, openAiPromise])
-    const [geoPluginCode, geoPluginName] = geoPluginData
-    const atLeaseOneSuccessful = openAiCode !== '' || geoPluginCode !== ''
-    if (!atLeaseOneSuccessful) return { supported: false }
-    const code = openAiCode || geoPluginCode
-    // GeoPlugin's data is less accurate. If the two results differ, use the one from OpenAI.
     return {
-        supported: ALLOWED_COUNTRY_CODES.has(code),
-        name: geoPluginCode == openAiCode ? geoPluginName : openAiCode,
+        supported: ALLOWED_COUNTRY_CODES.has(openAiCode),
+        name: openAiCode,
     }
 }
