@@ -35,15 +35,33 @@ interface GeoPluginData {
 }
 
 export async function getIpLocationInfo(): Promise<IpLocation> {
-    try {
-        const fetch = isUserscript() ? userscriptFetch : window.fetch
-        const response = await fetch('http://www.geoplugin.net/json.gp', { cache: 'no-store' })
-        const data = (await response.json()) as GeoPluginData
-        return {
-            supported: ALLOWED_COUNTRY_CODES.has(data.geoplugin_countryCode),
-            name: data.geoplugin_countryName,
-        }
-    } catch (e) {
-        return { supported: false }
+    const fetch = isUserscript() ? userscriptFetch : window.fetch
+
+    const geoPluginPromise = fetch('http://www.geoplugin.net/json.gp', { cache: 'no-store' })
+        .then((response) => response.json() as GeoPluginData)
+        .then((data) => [data.geoplugin_countryCode, data.geoplugin_countryName])
+        .catch((_) => ['', ''])
+
+    const openAiPromise = fetch('https://chat.openai.com/cdn-cgi/trace', { cache: 'no-store' })
+        .then((response) => response.text() as string)
+        .then((body) => {
+            const match = body.match(/loc=(.*)/)
+            if (match && match[1]) {
+                return match[1]
+            }
+            return ''
+        })
+        .catch(() => '')
+    // API endpoint of OpenAI's CDN that returns location information. No authentication needed.
+
+    const [geoPluginData, openAiCode] = await Promise.all([geoPluginPromise, openAiPromise])
+    const [geoPluginCode, geoPluginName] = geoPluginData
+    const atLeaseOneSuccessful = openAiCode !== '' || geoPluginCode !== ''
+    if (!atLeaseOneSuccessful) return { supported: false }
+    const code = openAiCode || geoPluginCode
+    // GeoPlugin's data is less accurate. If the two results differ, use the one from OpenAI.
+    return {
+        supported: ALLOWED_COUNTRY_CODES.has(code),
+        name: geoPluginCode == openAiCode ? geoPluginName : openAiCode,
     }
 }

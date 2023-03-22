@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { Trans } from 'react-i18next'
 import { Notification, KIND as NOTIFICATION_KIND } from 'baseui-sd/notification'
 import { StyledLink } from 'baseui-sd/link'
 import { IpLocation, getIpLocationInfo } from '../common/geo'
 
 export default function IpLocationNotification() {
-    const { t } = useTranslation()
-
     const [ipLocation, setIpLocation] = useState<IpLocation | null>(null)
     useEffect(() => {
         ;(async () => {
