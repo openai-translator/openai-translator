@@ -35,5 +35,7 @@
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "獲取您的 API 密鑰。您可以使用英文逗號分隔多個 API 密鑰，以實現配額加倍和負載均衡。",
   "Restore Previous Position": "恢復上次位置",
   "API Model": "API 模型",
-  "Chars Limited": "字數超出限制"
+  "Chars Limited": "字數超出限制",
+  "Country Not Supported": "您的 IP 屬地為 {{name}}，不在 OpenAI <0>支援的地區</0> 範圍內。如果不進行額外的網路配置繼續使用，即使訂閱了 ChatGPT Plus 或賬戶內仍有餘額，您的賬戶也會被 OpenAI 封锁。",
+  "Country Not Detected": "我們無法檢查您的 IP 地址是否位於 OpenAI 的<0>支援的地區</0>。請確保您在支援的位置訪問 API，否則即使訂閱了 ChatGPT Plus 或賬號內仍有餘額，您的賬戶也會被 OpenAI 封锁。"
 }

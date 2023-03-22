@@ -35,5 +35,7 @@
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "にアクセスして、APIキーを取得してください。複数のAPIキーをカンマで区切ることで、利用制限を緩和し、システムへの負荷を軽減することができます。",
   "Restore Previous Position": "以前の位置を復元",
   "API Model": "API モデル",
-  "Chars Limited": "文字数が制限を超えています"
+  "Chars Limited": "文字数が制限を超えています",
+  "Country Not Supported": "IP アドレスは {{name}} からであり、それは OpenAI の<0>対応していない地域</0>です。追加のネットワーク設定なしで使用を続けると、ChatGPT Plus のサブスクリプション状況やアカウント残高に関わらず、OpenAI によってアカウントがブロックされる可能性があります。",
+  "Country Not Detected": "IP アドレスが OpenAI の<0>対応地域</0>にあるかどうかを確認できませんでした。API に対してサポートされている場所からアクセスしていることを確認してください。そうしない場合、GPT Plus のサブスクリプション状況やアカウント残高に関わらず、アカウントがブロックされる可能性があります。"
 }
