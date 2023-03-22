@@ -34,7 +34,6 @@ i18n.use(Backend)
     .init({
         resources,
         fallbackLng: 'en',
-        debug: true,
 
         interpolation: {
             escapeValue: false,
