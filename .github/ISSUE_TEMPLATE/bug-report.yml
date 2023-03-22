@@ -32,9 +32,9 @@ body:
       attributes:
           label: Please read README
           description: |
-            辛苦提 Bug 前（尤其是桌面端划词不出现图标、权限弹窗、报告文件已损坏的部分），仔细阅读一下 README 中的 Troubleshooting(https://github.com/yetone/openai-translator/tree/main#troubleshooting) 是否已经给出相关解决方案
+            辛苦提 Bug 前（尤其是桌面端应用划词不出现图标、权限弹窗、报告文件已损坏的部分），请仔细阅读一下 README 中的 Troubleshooting(https://github.com/yetone/openai-translator/tree/main#troubleshooting) 是否已经给出相关解决方案
             
-            Before reporting bugs (especially for issues such as missing icon when selecting text on desktop, permission pop-ups, and damaged report files), please carefully read the Troubleshooting section in README (https://github.com/yetone/openai-translator/tree/main#troubleshooting) to see if there are any relevant solutions provided.
+            Before reporting bugs (especially for issues such as missing icons in the desktop application, permission pop-ups, and damaged report files), please carefully read the Troubleshooting section in README (https://github.com/yetone/openai-translator/tree/main#troubleshooting) to see if relevant solutions have already been provided.
             
           options:
               - label: I have read the troubleshooting section in the README in detail.
