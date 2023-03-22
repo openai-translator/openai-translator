@@ -7,6 +7,7 @@ use crate::ALWAYS_ON_TOP;
 use crate::config::get_config;
 use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
 use crate::ocr::ocr;
+use std::sync::atomic::Ordering;
 
 pub fn menu() -> SystemTray {
     let config = get_config().unwrap();
@@ -19,9 +20,7 @@ pub fn menu() -> SystemTray {
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
     let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    unsafe {
-        pin.selected = ALWAYS_ON_TOP;
-    }
+    pin.selected = ALWAYS_ON_TOP.load(Ordering::Acquire);
     let tray_menu = SystemTrayMenu::new()
         .add_item(ocr)
         .add_native_item(SystemTrayMenuItem::Separator)

@@ -10,7 +10,9 @@ mod utils;
 mod windows;
 mod ocr;
 
+use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
+use parking_lot::Mutex;
 
 use crate::config::get_config_content;
 use crate::windows::{MAIN_WIN_NAME, show_main_window_with_selected_text, get_main_window_always_on_top, set_main_window_always_on_top};
@@ -24,8 +26,8 @@ use tauri::api::notification::Notification;
 use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
-pub static mut ALWAYS_ON_TOP: bool = false;
-pub static mut CPU_VENDOR: String = String::new();
+pub static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
+pub static CPU_VENDOR: Mutex<String> = Mutex::new(String::new());
 
 #[derive(Clone, serde::Serialize)]
 struct Payload {
@@ -52,11 +54,10 @@ fn query_accessibility_permissions() -> bool {
 fn main() {
     let mut sys = System::new();
     sys.refresh_cpu(); // Refreshing CPU information.
-    sys.cpus().iter().for_each(|cpu| {
-        unsafe {
-            CPU_VENDOR = cpu.vendor_id().to_string();
-        }
-    });
+    if let Some(cpu) = sys.cpus().first() {
+        let vendor_id = cpu.vendor_id().to_string();
+        *CPU_VENDOR.lock() = vendor_id;
+    }
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             println!("{}, {argv:?}, {cwd}", app.package_info().name);
