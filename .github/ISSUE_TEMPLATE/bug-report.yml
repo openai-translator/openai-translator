@@ -11,6 +11,7 @@ body:
             有关讨论、建议或者咨询的内容请去往[讨论区](https://github.com/yetone/openai-translator/discussions)。
 
             For suggestions or help, please consider using [Github Discussion](https://github.com/yetone/openai-translator/discussions) instead.
+
     - type: checkboxes
       attributes:
           label: Please search before asking
@@ -22,6 +23,7 @@ body:
             Please search [issues](https://github.com/yetone/openai-translator/issues) to check if your issue has already been reported.
             
             Not related to bugs, please go to the [discussion area](https://github.com/yetone/openai-translator/discussions) for relevant discussions.
+
           options:
               - label: >
                     I searched in the [issues](https://github.com/yetone/openai-translator/issues) and found nothing similar.
@@ -33,17 +35,18 @@ body:
             辛苦提 Bug 前（尤其是桌面端划词不出现图标和权限弹窗部分），检索一下 README 中的 Troubleshooting(https://github.com/yetone/openai-translator/tree/main#troubleshooting) 是否已经给出相关解决方案
             
             Before submitting a bug report (especially regarding permissions), please search the Troubleshooting section in the README (https://github.com/yetone/openai-translator/tree/main#troubleshooting) to see if a solution has already been provided.
+
           options:
               - label: I have read the troubleshooting section in the README in detail.
                 required: true
-     - type: checkboxes
+    - type: checkboxes
       attributes:
           label: Please check your network and OpenAI API quota
           description: |
-            如果你遇到报错事 Failed to fetch 或者 API quota exceed，则说明是网络问题或者 OpenAI API 使用量超过阈值，这些问题都与 OpenAI Translator 无关，请自行解决
+            如果您遇到的报错是 Failed to fetch 或者 API quota exceed，则说明是网络问题或者 OpenAI API 使用量超过阈值，这些问题都与 OpenAI Translator 无关，请自行解决
             
             If you encounter error messages such as 'Failed to fetch' or 'API quota exceed', it means there is a network issue or the usage limit of OpenAI API has been exceeded. These issues are not related to OpenAI Translator, please resolve them on your own.
-            
+
           options:
               - label: I am sure it is not a network issue or an OpenAI API quota issue.
                 required: true
