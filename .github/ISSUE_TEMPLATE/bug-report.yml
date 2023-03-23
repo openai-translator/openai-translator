@@ -1,6 +1,6 @@
 name: Bug report
 description: Problems with the software
-title: '[Bug] '
+title: '[Bug] {{请输入标题，不要留空 - Please enter a title, do not leave it blank.}}'
 labels: ['bug']
 body:
     - type: markdown
