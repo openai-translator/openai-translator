@@ -133,8 +133,8 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
 }
 
 interface IThemeTypeSelectorProps {
-    value?: TranslateMode | 'nop'
-    onChange?: (value: TranslateMode | 'nop') => void
+    value?: ThemeType
+    onChange?: (value: ThemeType) => void
     onBlur?: () => void
 }
 
@@ -148,25 +148,22 @@ function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
             searchable={false}
             clearable={false}
             value={
-                props.value && [
-                    {
-                        id: props.value,
-                    },
-                ]
+                props.value
+                    ? [
+                          {
+                              id: props.value,
+                          },
+                      ]
+                    : []
             }
             onChange={(params) => {
-                props.onChange?.(params.value[0].id as TranslateMode | 'nop')
+                props.onChange?.(params.value[0].id as ThemeType)
             }}
-            options={
-                [
-                    { label: t('Follow the System'), id: 'followTheSystem' },
-                    { label: t('Dark'), id: 'dark' },
-                    { label: t('Light'), id: 'light' },
-                ] as {
-                    label: string
-                    id: ThemeType
-                }[]
-            }
+            options={[
+                { label: t('Follow the System'), id: 'followTheSystem' },
+                { label: t('Dark'), id: 'dark' },
+                { label: t('Light'), id: 'light' },
+            ]}
         />
     )
 }
@@ -302,6 +299,7 @@ const useHotkeyRecorderStyles = createUseStyles({
         cursor: 'pointer',
         border: '1px dashed transparent',
         backgroundColor: props.theme.colors.backgroundTertiary,
+        color: props.theme.colors.primary,
     }),
     'clearHotkey': {
         position: 'absolute',
@@ -524,8 +522,6 @@ export function Settings(props: IPopupProps) {
         }
     }, [values])
 
-    const { themeType } = useTheme()
-
     const isDesktopApp = utils.isDesktopApp()
 
     return (
@@ -533,7 +529,7 @@ export function Settings(props: IPopupProps) {
             style={{
                 paddingTop: isDesktopApp ? '98px' : undefined,
                 paddingBottom: isDesktopApp ? '32px' : undefined,
-                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
+                background: theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
             }}
         >
