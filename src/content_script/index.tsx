@@ -185,6 +185,7 @@ async function main() {
 
     browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'open-translator') {
+            if (window !== window.top) return
             const text = request.info.selectionText ?? ''
             showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
         }
