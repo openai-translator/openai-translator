@@ -1,4 +1,6 @@
 use tauri::Manager;
+use arboard::Clipboard;
+
 
 use crate::APP_HANDLE;
 
@@ -52,17 +54,20 @@ pub fn copy() {
 
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    let mut ctx: ClipboardContext = ClipboardProvider::new()?;
-    let current_text = ctx.get_contents()?;
+    let mut clipboard = Clipboard::new()?;
+    let current_text = clipboard.get_text()?;
     copy();
-    ctx.get_contents().map(|selected_text| {
-        if selected_text.trim() == current_text.trim() {
-            Ok("".to_string())
-        } else {
-            ctx.set_contents(current_text)
-                .and_then(|_| Ok(selected_text))
-        }
-    })?
+    let selected_text = clipboard.get_text()?;
+    // creat a new thread to restore the clipboard
+    let current_text_cloned = current_text.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        clipboard.set_text(&current_text_cloned).unwrap();
+    });
+    if selected_text.trim() == current_text.trim() {
+        return Ok(String::new());
+    }
+    Ok(selected_text)
 }
 
 #[cfg(target_os = "macos")]
@@ -74,19 +79,26 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
         .resolve_resource("resources/get-selected-text.applescript")
         .expect("failed to resolve ocr binary resource");
 
-    let output = std::process::Command::new("osascript")
-        .arg(apple_script)
-        .output()
-        .expect("failed to execute get-selected-text.applescript");
-
-    // check exit code
-    if output.status.success() {
-        // get output content
-        let content = String::from_utf8(output.stdout)
-            .expect("failed to parse get-selected-text.applescript output");
-        Ok(content)
-    } else {
-        Err("failed to execute get-selected-text.applescript".into())
+    match std::process::Command::new("osascript").arg(apple_script).output() {
+        Ok(output) => {
+            // check exit code
+            if output.status.success() {
+                // get output content
+                let content = String::from_utf8(output.stdout)
+                    .expect("failed to parse get-selected-text.applescript output");
+                // trim content
+                let content = content.trim();
+                Ok(content.to_string())
+            } else {
+                let err = output.stderr
+                    .into_iter()
+                    .map(|c| c as char)
+                    .collect::<String>()
+                    .into();
+                Err(err)
+            }
+        }
+        Err(e) => Err(Box::new(e)),
     }
 }
 

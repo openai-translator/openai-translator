@@ -145,6 +145,7 @@ export function App() {
                 editorRows={10}
                 containerStyle={isLinux ? undefined : { paddingTop: '26px' }}
                 onSettingsSave={(oldSettings) => {
+                    invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)
                 }}

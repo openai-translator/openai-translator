@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OpenAI Translator Thumb</title>
+    <script src="./thumb.js" defer></script>
+    <style>
+      html,
+      body {
+        padding: 0px;
+        margin: 0px;
+        height: 20px;
+        width: 20px;
+        overflow: hidden;
+        background: transparent;
+        user-select: none;
+      }
+      body * {
+        user-select: none;
+      }
+      .thumb {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+        padding: 2px;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+      .thumb:hover {
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

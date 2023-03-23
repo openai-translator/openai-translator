@@ -1,19 +1,32 @@
+use parking_lot::Mutex;
 use tauri::api::path::config_dir;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
     pub ocr_hotkey: Option<String>,
     pub restore_previous_position: Option<bool>,
+    pub always_show_icons: Option<bool>,
 }
 
+static CONFIG_CACHE: Mutex<Option<Config>> = Mutex::new(None);
+
 pub fn get_config() -> Result<Config, Box<dyn std::error::Error>> {
+    if let Some(config_cache) = &*CONFIG_CACHE.lock() {
+        return Ok(config_cache.clone());
+    }
     let config_content = get_config_content()?;
     let config: Config = serde_json::from_str(&config_content)?;
+    CONFIG_CACHE.lock().replace(config.clone());
     Ok(config)
+}
+
+#[tauri::command]
+pub fn clear_config_cache() {
+    CONFIG_CACHE.lock().take();
 }
 
 #[tauri::command]
