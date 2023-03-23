@@ -600,7 +600,7 @@ export function Settings(props: IPopupProps) {
                                         >
                                             {t('Azure OpenAI Service page')}
                                         </a>
-                                    ): (
+                                    ) : (
                                         <a
                                             target='_blank'
                                             href='https://platform.openai.com/account/api-keys'
