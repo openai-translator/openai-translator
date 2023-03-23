@@ -26,6 +26,17 @@ export interface TranslateResult {
     error?: string
 }
 
+const isAWord = (lang: string, text: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const Segmenter = (Intl as any).Segmenter
+    if (!Segmenter) {
+        return false
+    }
+    const segmenter = new Segmenter(lang, { granularity: 'word' })
+    const iterator = segmenter.segment(text)[Symbol.iterator]()
+    return iterator.next().value.segment === text
+}
+
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
@@ -47,7 +58,7 @@ export async function translate(query: TranslateQuery) {
                     assistantPrompt = '翻譯成台灣常用用法之繁體中文白話文'
                 } else if (query.detectTo === 'zh-Hans') {
                     assistantPrompt = '翻译成简体白话文'
-                } else if (query.text.length < 5 && settings.defaultTargetLanguage === 'zh-Hans') {
+                } else if (query.text.length < 5 && toChinese) {
                     // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                     systemPrompt = `你是一个翻译引擎，请将给到的文本翻译成${
                         lang.langMap.get(query.detectTo) || query.detectTo
@@ -58,7 +69,7 @@ export async function translate(query: TranslateQuery) {
                     assistantPrompt = ''
                 }
             }
-            if (toChinese && !query.text.includes(' ')) {
+            if (toChinese && isAWord(query.detectFrom, query.text.trim())) {
                 // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
                 systemPrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
                 <原始文本>
