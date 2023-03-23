@@ -71,10 +71,11 @@
 5. 支持一键复制
 6. 支持 TTS
 7. 有桌面端应用，全平台（Windows + macOS + Linux）支持！
+8. 同时支持 [OpenAI](https://openai.com/) 和 [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
 
 # 使用准备
 
--   （必须）申请 [OpenAI API Key](https://platform.openai.com/account/api-keys)
+-   （必须）申请 [OpenAI API Key](https://platform.openai.com/account/api-keys) 或 [Azure OpenAI Service API Key](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint)
 -   （可选）如果无法访问 OpenAI，可以使用 OpenAI API Proxy
 
 # 安装
@@ -131,7 +132,7 @@ scoop install openai-translator
         ```
 
 -   如果您每次打开它都遇到权限提示，或者无法执行快捷键划词翻译，请前往 `设置` -> `隐私与安全性` -> `辅助功能` 中删除 OpenAI Translator，然后重新添加 OpenAI Translator:
-   
+
     <p align="center">
       <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
       <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
@@ -155,7 +156,7 @@ scoop install openai-translator
    <p align="center">
      <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
    </p>
-   
+
 3. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
 
 # License
