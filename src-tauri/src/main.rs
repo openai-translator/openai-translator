@@ -9,11 +9,13 @@ mod ocr;
 mod tray;
 mod utils;
 mod windows;
+mod lang;
 
 use parking_lot::Mutex;
 use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
 
+use crate::lang::detect_lang;
 use crate::config::get_config_content;
 use crate::ocr::ocr;
 use crate::windows::{
@@ -99,6 +101,7 @@ fn main() {
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,
+            detect_lang,
         ])
         .system_tray(tray::menu())
         .on_system_tray_event(tray::handler)

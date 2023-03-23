@@ -22,9 +22,14 @@ interface IRuntime {
     getURL(path: string): string
 }
 
+interface II18n {
+    detectLanguage(text: string): Promise<{ languages: { language: string; percentage: number }[] }>
+}
+
 export interface IBrowser {
     storage: IStorage
     runtime: IRuntime
+    i18n: II18n
 }
 
 export type BaseThemeType = 'light' | 'dark'

@@ -65,13 +65,25 @@ class BrowserRuntime {
     }
 }
 
+class BrowserI18n {
+    detectLanguage(_text: string): Promise<{ languages: { language: string; percentage: number }[] }> {
+        return new Promise((resolve) => {
+            resolve({
+                languages: [],
+            })
+        })
+    }
+}
+
 class Browser implements IBrowser {
     storage: BrowserStorage
     runtime: BrowserRuntime
+    i18n: BrowserI18n
 
     constructor() {
         this.storage = new BrowserStorage()
         this.runtime = new BrowserRuntime()
+        this.i18n = new BrowserI18n()
     }
 }
 

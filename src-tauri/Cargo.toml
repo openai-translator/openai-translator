@@ -28,6 +28,7 @@ tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-wo
 cpuid = "0.1.1"
 sysinfo = "0.28.3"
 parking_lot = "0.12.1"
+cld2 = "1.0.2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"

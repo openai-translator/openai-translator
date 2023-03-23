@@ -32,6 +32,10 @@ const config = {
             resolveFrom: 'cwd',
             assets: [
                 {
+                    from: 'public/cld-min.js',
+                    to: `${tauriOutDir}/cld-min.js`,
+                },
+                {
                     from: 'src/tauri/index.html',
                     to: `${tauriOutDir}/index.html`,
                 },

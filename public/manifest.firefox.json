@@ -18,7 +18,7 @@
         {
             "matches": ["<all_urls>"],
             "all_frames": true,
-            "js": ["js/content_script.js"]
+            "js": ["js/cld-min.js", "js/content_script.js"]
         }
     ],
 

@@ -55,6 +55,7 @@ async function build() {
     await esbuildBrowserExtension()
 
     const commonFiles = [
+        { src: `public/cld-min.js`, dst: 'js/cld-min.js' },
         { src: `${browserExtensionOutDir}/content_script/index.js`, dst: 'js/content_script.js' },
         { src: `${browserExtensionOutDir}/content_script/index.js.map`, dst: 'js/content_script.js.map' },
         { src: `${browserExtensionOutDir}/background/index.js`, dst: 'js/background.js' },
