@@ -5,20 +5,22 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
 
 #[cfg(target_os = "macos")]
 pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::{CPU_VENDOR, APP_HANDLE};
+    use crate::{APP_HANDLE, CPU_VENDOR};
 
     let mut rel_path = "resources/bin/ocr_intel".to_string();
     if *CPU_VENDOR.lock() == "Apple" {
         rel_path = "resources/bin/ocr_apple".to_string();
     }
 
-    let bin_path = APP_HANDLE.get().unwrap().path_resolver()
-      .resolve_resource(rel_path)
-      .expect("failed to resolve ocr binary resource");
-
+    let bin_path = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource(rel_path)
+        .expect("failed to resolve ocr binary resource");
 
     let output = std::process::Command::new(bin_path)
-        .args(&["-l", "zh"])
+        .args(["-l", "zh"])
         .output()
         .expect("failed to execute ocr binary");
 

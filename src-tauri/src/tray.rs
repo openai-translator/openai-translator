@@ -3,10 +3,10 @@ use tauri::{
     AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
 
-use crate::ALWAYS_ON_TOP;
 use crate::config::get_config;
-use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
 use crate::ocr::ocr;
+use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
+use crate::ALWAYS_ON_TOP;
 use std::sync::atomic::Ordering;
 
 pub fn menu() -> SystemTray {

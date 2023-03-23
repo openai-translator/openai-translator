@@ -5,24 +5,26 @@
 
 mod config;
 mod hotkey;
+mod ocr;
 mod tray;
 mod utils;
 mod windows;
-mod ocr;
 
+use parking_lot::Mutex;
 use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
-use parking_lot::Mutex;
 
 use crate::config::get_config_content;
-use crate::windows::{MAIN_WIN_NAME, show_main_window_with_selected_text, get_main_window_always_on_top, set_main_window_always_on_top};
 use crate::ocr::ocr;
-
+use crate::windows::{
+    get_main_window_always_on_top, set_main_window_always_on_top,
+    show_main_window_with_selected_text, MAIN_WIN_NAME,
+};
 
 use once_cell::sync::OnceCell;
+use tauri::api::notification::Notification;
 use tauri::AppHandle;
 use tauri::Manager;
-use tauri::api::notification::Notification;
 use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
@@ -43,12 +45,12 @@ fn query_accessibility_permissions() -> bool {
     } else {
         print!("Application isn't trusted :(");
     }
-    return trusted
+    trusted
 }
 
 #[cfg(not(target_os = "macos"))]
 fn query_accessibility_permissions() -> bool {
-    return true
+    return true;
 }
 
 fn main() {
@@ -102,15 +104,16 @@ fn main() {
         .on_system_tray_event(tray::handler)
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|app, event| match event {
-            tauri::RunEvent::WindowEvent { label, event, .. } => match event {
-                tauri::WindowEvent::CloseRequested { api, .. } => {
-                    let window = app.get_window(label.as_str()).unwrap();
-                    window.hide().unwrap();
-                    api.prevent_close();
-                }
-                _ => {}
-            },
-            _ => {}
+        .run(|app, event| {
+            if let tauri::RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::CloseRequested { api, .. },
+                ..
+            } = event
+            {
+                let window = app.get_window(label.as_str()).unwrap();
+                window.hide().unwrap();
+                api.prevent_close();
+            }
         });
 }
