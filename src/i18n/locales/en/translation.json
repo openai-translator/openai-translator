@@ -35,5 +35,7 @@
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.",
   "Restore Previous Position": "Restore Previous Position",
   "API Model": "API Model",
-  "Chars Limited": "The number of characters exceeds the limit"
+  "Chars Limited": "The number of characters exceeds the limit",
+  "Country Not Supported": "Your IP address is from {{name}}, which is not a <0>supported region</0> of OpenAI. Continuing to use without extra network configuration may result in your account being blocked by OpenAI, regardless of your ChatGPT Plus subscription status or any remaining account balance.",
+  "Country Not Detected": "We were unable to check if your IP address is in a <0>supported region</0> of OpenAI. Please check your Internet connection, and ensure that you are accessing the API in a supported region of OpenAI, or your account may get banned regardless of your GPT Plus subscription status or any remaining account balance."
 }
