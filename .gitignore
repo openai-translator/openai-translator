@@ -13,3 +13,5 @@ npm-error.log
 .vscode
 .idea
 .eslintcache
+.yarn
+.yarnrc.yml
