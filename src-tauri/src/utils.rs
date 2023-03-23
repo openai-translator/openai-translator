@@ -1,9 +1,8 @@
-use clipboard::ClipboardProvider;
-use clipboard::ClipboardContext;
 use tauri::Manager;
 
 use crate::APP_HANDLE;
 
+#[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn copy() {
     use enigo::*;
@@ -16,7 +15,7 @@ pub fn copy() {
     enigo.key_click(Key::Layout('c'));
     enigo.key_up(Key::Control);
 }
-
+#[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn copy() {
     // use std::{thread, time::Duration};
@@ -37,7 +36,7 @@ pub fn copy() {
     // enigo.key_up(Key::Layout('c'));
     enigo.key_up(Key::Meta);
 }
-
+#[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn copy() {
     use enigo::*;
@@ -60,16 +59,20 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
         if selected_text.trim() == current_text.trim() {
             Ok("".to_string())
         } else {
-            ctx.set_contents(current_text).and_then(|_| Ok(selected_text))
+            ctx.set_contents(current_text)
+                .and_then(|_| Ok(selected_text))
         }
     })?
 }
 
 #[cfg(target_os = "macos")]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    let apple_script = APP_HANDLE.get().unwrap().path_resolver()
-      .resolve_resource("resources/get-selected-text.applescript")
-      .expect("failed to resolve ocr binary resource");
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/get-selected-text.applescript")
+        .expect("failed to resolve ocr binary resource");
 
     let output = std::process::Command::new("osascript")
         .arg(apple_script)
@@ -79,7 +82,8 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     // check exit code
     if output.status.success() {
         // get output content
-        let content = String::from_utf8(output.stdout).expect("failed to parse get-selected-text.applescript output");
+        let content = String::from_utf8(output.stdout)
+            .expect("failed to parse get-selected-text.applescript output");
         Ok(content)
     } else {
         Err("failed to execute get-selected-text.applescript".into())

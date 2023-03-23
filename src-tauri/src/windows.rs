@@ -1,14 +1,14 @@
-use crate::ALWAYS_ON_TOP;
-use crate::utils;
 use crate::config;
+use crate::utils;
+use crate::ALWAYS_ON_TOP;
 use crate::APP_HANDLE;
+use mouse_position::mouse_position::Mouse;
+use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 #[cfg(target_os = "windows")]
 use window_shadows::set_shadow;
 #[cfg(target_os = "linux")]
 use window_shadows::set_shadow;
-use mouse_position::mouse_position::Mouse;
-use std::sync::atomic::Ordering;
 
 pub const MAIN_WIN_NAME: &str = "main";
 
@@ -17,11 +17,11 @@ fn get_mouse_location() -> Result<(i32, i32), String> {
     match position {
         Mouse::Position { x, y } => Ok((x, y)),
         Mouse::Error => Err("Error getting mouse position".to_string()),
-   }
+    }
 }
 
 #[tauri::command]
-pub fn set_main_window_always_on_top() -> bool  {
+pub fn set_main_window_always_on_top() -> bool {
     let handle = APP_HANDLE.get().unwrap();
     let window = handle.get_window(MAIN_WIN_NAME).unwrap();
     let item = handle.tray_handle().get_item("pin");
@@ -78,25 +78,23 @@ pub fn show_main_window(center: bool) {
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
                 }
-            } else {
-                if !center {
-                    let (x, y): (i32, i32) = get_mouse_location().unwrap();
-                    if cfg!(target_os = "macos") {
-                        window
-                            .set_position(LogicalPosition::new(x as f64, y as f64))
-                            .unwrap();
-                    } else {
-                        window.unminimize().unwrap();
-                        window
-                            .set_position(PhysicalPosition::new(x as f64, y as f64))
-                            .unwrap();
-                    }
+            } else if !center {
+                let (x, y): (i32, i32) = get_mouse_location().unwrap();
+                if cfg!(target_os = "macos") {
+                    window
+                        .set_position(LogicalPosition::new(x as f64, y as f64))
+                        .unwrap();
                 } else {
-                    if !cfg!(target_os = "macos") {
-                        window.unminimize().unwrap();
-                    }
-                    window.center().unwrap();
+                    window.unminimize().unwrap();
+                    window
+                        .set_position(PhysicalPosition::new(x as f64, y as f64))
+                        .unwrap();
                 }
+            } else {
+                if !cfg!(target_os = "macos") {
+                    window.unminimize().unwrap();
+                }
+                window.center().unwrap();
             }
             window.unminimize().unwrap();
             window.set_focus().unwrap();
