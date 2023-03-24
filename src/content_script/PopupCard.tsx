@@ -16,7 +16,7 @@ import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { RxCopy, RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxXY, queryPopupCardElement } from './utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
@@ -1270,6 +1270,19 @@ export function PopupCard(props: IPopupCardProps) {
                                                             <RxCopy size={13} />
                                                         </div>
                                                     </CopyToClipboard>
+                                                </div>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content={t('Clear input')} showArrow placement='left'>
+                                                <div
+                                                    className={styles.actionButton}
+                                                    onClick={() => {
+                                                        setEditableText('')
+                                                        editorRef.current?.focus()
+                                                    }}
+                                                >
+                                                    <div className={styles.actionButton}>
+                                                        <RxEraser size={13} />
+                                                    </div>
                                                 </div>
                                             </StatefulTooltip>
                                         </div>
