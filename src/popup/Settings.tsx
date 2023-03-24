@@ -592,13 +592,23 @@ export function Settings(props: IPopupProps) {
                             caption={
                                 <div>
                                     {t('Go to the')}{' '}
-                                    <a
-                                        target='_blank'
-                                        href='https://platform.openai.com/account/api-keys'
-                                        rel='noreferrer'
-                                    >
-                                        {t('OpenAI page')}
-                                    </a>{' '}
+                                    {values.provider === 'Azure' ? (
+                                        <a
+                                            target='_blank'
+                                            href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
+                                            rel='noreferrer'
+                                        >
+                                            {t('Azure OpenAI Service page')}
+                                        </a>
+                                    ) : (
+                                        <a
+                                            target='_blank'
+                                            href='https://platform.openai.com/account/api-keys'
+                                            rel='noreferrer'
+                                        >
+                                            {t('OpenAI page')}
+                                        </a>
+                                    )}{' '}
                                     {t(
                                         'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
                                     )}

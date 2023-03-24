@@ -74,10 +74,11 @@ What began as a translation tool has now evolved to include surprisingly effecti
 5. One-click copying
 6. Text-to-Speech (TTS)
 7. Available on all platforms (Windows, macOS, and Linux) for both browsers and Desktop
+8. Supports both [OpenAI](https://openai.com/) and [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service) at the same time
 
 # Preparation
 
--   (required) Apply for an OpenAI API key [here](https://platform.openai.com/account/api-keys)
+-   (required) Apply for an OpenAI API key [here](https://platform.openai.com/account/api-keys) or [Azure OpenAI Service API Key](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint)
 -   (optional) If you cannot access OpenAI, you can use the OpenAI API Proxy.
 
 # Installation
@@ -115,16 +116,16 @@ scoop install openai-translator
 ### Troubleshooting
 
 -   "OpenAI Translator" can’t be opened because the developer cannot be verified.
-    
+ 
     <p align="center">
       <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
     </p>
-  
+ 
     -   Click the `Cancel` button, then go to the `Settings` -> `Privacy and Security` page, click the `Still Open` button, and then click the `Open` button in the pop-up window. After that, there will be no more pop-up warnings when opening `OpenAI Translator`. 🎉
         <p align="center">
           <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
         </p>
-  
+ 
     -   If you cannot find the above options in `Privacy & Security`, or get error prompts such as broken files with Apple Silicon machines. Open `Terminal.app` and enter the following command (you may need to enter a password halfway through), then restart `OpenAI Translator`:
 
         ```sh
@@ -137,7 +138,7 @@ scoop install openai-translator
       <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
       <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
     </p>
-  
+ 
 ## Browser Extension
 
 1. Visit your Browser Extension Store to install this plugin:
@@ -152,11 +153,11 @@ scoop install openai-translator
    </p>
 
 2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
-   
+ 
    <p align="center">
      <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
    </p>
-  
+
 3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
 # License
