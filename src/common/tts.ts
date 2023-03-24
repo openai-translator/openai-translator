@@ -4,7 +4,7 @@ interface SpeakOptions {
     onFinish?: () => void
 }
 
-const langMap: Record<string, string> = {
+export const supportTTSLang: Record<string, string> = {
     'en': 'en-US',
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
@@ -34,16 +34,14 @@ const langMap: Record<string, string> = {
     'vi': 'vi-VN',
 }
 
-const supportedVoices = speechSynthesis.getVoices()
-
 export function speak({ text, lang, onFinish }: SpeakOptions) {
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
-    const langTag = langMap[lang ?? 'en'] ?? 'en-US'
+    const langTag = supportTTSLang[lang ?? 'en'] ?? 'en-US'
     utterance.text = text
     utterance.lang = langTag
-    utterance.voice = supportedVoices.find((v) => v.lang === langTag) ?? null
+    utterance.voice = speechSynthesis.getVoices().find((v) => v.lang === langTag) ?? null
     speechSynthesis.speak(utterance)
 }
