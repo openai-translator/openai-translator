@@ -919,6 +919,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     setShowSettings(false)
                                     props.onSettingsSave?.(oldSettings)
                                 }}
+                                engine={props.engine}
                             />
                         ) : (
                             <div style={props.containerStyle}>

@@ -451,12 +451,11 @@ function ProviderSelector(props: IProviderSelectorProps) {
     )
 }
 
-const engine = new Styletron()
-
 const { Form, FormItem, useForm } = createForm<ISettings>()
 
 interface IPopupProps {
     onSave?: (oldSettings: ISettings) => void
+    engine: Styletron
 }
 
 export function Settings(props: IPopupProps) {
@@ -534,7 +533,7 @@ export function Settings(props: IPopupProps) {
             }}
         >
             <style>{formStyles}</style>
-            <StyletronProvider value={engine}>
+            <StyletronProvider value={props.engine}>
                 <BaseProvider theme={theme}>
                     <nav
                         style={{
