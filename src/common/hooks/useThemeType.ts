@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react'
 import { ThemeType } from '../types'
-import { getSettings } from '../utils'
+import { useSettings } from './useSettings'
 
 export const useThemeType = () => {
     const [themeType, setThemeType] = useState<ThemeType>('followTheSystem')
 
+    const { settings } = useSettings()
+
     useEffect(() => {
-        ;(async () => {
-            const settings = await getSettings()
-            if (settings.themeType) {
-                setThemeType(settings.themeType)
-            }
-        })()
-    }, [])
+        if (settings?.themeType) {
+            setThemeType(settings.themeType)
+        }
+    }, [settings])
 
     return {
         themeType,

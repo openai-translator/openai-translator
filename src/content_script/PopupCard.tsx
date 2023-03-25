@@ -22,7 +22,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { getSettings, isDesktopApp, isTauri } from '../common/utils'
+import { isDesktopApp, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
@@ -38,6 +38,7 @@ import LRUCache from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { speak } from '../common/tts'
+import { useSettings } from '../common/hooks/useSettings'
 
 const cache = new LRUCache({
     max: 500,
@@ -372,16 +373,14 @@ export function PopupCard(props: IPopupCardProps) {
     const highlightRef = useRef<HighlightInTextarea | null>(null)
 
     const { t, i18n } = useTranslation()
+    const { settings } = useSettings()
     useEffect(() => {
-        ;(async () => {
-            const settings = await getSettings()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (settings?.i18n !== (i18n as any).language) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (settings.i18n !== (i18n as any).language) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ;(i18n as any).changeLanguage(settings.i18n)
-            }
-        })()
-    }, [])
+            ;(i18n as any).changeLanguage(settings?.i18n)
+        }
+    }, [settings])
 
     const [autoFocus, setAutoFocus] = useState(false)
 
@@ -418,13 +417,10 @@ export function PopupCard(props: IPopupCardProps) {
 
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
-        ;(async () => {
-            const settings = await getSettings()
-            if (settings.defaultTranslateMode !== 'nop') {
-                setTranslateMode(settings.defaultTranslateMode)
-            }
-        })()
-    }, [])
+        if (settings && settings.defaultTranslateMode !== 'nop') {
+            setTranslateMode(settings.defaultTranslateMode)
+        }
+    }, [settings])
     const isTranslate = translateMode === 'translate'
     useEffect(() => {
         if (!isTranslate) {
@@ -501,11 +497,10 @@ export function PopupCard(props: IPopupCardProps) {
                 (translateMode === 'translate' || translateMode === 'analyze') &&
                 !stopAutomaticallyChangeDetectTo.current
             ) {
-                const settings = await getSettings()
-                setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings.defaultTargetLanguage)
+                setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings?.defaultTargetLanguage ?? 'en')
             }
         })()
-    }, [originalText, translateMode])
+    }, [originalText, translateMode, settings])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -785,13 +780,10 @@ export function PopupCard(props: IPopupCardProps) {
         if (!props.defaultShowSettings) {
             return
         }
-        ;(async () => {
-            const settings = await getSettings()
-            if (!settings.apiKeys) {
-                setShowSettings(true)
-            }
-        })()
-    }, [props.defaultShowSettings])
+        if (settings && !settings.apiKeys) {
+            setShowSettings(true)
+        }
+    }, [props.defaultShowSettings, settings])
 
     const [isOCRProcessing, setIsOCRProcessing] = useState(false)
     const [showOCRProcessing, setShowOCRProcessing] = useState(false)
