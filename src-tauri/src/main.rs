@@ -94,8 +94,16 @@ fn main() {
                                         let LogicalPosition{ x: x1, y: y1 } = position.to_logical::<i32>(scale_factor);
                                         let LogicalSize{ width: w, height: h } = size.to_logical::<i32>(scale_factor);
                                         let (x2, y2) = (x1 + w, y1 + h);
-                                        let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
-                                        res
+                                        #[cfg(target_os = "windows")]
+                                        {
+                                            let res = x >= x1 - 10 && x <= x2 + 10 && y >= y1 - 10 && y <= y2 + 10;
+                                            res
+                                        }
+                                        #[cfg(not(target_os = "windows"))]
+                                        {
+                                            let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
+                                            res
+                                        }
                                     } else {
                                         false
                                     }
@@ -134,7 +142,6 @@ fn main() {
                 if previous_release_time != 0 && is_double_click {
                     is_text_selected_event = true;
                 }
-                println!("is_text_selected_event: {}, pressed_time: {}, is_double_click: {}, mouse_distance: {}", is_text_selected_event, pressed_time, is_double_click, mouse_distance);
                 if !is_text_selected_event {
                     windows::close_thumb();
                     return;
