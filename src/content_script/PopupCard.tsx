@@ -75,7 +75,7 @@ const useStyles = createUseStyles({
                   paddingLeft: '10px',
                   display: 'flex',
                   alignItems: 'center',
-                  background: props.themeType === 'dark' ? '#1f1f1f' : '#fff',
+                  background: props.theme.colors.backgroundPrimary,
               }
             : {
                   color: props.theme.colors.contentSecondary,
@@ -375,7 +375,9 @@ export function PopupCard(props: IPopupCardProps) {
     useEffect(() => {
         ;(async () => {
             const settings = await getSettings()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (settings.i18n !== (i18n as any).language) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ;(i18n as any).changeLanguage(settings.i18n)
             }
         })()
@@ -909,7 +911,7 @@ export function PopupCard(props: IPopupCardProps) {
                             'yetone-dark': themeType === 'dark',
                         })}
                         style={{
-                            background: themeType === 'dark' ? '#1f1f1f' : '#fff',
+                            background: theme.colors.backgroundPrimary,
                             paddingBottom: showSettings ? '0px' : '30px',
                         }}
                     >

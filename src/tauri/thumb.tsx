@@ -2,26 +2,29 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import icon from '../content_script/assets/images/icon.png'
 import { useTheme } from '../common/hooks/useTheme'
+import { BaseProvider } from 'baseui-sd'
 
 export function Thumb() {
-    const { themeType } = useTheme()
+    const { theme } = useTheme()
 
     return (
-        <div
-            className='thumb'
-            style={{
-                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
-            }}
-        >
-            <img
+        <BaseProvider theme={theme}>
+            <div
+                className='thumb'
                 style={{
-                    display: 'block',
-                    width: '100%',
-                    height: '100%',
+                    background: theme.colors.backgroundPrimary,
                 }}
-                src={icon}
-            />
-        </div>
+            >
+                <img
+                    style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                    src={icon}
+                />
+            </div>
+        </BaseProvider>
     )
 }
 
