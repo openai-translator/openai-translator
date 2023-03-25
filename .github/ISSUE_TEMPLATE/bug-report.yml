@@ -50,6 +50,16 @@ body:
           options:
               - label: I am sure it is not a network issue or an OpenAI API quota issue.
                 required: true
+    - type: dropdown
+      attributes:
+          label: Please select your OS if you are using the desktop app
+          options:
+            - MacOS
+            - Windows
+            - Linux
+            - Others
+          description: >
+            使用桌面版的用户, 请选择您的操作系统.
     - type: input
       attributes:
           label: OpenAI Translator version
