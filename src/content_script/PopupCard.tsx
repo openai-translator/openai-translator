@@ -400,10 +400,7 @@ export function PopupCard(props: IPopupCardProps) {
         }
         highlightRef.current = new HighlightInTextarea(editor, { highlight: '' })
         if (props.autoFocus) {
-            setAutoFocus(false)
-            setTimeout(() => {
-                setAutoFocus(true)
-            }, 500)
+            editor.focus()
         }
     }, [props.autoFocus])
 
