@@ -21,10 +21,10 @@ import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
 import { ISettings, IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
-import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
+import { useSettings } from '../common/hooks/useSettings'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -460,7 +460,6 @@ interface IPopupProps {
 
 export function Settings(props: IPopupProps) {
     const { theme } = useTheme()
-    const { setThemeType } = useThemeType()
 
     const { t } = useTranslation()
 
@@ -487,13 +486,14 @@ export function Settings(props: IPopupProps) {
         form.setFieldsValue(values)
     }, [form, values])
 
+    const { settings, setSettings } = useSettings()
+
     useEffect(() => {
-        !(async () => {
-            const settings = await utils.getSettings()
+        if (settings) {
             setValues(settings)
             setPrevValues(settings)
-        })()
-    }, [])
+        }
+    }, [settings])
 
     const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
@@ -508,9 +508,7 @@ export function Settings(props: IPopupProps) {
             duration: 3000,
         })
         setLoading(false)
-        if (data.themeType) {
-            setThemeType(data.themeType)
-        }
+        setSettings(data)
         props.onSave?.(oldSettings)
     }, [])
 

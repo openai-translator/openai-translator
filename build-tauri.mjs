@@ -12,7 +12,7 @@ const enableWatch = process.argv.includes('--watch')
 const enableServe = process.argv.includes('--serve')
 
 const config = {
-    entryPoints: ['src/tauri/index.tsx'],
+    entryPoints: ['src/tauri/index.tsx', 'src/tauri/thumb.tsx'],
     target: ['es2015', 'safari11'],
     bundle: true,
     outdir: tauriOutDir,
@@ -38,6 +38,10 @@ const config = {
                 {
                     from: 'src/tauri/index.html',
                     to: `${tauriOutDir}/index.html`,
+                },
+                {
+                    from: 'src/tauri/thumb.html',
+                    to: `${tauriOutDir}/thumb.html`,
                 },
                 {
                     from: 'src-tauri/get-selected-text.applescript',

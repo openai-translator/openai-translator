@@ -34,7 +34,7 @@ const isAWord = (lang: string, text: string) => {
     }
     const segmenter = new Segmenter(lang, { granularity: 'word' })
     const iterator = segmenter.segment(text)[Symbol.iterator]()
-    return iterator.next().value.segment === text
+    return iterator.next().value?.segment === text
 }
 
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']

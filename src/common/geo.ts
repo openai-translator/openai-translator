@@ -27,7 +27,6 @@ interface OpenAICDNCGITraceResponse {
 }
 
 function parseResponse(response: string): OpenAICDNCGITraceResponse {
-    console.log(response)
     const params: Record<string, string> = {}
     const pairs = response.split('\n')
     for (const pair of pairs) {
