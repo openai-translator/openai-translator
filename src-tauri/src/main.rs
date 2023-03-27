@@ -83,48 +83,8 @@ fn main() {
         }
         match event {
             mouce::common::MouseEvent::Press(mouce::common::MouseButton::Left) => {
-                let (x, y): (i32, i32) = windows::get_mouse_location().unwrap();
                 let current_press_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
-                {
-                    *PREVIOUS_PRESS_TIME.lock() = current_press_time;
-                }
-                let previous_release_time = { *PREVIOUS_RELEASE_TIME.lock() };
-                let is_double_click = current_press_time - previous_release_time > 700;
-                if let Some(handle) = APP_HANDLE.get() {
-                    let is_click_on_thumb = match handle.get_window(windows::THUMB_WIN_NAME) {
-                        Some(window) => {
-                            match window.outer_position() {
-                                Ok(position) => {
-                                    let scale_factor = window.scale_factor().unwrap_or(1.0);
-                                    if let Ok(size) = window.outer_size() {
-                                        let LogicalPosition{ x: x1, y: y1 } = position.to_logical::<i32>(scale_factor);
-                                        let LogicalSize{ width: w, height: h } = size.to_logical::<i32>(scale_factor);
-                                        let (x2, y2) = (x1 + w, y1 + h);
-                                        #[cfg(target_os = "windows")]
-                                        {
-                                            let res = x >= x1 - 10 && x <= x2 + 10 && y >= y1 - 10 && y <= y2 + 10;
-                                            res
-                                        }
-                                        #[cfg(not(target_os = "windows"))]
-                                        {
-                                            let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
-                                            res
-                                        }
-                                    } else {
-                                        false
-                                    }
-                                }
-                                Err(_) => false
-                            }
-                        }
-                        None => false
-                    };
-                    if is_click_on_thumb && is_double_click {
-                        let window = windows::show_main_window(false);
-                        window.set_focus().unwrap();
-                        utils::send_text((*SELECTED_TEXT.lock()).to_string());
-                    }
-                }
+                *PREVIOUS_PRESS_TIME.lock() = current_press_time;
             }
             mouce::common::MouseEvent::Release(mouce::common::MouseButton::Left) => {
                 let mut is_text_selected_event = false;
@@ -148,47 +108,55 @@ fn main() {
                 if previous_release_time != 0 && is_double_click {
                     is_text_selected_event = true;
                 }
-                if !is_text_selected_event {
-                    windows::close_thumb();
-                    return;
-                }
-                if let Some(handle) = APP_HANDLE.get() {
-                    let is_click_on_thumb = match handle.get_window(windows::THUMB_WIN_NAME) {
-                        Some(window) => {
-                            match window.outer_position() {
-                                Ok(position) => {
-                                    let scale_factor = window.scale_factor().unwrap_or(1.0);
-                                    if let Ok(size) = window.outer_size() {
-                                        let LogicalPosition{ x: x1, y: y1 } = position.to_logical::<i32>(scale_factor);
-                                        let LogicalSize{ width: w, height: h } = size.to_logical::<i32>(scale_factor);
-                                        let (x2, y2) = (x1 + w, y1 + h);
-                                        let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
-                                        res
-                                    } else {
+                let is_click_on_thumb = match APP_HANDLE.get() {
+                    Some(handle) => {
+                        match handle.get_window(windows::THUMB_WIN_NAME) {
+                            Some(window) => {
+                                match window.outer_position() {
+                                    Ok(position) => {
+                                        let scale_factor = window.scale_factor().unwrap_or(1.0);
+                                        if let Ok(size) = window.outer_size() {
+                                            let LogicalPosition{ x: x1, y: y1 } = position.to_logical::<i32>(scale_factor);
+                                            let LogicalSize{ width: w, height: h } = size.to_logical::<i32>(scale_factor);
+                                            let (x2, y2) = (x1 + w, y1 + h);
+                                            let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
+                                            res
+                                        } else {
+                                            false
+                                        }
+                                    }
+                                    Err(err) => {
+                                        println!("err: {:?}", err);
                                         false
                                     }
                                 }
-                                Err(err) => {
-                                    println!("err: {:?}", err);
-                                    false
-                                }
                             }
+                            None => false
                         }
-                        None => false
-                    };
+                    }
+                    None => false
+                };
+                if !is_text_selected_event && !is_click_on_thumb {
+                    return;
+                }
 
-                    if !is_click_on_thumb {
-                        let selected_text = utils::get_selected_text().unwrap();
-                        if !selected_text.is_empty() && !is_click_on_thumb {
-                            {
-                                *SELECTED_TEXT.lock() = selected_text;
-                            }
-                            windows::show_thumb(x, y);
-                        } else {
-                            windows::close_thumb();
+                if !is_click_on_thumb {
+                    let selected_text = utils::get_selected_text().unwrap();
+                    if !selected_text.is_empty() && !is_click_on_thumb {
+                        {
+                            *SELECTED_TEXT.lock() = selected_text;
                         }
+                        windows::show_thumb(x, y);
                     } else {
                         windows::close_thumb();
+                    }
+                } else {
+                    windows::close_thumb();
+                    let selected_text = (*SELECTED_TEXT.lock()).to_string();
+                    if !selected_text.is_empty() {
+                        let window = windows::show_main_window(false);
+                        window.set_focus().unwrap();
+                        utils::send_text(selected_text);
                     }
                 }
             }
