@@ -135,7 +135,7 @@ fn main() {
                     *PREVIOUS_RELEASE_TIME.lock() = current_release_time;
                 }
                 let pressed_time = current_release_time - previous_press_time;
-                let is_double_click = current_release_time - previous_release_time < 700 && mouse_distance < 100.0;
+                let is_double_click = current_release_time - previous_release_time < 1000 && mouse_distance < 100.0;
                 if pressed_time > 300 && mouse_distance > 10.0 {
                     is_text_selected_event = true;
                 }

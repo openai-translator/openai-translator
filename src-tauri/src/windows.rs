@@ -154,16 +154,25 @@ pub fn show_main_window(center: bool) -> tauri::Window {
                 }
             } else if !center {
                 let (x, y): (i32, i32) = get_mouse_location().unwrap();
-                if cfg!(target_os = "macos") {
-                    window
-                        .set_position(LogicalPosition::new(x as f64, y as f64))
-                        .unwrap();
-                } else {
-                    window.unminimize().unwrap();
-                    window
-                        .set_position(PhysicalPosition::new(x as f64, y as f64))
-                        .unwrap();
+                let window_size = window.outer_size().unwrap();
+                // get minitor size
+                let monitor = window.current_monitor().unwrap().unwrap();
+                let monitor_size = monitor.size();
+                let scale_factor = window.scale_factor().unwrap_or(1.0);
+                let mouse_physical_position = LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
+                let mut window_physical_position = mouse_physical_position;
+                if mouse_physical_position.x + window_size.width > monitor_size.width {
+                    window_physical_position.x = monitor_size.width - window_size.width;
                 }
+                if mouse_physical_position.y + window_size.height > monitor_size.height {
+                    window_physical_position.y = monitor_size.height - window_size.height;
+                }
+                if !cfg!(target_os = "macos") {
+                    window.unminimize().unwrap();
+                }
+                window
+                    .set_position(window_physical_position)
+                    .unwrap();
             } else {
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
