@@ -608,23 +608,22 @@ export function PopupCard(props: IPopupCardProps) {
         }
 
         const overflowCheck = ($popupCard: HTMLDivElement, movementXY: MovementXY): number[] => {
-            let left = $popupCard.offsetLeft
-            let top = $popupCard.offsetTop
+            let { offsetTop: cardTop, offsetLeft: cardLeft } = $popupCard
+            const rect = $popupCard.getBoundingClientRect()
             const { x: movementX, y: movementY } = movementXY
             if (
-                $popupCard.offsetLeft + movementX > documentPadding &&
-                window.innerWidth - $popupCard.offsetLeft - movementX - $popupCard.offsetWidth > documentPadding
+                rect.left + movementX > documentPadding &&
+                rect.right + movementX < document.documentElement.clientWidth - documentPadding
             ) {
-                left = $popupCard.offsetLeft + movementX
+                cardLeft = $popupCard.offsetLeft + movementX
             }
             if (
-                $popupCard.offsetTop + movementY > documentPadding &&
-                document.documentElement.offsetHeight - $popupCard.offsetTop - movementY - $popupCard.offsetHeight >
-                    documentPadding
+                rect.top + movementY > documentPadding &&
+                rect.bottom + movementY < document.documentElement.clientHeight - documentPadding
             ) {
-                top = $popupCard.offsetTop + movementY
+                cardTop = $popupCard.offsetTop + movementY
             }
-            return [left, top]
+            return [cardLeft, cardTop]
         }
 
         const elementScroll = async (e: globalThis.Event) => {
