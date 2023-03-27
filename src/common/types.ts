@@ -55,5 +55,8 @@ export interface ISettings {
     ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
+    tts?: {
+        voices?: { [key: string]: string }
+    }
     restorePreviousPosition?: boolean
 }

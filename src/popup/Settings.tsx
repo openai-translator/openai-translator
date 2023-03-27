@@ -13,7 +13,7 @@ import formStyles from 'inline:../components/Form/index.module.css'
 import { Button } from 'baseui-sd/button'
 import './index.css'
 import { TranslateMode, Provider, APIModel } from '../content_script/translate'
-import { Select, Value, Option } from 'baseui-sd/select'
+import { Select, Value, Option, OnChangeParams, Options } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
@@ -25,6 +25,7 @@ import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
 import { useSettings } from '../common/hooks/useSettings'
+import { supportTTSLang } from '../common/tts'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -165,6 +166,88 @@ function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
                 { label: t('Light'), id: 'light' },
             ]}
         />
+    )
+}
+
+const useTTSSettingsStyles = createUseStyles({
+    settingsLabel: {
+        display: 'block',
+        marignTop: '4px',
+        marginBottom: '4px',
+    },
+    voiceSelector: {
+        display: 'flex',
+        gap: '4px',
+    },
+})
+
+interface TTSSettingsProps {
+    value?: ISettings['tts']
+    onChange?: (value: ISettings['tts']) => void
+    onBlur?: () => void
+}
+
+function TTSSettings(props: TTSSettingsProps) {
+    const styles = useTTSSettingsStyles()
+
+    const [lang, setLang] = useState<Value>([{ label: 'English', id: 'en' }])
+
+    const ttsLangTag = lang.length > 0 ? supportTTSLang[lang[0].id as string] : 'en-US'
+
+    const supportVoices = speechSynthesis.getVoices()
+    const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
+        if (id in supportTTSLang && supportVoices.find((v) => v.lang === supportTTSLang[id])) {
+            return [
+                ...acc,
+                {
+                    id,
+                    label,
+                } as Option,
+            ]
+        }
+        return acc
+    }, [] as Value)
+
+    const voiceOptions: Options = supportVoices
+        .filter((v) => lang.length > 0 && v.lang === ttsLangTag)
+        .map((sv) => ({ id: sv.voiceURI, label: sv.name, lang: sv.lang }))
+
+    const voiceURI = props.value?.voices?.[ttsLangTag] ?? voiceOptions?.[0]?.id ?? null
+    const voiceCfg = supportVoices.find((v) => v.voiceURI === voiceURI)
+    const voice: Value = voiceURI && voiceCfg ? [{ label: voiceCfg.name, id: voiceCfg.voiceURI }] : []
+
+    const handleVoiceOnChange = ({ value }: OnChangeParams) => {
+        if (value.length > 0) {
+            props.onChange?.({
+                ...(props.value ?? {}),
+                voices: { ...(props.value?.voices ?? {}), [value[0].lang]: value[0].id },
+            })
+        }
+    }
+
+    return (
+        <div>
+            <div>
+                <label className={styles.settingsLabel}>Voice</label>
+                <div className={styles.voiceSelector}>
+                    <Select
+                        size='compact'
+                        clearable={false}
+                        options={langOptions}
+                        onChange={({ value }) => setLang(value)}
+                        value={lang}
+                    />
+                    <Select
+                        size='compact'
+                        options={voiceOptions}
+                        value={voice}
+                        onChange={handleVoiceOnChange}
+                        clearable={false}
+                        onBlur={props.onBlur}
+                    />
+                </div>
+            </div>
+        </div>
     )
 }
 
@@ -476,6 +559,7 @@ export function Settings(props: IPopupProps) {
         alwaysShowIcons: utils.defaultAlwaysShowIcons,
         hotkey: '',
         i18n: utils.defaulti18n,
+        tts: {},
         restorePreviousPosition: false,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
@@ -643,6 +727,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='i18n' label={t('i18n')}>
                             <Ii18nSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='tts' label={t('TTS')}>
+                            <TTSSettings onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />

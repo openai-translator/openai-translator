@@ -1,10 +1,12 @@
+import { getSettings } from './utils'
+
 interface SpeakOptions {
     text: string
     lang?: string
     onFinish?: () => void
 }
 
-const langMap: Record<string, string> = {
+export const supportTTSLang: Record<string, string> = {
     'en': 'en-US',
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
@@ -34,16 +36,25 @@ const langMap: Record<string, string> = {
     'vi': 'vi-VN',
 }
 
-const supportedVoices = speechSynthesis.getVoices()
+let supportVoices: SpeechSynthesisVoice[]
+window.speechSynthesis.onvoiceschanged = () => {
+    supportVoices = speechSynthesis.getVoices()
+}
 
-export function speak({ text, lang, onFinish }: SpeakOptions) {
+export async function speak({ text, lang, onFinish }: SpeakOptions) {
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
-    const langTag = langMap[lang ?? 'en'] ?? 'en-US'
+
+    const langTag = supportTTSLang[lang ?? 'en'] ?? 'en-US'
     utterance.text = text
     utterance.lang = langTag
-    utterance.voice = supportedVoices.find((v) => v.lang === langTag) ?? null
+
+    const settings = await getSettings()
+    const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
+    const settingsVoice = supportVoices.find((v) => v.voiceURI === settings.tts?.voices?.[langTag])
+    utterance.voice = settingsVoice ?? defaultVoice
+
     speechSynthesis.speak(utterance)
 }
