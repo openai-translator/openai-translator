@@ -34,6 +34,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     themeType: 1,
     i18n: 1,
     restorePreviousPosition: 1,
+    runAtStartup: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
