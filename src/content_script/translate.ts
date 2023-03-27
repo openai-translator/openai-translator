@@ -155,28 +155,37 @@ export async function translate(query: TranslateQuery) {
         'Content-Type': 'application/json',
     }
 
+    let isChatAPI = true
+    if (settings.provider === 'Azure' && settings.apiURLPath && settings.apiURLPath.indexOf('/chat/completions') < 0) {
+        // Azure OpenAI Service supports multiple API.
+        // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
+        // If not, we should use the legacy parameters.
+        isChatAPI = false
+        body[
+            'prompt'
+        ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
+        body['stop'] = ['<|im_end|>']
+    } else {
+        body['messages'] = [
+            {
+                role: 'system',
+                content: systemPrompt,
+            },
+            {
+                role: 'user',
+                content: assistantPrompt,
+            },
+            { role: 'user', content: `"${query.text}"` },
+        ]
+    }
+
     switch (settings.provider) {
         case 'OpenAI':
             headers['Authorization'] = `Bearer ${apiKey}`
-            body['messages'] = [
-                {
-                    role: 'system',
-                    content: systemPrompt,
-                },
-                {
-                    role: 'user',
-                    content: assistantPrompt,
-                },
-                { role: 'user', content: `"${query.text}"` },
-            ]
             break
 
         case 'Azure':
             headers['api-key'] = `${apiKey}`
-            body[
-                'prompt'
-            ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
-            body['stop'] = ['<|im_end|>']
             break
     }
 
@@ -207,32 +216,29 @@ export async function translate(query: TranslateQuery) {
             }
 
             let targetTxt = ''
-            switch (settings.provider) {
-                case 'OpenAI': {
-                    const { content = '', role } = choices[0].delta
-                    targetTxt = content
 
-                    if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
-                        targetTxt = targetTxt.slice(1)
-                    }
+            if (!isChatAPI) {
+                // It's used for Azure OpenAI Serivce's legacy parameters.
+                targetTxt = choices[0].text
 
-                    if (!role) {
-                        isFirst = false
-                    }
-
-                    query.onMessage({ content: targetTxt, role })
-                    break
+                if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+                    targetTxt = targetTxt.slice(1)
                 }
-                case 'Azure':
-                    targetTxt = choices[0].text
-                    console.log(resp)
 
-                    if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
-                        targetTxt = targetTxt.slice(1)
-                    }
+                query.onMessage({ content: targetTxt, role: '' })
+            } else {
+                const { content = '', role } = choices[0].delta
+                targetTxt = content
 
-                    query.onMessage({ content: targetTxt, role: '' })
-                    break
+                if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
+                    targetTxt = targetTxt.slice(1)
+                }
+
+                if (!role) {
+                    isFirst = false
+                }
+
+                query.onMessage({ content: targetTxt, role })
             }
         },
         onError: (err) => {
