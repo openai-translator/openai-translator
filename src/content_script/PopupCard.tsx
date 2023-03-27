@@ -22,7 +22,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { isDesktopApp, isTauri } from '../common/utils'
+import { defaultAPIURL, isDesktopApp, isTauri } from '../common/utils'
 import { Settings } from '../popup/Settings'
 import { documentPadding } from './consts'
 import Dropzone from 'react-dropzone'
@@ -1071,9 +1071,11 @@ export function PopupCard(props: IPopupCardProps) {
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
-                                    <div>
-                                        <IpLocationNotification />
-                                    </div>
+                                    {settings?.apiURL === defaultAPIURL && (
+                                        <div>
+                                            <IpLocationNotification />
+                                        </div>
+                                    )}
                                     <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
                                         <div
                                             style={{
