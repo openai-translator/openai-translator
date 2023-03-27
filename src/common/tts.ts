@@ -1,3 +1,5 @@
+import { getSettings } from './utils'
+
 interface SpeakOptions {
     text: string
     lang?: string
@@ -34,14 +36,25 @@ export const supportTTSLang: Record<string, string> = {
     'vi': 'vi-VN',
 }
 
-export function speak({ text, lang, onFinish }: SpeakOptions) {
+let supportVoices: SpeechSynthesisVoice[]
+window.speechSynthesis.onvoiceschanged = () => {
+    supportVoices = speechSynthesis.getVoices()
+}
+
+export async function speak({ text, lang, onFinish }: SpeakOptions) {
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
+
     const langTag = supportTTSLang[lang ?? 'en'] ?? 'en-US'
     utterance.text = text
     utterance.lang = langTag
-    utterance.voice = speechSynthesis.getVoices().find((v) => v.lang === langTag) ?? null
+
+    const settings = await getSettings()
+    const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
+    const settingsVoice = supportVoices.find((v) => v.voiceURI === settings.tts?.voices?.[langTag])
+    utterance.voice = settingsVoice ?? defaultVoice
+
     speechSynthesis.speak(utterance)
 }

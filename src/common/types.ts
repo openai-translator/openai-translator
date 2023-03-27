@@ -57,7 +57,6 @@ export interface ISettings {
     i18n?: string
     tts?: {
         voices?: { [key: string]: string }
-        rate?: number
     }
     restorePreviousPosition?: boolean
 }

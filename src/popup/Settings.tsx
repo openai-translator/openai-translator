@@ -13,7 +13,7 @@ import formStyles from 'inline:../components/Form/index.module.css'
 import { Button } from 'baseui-sd/button'
 import './index.css'
 import { TranslateMode, Provider, APIModel } from '../content_script/translate'
-import { Select, Value, Option, OnChangeParams } from 'baseui-sd/select'
+import { Select, Value, Option, OnChangeParams, Options } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
@@ -169,18 +169,33 @@ function ThemeTypeSelector(props: IThemeTypeSelectorProps) {
     )
 }
 
-interface VoiceSelectorProps {
-    value?: { [key: string]: string }
-    onChange?: (value: { [key: string]: string }) => void
+const useTTSSettingsStyles = createUseStyles({
+    settingsLabel: {
+        display: 'block',
+        marignTop: '4px',
+        marginBottom: '4px',
+    },
+    voiceSelector: {
+        display: 'flex',
+        gap: '4px',
+    },
+})
+
+interface TTSSettingsProps {
+    value?: ISettings['tts']
+    onChange?: (value: ISettings['tts']) => void
     onBlur?: () => void
 }
 
-function VoiceSelector(props: VoiceSelectorProps) {
-    console.log(props, 'props-----------')
+function TTSSettings(props: TTSSettingsProps) {
+    const styles = useTTSSettingsStyles()
+
     const [lang, setLang] = useState<Value>([{ label: 'English', id: 'en' }])
 
+    const ttsLangTag = lang.length > 0 ? supportTTSLang[lang[0].id as string] : 'en-US'
+
     const supportVoices = speechSynthesis.getVoices()
-    const ttsLangOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
+    const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
         if (id in supportTTSLang && supportVoices.find((v) => v.lang === supportTTSLang[id])) {
             return [
                 ...acc,
@@ -193,37 +208,45 @@ function VoiceSelector(props: VoiceSelectorProps) {
         return acc
     }, [] as Value)
 
-    const voiceOptions: Value = supportVoices
-        .filter((v) => lang.length > 0 && v.lang === supportTTSLang[lang[0].id as string])
-        .map((sv) => ({ id: sv.voiceURI, label: sv.name }))
+    const voiceOptions: Options = supportVoices
+        .filter((v) => lang.length > 0 && v.lang === ttsLangTag)
+        .map((sv) => ({ id: sv.voiceURI, label: sv.name, lang: sv.lang }))
 
-    const voiceName = props.value?.[lang[0].id as string] ?? null
-    const voiceCfg = supportVoices.find((v) => v.name === voiceName)
-    const voice: Value = voiceName && voiceCfg ? [{ label: voiceName, id: voiceCfg.voiceURI }] : []
+    const voiceURI = props.value?.voices?.[ttsLangTag] ?? voiceOptions?.[0]?.id ?? null
+    const voiceCfg = supportVoices.find((v) => v.voiceURI === voiceURI)
+    const voice: Value = voiceURI && voiceCfg ? [{ label: voiceCfg.name, id: voiceCfg.voiceURI }] : []
 
     const handleVoiceOnChange = ({ value }: OnChangeParams) => {
-        if (value.length > 0 && lang.length > 0) {
-            props.onChange?.({ ...(props.value ?? {}), [lang[0].id as string]: value[0].label as string })
+        if (value.length > 0) {
+            props.onChange?.({
+                ...(props.value ?? {}),
+                voices: { ...(props.value?.voices ?? {}), [value[0].lang]: value[0].id },
+            })
         }
     }
 
     return (
-        <div style={{ display: 'flex', gap: '4px' }}>
-            <Select
-                size='compact'
-                clearable={false}
-                options={ttsLangOptions}
-                onChange={({ value }) => setLang(value)}
-                value={lang}
-            />
-            <Select
-                size='compact'
-                options={voiceOptions}
-                value={voice}
-                onChange={handleVoiceOnChange}
-                clearable={false}
-                onBlur={props.onBlur}
-            />
+        <div>
+            <div>
+                <label className={styles.settingsLabel}>Voice</label>
+                <div className={styles.voiceSelector}>
+                    <Select
+                        size='compact'
+                        clearable={false}
+                        options={langOptions}
+                        onChange={({ value }) => setLang(value)}
+                        value={lang}
+                    />
+                    <Select
+                        size='compact'
+                        options={voiceOptions}
+                        value={voice}
+                        onChange={handleVoiceOnChange}
+                        clearable={false}
+                        onBlur={props.onBlur}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
@@ -705,8 +728,8 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='i18n' label={t('i18n')}>
                             <Ii18nSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name={['tts', 'voices']} label={t('TTS')}>
-                            <VoiceSelector />
+                        <FormItem name='tts' label={t('TTS')}>
+                            <TTSSettings onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
