@@ -56,4 +56,5 @@ export interface ISettings {
     themeType?: ThemeType
     i18n?: string
     restorePreviousPosition?: boolean
+    runAtStartup?: boolean
 }

@@ -12,6 +12,8 @@ mod windows;
 mod lang;
 
 use parking_lot::Mutex;
+use tauri_plugin_autostart::MacosLauncher;
+use std::env;
 use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
 
@@ -56,6 +58,9 @@ fn query_accessibility_permissions() -> bool {
 }
 
 fn main() {
+    let silently = env::args().any(|arg| {
+        arg == "--silently"
+    });
     let mut sys = System::new();
     sys.refresh_cpu(); // Refreshing CPU information.
     if let Some(cpu) = sys.cpus().first() {
@@ -74,7 +79,8 @@ fn main() {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        .setup(|app| {
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--silently"])))
+        .setup(move |app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle());
             if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
@@ -92,6 +98,11 @@ fn main() {
                     .icon("icon.png")
                     .notify(&app_handle)
                     .unwrap();
+            }
+            if silently {
+                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                window.unminimize().unwrap();
+                window.hide().unwrap();
             }
             Ok(())
         })

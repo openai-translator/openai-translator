@@ -25,6 +25,7 @@ import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
+import { enable as autostartEnable, disable as autostartDisable, isEnabled as autostartIsEnabled} from "tauri-plugin-autostart-api" ;
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -287,6 +288,24 @@ function RestorePreviousPositionCheckbox(props: RestorePreviousPositionCheckboxP
         />
     )
 }
+interface RunAtStartupCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function RunAtStartupCheckbox(props: RunAtStartupCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={props.value}
+            onChange={(e) => {
+                props.onChange?.(e.target.checked)
+                props.onBlur?.()
+            }}
+        />
+    )
+}
 
 const useHotkeyRecorderStyles = createUseStyles({
     'hotkeyRecorder': (props: IThemedStyleProps) => ({
@@ -479,6 +498,7 @@ export function Settings(props: IPopupProps) {
         hotkey: '',
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
+        runAtStartup: false,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
@@ -491,6 +511,7 @@ export function Settings(props: IPopupProps) {
     useEffect(() => {
         !(async () => {
             const settings = await utils.getSettings()
+            settings.runAtStartup = await autostartIsEnabled();
             setValues(settings)
             setPrevValues(settings)
         })()
@@ -499,11 +520,20 @@ export function Settings(props: IPopupProps) {
     const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
     }, [])
-
+    const isTauri = utils.isTauri()
     const onSubmit = useCallback(async (data: ISettings) => {
         setLoading(true)
         const oldSettings = await utils.getSettings()
+        if (isTauri) {
+            if (data.runAtStartup) {
+                await autostartEnable();
+            } else {
+                await autostartDisable();
+            }
+        }
+        data.runAtStartup = await autostartIsEnabled();
         await utils.setSettings(data)
+
         toast(t('Saved'), {
             icon: '👍',
             duration: 3000,
@@ -628,6 +658,13 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
+                        {
+                            isTauri && (
+                                <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                                    <RunAtStartupCheckbox onBlur={onBlur} />
+                                </FormItem>
+                            )
+                        }
                         <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                             <LanguageSelector onBlur={onBlur} />
                         </FormItem>
