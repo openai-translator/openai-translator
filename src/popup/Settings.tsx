@@ -24,7 +24,11 @@ import { useTheme } from '../common/hooks/useTheme'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
-import { enable as autostartEnable, disable as autostartDisable, isEnabled as autostartIsEnabled} from "tauri-plugin-autostart-api" ;
+import {
+    enable as autostartEnable,
+    disable as autostartDisable,
+    isEnabled as autostartIsEnabled,
+} from 'tauri-plugin-autostart-api'
 import { useSettings } from '../common/hooks/useSettings'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
@@ -510,8 +514,8 @@ export function Settings(props: IPopupProps) {
 
     useEffect(() => {
         if (settings) {
-            async() => {
-                settings.runAtStartup = await autostartIsEnabled();
+            ;async () => {
+                settings.runAtStartup = await autostartIsEnabled()
                 setValues(settings)
                 setPrevValues(settings)
             }
@@ -527,12 +531,12 @@ export function Settings(props: IPopupProps) {
         const oldSettings = await utils.getSettings()
         if (isTauri) {
             if (data.runAtStartup) {
-                await autostartEnable();
+                await autostartEnable()
             } else {
-                await autostartDisable();
+                await autostartDisable()
             }
         }
-        data.runAtStartup = await autostartIsEnabled();
+        data.runAtStartup = await autostartIsEnabled()
         await utils.setSettings(data)
 
         toast(t('Saved'), {
@@ -667,13 +671,11 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
-                        {
-                            isTauri && (
-                                <FormItem name='runAtStartup' label={t('Run at Startup')}>
-                                    <RunAtStartupCheckbox onBlur={onBlur} />
-                                </FormItem>
-                            )
-                        }
+                        {isTauri && (
+                            <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                                <RunAtStartupCheckbox onBlur={onBlur} />
+                            </FormItem>
+                        )}
                         <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                             <LanguageSelector onBlur={onBlur} />
                         </FormItem>
