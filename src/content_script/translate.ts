@@ -218,7 +218,7 @@ export async function translate(query: TranslateQuery) {
             let targetTxt = ''
 
             if (!isChatAPI) {
-                // It's used for Azure OpenAI Serivce's legacy parameters.
+                // It's used for Azure OpenAI Service's legacy parameters.
                 targetTxt = choices[0].text
 
                 if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
