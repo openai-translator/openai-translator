@@ -84,13 +84,8 @@ async function handleReadyStateChange(isStream: boolean, r: Tampermonkey.Respons
     Object.assign(r, { status: r.status })
 
     if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-        if (r.status === 200) {
-            if (isStream) {
-                Object.assign(r, { body: r.response })
-            } else {
-                const respText = await getStreamText(r.response)
-                Object.assign(r, { text: () => respText, json: () => JSON.parse(respText) })
-            }
+        if (r.status === 200 && isStream) {
+            Object.assign(r, { body: r.response })
             return r
         } else {
             const respText = await getStreamText(r.response)
