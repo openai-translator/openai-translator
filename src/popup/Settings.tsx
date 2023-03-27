@@ -24,11 +24,6 @@ import { useTheme } from '../common/hooks/useTheme'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
-import {
-    enable as autostartEnable,
-    disable as autostartDisable,
-    isEnabled as autostartIsEnabled,
-} from 'tauri-plugin-autostart-api'
 import { useSettings } from '../common/hooks/useSettings'
 import { supportTTSLang } from '../common/tts'
 
@@ -595,32 +590,40 @@ export function Settings(props: IPopupProps) {
     }, [form, values])
 
     const { settings, setSettings } = useSettings()
+    const isTauri = utils.isTauri()
 
     useEffect(() => {
         if (settings) {
-            ;async () => {
-                settings.runAtStartup = await autostartIsEnabled()
+            ;(async () => {
+                if (isTauri) {
+                    const { isEnabled: autostartIsEnabled } = await require('tauri-plugin-autostart-api')
+                    settings.runAtStartup = await autostartIsEnabled()
+                }
                 setValues(settings)
                 setPrevValues(settings)
-            }
+            })()
         }
     }, [settings])
 
     const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
     }, [])
-    const isTauri = utils.isTauri()
     const onSubmit = useCallback(async (data: ISettings) => {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         if (isTauri) {
+            const {
+                enable: autostartEnable,
+                disable: autostartDisable,
+                isEnabled: autostartIsEnabled,
+            } = await require('tauri-plugin-autostart-api')
             if (data.runAtStartup) {
                 await autostartEnable()
             } else {
                 await autostartDisable()
             }
+            data.runAtStartup = await autostartIsEnabled()
         }
-        data.runAtStartup = await autostartIsEnabled()
         await utils.setSettings(data)
 
         toast(t('Saved'), {
