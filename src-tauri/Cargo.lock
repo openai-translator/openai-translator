@@ -95,6 +95,7 @@ version = "0.1.0"
 dependencies = [
  "active-win-pos-rs",
  "arboard",
+ "captis",
  "clipboard",
  "cocoa 0.24.1",
  "core-graphics 0.22.3",
@@ -491,6 +492,19 @@ dependencies = [
  "glib-sys",
  "libc",
  "system-deps",
+]
+
+[[package]]
+name = "captis"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18181271d51b702730b3df97a207c96c61e4572cee11d7f9174306e6781a903f"
+dependencies = [
+ "core-graphics 0.22.3",
+ "image",
+ "libc",
+ "winapi 0.3.9",
+ "x11rb",
 ]
 
 [[package]]

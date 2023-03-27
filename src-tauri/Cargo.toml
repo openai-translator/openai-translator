@@ -48,6 +48,7 @@ reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 futures-util = "0.3.29"
 tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase", branch = "v2" }
+captis = "0.6.1"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"
@@ -56,7 +57,10 @@ macos-accessibility-client = "0.0.1"
 core-graphics = "0.22.3"
 
 [target.'cfg(windows)'.dependencies]
-windows = {version="0.44.0",features= ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
+windows = {version="0.44.0",features= ["Win32_UI_WindowsAndMessaging", "Win32_Foundation", "Media_Ocr", 
+    "Graphics_Imaging",
+    "Storage_Streams",
+    "Foundation"] }
 
 [features]
 # by default Tauri runs in production mode

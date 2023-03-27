@@ -3,6 +3,12 @@ use tauri::Manager;
 
 #[cfg(not(target_os = "macos"))]
 pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
+    use captis::{init_capturer, Capturer};
+    let capturer = init_capturer().expect("Couldn't Initialize Capturer");
+
+    let image = capturer.capture(0).expect("Couldn't Capture Screen");
+
+    image.save("test.jpeg").expect("Couldn't Save Image");
     Ok(())
 }
 
