@@ -1,11 +1,9 @@
-use cld2::{detect_language, Format};
+use whatlang::detect;
 
 #[tauri::command]
 pub fn detect_lang(text: String) -> String {
-    match detect_language(&text, Format::Text) {
-        (Some(info), _) => {
-            info.0.to_string()
-        },
-        (None, _) => "".to_string(),
+    match detect(&text) {
+        Some(info) => info.lang().to_string(),
+        None => "".to_string(),
     }
 }

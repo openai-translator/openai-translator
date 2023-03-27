@@ -3,8 +3,6 @@
 
 import { isTraditional } from '../common/traditional-or-simplified'
 import ISO6391 from 'iso-639-1'
-import { invoke } from '@tauri-apps/api/tauri'
-import { isDesktopApp } from '../common/utils'
 
 export const supportLanguages: [string, string][] = [
     // ['auto', 'auto'],
@@ -86,22 +84,9 @@ export async function detectLang(text: string): Promise<string | null> {
 export async function _detectLang(text: string): Promise<string | null> {
     const detectedText = text.trim()
     return new Promise((resolve) => {
-        if (isDesktopApp()) {
-            invoke('detect_lang', { text: detectedText }).then((lang) => {
-                if (!lang) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const langName = (window as any).detectLanguage(detectedText)
-                    const langCode = ISO6391.getCode(langName)
-                    resolve(langCode)
-                } else {
-                    resolve(lang as string)
-                }
-            })
-        } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const langName = (window as any).detectLanguage(detectedText)
-            const langCode = ISO6391.getCode(langName)
-            resolve(langCode)
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const langName = (window as any).detectLanguage(detectedText)
+        const langCode = ISO6391.getCode(langName)
+        resolve(langCode)
     })
 }

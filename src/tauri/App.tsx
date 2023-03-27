@@ -83,7 +83,7 @@ export function App() {
         }
     }, [])
 
-    const { themeType } = useTheme()
+    const { theme, themeType } = useTheme()
 
     const svgPathColor = themeType === 'dark' ? '#fff' : '#000'
 
@@ -91,7 +91,7 @@ export function App() {
         <div
             style={{
                 position: 'relative',
-                background: themeType === 'dark' ? '#1f1f1f' : '#fff',
+                background: theme.colors.backgroundPrimary,
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
                 minHeight: '100vh',
             }}
@@ -145,6 +145,7 @@ export function App() {
                 editorRows={10}
                 containerStyle={isLinux ? undefined : { paddingTop: '26px' }}
                 onSettingsSave={(oldSettings) => {
+                    invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)
                 }}

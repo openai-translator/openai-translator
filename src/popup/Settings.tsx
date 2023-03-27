@@ -21,11 +21,11 @@ import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
 import { ISettings, IThemedStyleProps, ThemeType } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
-import { useThemeType } from '../common/hooks/useThemeType'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../package.json'
 import { enable as autostartEnable, disable as autostartDisable, isEnabled as autostartIsEnabled} from "tauri-plugin-autostart-api" ;
+import { useSettings } from '../common/hooks/useSettings'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -470,17 +470,15 @@ function ProviderSelector(props: IProviderSelectorProps) {
     )
 }
 
-const engine = new Styletron()
-
 const { Form, FormItem, useForm } = createForm<ISettings>()
 
 interface IPopupProps {
     onSave?: (oldSettings: ISettings) => void
+    engine: Styletron
 }
 
 export function Settings(props: IPopupProps) {
     const { theme } = useTheme()
-    const { setThemeType } = useThemeType()
 
     const { t } = useTranslation()
 
@@ -508,14 +506,17 @@ export function Settings(props: IPopupProps) {
         form.setFieldsValue(values)
     }, [form, values])
 
+    const { settings, setSettings } = useSettings()
+
     useEffect(() => {
-        !(async () => {
-            const settings = await utils.getSettings()
-            settings.runAtStartup = await autostartIsEnabled();
-            setValues(settings)
-            setPrevValues(settings)
-        })()
-    }, [])
+        if (settings) {
+            async() => {
+                settings.runAtStartup = await autostartIsEnabled();
+                setValues(settings)
+                setPrevValues(settings)
+            }
+        }
+    }, [settings])
 
     const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
@@ -539,9 +540,7 @@ export function Settings(props: IPopupProps) {
             duration: 3000,
         })
         setLoading(false)
-        if (data.themeType) {
-            setThemeType(data.themeType)
-        }
+        setSettings(data)
         props.onSave?.(oldSettings)
     }, [])
 
@@ -564,7 +563,7 @@ export function Settings(props: IPopupProps) {
             }}
         >
             <style>{formStyles}</style>
-            <StyletronProvider value={engine}>
+            <StyletronProvider value={props.engine}>
                 <BaseProvider theme={theme}>
                     <nav
                         style={{
@@ -622,13 +621,23 @@ export function Settings(props: IPopupProps) {
                             caption={
                                 <div>
                                     {t('Go to the')}{' '}
-                                    <a
-                                        target='_blank'
-                                        href='https://platform.openai.com/account/api-keys'
-                                        rel='noreferrer'
-                                    >
-                                        {t('OpenAI page')}
-                                    </a>{' '}
+                                    {values.provider === 'Azure' ? (
+                                        <a
+                                            target='_blank'
+                                            href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
+                                            rel='noreferrer'
+                                        >
+                                            {t('Azure OpenAI Service page')}
+                                        </a>
+                                    ) : (
+                                        <a
+                                            target='_blank'
+                                            href='https://platform.openai.com/account/api-keys'
+                                            rel='noreferrer'
+                                        >
+                                            {t('OpenAI page')}
+                                        </a>
+                                    )}{' '}
                                     {t(
                                         'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
                                     )}
