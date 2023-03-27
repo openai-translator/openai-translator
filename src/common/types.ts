@@ -59,4 +59,5 @@ export interface ISettings {
         voices?: { [key: string]: string }
     }
     restorePreviousPosition?: boolean
+    runAtStartup?: boolean
 }

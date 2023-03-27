@@ -14,6 +14,8 @@ mod windows;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
+use tauri_plugin_autostart::MacosLauncher;
+use std::env;
 use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
 
@@ -63,6 +65,10 @@ fn query_accessibility_permissions() -> bool {
 }
 
 fn main() {
+    let silently = env::args().any(|arg| {
+        arg == "--silently"
+    });
+
     let mut mouse_manager = Mouse::new();
 
     if !query_accessibility_permissions() {
@@ -217,8 +223,14 @@ fn main() {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--silently"])))
         // .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|app| {
+        .setup(move |app| {
+            if silently {
+                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                window.unminimize().unwrap();
+                window.hide().unwrap();
+            }
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle());
             if cfg!(target_os = "windows") || cfg!(target_os = "linux") {

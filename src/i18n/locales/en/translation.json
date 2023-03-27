@@ -35,6 +35,7 @@
   "OpenAI page": "OpenAI page",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.",
   "Restore Previous Position": "Restore Previous Position",
+  "Run at Startup": "Run at Startup",
   "API Model": "API Model",
   "Chars Limited": "The number of characters exceeds the limit",
   "Country Not Supported": "Your IP address is from {{name}}, which is not a <0>supported region</0> of OpenAI. Continuing to use without extra network configuration may result in your account being blocked by OpenAI, regardless of your ChatGPT Plus subscription status or any remaining account balance.",

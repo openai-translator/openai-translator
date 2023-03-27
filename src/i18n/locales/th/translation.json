@@ -34,6 +34,7 @@
   "OpenAI page": "หน้า OpenAI",
   "to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.": "ในการรับ API Key ของคุณ คุณสามารถแยก API Key หลายคีย์ ด้วยเครื่องหมายจุลภาคหรือคอมม่า (,) เพื่อทำให้ได้รับโควต้าสองเท่าและการจัดสรรภาระงาน",
   "Restore Previous Position": "กู้คืนตำแหน่งก่อนหน้า",
+  "Run at Startup": "เรียกใช้เมื่อเริ่มต้น",
   "API Model": "โมเดล API",
   "Chars Limited": "จำนวนอักขระเกินขีดจำกัด",
   "Country Not Supported": "ที่อยู่ IP ของคุณมาจาก {{name}}, ซึ่งไม่ใช่<0>เขตที่รองรับ</0>ของ OpenAI การใช้งานต่อไปโดยไม่มีการกำหนดค่าเครือข่ายเสริมอาจทำให้บัญชีของคุณถูกบล็อกโดย OpenAI ไม่ว่าคุณจะเป็นสมาชิกของ ChatGPT Plus หรือมียอดคงเหลือในบัญชี",

@@ -7894,6 +7894,12 @@ tar@^6.1.11:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
+"tauri-plugin-autostart-api@https://github.com/tauri-apps/tauri-plugin-autostart":
+  version "0.0.0"
+  resolved "https://github.com/tauri-apps/tauri-plugin-autostart#0c8e3ad92e00e7b0aed60fc8a639e77407105253"
+  dependencies:
+    "@tauri-apps/api" "^1.2.0"
+
 temp-file@^3.4.0:
   version "3.4.0"
   resolved "https://registry.npmjs.org/temp-file/-/temp-file-3.4.0.tgz"
