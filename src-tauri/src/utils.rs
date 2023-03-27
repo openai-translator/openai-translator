@@ -1,5 +1,4 @@
 use tauri::Manager;
-use arboard::Clipboard;
 
 
 use crate::APP_HANDLE;
