@@ -41,6 +41,7 @@ pub static SELECTED_TEXT: Mutex<String> = Mutex::new(String::new());
 pub static PREVIOUS_PRESS_TIME: Mutex<u128> = Mutex::new(0);
 pub static PREVIOUS_RELEASE_TIME: Mutex<u128> = Mutex::new(0);
 pub static PREVIOUS_RELEASE_POSITION: Mutex<(i32, i32)> = Mutex::new((0, 0));
+pub static RELEASE_THREAD_ID: Mutex<u32> = Mutex::new(0);
 
 #[derive(Clone, serde::Serialize)]
 struct Payload {
@@ -87,6 +88,7 @@ fn main() {
                 *PREVIOUS_PRESS_TIME.lock() = current_press_time;
             }
             mouce::common::MouseEvent::Release(mouce::common::MouseButton::Left) => {
+                let current_release_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
                 let mut is_text_selected_event = false;
                 let (x, y): (i32, i32) = windows::get_mouse_location().unwrap();
                 let (prev_release_x, prev_release_y) = { *PREVIOUS_RELEASE_POSITION.lock() };
@@ -94,11 +96,14 @@ fn main() {
                     *PREVIOUS_RELEASE_POSITION.lock() = (x, y);
                 }
                 let mouse_distance = (((x - prev_release_x).pow(2) + (y - prev_release_y).pow(2)) as f64).sqrt();
-                let previous_press_time = { *PREVIOUS_PRESS_TIME.lock() };
-                let previous_release_time = { *PREVIOUS_RELEASE_TIME.lock() };
-                let current_release_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
+                let mut previous_press_time = 0;
+                let mut previous_release_time = 0;
                 {
-                    *PREVIOUS_RELEASE_TIME.lock() = current_release_time;
+                    let previous_press_time_lock = PREVIOUS_PRESS_TIME.lock();
+                    let mut previous_release_time_lock = PREVIOUS_RELEASE_TIME.lock();
+                    *previous_release_time_lock = current_release_time;
+                    previous_release_time = *previous_release_time_lock;
+                    previous_press_time = *previous_press_time_lock;
                 }
                 let pressed_time = current_release_time - previous_press_time;
                 let is_double_click = current_release_time - previous_release_time < 1000 && mouse_distance < 100.0;
@@ -137,19 +142,32 @@ fn main() {
                     None => false
                 };
                 if !is_text_selected_event && !is_click_on_thumb {
+                    windows::close_thumb();
+                    // println!("not text selected event");
+                    // println!("is_click_on_thumb: {}", is_click_on_thumb);
+                    // println!("mouse_distance: {}", mouse_distance);
+                    // println!("pressed_time: {}", pressed_time);
+                    // println!("released_time: {}", current_release_time - previous_release_time);
+                    // println!("is_double_click: {}", is_double_click);
                     return;
                 }
 
                 if !is_click_on_thumb {
-                    let selected_text = utils::get_selected_text().unwrap();
-                    if !selected_text.is_empty() && !is_click_on_thumb {
-                        {
-                            *SELECTED_TEXT.lock() = selected_text;
-                        }
-                        windows::show_thumb(x, y);
-                    } else {
-                        windows::close_thumb();
+                    if RELEASE_THREAD_ID.is_locked() {
+                        return;
                     }
+                    std::thread::spawn(move || {
+                        let _lock = RELEASE_THREAD_ID.lock();
+                        let selected_text = utils::get_selected_text().unwrap();
+                        if !selected_text.is_empty() {
+                            {
+                                *SELECTED_TEXT.lock() = selected_text;
+                            }
+                            windows::show_thumb(x, y);
+                        } else {
+                            windows::close_thumb();
+                        }
+                    });
                 } else {
                     windows::close_thumb();
                     let selected_text = (*SELECTED_TEXT.lock()).to_string();

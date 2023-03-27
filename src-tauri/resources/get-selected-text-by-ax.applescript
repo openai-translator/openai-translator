@@ -30,15 +30,18 @@ tell sys to if (count _U) ≠ 0 then ¬
 
 set _U to a reference to UI elements of _W
 
-tell sys to repeat while (_U exists)
-	tell (a reference to ¬
-		(_U whose ¬
-			name of attributes contains "AXSelectedText" and ¬
-			class of value of attribute "AXSelectedText" is not class)) ¬
-		to if (count) ≠ 0 then return the value of ¬
-		attribute "AXSelectedText" of its contents's first item
-	
-	set _U to a reference to (UI elements of _U)
-end repeat
+with timeout of 1 seconds
+	tell sys to repeat while (_U exists)
+		tell (a reference to ¬
+			(_U whose ¬
+				name of attributes contains "AXSelectedText" and ¬
+				value of attribute "AXSelectedText" is not "" and ¬
+				class of value of attribute "AXSelectedText" is not class)) ¬
+			to if (count) ≠ 0 then return the value of ¬
+			attribute "AXSelectedText" of its contents's first item
+
+		set _U to a reference to (UI elements of _U)
+	end repeat
+end timeout
 
 error "not found AXSelectedText"
