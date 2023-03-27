@@ -72,7 +72,39 @@ class Browser implements IBrowser {
 
 export const userscriptBrowser = new Browser()
 
-export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<any> {
+async function getStreamText(stream: ReadableStream) {
+    const reader = stream.getReader()
+    const { value } = await reader.read()
+    const str = new TextDecoder().decode(value)
+    reader.releaseLock()
+    return str
+}
+
+async function handleReadyStateChange(isStream: boolean, r: Tampermonkey.Response<any>) {
+    Object.assign(r, { status: r.status })
+
+    if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+        if (r.status === 200) {
+            if (isStream) {
+                Object.assign(r, { body: r.response })
+            } else {
+                const respText = await getStreamText(r.response)
+                Object.assign(r, { text: () => respText, json: () => JSON.parse(respText) })
+            }
+            return r
+        } else {
+            const respText = await getStreamText(r.response)
+            Object.assign(r, { json: () => JSON.parse(respText), text: () => respText })
+            return r
+        }
+    }
+}
+
+export async function userscriptFetch(
+    url: string,
+    { body, headers, method, signal }: RequestInit,
+    isStream = true
+): Promise<any> {
     return new Promise((resolve) => {
         const handle = GM_xmlhttpRequest({
             url,
@@ -80,20 +112,7 @@ export async function userscriptFetch(url: string, { body, headers, method, sign
             headers: headers as any,
             method: method as any,
             responseType: 'stream' as any,
-            onreadystatechange: async function (r) {
-                Object.assign(r, { body: r.response, status: r.status })
-                if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-                    if (r.status === 200) {
-                        resolve(r)
-                    } else {
-                        const reader = r.response.getReader()
-                        const { value } = await reader.read()
-                        const str = new TextDecoder().decode(value)
-                        Object.assign(r, { json: () => JSON.parse(str) })
-                        resolve(r)
-                    }
-                }
-            },
+            onreadystatechange: async (r) => resolve(await handleReadyStateChange(isStream, r)),
         })
         signal?.addEventListener('abort', () => {
             handle.abort()
