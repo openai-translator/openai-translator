@@ -39,7 +39,9 @@ function parseResponse(response: string): OpenAICDNCGITraceResponse {
 }
 
 export async function getIpLocationInfo(): Promise<IpLocation> {
-    const fetch = isUserscript() ? userscriptFetch : window.fetch
+    const fetch = isUserscript()
+        ? (url: string, details: RequestInit) => userscriptFetch(url, details, false)
+        : window.fetch
 
     const code = await fetch(
         'https://chat.openai.com/cdn-cgi/trace', // API endpoint of OpenAI's CDN that returns location information. No authentication needed.
