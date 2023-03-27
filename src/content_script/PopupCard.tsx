@@ -11,7 +11,6 @@ import { AiOutlineTranslation } from 'react-icons/ai'
 import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode } from 'react-icons/md'
-import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, supportLanguages } from './lang'
 import { translate, TranslateMode } from './translate'
 import { Select, Value, Option } from 'baseui-sd/select'
@@ -38,6 +37,7 @@ import LRUCache from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../common/types'
 import { useTheme } from '../common/hooks/useTheme'
 import { speak } from '../common/tts'
+import { Tooltip } from '../components/Tooltip'
 import { useSettings } from '../common/hooks/useSettings'
 
 const cache = new LRUCache({
@@ -962,11 +962,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                 setDetectTo(detectFrom)
                                             }}
                                         >
-                                            <StatefulTooltip content='Exchange' placement='top' showArrow>
+                                            <Tooltip content='Exchange' placement='top'>
                                                 <div>
                                                     <TbArrowsExchange />
                                                 </div>
-                                            </StatefulTooltip>
+                                            </Tooltip>
                                         </div>
                                         <div className={styles.to}>
                                             <Select
@@ -994,11 +994,7 @@ export function PopupCard(props: IPopupCardProps) {
                                         </div>
                                     </div>
                                     <div className={styles.popupCardHeaderButtonGroup}>
-                                        <StatefulTooltip
-                                            content={t('Translate')}
-                                            placement={isDesktopApp() ? 'bottom' : 'top'}
-                                            showArrow
-                                        >
+                                        <Tooltip content={t('Translate')} placement={isDesktopApp() ? 'bottom' : 'top'}>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'translate' ? 'primary' : 'secondary'}
@@ -1006,12 +1002,8 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <AiOutlineTranslation />
                                             </Button>
-                                        </StatefulTooltip>
-                                        <StatefulTooltip
-                                            content={t('Polishing')}
-                                            placement={isDesktopApp() ? 'bottom' : 'top'}
-                                            showArrow
-                                        >
+                                        </Tooltip>
+                                        <Tooltip content={t('Polishing')} placement={isDesktopApp() ? 'bottom' : 'top'}>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
@@ -1022,12 +1014,8 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <IoColorPaletteOutline />
                                             </Button>
-                                        </StatefulTooltip>
-                                        <StatefulTooltip
-                                            content={t('Summarize')}
-                                            placement={isDesktopApp() ? 'bottom' : 'top'}
-                                            showArrow
-                                        >
+                                        </Tooltip>
+                                        <Tooltip content={t('Summarize')} placement={isDesktopApp() ? 'bottom' : 'top'}>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
@@ -1037,12 +1025,8 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <MdOutlineSummarize />
                                             </Button>
-                                        </StatefulTooltip>
-                                        <StatefulTooltip
-                                            content={t('Analyze')}
-                                            placement={isDesktopApp() ? 'bottom' : 'top'}
-                                            showArrow
-                                        >
+                                        </Tooltip>
+                                        <Tooltip content={t('Analyze')} placement={isDesktopApp() ? 'bottom' : 'top'}>
                                             <Button
                                                 size='mini'
                                                 kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
@@ -1050,11 +1034,10 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <MdOutlineAnalytics />
                                             </Button>
-                                        </StatefulTooltip>
-                                        <StatefulTooltip
+                                        </Tooltip>
+                                        <Tooltip
                                             content={t('Explain Code')}
-                                            placement={isDesktopApp() ? 'left' : 'top'}
-                                            showArrow
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
                                         >
                                             <Button
                                                 size='mini'
@@ -1066,7 +1049,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             >
                                                 <MdCode />
                                             </Button>
-                                        </StatefulTooltip>
+                                        </Tooltip>
                                     </div>
                                 </div>
                                 <div className={styles.popupCardContentContainer}>
@@ -1206,10 +1189,9 @@ export function PopupCard(props: IPopupCardProps) {
                                         </Dropzone>
                                         <div className={styles.actionButtonsContainer}>
                                             <div style={{ marginRight: 'auto' }} />
-                                            <StatefulTooltip
+                                            <Tooltip
                                                 content={t('Upload an image for OCR translation')}
-                                                showArrow
-                                                placement='left'
+                                                placement='bottom'
                                             >
                                                 <div className={styles.actionButton}>
                                                     <Dropzone onDrop={onDrop}>
@@ -1221,8 +1203,8 @@ export function PopupCard(props: IPopupCardProps) {
                                                         )}
                                                     </Dropzone>
                                                 </div>
-                                            </StatefulTooltip>
-                                            <StatefulTooltip content={t('Speak')} showArrow placement='left'>
+                                            </Tooltip>
+                                            <Tooltip content={t('Speak')} placement='bottom'>
                                                 <div
                                                     className={styles.actionButton}
                                                     onClick={() => {
@@ -1245,12 +1227,8 @@ export function PopupCard(props: IPopupCardProps) {
                                                         <RxSpeakerLoud size={13} />
                                                     )}
                                                 </div>
-                                            </StatefulTooltip>
-                                            <StatefulTooltip
-                                                content={t('Copy to clipboard')}
-                                                showArrow
-                                                placement='left'
-                                            >
+                                            </Tooltip>
+                                            <Tooltip content={t('Copy to clipboard')} placement='bottom'>
                                                 <div>
                                                     <CopyToClipboard
                                                         text={editableText}
@@ -1267,8 +1245,8 @@ export function PopupCard(props: IPopupCardProps) {
                                                         </div>
                                                     </CopyToClipboard>
                                                 </div>
-                                            </StatefulTooltip>
-                                            <StatefulTooltip content={t('Clear input')} showArrow placement='left'>
+                                            </Tooltip>
+                                            <Tooltip content={t('Clear input')} placement='bottom'>
                                                 <div
                                                     className={styles.actionButton}
                                                     onClick={() => {
@@ -1280,7 +1258,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         <RxEraser size={13} />
                                                     </div>
                                                 </div>
-                                            </StatefulTooltip>
+                                            </Tooltip>
                                         </div>
                                     </div>
                                     {originalText !== '' && (
@@ -1308,14 +1286,14 @@ export function PopupCard(props: IPopupCardProps) {
                                             {errorMessage ? (
                                                 <div className={styles.errorMessage}>
                                                     <span>{errorMessage}</span>
-                                                    <StatefulTooltip content={t('Retry')} showArrow placement='left'>
+                                                    <Tooltip content={t('Retry')} placement='bottom'>
                                                         <div
                                                             onClick={() => forceTranslate()}
                                                             className={styles.actionButton}
                                                         >
                                                             <RxReload size={13} />
                                                         </div>
-                                                    </StatefulTooltip>
+                                                    </Tooltip>
                                                 </div>
                                             ) : (
                                                 <div
@@ -1347,11 +1325,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             className={styles.actionButtonsContainer}
                                                         >
                                                             <div style={{ marginRight: 'auto' }} />
-                                                            <StatefulTooltip
-                                                                content={t('Speak')}
-                                                                showArrow
-                                                                placement='left'
-                                                            >
+                                                            <Tooltip content={t('Speak')} placement='bottom'>
                                                                 <div
                                                                     className={styles.actionButton}
                                                                     onClick={() => {
@@ -1374,11 +1348,10 @@ export function PopupCard(props: IPopupCardProps) {
                                                                         <RxSpeakerLoud size={13} />
                                                                     )}
                                                                 </div>
-                                                            </StatefulTooltip>
-                                                            <StatefulTooltip
+                                                            </Tooltip>
+                                                            <Tooltip
                                                                 content={t('Copy to clipboard')}
-                                                                showArrow
-                                                                placement='left'
+                                                                placement='bottom'
                                                             >
                                                                 <div>
                                                                     <CopyToClipboard
@@ -1396,7 +1369,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                         </div>
                                                                     </CopyToClipboard>
                                                                 </div>
-                                                            </StatefulTooltip>
+                                                            </Tooltip>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1408,9 +1381,8 @@ export function PopupCard(props: IPopupCardProps) {
                         )}
                         {props.showSettings && (
                             <div className={styles.footer}>
-                                <StatefulTooltip
+                                <Tooltip
                                     content={showSettings ? t('Go to Translator') : t('Go to Settings')}
-                                    showArrow
                                     placement='right'
                                 >
                                     <div onClick={() => setShowSettings((s) => !s)}>
@@ -1420,7 +1392,7 @@ export function PopupCard(props: IPopupCardProps) {
                                             <IoSettingsOutline size='14' />
                                         )}
                                     </div>
-                                </StatefulTooltip>
+                                </Tooltip>
                             </div>
                         )}
                         <Toaster />
