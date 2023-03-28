@@ -737,9 +737,11 @@ export function Settings(props: IPopupProps) {
                         >
                             <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='apiModel' label={t('API Model')}>
-                            <APIModelSelector onBlur={onBlur} />
-                        </FormItem>
+                        {values.provider !== 'Azure' && (
+                            <FormItem name='apiModel' label={t('API Model')}>
+                                <APIModelSelector onBlur={onBlur} />
+                            </FormItem>
+                        )}
                         <FormItem required name='apiURL' label={t('API URL')}>
                             <Input size='compact' onBlur={onBlur} />
                         </FormItem>
