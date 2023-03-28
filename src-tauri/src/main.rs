@@ -156,23 +156,11 @@ fn main() {
                 }
 
                 if !is_click_on_thumb {
-                    if cfg!(target_os = "macos") {
-                        if RELEASE_THREAD_ID.is_locked() {
-                            return;
-                        }
-                        std::thread::spawn(move || {
-                            let _lock = RELEASE_THREAD_ID.lock();
-                            let selected_text = utils::get_selected_text().unwrap();
-                            if !selected_text.is_empty() {
-                                {
-                                    *SELECTED_TEXT.lock() = selected_text;
-                                }
-                                windows::show_thumb(x, y);
-                            } else {
-                                windows::close_thumb();
-                            }
-                        });
-                    } else {
+                    if RELEASE_THREAD_ID.is_locked() {
+                        return;
+                    }
+                    std::thread::spawn(move || {
+                        let _lock = RELEASE_THREAD_ID.lock();
                         let selected_text = utils::get_selected_text().unwrap();
                         if !selected_text.is_empty() {
                             {
@@ -182,7 +170,7 @@ fn main() {
                         } else {
                             windows::close_thumb();
                         }
-                    }
+                    });
                 } else {
                     windows::close_thumb();
                     let selected_text = (*SELECTED_TEXT.lock()).to_string();
