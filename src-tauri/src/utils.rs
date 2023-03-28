@@ -1,5 +1,5 @@
+use arboard::Clipboard;
 use tauri::Manager;
-
 
 use crate::APP_HANDLE;
 
@@ -89,7 +89,10 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
         .resolve_resource("resources/get-selected-text-by-ax.applescript")
         .expect("failed to resolve ocr binary resource");
 
-    match std::process::Command::new("osascript").arg(apple_script).output() {
+    match std::process::Command::new("osascript")
+        .arg(apple_script)
+        .output()
+    {
         Ok(output) => {
             // check exit code
             if output.status.success() {
@@ -100,7 +103,8 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
                 let content = content.trim();
                 Ok(content.to_string())
             } else {
-                let err = output.stderr
+                let err = output
+                    .stderr
                     .into_iter()
                     .map(|c| c as char)
                     .collect::<String>()
@@ -121,7 +125,10 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
         .resolve_resource("resources/get-selected-text.applescript")
         .expect("failed to resolve ocr binary resource");
 
-    match std::process::Command::new("osascript").arg(apple_script).output() {
+    match std::process::Command::new("osascript")
+        .arg(apple_script)
+        .output()
+    {
         Ok(output) => {
             // check exit code
             if output.status.success() {
@@ -132,7 +139,8 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
                 let content = content.trim();
                 Ok(content.to_string())
             } else {
-                let err = output.stderr
+                let err = output
+                    .stderr
                     .into_iter()
                     .map(|c| c as char)
                     .collect::<String>()
