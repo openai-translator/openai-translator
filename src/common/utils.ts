@@ -33,7 +33,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ocrHotkey: 1,
     themeType: 1,
     i18n: 1,
-    tts: 1,
+    ttsVoices: 1,
     restorePreviousPosition: 1,
     runAtStartup: 1,
 }

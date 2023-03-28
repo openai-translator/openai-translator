@@ -6,7 +6,7 @@ interface SpeakOptions {
     onFinish?: () => void
 }
 
-export const supportTTSLang: Record<string, string> = {
+export const langCode2TTSLang: Record<string, string> = {
     'en': 'en-US',
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
@@ -47,13 +47,15 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
 
-    const langTag = supportTTSLang[lang ?? 'en'] ?? 'en-US'
+    const langTag = langCode2TTSLang[lang ?? 'en'] ?? 'en-US'
     utterance.text = text
     utterance.lang = langTag
 
     const settings = await getSettings()
     const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
-    const settingsVoice = supportVoices.find((v) => v.voiceURI === settings.tts?.voices?.[langTag])
+    const settingsVoice = supportVoices.find(
+        (v) => v.voiceURI === settings.ttsVoices?.find((item) => item.lang === lang)?.voice
+    )
     utterance.voice = settingsVoice ?? defaultVoice
 
     speechSynthesis.speak(utterance)
