@@ -13,7 +13,7 @@ import formStyles from 'inline:../components/Form/index.module.css'
 import { Button } from 'baseui-sd/button'
 import './index.css'
 import { TranslateMode, Provider, APIModel } from '../content_script/translate'
-import { Select, Value, Option, OnChangeParams, Options } from 'baseui-sd/select'
+import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { supportLanguages } from '../content_script/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
@@ -727,17 +727,21 @@ export function Settings(props: IPopupProps) {
         setLoading(true)
         const oldSettings = await utils.getSettings()
         if (isTauri) {
-            const {
-                enable: autostartEnable,
-                disable: autostartDisable,
-                isEnabled: autostartIsEnabled,
-            } = await require('tauri-plugin-autostart-api')
-            if (data.runAtStartup) {
-                await autostartEnable()
-            } else {
-                await autostartDisable()
+            try {
+                const {
+                    enable: autostartEnable,
+                    disable: autostartDisable,
+                    isEnabled: autostartIsEnabled,
+                } = await require('tauri-plugin-autostart-api')
+                if (data.runAtStartup) {
+                    await autostartEnable()
+                } else {
+                    await autostartDisable()
+                }
+                data.runAtStartup = await autostartIsEnabled()
+            } catch (e) {
+                console.log('err', e)
             }
-            data.runAtStartup = await autostartIsEnabled()
         }
         await utils.setSettings(data)
 

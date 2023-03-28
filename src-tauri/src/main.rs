@@ -16,7 +16,7 @@ use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
 use tauri_plugin_autostart::MacosLauncher;
 use std::env;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
 
 use crate::config::{get_config_content, clear_config_cache};
@@ -175,9 +175,19 @@ fn main() {
                     windows::close_thumb();
                     let selected_text = (*SELECTED_TEXT.lock()).to_string();
                     if !selected_text.is_empty() {
-                        let window = windows::show_main_window(false);
-                        window.set_focus().unwrap();
+                        let window = windows::show_main_window(false, false);
                         utils::send_text(selected_text);
+                        if cfg!(target_os = "windows") {
+                            window.set_always_on_top(true).unwrap();
+                            let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
+                            if !always_on_top {
+                                std::thread::spawn(move || {
+                                    window.set_always_on_top(false).unwrap();
+                                });
+                            }
+                        } else {
+                            window.set_focus().unwrap();
+                        }
                     }
                 }
             }
