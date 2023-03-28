@@ -82,6 +82,9 @@ fn main() {
         if !always_show_icons {
             return;
         }
+        if cfg!(target_os = "linux") {
+            return;
+        }
         match event {
             mouce::common::MouseEvent::Press(mouce::common::MouseButton::Left) => {
                 let current_press_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
