@@ -104,13 +104,14 @@ fn main() {
                 {
                     let previous_press_time_lock = PREVIOUS_PRESS_TIME.lock();
                     let mut previous_release_time_lock = PREVIOUS_RELEASE_TIME.lock();
-                    *previous_release_time_lock = current_release_time;
                     previous_release_time = *previous_release_time_lock;
+                    *previous_release_time_lock = current_release_time;
                     previous_press_time = *previous_press_time_lock;
                 }
+                let is_pressed = previous_release_time < previous_press_time;
                 let pressed_time = current_release_time - previous_press_time;
                 let is_double_click = current_release_time - previous_release_time < 700 && mouse_distance < 100.0;
-                if pressed_time > 300 && mouse_distance > 20.0 {
+                if is_pressed && pressed_time > 300 && mouse_distance > 20.0 {
                     is_text_selected_event = true;
                 }
                 if previous_release_time != 0 && is_double_click {
