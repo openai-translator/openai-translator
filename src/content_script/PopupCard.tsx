@@ -269,6 +269,13 @@ const useStyles = createUseStyles({
         paddingTop: '6px',
         paddingBottom: '6px',
     }),
+    'actionButtonDisabled': (props: IThemedStyleProps) => ({
+        color: props.theme.colors.buttonDisabledText,
+        cursor: 'default',
+        display: 'flex',
+        paddingTop: '6px',
+        paddingBottom: '6px',
+    }),
     'writing': {
         'marginLeft': '3px',
         'width': '10px',
@@ -889,6 +896,42 @@ export function PopupCard(props: IPopupCardProps) {
         await (await worker).terminate()
     }
 
+    const handleEditSpeakAction = () => {
+        if (typeof window.speechSynthesis === 'undefined') {
+            return
+        }
+
+        if (isSpeakingEditableText) {
+            speechSynthesis.cancel()
+            setIsSpeakingEditableText(false)
+            return
+        }
+        setIsSpeakingEditableText(true)
+        speak({
+            text: editableText,
+            lang: detectFrom,
+            onFinish: handleSpeakDone,
+        })
+    }
+
+    const handleTranslatedSpeakAction = () => {
+        if (typeof window.speechSynthesis === 'undefined') {
+            return
+        }
+
+        if (isSpeakingTranslatedText) {
+            speechSynthesis.cancel()
+            setIsSpeakingTranslatedText(false)
+            return
+        }
+        setIsSpeakingTranslatedText(true)
+        speak({
+            text: translatedText,
+            lang: detectTo,
+            onFinish: handleSpeakDone,
+        })
+    }
+
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
@@ -1202,20 +1245,12 @@ export function PopupCard(props: IPopupCardProps) {
                                             </Tooltip>
                                             <Tooltip content={t('Speak')} placement='bottom'>
                                                 <div
-                                                    className={styles.actionButton}
-                                                    onClick={() => {
-                                                        if (isSpeakingEditableText) {
-                                                            speechSynthesis.cancel()
-                                                            setIsSpeakingEditableText(false)
-                                                            return
-                                                        }
-                                                        setIsSpeakingEditableText(true)
-                                                        speak({
-                                                            text: editableText,
-                                                            lang: detectFrom,
-                                                            onFinish: handleSpeakDone,
-                                                        })
-                                                    }}
+                                                    className={
+                                                        window.speechSynthesis
+                                                            ? styles.actionButton
+                                                            : styles.actionButtonDisabled
+                                                    }
+                                                    onClick={handleEditSpeakAction}
                                                 >
                                                     {isSpeakingEditableText ? (
                                                         <SpeakerMotion />
@@ -1323,20 +1358,12 @@ export function PopupCard(props: IPopupCardProps) {
                                                             <div style={{ marginRight: 'auto' }} />
                                                             <Tooltip content={t('Speak')} placement='bottom'>
                                                                 <div
-                                                                    className={styles.actionButton}
-                                                                    onClick={() => {
-                                                                        if (isSpeakingTranslatedText) {
-                                                                            speechSynthesis.cancel()
-                                                                            setIsSpeakingTranslatedText(false)
-                                                                            return
-                                                                        }
-                                                                        setIsSpeakingTranslatedText(true)
-                                                                        speak({
-                                                                            text: translatedText,
-                                                                            lang: detectTo,
-                                                                            onFinish: handleSpeakDone,
-                                                                        })
-                                                                    }}
+                                                                    className={
+                                                                        window.speechSynthesis
+                                                                            ? styles.actionButton
+                                                                            : styles.actionButtonDisabled
+                                                                    }
+                                                                    onClick={handleTranslatedSpeakAction}
                                                                 >
                                                                     {isSpeakingTranslatedText ? (
                                                                         <SpeakerMotion />

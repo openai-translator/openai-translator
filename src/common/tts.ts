@@ -36,9 +36,11 @@ export const langCode2TTSLang: Record<string, string> = {
     'vi': 'vi-VN',
 }
 
-let supportVoices: SpeechSynthesisVoice[]
-window.speechSynthesis.onvoiceschanged = () => {
-    supportVoices = speechSynthesis.getVoices()
+let supportVoices: SpeechSynthesisVoice[] = []
+if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        supportVoices = speechSynthesis.getVoices()
+    }
 }
 
 export async function speak({ text, lang, onFinish }: SpeakOptions) {

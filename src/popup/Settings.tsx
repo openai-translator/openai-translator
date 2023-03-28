@@ -199,7 +199,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
 
     const [showLangSelector, setShowLangSelector] = useState(false)
 
-    const supportVoices = speechSynthesis.getVoices()
+    const supportVoices = window.speechSynthesis?.getVoices() ?? []
 
     const getLangOptions = useCallback(
         (lang: string) => {
