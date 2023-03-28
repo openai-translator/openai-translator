@@ -23,6 +23,16 @@ if appName is equal to "Safari" then
 	error "not support Safari"
 end
 
+if appName is equal to "Google Chrome" then
+	try
+		tell application "Google Chrome" to tell active tab of window 1
+			set theText to (execute javascript "getSelection().toString()")
+		end tell
+		return theText
+	end try
+	error "not support Google Chrome"
+end
+
 set _W to a reference to the first window of P
 
 set _U to a reference to ¬
