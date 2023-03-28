@@ -33,6 +33,16 @@ if appName is equal to "Google Chrome" then
 	error "not support Google Chrome"
 end
 
+if appName is equal to "Microsoft Edge" then
+	try
+		tell application "Microsoft Edge" to tell active tab of window 1
+			set theText to (execute javascript "getSelection().toString()")
+		end tell
+		return theText
+	end try
+	error "not support Microsoft Edge"
+end
+
 set _W to a reference to the first window of P
 
 set _U to a reference to ¬
