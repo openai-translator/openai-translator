@@ -67,7 +67,7 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     if selected_text.trim() == current_text.trim() {
         return Ok(String::new());
     }
-    Ok(selected_text)
+    Ok(selected_text.trim().to_string())
 }
 
 #[cfg(target_os = "macos")]
