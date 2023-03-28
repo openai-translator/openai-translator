@@ -45,7 +45,7 @@ pub fn get_main_window_always_on_top() -> bool {
 
 #[tauri::command]
 pub fn show_main_window_with_selected_text() {
-    let window = show_main_window(false);
+    let mut window = show_main_window(false, false);
     let selected_text = match utils::get_selected_text() {
         Ok(text) => text,
         Err(e) => {
@@ -56,7 +56,7 @@ pub fn show_main_window_with_selected_text() {
     if !selected_text.is_empty() {
         utils::send_text(selected_text);
     } else {
-        show_main_window(true);
+        window = show_main_window(true, false);
     }
 
     window.set_focus().unwrap();
@@ -136,7 +136,7 @@ pub fn show_thumb(x: i32, y: i32) {
     }
 }
 
-pub fn show_main_window(center: bool) -> tauri::Window {
+pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
     let handle = APP_HANDLE.get().unwrap();
     match handle.get_window(MAIN_WIN_NAME) {
         Some(window) => {
@@ -180,6 +180,9 @@ pub fn show_main_window(center: bool) -> tauri::Window {
                 window.center().unwrap();
             }
             window.unminimize().unwrap();
+            if set_focus {
+                window.set_focus().unwrap();
+            }
             window.show().unwrap();
             window
         }

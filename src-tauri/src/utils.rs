@@ -55,9 +55,9 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     use clipboard::ClipboardProvider;
     use clipboard::ClipboardContext;
     let mut ctx: ClipboardContext = ClipboardProvider::new()?;
-    let current_text = ctx.get_contents()?;
+    let current_text = ctx.get_contents().unwrap_or_default();
     copy();
-    let selected_text = ctx.get_contents()?;
+    let selected_text = ctx.get_contents().unwrap_or_default();
     // creat a new thread to restore the clipboard
     let current_text_cloned = current_text.clone();
     std::thread::spawn(move || {
