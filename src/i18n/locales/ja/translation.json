@@ -39,5 +39,20 @@
   "API Model": "API モデル",
   "Chars Limited": "文字数が制限を超えています",
   "Country Not Supported": "IPアドレスは{{name}}からであり、それはOpenAIの <0>対応していない地域</0> です。追加のネットワーク設定なしで使用を続けると、ChatGPT Plusのサブスクリプション状況やアカウント残高に関わらず、OpenAIによってアカウントがブロックされる可能性があります。",
-  "Country Not Detected": "OpenAIのサービスが <0>対応している地域</0> からアクセスされているかを確認できませんでした。これは、OpenAIへのアクセスに影響するネットワーク接続の問題が原因かもしれません。ネットワーク接続を確認して、サポートされている地域からAPIにアクセスしていることを確認してください。サポートされている地域からアクセスしない場合、ChatGPT Plusに加入している場合や口座にまだ残高がある場合でも、OpenAIによってアクセスがブロックされる可能性があります。"
+  "Country Not Detected": "OpenAIのサービスが <0>対応している地域</0> からアクセスされているかを確認できませんでした。これは、OpenAIへのアクセスに影響するネットワーク接続の問題が原因かもしれません。ネットワーク接続を確認して、サポートされている地域からAPIにアクセスしていることを確認してください。サポートされている地域からアクセスしない場合、ChatGPT Plusに加入している場合や口座にまだ残高がある場合でも、OpenAIによってアクセスがブロックされる可能性があります。",
+  "words are collected": "{{collectTotal}} つの単語を収集しました",
+  "Collection Review": "レビューの収集",
+  "Export csv of your collection": "コレクションのcsvをエクスポート",
+  "Csv saved on Desktop": "デスクトップに保存されたCsv",
+  "Remove from collection": "コレクションから削除",
+  "Add to collection": "コレクションに追加",
+  "Random Change": "ランダム変化",
+  "Please select an essay type": "記事の種類を選択してください",
+  "is writing": "作成中",
+  "An insteresting story": "魅力的な物語",
+  "A political newsletter": "政治時事通信",
+  "A sports bulletin": "スポーツ公告",
+  "A catchy lyric": "朗々とした歌詞",
+  "A smooth poem": "流暢な詩",
+  "No article type selected":"記事タイプが選択されていません"
 }

@@ -38,10 +38,7 @@
       },
       "fs": {
         "all": false,
-        "scope": [
-          "$APPCONFIG/*",
-          "$RESOURCE/*"
-        ],
+        "scope": ["**"],
         "writeFile": true,
         "readFile": true,
         "readDir": true
