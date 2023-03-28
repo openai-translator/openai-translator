@@ -37,7 +37,7 @@ export const langCode2TTSLang: Record<string, string> = {
 }
 
 let supportVoices: SpeechSynthesisVoice[] = []
-if (typeof window.speechSynthesis !== 'undefined') {
+if (window.speechSynthesis) {
     window.speechSynthesis.onvoiceschanged = () => {
         supportVoices = speechSynthesis.getVoices()
     }
