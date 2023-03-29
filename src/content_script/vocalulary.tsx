@@ -5,16 +5,15 @@ import { useTheme } from '../common/hooks/useTheme'
 import { createUseStyles } from 'react-jss'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { IThemedStyleProps } from '../common/types'
-import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
+import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
 import { FaDice } from 'react-icons/fa'
 import { AiOutlineCloseCircle } from 'react-icons/ai'
-import { Select, Value, Option } from 'baseui-sd/select'
+import { Select } from 'baseui-sd/select'
 import { FcIdea } from 'react-icons/fc'
 import { toast } from 'react-hot-toast'
 import { translate } from './translate'
-import { clsx } from 'clsx'
-import { BaseProvider, Theme } from 'baseui-sd'
+import { BaseProvider } from 'baseui-sd'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -355,7 +354,7 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
                                         onChange={({ value }) => {
                                             controlRef.current.abort()
                                             setArticle('')
-                                            setArticleType(value[0].id ?? '')
+                                            setArticleType(`${value[0].id ?? ''}`)
                                         }}
                                     />
                                     <StatefulTooltip content='Big Bang' placement='bottom' showArrow>

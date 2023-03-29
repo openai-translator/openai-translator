@@ -955,7 +955,7 @@ export function PopupCard(props: IPopupCardProps) {
                 await LocalDB.vocabulary.put({
                     word: editableText,
                     count: 1,
-                    description: translatedText.substr(editableText.length + 1), // seperate string after first '\n'
+                    description: translatedText.substr(editableText.length + 1), // separate string after first '\n'
                     updateAt: new Date().valueOf().toString(),
                 })
                 setColleced(true)
