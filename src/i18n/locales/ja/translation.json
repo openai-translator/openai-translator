@@ -54,5 +54,7 @@
   "A sports bulletin": "スポーツ公告",
   "A catchy lyric": "朗々とした歌詞",
   "A smooth poem": "流暢な詩",
-  "No article type selected":"記事タイプが選択されていません"
+  "No article type selected":"記事タイプが選択されていません",
+  "review count": "クエリ回数",
+  "last review": "最近のクエリ時間"
 }

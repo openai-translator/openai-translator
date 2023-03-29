@@ -53,5 +53,7 @@
   "A sports bulletin": "ประกาศกีฬา",
   "A catchy lyric": "เนื้อเพลงที่ติดหู",
   "A smooth poem": "บทกวีที่ไหลลื่น",
-  "No article type selected":"ยังไม่ได้เลือกประเภทบทความ"
+  "No article type selected":"ยังไม่ได้เลือกประเภทบทความ",
+  "review count": "จำนวนการสอบถาม",
+  "last review": "เวลาสอบถามล่าสุด"
 }

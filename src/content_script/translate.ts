@@ -143,7 +143,7 @@ export async function translate(query: TranslateQuery) {
             break
         case 'big-bang':
             systemPrompt = `You are a professional writer and you will write ${query.articlePrompt} based on the given words`
-            assistantPrompt = `Write ${query.articlePrompt} of no more than 100 words. The article must contain the words in the following text. The more words you use, the better`
+            assistantPrompt = `Write ${query.articlePrompt} of no more than 160 words. The article must contain the words in the following text. The more words you use, the better`
             break
     }
 

@@ -407,10 +407,16 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
                                     </div>
                                 )}
                                 {descriptionLines.length > 0 &&
-                                    descriptionLines.map((line, idx) => <div key={idx}>{line}</div>)}
-                                {selectWord?.count && <div>query count: {selectWord?.count}</div>}
+                                    descriptionLines.map((line, idx) => <p key={idx}>{line}</p>)}
+                                {selectWord?.count && (
+                                    <p>
+                                        {t('review count')}: {selectWord?.count}
+                                    </p>
+                                )}
                                 {selectWord?.updateAt && (
-                                    <div>last time: {formatDate(+selectWord?.updateAt, 'YYYY-MM-DD HH:mm:ss')}</div>
+                                    <p>
+                                        {t('last review')}: {formatDate(+selectWord?.updateAt, 'YYYY-MM-DD HH:mm:ss')}
+                                    </p>
                                 )}
                             </div>
                         )}

@@ -54,5 +54,7 @@
   "A sports bulletin": "一则体育快讯",
   "A catchy lyric": "一篇简易的歌词",
   "A smooth poem": "一首流畅的诗",
-  "No article type selected":"未选中文章类型"
+  "No article type selected":"未选中文章类型",
+  "review count": "查询次数",
+  "last review": "最近查询时间"
 }
