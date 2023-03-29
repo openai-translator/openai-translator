@@ -215,6 +215,7 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
             } else {
                 const arr: number[] = []
                 while (arr.length < RANDOM_SIZE) {
+                    // eslint-disable-next-line no-constant-condition
                     while (true) {
                         const random = Math.floor(count * Math.random())
                         if (!arr.includes(random)) {

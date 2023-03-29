@@ -360,6 +360,10 @@ const actionStrItems: Record<TranslateMode, IActionStrItem> = {
         beforeStr: 'Explaining...',
         afterStr: 'Explained',
     },
+    'big-bang': {
+        beforeStr: 'Writing...',
+        afterStr: 'Written',
+    },
 }
 
 export interface TesseractResult extends RecognizeResult {
