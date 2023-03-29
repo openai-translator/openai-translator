@@ -143,7 +143,7 @@ export function App() {
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
-                containerStyle={isLinux ? undefined : { paddingTop: '26px' }}
+                containerStyle={{ paddingTop: '26px' }}
                 onSettingsSave={(oldSettings) => {
                     invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
