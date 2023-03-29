@@ -265,7 +265,7 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
         controlRef.current.abort()
         controlRef.current = new AbortController()
         const { signal } = controlRef.current
-        const frequentWords = await LocalDB.vocabulary.orderBy('count').desc().limit(MAX_WORDS).toArray()
+        const frequentWords = await (LocalDB.vocabulary.orderBy('count') as any).desc().limit(MAX_WORDS).toArray()
         const frequentWordsArr = frequentWords.map((item: VocabularyItem) => item.word)
         ArticleUsedWord.current = [...frequentWordsArr]
         ArticleTxt.current = ''
