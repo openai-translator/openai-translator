@@ -52,13 +52,14 @@ const useStyles = createUseStyles({
         padding: '16px 0',
         borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
     },
-    'display': {
+    'display': (props: IThemedStyleProps) => ({
         display: 'flex',
         padding: '16px 10px 10px',
         flexDirection: 'column',
         overflowY: 'auto',
         overflowX: 'hidden',
-    },
+        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+    }),
     'articleDisplay': {
         marginTop: '16px',
         display: 'flex',
@@ -408,14 +409,13 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
                                 )}
                                 {descriptionLines.length > 0 &&
                                     descriptionLines.map((line, idx) => <p key={idx}>{line}</p>)}
-                                {selectWord?.count && (
-                                    <p>
-                                        {t('review count')}: {selectWord?.count}
-                                    </p>
-                                )}
+                                {selectWord?.count && <p>{`[${t('review count')}] ${selectWord?.count}`}</p>}
                                 {selectWord?.updateAt && (
                                     <p>
-                                        {t('last review')}: {formatDate(+selectWord?.updateAt, 'YYYY-MM-DD HH:mm:ss')}
+                                        {`[${t('last review')}] ${formatDate(
+                                            +selectWord?.updateAt,
+                                            'YYYY-MM-DD HH:mm:ss'
+                                        )}`}
                                     </p>
                                 )}
                             </div>
