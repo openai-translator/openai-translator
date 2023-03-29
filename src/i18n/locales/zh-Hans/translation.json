@@ -39,5 +39,22 @@
   "API Model": "API 模型",
   "Chars Limited": "字数超出限制",
   "Country Not Supported": "您的 IP 属地为 {{name}}，不在 OpenAI <0>支持的地区</0> 范围内。如果不进行额外的网络配置继续使用，即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。",
-  "Country Not Detected": "我们无法检查您的 IP 地址是否位于 OpenAI 的<0>支持的地区</0>，可能是由于您的网络环境无法访问 OpenAI。请检查您的网络连接，并确保您在支持的位置访问 API，否则即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。"
+  "Country Not Detected": "我们无法检查您的 IP 地址是否位于 OpenAI 的<0>支持的地区</0>，可能是由于您的网络环境无法访问 OpenAI。请检查您的网络连接，并确保您在支持的位置访问 API，否则即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。",
+  "words are collected": "已收藏 {{collectTotal}} 个单词",
+  "Collection Review": "单词复习",
+  "Export csv of your collection": "csv导出",
+  "Csv saved on Desktop": "Csv已保存到桌面",
+  "Remove from collection": "移出收藏",
+  "Add to collection": "加入收藏",
+  "Random Change": "下一批",
+  "Please select an essay type": "请选择文章类型",
+  "is writing": "正在创作中",
+  "An insteresting story": "一个有趣的故事",
+  "A political newsletter": "一篇时政新闻",
+  "A sports bulletin": "一则体育快讯",
+  "A catchy lyric": "一篇简易的歌词",
+  "A smooth poem": "一首流畅的诗",
+  "No article type selected":"未选中文章类型",
+  "review count": "查询次数",
+  "last review": "最近查询时间"
 }

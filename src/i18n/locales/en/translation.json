@@ -39,5 +39,22 @@
   "API Model": "API Model",
   "Chars Limited": "The number of characters exceeds the limit",
   "Country Not Supported": "Your IP address is from {{name}}, which is not a <0>supported region</0> of OpenAI. Continuing to use without extra network configuration may result in your account being blocked by OpenAI, regardless of your ChatGPT Plus subscription status or any remaining account balance.",
-  "Country Not Detected": "We were unable to check if your IP address is in a <0>supported region</0> of OpenAI. Please check your Internet connection, and ensure that you are accessing the API in a supported region of OpenAI, or your account may get banned regardless of your GPT Plus subscription status or any remaining account balance."
+  "Country Not Detected": "We were unable to check if your IP address is in a <0>supported region</0> of OpenAI. Please check your Internet connection, and ensure that you are accessing the API in a supported region of OpenAI, or your account may get banned regardless of your GPT Plus subscription status or any remaining account balance.",
+  "words are collected": "{{collectTotal}} words are collected",
+  "Collection Review": "Collection Review",
+  "Export csv of your collection": "Export csv of your collection",
+  "Csv saved on Desktop": "Csv saved on Desktop",
+  "Remove from collection": "Remove from collection",
+  "Add to collection": "Add to collection",
+  "Random Change": "Random Change",
+  "Please select an essay type": "Please select an essay type",
+  "is writing": "is writing",
+  "An insteresting story": "An insteresting story",
+  "A political newsletter": "A political newsletter",
+  "A sports bulletin": "A sports bulletin",
+  "A catchy lyric": "A catchy lyric",
+  "A smooth poem": "A smooth poem",
+  "No article type selected": "No article type selected",
+  "review count": "Review count",
+  "last review": "Last review time"
 }

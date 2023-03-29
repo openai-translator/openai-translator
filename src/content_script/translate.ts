@@ -3,7 +3,7 @@ import * as utils from '../common/utils'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
-export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'Azure'
 export type APIModel = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0301' | 'gpt-4' | 'gpt-4-0314' | 'gpt-4-32k' | 'gpt-4-32k-0314'
 
@@ -13,10 +13,11 @@ export interface TranslateQuery {
     detectFrom: string
     detectTo: string
     mode: TranslateMode
-    onMessage: (message: { content: string; role: string }) => void
+    onMessage: (message: { content: string; role: string; wordMode: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     signal: AbortSignal
+    articlePrompt?: string
 }
 
 export interface TranslateResult {
@@ -48,6 +49,8 @@ export async function translate(query: TranslateQuery) {
     let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
     }`
+    // a word could be collected
+    let isWordMode = false
     switch (query.mode) {
         case 'translate':
             if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
@@ -70,6 +73,7 @@ export async function translate(query: TranslateQuery) {
                 }
             }
             if (toChinese && isAWord(query.detectFrom, query.text.trim())) {
+                isWordMode = true
                 // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
                 systemPrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
                 <原始文本>
@@ -136,6 +140,10 @@ export async function translate(query: TranslateQuery) {
                     lang.langMap.get(query.detectTo) || query.detectTo
                 } language! If the content is not code, return an error message. If the code has obvious errors, point them out.`
             }
+            break
+        case 'big-bang':
+            systemPrompt = `You are a professional writer and you will write ${query.articlePrompt} based on the given words`
+            assistantPrompt = `Write ${query.articlePrompt} of no more than 160 words. The article must contain the words in the following text. The more words you use, the better`
             break
     }
 
@@ -225,7 +233,7 @@ export async function translate(query: TranslateQuery) {
                     targetTxt = targetTxt.slice(1)
                 }
 
-                query.onMessage({ content: targetTxt, role: '' })
+                query.onMessage({ content: targetTxt, role: '', wordMode: isWordMode })
             } else {
                 const { content = '', role } = choices[0].delta
                 targetTxt = content
@@ -238,7 +246,7 @@ export async function translate(query: TranslateQuery) {
                     isFirst = false
                 }
 
-                query.onMessage({ content: targetTxt, role })
+                query.onMessage({ content: targetTxt, role, wordMode: isWordMode })
             }
         },
         onError: (err) => {
