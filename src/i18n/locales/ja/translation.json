@@ -42,8 +42,8 @@
   "Country Not Detected": "OpenAIのサービスが <0>対応している地域</0> からアクセスされているかを確認できませんでした。これは、OpenAIへのアクセスに影響するネットワーク接続の問題が原因かもしれません。ネットワーク接続を確認して、サポートされている地域からAPIにアクセスしていることを確認してください。サポートされている地域からアクセスしない場合、ChatGPT Plusに加入している場合や口座にまだ残高がある場合でも、OpenAIによってアクセスがブロックされる可能性があります。",
   "words are collected": "{{collectTotal}} つの単語を収集しました",
   "Collection Review": "レビューの収集",
-  "Export csv of your collection": "コレクションのcsvをエクスポート",
-  "Csv saved on Desktop": "デスクトップに保存されたCsv",
+  "Export your collection as a csv file": "CSVファイルとしてコレクションをエクスポート",
+  "csv file saved on Desktop": "デスクトップに保存されたCSVファイル",
   "Remove from collection": "コレクションから削除",
   "Add to collection": "コレクションに追加",
   "Random Change": "ランダム変化",
@@ -56,5 +56,8 @@
   "A smooth poem": "流暢な詩",
   "No article type selected":"記事タイプが選択されていません",
   "review count": "クエリ回数",
-  "last review": "最近のクエリ時間"
+  "last review": "最近のクエリ時間",
+  "vocabulary": "語彙",
+  "generate article": "記事を生成",
+  "insert to editor": "エディタに挿入"
 }

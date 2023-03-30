@@ -13,7 +13,7 @@ export interface TranslateQuery {
     detectFrom: string
     detectTo: string
     mode: TranslateMode
-    onMessage: (message: { content: string; role: string; wordMode: boolean }) => void
+    onMessage: (message: { content: string; role: string; isWordMode: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     signal: AbortSignal
@@ -27,7 +27,7 @@ export interface TranslateResult {
     error?: string
 }
 
-const isAWord = (lang: string, text: string) => {
+export const isAWord = (lang: string, text: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const Segmenter = (Intl as any).Segmenter
     if (!Segmenter) {
@@ -41,7 +41,6 @@ const isAWord = (lang: string, text: string) => {
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
-    const trimFirstQuotation = !query.selectedWord
     const settings = await utils.getSettings()
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
@@ -197,8 +196,6 @@ export async function translate(query: TranslateQuery) {
             break
     }
 
-    let isFirst = true
-
     await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
         method: 'POST',
         headers,
@@ -229,24 +226,12 @@ export async function translate(query: TranslateQuery) {
                 // It's used for Azure OpenAI Service's legacy parameters.
                 targetTxt = choices[0].text
 
-                if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
-                    targetTxt = targetTxt.slice(1)
-                }
-
-                query.onMessage({ content: targetTxt, role: '', wordMode: isWordMode })
+                query.onMessage({ content: targetTxt, role: '', isWordMode })
             } else {
                 const { content = '', role } = choices[0].delta
                 targetTxt = content
 
-                if (trimFirstQuotation && isFirst && targetTxt && ['“', '"', '「'].indexOf(targetTxt[0]) >= 0) {
-                    targetTxt = targetTxt.slice(1)
-                }
-
-                if (!role) {
-                    isFirst = false
-                }
-
-                query.onMessage({ content: targetTxt, role, wordMode: isWordMode })
+                query.onMessage({ content: targetTxt, role, isWordMode })
             }
         },
         onError: (err) => {

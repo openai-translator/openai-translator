@@ -42,8 +42,8 @@
   "Country Not Detected": "我們無法檢查您的 IP 地址是否位於 OpenAI 的<0>支援的地區</0>，可能是由於您的網路環境無法訪問 OpenAI。請檢查您的網路連線，並確保您在支援的位置訪問 API，否則即使訂閱了 ChatGPT Plus 或賬號內仍有餘額，您的賬戶也會被 OpenAI 封鎖。",
   "words are collected": "已收藏 {{collectTotal}} 個單詞",
   "Collection Review": "單詞複習",
-  "Export csv of your collection": "csv匯出",
-  "Csv saved on Desktop": "Csv已保存到案頭 ",
+  "Export your collection as a csv file": "將您的單詞收藏導出為 csv 文件",
+  "csv file saved on Desktop": "CSV 文件已保存到桌面",
   "Remove from collection": "移出收藏",
   "Add to collection": "加入收藏",
   "Random Change": "下一批",
@@ -56,5 +56,8 @@
   "A smooth poem": "一首流暢的詩",
   "No article type selected":"未選中文章類型",
   "review count": "査詢次數",
-  "last review": "最近査詢時間"
+  "last review": "最近査詢時間",
+  "vocabulary": "單詞",
+  "generate article": "創作文章",
+  "insert to editor": "插入編輯器"
 }
