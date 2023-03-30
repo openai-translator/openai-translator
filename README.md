@@ -107,6 +107,19 @@ scoop install openai-translator
 
 ## MacOS
 
+### Install via [brew cask](https://formulae.brew.sh/cask/)
+```bash
+brew install --cask openai-translator
+```
+
+> **_NOTE:_** If you don't have either brew or brew cask
+```bash
+# Install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Install cask
+brew tap homebrew/cask
+```
+
 ### Install Manually
 
 1. Go to the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page and download the corresponding chip's `.dmg` installation package. Note: Use aarch64 version for Apple Silicon machines and run `xattr` command below.
