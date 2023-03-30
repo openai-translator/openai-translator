@@ -4,7 +4,6 @@ import { isDesktopApp, isUserscript } from '../common/utils'
 import { containerID, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 import Dexie, { Table } from 'dexie'
 import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs'
-import { toast } from 'react-hot-toast'
 
 function attachEventsToContainer($container: HTMLElement) {
     $container.addEventListener('mousedown', (event) => {
@@ -69,7 +68,7 @@ interface FetchSSEOptions extends RequestInit {
 
 async function backgroundFetch(input: string, options: FetchSSEOptions) {
     return new Promise((_resolve, reject) => {
-        ;(async () => {
+        ; (async () => {
             const { onMessage, onError, signal, ...fetchOptions } = options
 
             const browser = await require('webextension-polyfill')
