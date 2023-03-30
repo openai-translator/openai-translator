@@ -12,7 +12,7 @@ browser.contextMenus.create(
         browser.runtime.lastError
     }
 )
-browser.contextMenus.onClicked.addListener(async function (info, _tab) {
+browser.contextMenus.onClicked.addListener(async function (info) {
     const [tab] = await chrome.tabs.query({ active: true })
     tab.id &&
         browser.tabs.sendMessage(tab.id, {
@@ -21,20 +21,20 @@ browser.contextMenus.onClicked.addListener(async function (info, _tab) {
         })
 })
 
-type FetchMessage = {
-    type: string
-    details: { url: string; options: RequestInit }
+interface BackgroundFetchMessage {
+    type: 'open' | 'abort'
+    details: { url: string; options: { stream?: boolean } & RequestInit }
 }
 
-const portSet = new Set()
-
-async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage, signal: AbortSignal) {
-    const { url, options } = message.details
+async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFetchMessage, signal: AbortSignal) {
+    const {
+        url,
+        options: { stream, ...fetchOptions },
+    } = message.details
     let response: Response | null = null
-    const tabId = port.sender?.tab?.id
 
     try {
-        response = await fetch(url, { ...options, signal })
+        response = await fetch(url, { ...fetchOptions, signal })
     } catch (error) {
         if (error instanceof Error) {
             const { message, name } = error
@@ -42,8 +42,15 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
                 error: { message, name },
             })
         }
-        tabId && portSet.delete(tabId)
         port.disconnect()
+        return
+    }
+
+    if (!stream) {
+        port.postMessage({
+            status: response.status,
+            response: await response.text(),
+        })
         return
     }
 
@@ -75,7 +82,6 @@ async function fetchWithStream(port: browser.Runtime.Port, message: FetchMessage
     } catch (error) {
         console.log(error)
     } finally {
-        tabId && portSet.delete(tabId)
         port.disconnect()
         reader.releaseLock()
     }
@@ -89,12 +95,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     if (!tabId) {
         return
     }
-    // only one port is allowed per tab.
-    if (portSet.has(tabId)) {
-        return
-    }
 
-    portSet.add(tabId)
     const controller = new AbortController()
     const { signal } = controller
 
