@@ -118,3 +118,5 @@ export const isDarkMode = async () => {
     }
     return settings.themeType === 'dark'
 }
+
+export const isFirefox = /firefox/i.test(navigator.userAgent)

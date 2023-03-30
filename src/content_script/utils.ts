@@ -1,6 +1,7 @@
 import { createParser } from 'eventsource-parser'
+import { backgroundFetch } from '../common/background-fetch'
 import { userscriptFetch } from '../common/userscript-polyfill'
-import { isDesktopApp, isUserscript } from '../common/utils'
+import { isFirefox, isUserscript, isDesktopApp } from '../common/utils'
 import { containerID, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 import Dexie, { Table } from 'dexie'
 import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs'
@@ -66,73 +67,37 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
 }
 
-async function backgroundFetch(input: string, options: FetchSSEOptions) {
-    return new Promise((_resolve, reject) => {
-        ; (async () => {
-            const { onMessage, onError, signal, ...fetchOptions } = options
-
-            const browser = await require('webextension-polyfill')
-            const port = browser.runtime.connect({ name: 'background-fetch' })
-            port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
-            port.onMessage.addListener(
-                (msg: { error: { message: string; name: string }; status: number; response: string }) => {
-                    if (msg.error) {
-                        const error = new Error()
-                        error.message = msg.error.message
-                        error.name = msg.error.name
-                        reject(error)
-                        return
-                    }
-                    if (msg.status !== 200) {
-                        onError(msg)
-                    } else {
-                        onMessage(msg.response)
-                    }
-                }
-            )
-
-            function handleAbort() {
-                port.postMessage({ type: 'abort' })
-            }
-            port.onDisconnect.addListener(() => {
-                signal?.removeEventListener('abort', handleAbort)
-            })
-            signal?.addEventListener('abort', handleAbort)
-        })()
-    })
-}
-
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
 
-    if (!isDesktopApp() && !isUserscript() && !location.protocol.includes('extension:')) {
-        await backgroundFetch(input, options)
-    } else {
-        const fetch = isUserscript() ? userscriptFetch : window.fetch
-        const resp = await fetch(input, fetchOptions)
-        if (resp.status !== 200) {
-            onError(await resp.json())
-            return
+    if (isFirefox) {
+        return await backgroundFetch(input, options)
+    }
+
+    const fetch = isUserscript() ? userscriptFetch : window.fetch
+    const resp = await fetch(input, fetchOptions)
+    if (resp.status !== 200) {
+        onError(await resp.json())
+        return
+    }
+    const parser = createParser((event) => {
+        if (event.type === 'event') {
+            onMessage(event.data)
         }
-        const parser = createParser((event) => {
-            if (event.type === 'event') {
-                onMessage(event.data)
+    })
+    const reader = resp.body.getReader()
+    try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+                break
             }
-        })
-        const reader = resp.body.getReader()
-        try {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                const { done, value } = await reader.read()
-                if (done) {
-                    break
-                }
-                const str = new TextDecoder().decode(value)
-                parser.feed(str)
-            }
-        } finally {
-            reader.releaseLock()
+            const str = new TextDecoder().decode(value)
+            parser.feed(str)
         }
+    } finally {
+        reader.releaseLock()
     }
 }
 
