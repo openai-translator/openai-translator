@@ -166,24 +166,6 @@ export class MySubClassedDexie extends Dexie {
 }
 // init indexdb
 export const LocalDB = new MySubClassedDexie()
-export function formatDate(dateNum: number, format: string) {
-    const date = new Date(dateNum)
-    const year = date.getFullYear().toString()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-    const second = date.getSeconds()
-    const formattedDate = format
-        .replace('YYYY', year)
-        .replace('MM', ('0' + month).slice(-2))
-        .replace('DD', ('0' + day).slice(-2))
-        .replace('HH', ('0' + hour).slice(-2))
-        .replace('mm', ('0' + minute).slice(-2))
-        .replace('ss', ('0' + second).slice(-2))
-
-    return formattedDate
-}
 
 // js to csv
 export async function exportToCsv<T extends Record<string, string | number>>(filename: string, rows: T[]) {

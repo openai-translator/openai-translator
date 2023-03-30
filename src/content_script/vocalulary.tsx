@@ -1,5 +1,5 @@
 import { type FC, useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { formatDate, LocalDB, VocabularyItem } from './utils'
+import { LocalDB, VocabularyItem } from './utils'
 import { Button } from 'baseui-sd/button'
 import { useTheme } from '../common/hooks/useTheme'
 import { createUseStyles } from 'react-jss'
@@ -18,6 +18,7 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
+import { format } from 'date-fns'
 const RANDOM_SIZE = 10
 const MAX_WORDS = 50
 
@@ -412,9 +413,9 @@ const Vocabulary: FC<VocabularyProps> = (props) => {
                                 {selectWord?.count && <p>{`[${t('review count')}] ${selectWord?.count}`}</p>}
                                 {selectWord?.updateAt && (
                                     <p>
-                                        {`[${t('last review')}] ${formatDate(
+                                        {`[${t('last review')}] ${format(
                                             +selectWord?.updateAt,
-                                            'YYYY-MM-DD HH:mm:ss'
+                                            'yyyy-MM-dd HH:mm:ss'
                                         )}`}
                                     </p>
                                 )}

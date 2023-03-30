@@ -394,7 +394,7 @@ export function PopupCard(props: IPopupCardProps) {
     const [selectedWord, setSelectedWord] = useState('')
     const [vocabularyType, setVocabularyType] = useState<'hide' | 'vocabulary' | 'article'>('hide')
     const highlightRef = useRef<HighlightInTextarea | null>(null)
-    const [showMoreBtn, setShowMore] = useState<boolean>(false)
+    const [showMoreBtn, setShowMoreBtn] = useState(false)
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
     useEffect(() => {
@@ -489,8 +489,8 @@ export function PopupCard(props: IPopupCardProps) {
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [wordMode, setWordMode] = useState<boolean>(false)
-    const [collectd, setColleced] = useState<boolean>(false)
-    const [collectTotal, updateTotal] = useState<number>(0)
+    const [isCollectd, setIsCollected] = useState(false)
+    const [collectTotal, setCollectTotal] = useState(0)
     const checkCollection = useCallback(async () => {
         try {
             const arr = await LocalDB.vocabulary.where('word').equals(editableText).toArray()
@@ -499,9 +499,9 @@ export function PopupCard(props: IPopupCardProps) {
                     ...arr[0],
                     count: arr[0].count + 1,
                 })
-                setColleced(true)
+                setIsCollected(true)
             } else {
-                setColleced(false)
+                setIsCollected(false)
             }
         } catch (e) {
             console.error(e)
@@ -573,7 +573,7 @@ export function PopupCard(props: IPopupCardProps) {
         const initCollectionTotal = async () => {
             try {
                 const total = await LocalDB.vocabulary.count()
-                updateTotal(total)
+                setCollectTotal(total)
             } catch (e) {
                 console.error(e)
             }
@@ -716,7 +716,7 @@ export function PopupCard(props: IPopupCardProps) {
 
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
-            setShowMore(false)
+            setShowMoreBtn(false)
             if (!text || !detectFrom || !detectTo || !translateMode) {
                 return
             }
@@ -950,11 +950,11 @@ export function PopupCard(props: IPopupCardProps) {
 
     const onWordCollection = async () => {
         try {
-            if (collectd) {
+            if (isCollectd) {
                 const wordInfo = await LocalDB.vocabulary.get(editableText)
                 await LocalDB.vocabulary.delete(wordInfo?.word ?? '')
-                setColleced(false)
-                updateTotal((t) => t - 1)
+                setIsCollected(false)
+                setCollectTotal((t) => t - 1)
             } else {
                 await LocalDB.vocabulary.put({
                     word: editableText,
@@ -962,8 +962,8 @@ export function PopupCard(props: IPopupCardProps) {
                     description: translatedText.substr(editableText.length + 1), // separate string after first '\n'
                     updateAt: new Date().valueOf().toString(),
                 })
-                setColleced(true)
-                updateTotal((t) => t + 1)
+                setIsCollected(true)
+                setCollectTotal((t) => t + 1)
             }
         } catch (e) {
             console.error(e)
@@ -1352,7 +1352,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                     >
                                                         <div
                                                             className={styles.actionButton}
-                                                            onClick={() => setShowMore((e) => !e)}
+                                                            onClick={() => setShowMoreBtn((e) => !e)}
                                                         >
                                                             <AiOutlineFileSync size={13} />
                                                         </div>
@@ -1506,7 +1506,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                                 {!isLoading && (
                                                                                     <StatefulTooltip
                                                                                         content={
-                                                                                            collectd
+                                                                                            isCollectd
                                                                                                 ? t(
                                                                                                       'Remove from collection'
                                                                                                   )
@@ -1521,7 +1521,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                                                             }
                                                                                             onClick={onWordCollection}
                                                                                         >
-                                                                                            {collectd ? (
+                                                                                            {isCollectd ? (
                                                                                                 <MdGrade size={15} />
                                                                                             ) : (
                                                                                                 <MdOutlineGrade
