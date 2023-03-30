@@ -95,7 +95,12 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "endpoints": [
+        "https://github.com/yetone/openai-translator/releases/latest/download/latest.json"
+      ],
+      "pubkey": "YOUR_PUBKEY"
     },
     "windows": [
       {
