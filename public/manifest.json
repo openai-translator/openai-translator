@@ -33,7 +33,7 @@
         "service_worker": "js/background.js"
     },
 
-    "permissions": ["storage", "tts", "contextMenus"],
+    "permissions": ["storage", "contextMenus"],
 
     "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com/"]
 }
