@@ -411,20 +411,51 @@ function Ii18nSelector(props: Ii18nSelectorProps) {
 }
 
 interface APIModelSelectorProps {
+    provider: Provider
     value?: string
     onChange?: (value: string) => void
     onBlur?: () => void
 }
 
+interface APIModelOption {
+    label: string
+    id: string
+}
+
 function APIModelSelector(props: APIModelSelectorProps) {
-    const options = [
-        { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
-        { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
-        { label: 'gpt-4', id: 'gpt-4' },
-        { label: 'gpt-4-0314', id: 'gpt-4-0314' },
-        { label: 'gpt-4-32k', id: 'gpt-4-32k' },
-        { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
-    ]
+    const [options, setOptions] = useState<APIModelOption[]>([])
+    useEffect(() => {
+        if (props.provider === 'OpenAI') {
+            setOptions([
+                { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
+                { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
+                { label: 'gpt-4', id: 'gpt-4' },
+                { label: 'gpt-4-0314', id: 'gpt-4-0314' },
+                { label: 'gpt-4-32k', id: 'gpt-4-32k' },
+                { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
+            ])
+        } else if (props.provider === 'ChatGPT') {
+            fetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
+                .then((response) => response.json())
+                .then((resp) => {
+                    const headers: Record<string, string> = {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${resp.accessToken}`,
+                    }
+                    return fetch(`${utils.defaultChatGPTWebAPI}/models`, {
+                        cache: 'no-cache',
+                        headers,
+                    }).then((response) => response.json())
+                }).then((models) => {
+                    if (!models || !models.models) {
+                        return
+                    }
+                    setOptions(models.models.map((model: any) => ({ label: model.title, id: model.slug })))
+                }).catch((e) => {
+                    console.error(e)
+                })
+        }
+    }, [props.provider])
 
     return (
         <Select
@@ -658,6 +689,7 @@ function ProviderSelector(props: IProviderSelectorProps) {
             options={
                 [
                     { label: 'OpenAI', id: 'OpenAI' },
+                    { label: 'ChatGPT (Web)', id: 'ChatGPT' },
                     { label: 'Azure', id: 'Azure' },
                 ] as {
                     label: string
@@ -824,49 +856,55 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='provider' label={t('Default Service Provider')}>
                             <ProviderSelector />
                         </FormItem>
-                        <FormItem
-                            required
-                            name='apiKeys'
-                            label={t('API Key')}
-                            caption={
-                                <div>
-                                    {t('Go to the')}{' '}
-                                    {values.provider === 'Azure' ? (
-                                        <a
-                                            target='_blank'
-                                            href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
-                                            rel='noreferrer'
-                                        >
-                                            {t('Azure OpenAI Service page')}
-                                        </a>
-                                    ) : (
-                                        <a
-                                            target='_blank'
-                                            href='https://platform.openai.com/account/api-keys'
-                                            rel='noreferrer'
-                                        >
-                                            {t('OpenAI page')}
-                                        </a>
-                                    )}{' '}
-                                    {t(
-                                        'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
-                                    )}
-                                </div>
-                            }
-                        >
-                            <Input autoFocus type='password' size='compact' onBlur={onBlur} />
-                        </FormItem>
-                        {values.provider !== 'Azure' && (
-                            <FormItem name='apiModel' label={t('API Model')}>
-                                <APIModelSelector onBlur={onBlur} />
+                        {values.provider !== 'ChatGPT' && (
+                            <FormItem
+                                required
+                                name='apiKeys'
+                                label={t('API Key')}
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        {values.provider === 'Azure' ? (
+                                            <a
+                                                target='_blank'
+                                                href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
+                                                rel='noreferrer'
+                                            >
+                                                {t('Azure OpenAI Service page')}
+                                            </a>
+                                        ) : (
+                                            <a
+                                                target='_blank'
+                                                href='https://platform.openai.com/account/api-keys'
+                                                rel='noreferrer'
+                                            >
+                                                {t('OpenAI page')}
+                                            </a>
+                                        )}{' '}
+                                        {t(
+                                            'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                        )}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                             </FormItem>
                         )}
-                        <FormItem required name='apiURL' label={t('API URL')}>
-                            <Input size='compact' onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                            <Input size='compact' />
-                        </FormItem>
+                        {values.provider !== 'Azure' && (
+                            <FormItem name='apiModel' label={t('API Model')}>
+                                <APIModelSelector provider={values.provider} onBlur={onBlur} />
+                            </FormItem>
+                        )}
+                        {values.provider !== 'ChatGPT' && (
+                            <>
+                                <FormItem required name='apiURL' label={t('API URL')}>
+                                    <Input size='compact' onBlur={onBlur} />
+                                </FormItem>
+                                <FormItem required name='apiURLPath' label={t('API URL Path')}>
+                                    <Input size='compact' />
+                                </FormItem>
+                            </>
+                        )}
                         <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                             <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>

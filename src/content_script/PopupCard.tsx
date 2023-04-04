@@ -777,6 +777,9 @@ export function PopupCard(props: IPopupCardProps) {
                         }
                         setIsWordMode(message.isWordMode)
                         setTranslatedText((translatedText) => {
+                            if (message.isFullText) {
+                                return message.content
+                            }
                             return translatedText + message.content
                         })
                     },
