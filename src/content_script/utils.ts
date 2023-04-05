@@ -84,6 +84,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         }
     })
     const reader = resp.body.getReader()
+    const contentType = resp.headers?.get('content-type')
     try {
         // eslint-disable-next-line no-constant-condition
         while (true) {
@@ -92,7 +93,14 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 break
             }
             const str = new TextDecoder().decode(value)
-            parser.feed(str)
+            if (contentType === 'application/octet-stream') {
+                // only process the final line
+                const lastIndex = str.lastIndexOf('\n', str.length - 2)
+                const msg = lastIndex === -1 ? str : str.substring(lastIndex)
+                onMessage(msg)
+            } else {
+                parser.feed(str)
+            }
         }
     } finally {
         reader.releaseLock()

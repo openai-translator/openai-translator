@@ -186,14 +186,16 @@ export async function translate(query: TranslateQuery) {
         ]
     }
 
-    switch (settings.provider) {
-        case 'OpenAI':
-            headers['Authorization'] = `Bearer ${apiKey}`
-            break
+    if (apiKey) {
+        switch (settings.provider) {
+            case 'OpenAI':
+                headers['Authorization'] = `Bearer ${apiKey}`
+                break
 
-        case 'Azure':
-            headers['api-key'] = `${apiKey}`
-            break
+            case 'Azure':
+                headers['api-key'] = `${apiKey}`
+                break
+        }
     }
 
     await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
@@ -210,7 +212,7 @@ export async function translate(query: TranslateQuery) {
                 query.onFinish('stop')
                 return
             }
-            const { choices } = resp
+            const choices = resp.choices || resp.detail?.choices
             if (!choices || choices.length === 0) {
                 return { error: 'No result' }
             }
@@ -224,7 +226,7 @@ export async function translate(query: TranslateQuery) {
 
             if (!isChatAPI) {
                 // It's used for Azure OpenAI Service's legacy parameters.
-                targetTxt = choices[0].text
+                targetTxt = choices[0].text || choices[0].delta?.content || ''
 
                 query.onMessage({ content: targetTxt, role: '', isWordMode })
             } else {
