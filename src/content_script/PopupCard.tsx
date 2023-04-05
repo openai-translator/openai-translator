@@ -737,7 +737,7 @@ export function PopupCard(props: IPopupCardProps) {
             const afterTranslate = (reason: string) => {
                 stopLoading()
                 if (reason !== 'stop') {
-                    if (reason == 'length') {
+                    if (reason == 'length' || reason == 'max_tokens') {
                         toast(t('Chars Limited'), {
                             duration: 5000,
                             icon: '😥',

@@ -270,7 +270,7 @@ export async function translate(query: TranslateQuery) {
 
                 const { finish_details: finishDetails } = resp.message
                 if (finishDetails) {
-                    query.onFinish('')
+                    query.onFinish(finishDetails.type)
                     return
                 }
 
