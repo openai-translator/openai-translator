@@ -439,19 +439,20 @@ function APIModelSelector(props: APIModelSelectorProps) {
                 .then((response) => response.json())
                 .then((resp) => {
                     const headers: Record<string, string> = {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${resp.accessToken}`,
+                        Authorization: `Bearer ${resp.accessToken}`,
                     }
                     return fetch(`${utils.defaultChatGPTWebAPI}/models`, {
                         cache: 'no-cache',
                         headers,
                     }).then((response) => response.json())
-                }).then((models) => {
+                })
+                .then((models) => {
                     if (!models || !models.models) {
                         return
                     }
                     setOptions(models.models.map((model: any) => ({ label: model.title, id: model.slug })))
-                }).catch((e) => {
+                })
+                .catch((e) => {
                     console.error(e)
                 })
         }

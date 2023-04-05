@@ -6,7 +6,14 @@ import { fetchSSE } from './utils'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
-export type APIModel = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0301' | 'gpt-4' | 'gpt-4-0314' | 'gpt-4-32k' | 'gpt-4-32k-0314' | string
+export type APIModel =
+    | 'gpt-3.5-turbo'
+    | 'gpt-3.5-turbo-0301'
+    | 'gpt-4'
+    | 'gpt-4-0314'
+    | 'gpt-4-32k'
+    | 'gpt-4-32k-0314'
+    | string
 
 export interface TranslateQuery {
     text: string
@@ -14,7 +21,7 @@ export interface TranslateQuery {
     detectFrom: string
     detectTo: string
     mode: TranslateMode
-    onMessage: (message: { content: string; role: string; isWordMode: boolean, isFullText?: boolean }) => void
+    onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     signal: AbortSignal
@@ -282,13 +289,15 @@ export async function translate(query: TranslateQuery) {
         })
         if (conversationId) {
             await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
-                    stream: false,
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ is_visible: false }),
-                    onMessage: () => {},
-                    onError: () => {},
-                })
+                stream: false,
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({ is_visible: false }),
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onMessage: () => {},
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onError: () => {},
+            })
         }
     } else {
         await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
