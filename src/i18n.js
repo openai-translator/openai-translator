@@ -40,8 +40,8 @@ i18n.use(Backend)
         },
         // prevent creating i18nextLng in localStorage for each domain
         detection: {
-            caches: []
-        }
+            caches: [],
+        },
     })
 
 export default i18n
