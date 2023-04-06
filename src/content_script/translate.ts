@@ -199,6 +199,11 @@ export async function translate(query: TranslateQuery) {
                 }
             },
             onError: (err) => {
+                const resp = (err as any).response
+                if (resp) {
+                    query.onError(resp)
+                    return
+                }
                 const { error } = err
                 stop = true
                 query.onError(error.message)
