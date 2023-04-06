@@ -49,6 +49,11 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.apiURL) {
         settings.apiURL = defaultAPIURL
+    } else {
+        // =>check for using https protocol
+        if (settings.apiURL.startsWith('http://')) {
+            settings.apiURL = settings.apiURL.replace('http://', 'https://');
+        }
     }
     if (!settings.apiURLPath) {
         settings.apiURLPath = defaultAPIURLPath
