@@ -54,6 +54,14 @@ async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFe
         return
     }
 
+    if (response.status !== 200) {
+        port.postMessage({
+            status: response.status,
+            response: await response.json(),
+        })
+        return
+    }
+
     const reader = response?.body?.getReader()
     if (!reader) {
         port.postMessage({

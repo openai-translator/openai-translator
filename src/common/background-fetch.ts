@@ -1,7 +1,7 @@
 interface BackgroundFetchMessage {
-    error: { message: string; name: string }
+    error: { message: string; name?: string }
     status: number
-    response: string
+    response: unknown
 }
 
 interface BackgroundFetchOptions extends RequestInit {
@@ -11,7 +11,7 @@ interface BackgroundFetchOptions extends RequestInit {
 }
 
 export async function backgroundFetch(input: string, { stream = true, ...options }: BackgroundFetchOptions) {
-    return new Promise((_resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         ;(async () => {
             const { onMessage, onError, signal, ...fetchOptions } = options
 
@@ -22,19 +22,21 @@ export async function backgroundFetch(input: string, { stream = true, ...options
                 if (msg.error) {
                     const error = new Error()
                     error.message = msg.error.message
-                    error.name = msg.error.name
+                    error.name = msg.error.name ?? 'UnknownError'
                     reject(error)
-                    !stream && port.disconnect()
                     return
                 }
 
                 if (msg.status !== 200) {
-                    onError(msg)
+                    onError(msg.response as Pick<BackgroundFetchMessage, 'error'>)
+                    resolve()
                 } else {
-                    onMessage(msg.response)
+                    onMessage(msg.response as string)
+                    if (!stream) {
+                        port.disconnect()
+                        resolve()
+                    }
                 }
-
-                !stream && port.disconnect()
             })
 
             function handleAbort() {
