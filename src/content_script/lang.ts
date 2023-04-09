@@ -66,6 +66,7 @@ export const supportLanguages: [string, string][] = [
     ['mn', 'Монгол хэл'],
     ['tr', 'Türkçe'],
     ['ug', 'ئۇيغۇر تىلى'],
+    ['uk', 'Українська'],
     ['ur', 'اردو'],
     ['vi', 'Tiếng Việt'],
 ]
