@@ -86,6 +86,10 @@ export async function _detectLang(text: string): Promise<string | null> {
     return new Promise((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const langName = (window as any).detectLanguage(detectedText)
+        if (langName === 'Chineset') {
+            resolve('zh-Hant')
+            return
+        }
         const langCode = ISO6391.getCode(langName)
         resolve(langCode)
     })
