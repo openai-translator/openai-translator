@@ -33,8 +33,8 @@ export async function backgroundFetch(input: string, { stream = true, ...options
                 } else {
                     onMessage(msg.response as string)
                     if (!stream) {
-                        port.disconnect()
                         resolve()
+                        port.disconnect()
                     }
                 }
             })
@@ -44,6 +44,7 @@ export async function backgroundFetch(input: string, { stream = true, ...options
             }
             port.onDisconnect.addListener(() => {
                 signal?.removeEventListener('abort', handleAbort)
+                resolve()
             })
             signal?.addEventListener('abort', handleAbort)
         })()

@@ -1,11 +1,19 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
+import { backgroundFetch } from '../common/background-fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
-export type Provider = 'OpenAI' | 'Azure'
-export type APIModel = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0301' | 'gpt-4' | 'gpt-4-0314' | 'gpt-4-32k' | 'gpt-4-32k-0314'
+export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
+export type APIModel =
+    | 'gpt-3.5-turbo'
+    | 'gpt-3.5-turbo-0301'
+    | 'gpt-4'
+    | 'gpt-4-0314'
+    | 'gpt-4-32k'
+    | 'gpt-4-32k-0314'
+    | string
 
 export interface TranslateQuery {
     text: string
@@ -13,7 +21,7 @@ export interface TranslateQuery {
     detectFrom: string
     detectTo: string
     mode: TranslateMode
-    onMessage: (message: { content: string; role: string; isWordMode: boolean }) => void
+    onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     signal: AbortSignal
@@ -147,7 +155,7 @@ export async function translate(query: TranslateQuery) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const body: Record<string, any> = {
+    let body: Record<string, any> = {
         model: settings.apiModel,
         temperature: 0,
         max_tokens: 1000,
@@ -157,7 +165,10 @@ export async function translate(query: TranslateQuery) {
         stream: true,
     }
 
-    const apiKey = await utils.getApiKey()
+    let apiKey = ''
+    if (settings.provider !== 'ChatGPT') {
+        apiKey = await utils.getApiKey()
+    }
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
     }
@@ -172,6 +183,51 @@ export async function translate(query: TranslateQuery) {
             'prompt'
         ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
         body['stop'] = ['<|im_end|>']
+    } else if (settings.provider === 'ChatGPT') {
+        let stop = false
+        let resp: any
+        await backgroundFetch(utils.defaultChatGPTAPIAuthSession, {
+            stream: false,
+            signal: query.signal,
+            onMessage: (msg) => {
+                try {
+                    resp = JSON.parse(msg)
+                } catch {
+                    stop = true
+                    query.onFinish('stop')
+                    return
+                }
+            },
+            onError: (err) => {
+                const resp = (err as any).response
+                if (resp) {
+                    query.onError(resp)
+                    return
+                }
+                const { error } = err
+                stop = true
+                query.onError(error.message)
+            },
+        })
+        if (stop) {
+            return
+        }
+        apiKey = resp.accessToken
+        body = {
+            action: 'next',
+            messages: [
+                {
+                    id: utils.generateUUID(),
+                    role: 'user',
+                    content: {
+                        content_type: 'text',
+                        parts: [systemPrompt + '\n\n' + assistantPrompt + ':\n' + `${query.text}`],
+                    },
+                },
+            ],
+            model: settings.apiModel, // 'text-davinci-002-render-sha'
+            parent_message_id: utils.generateUUID(),
+        }
     } else {
         body['messages'] = [
             {
@@ -188,6 +244,7 @@ export async function translate(query: TranslateQuery) {
 
     switch (settings.provider) {
         case 'OpenAI':
+        case 'ChatGPT':
             headers['Authorization'] = `Bearer ${apiKey}`
             break
 
@@ -196,47 +253,100 @@ export async function translate(query: TranslateQuery) {
             break
     }
 
-    await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-        signal: query.signal,
-        onMessage: (msg) => {
-            let resp
-            try {
-                resp = JSON.parse(msg)
-                // eslint-disable-next-line no-empty
-            } catch {
-                query.onFinish('stop')
-                return
-            }
-            const { choices } = resp
-            if (!choices || choices.length === 0) {
-                return { error: 'No result' }
-            }
-            const { finish_reason: finishReason } = choices[0]
-            if (finishReason) {
-                query.onFinish(finishReason)
-                return
-            }
+    if (settings.provider === 'ChatGPT') {
+        let conversationId = ''
+        await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+            signal: query.signal,
+            onMessage: (msg) => {
+                let resp
+                try {
+                    resp = JSON.parse(msg)
+                    // eslint-disable-next-line no-empty
+                } catch {
+                    query.onFinish('stop')
+                    return
+                }
+                if (!conversationId) {
+                    conversationId = resp.conversation_id
+                }
 
-            let targetTxt = ''
+                const { finish_details: finishDetails } = resp.message
+                if (finishDetails) {
+                    query.onFinish(finishDetails.type)
+                    return
+                }
 
-            if (!isChatAPI) {
-                // It's used for Azure OpenAI Service's legacy parameters.
-                targetTxt = choices[0].text
+                let targetTxt = ''
 
-                query.onMessage({ content: targetTxt, role: '', isWordMode })
-            } else {
-                const { content = '', role } = choices[0].delta
-                targetTxt = content
+                const { content, author } = resp.message
+                if (author.role === 'assistant') {
+                    targetTxt = content.parts.join('')
+                    query.onMessage({ content: targetTxt, role: '', isWordMode, isFullText: true })
+                }
+            },
+            onError: (err) => {
+                const { error } = err
+                query.onError(error.message)
+            },
+        })
+        if (conversationId) {
+            await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
+                stream: false,
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({ is_visible: false }),
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onMessage: () => {},
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onError: () => {},
+            })
+        }
+    } else {
+        await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+            signal: query.signal,
+            onMessage: (msg) => {
+                let resp
+                try {
+                    resp = JSON.parse(msg)
+                    // eslint-disable-next-line no-empty
+                } catch {
+                    query.onFinish('stop')
+                    return
+                }
 
-                query.onMessage({ content: targetTxt, role, isWordMode })
-            }
-        },
-        onError: (err) => {
-            const { error } = err
-            query.onError(error.message)
-        },
-    })
+                const { choices } = resp
+                if (!choices || choices.length === 0) {
+                    return { error: 'No result' }
+                }
+                const { finish_reason: finishReason } = choices[0]
+                if (finishReason) {
+                    query.onFinish(finishReason)
+                    return
+                }
+
+                let targetTxt = ''
+                if (!isChatAPI) {
+                    // It's used for Azure OpenAI Service's legacy parameters.
+                    targetTxt = choices[0].text
+
+                    query.onMessage({ content: targetTxt, role: '', isWordMode })
+                } else {
+                    const { content = '', role } = choices[0].delta
+                    targetTxt = content
+
+                    query.onMessage({ content: targetTxt, role, isWordMode })
+                }
+            },
+            onError: (err) => {
+                const { error } = err
+                query.onError(error.message)
+            },
+        })
+    }
 }

@@ -99,10 +99,6 @@ browser.runtime.onConnect.addListener(async function (port) {
     if (port.name !== 'background-fetch') {
         return
     }
-    const tabId = port.sender?.tab?.id
-    if (!tabId) {
-        return
-    }
 
     const controller = new AbortController()
     const { signal } = controller

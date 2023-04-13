@@ -289,7 +289,11 @@ const Vocabulary = (props: IVocabularyProps) => {
                         return
                     }
                     setArticle((e) => {
-                        articleTxt.current += message.content
+                        if (message.isFullText) {
+                            articleTxt.current = message.content
+                        } else {
+                            articleTxt.current += message.content
+                        }
                         if (articleUsedWord.current?.includes(message.content.toLowerCase().trim())) {
                             return e + `<b style="color: #f40;">${message.content}</b>`
                         } else {
