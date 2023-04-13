@@ -13,7 +13,7 @@ export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultAlwaysShowIcons = true
-
+export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
 export async function getApiKey(): Promise<string> {
@@ -40,6 +40,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ttsVoices: 1,
     restorePreviousPosition: 1,
     runAtStartup: 1,
+    selectInputElementsText: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -76,6 +77,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.i18n) {
         settings.i18n = defaulti18n
+    }
+    if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
+        settings.selectInputElementsText = defaultSelectInputElementsText
     }
     return settings
 }

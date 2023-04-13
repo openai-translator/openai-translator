@@ -60,5 +60,6 @@ export interface ISettings {
         voice: string
     }[]
     restorePreviousPosition?: boolean
+    selectInputElementsText?: boolean
     runAtStartup?: boolean
 }

@@ -160,11 +160,18 @@ async function showPopupThumb(text: string, x: number, y: number) {
 
 async function main() {
     const browser = await utils.getBrowser()
-
+    let mousedownTarget: EventTarget | null
     let lastMouseEvent: MouseEvent | undefined
 
-    document.addEventListener('mouseup', (event: MouseEvent) => {
+    document.addEventListener('mouseup', async (event: MouseEvent) => {
         lastMouseEvent = event
+        const settings = await utils.getSettings()
+        if (
+            (mousedownTarget instanceof HTMLInputElement || mousedownTarget instanceof HTMLTextAreaElement) &&
+            settings.selectInputElementsText === false
+        ) {
+            return
+        }
         window.setTimeout(async () => {
             let text = (window.getSelection()?.toString() ?? '').trim()
             if (!text) {
@@ -173,7 +180,6 @@ async function main() {
                     text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0).trim()
                 }
             } else {
-                const settings = await utils.getSettings()
                 if (settings.autoTranslate === true) {
                     showPopupCard(event.pageX + 7, event.pageY + 7, text)
                 } else if (settings.alwaysShowIcons === true) {
@@ -191,7 +197,8 @@ async function main() {
         }
     })
 
-    document.addEventListener('mousedown', () => {
+    document.addEventListener('mousedown', (event: MouseEvent) => {
+        mousedownTarget = event.target
         hidePopupCard()
         hidePopupThumb()
     })

@@ -518,6 +518,24 @@ function RestorePreviousPositionCheckbox(props: RestorePreviousPositionCheckboxP
         />
     )
 }
+interface SelectInputElementsProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function SelectInputElementsCheckbox(props: SelectInputElementsProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={props.value}
+            onChange={(e) => {
+                props.onChange?.(e.target.checked)
+                props.onBlur?.()
+            }}
+        />
+    )
+}
 interface RunAtStartupCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -727,6 +745,7 @@ export function Settings(props: IPopupProps) {
         hotkey: '',
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
+        selectInputElementsText: utils.defaultSelectInputElementsText,
         runAtStartup: false,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
@@ -917,6 +936,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
+                            <SelectInputElementsCheckbox onBlur={onBlur} />
                         </FormItem>
                         {isTauri && (
                             <FormItem name='runAtStartup' label={t('Run at Startup')}>
