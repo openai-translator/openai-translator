@@ -843,7 +843,11 @@ export function PopupCard(props: IPopupCardProps) {
         if (!props.defaultShowSettings) {
             return
         }
-        if (settings && !settings.apiKeys) {
+        if (
+            settings &&
+            ((settings.provider === 'ChatGPT' && !settings.apiModel) ||
+                (settings.provider !== 'ChatGPT' && !settings.apiKeys))
+        ) {
             setShowSettings(true)
         }
     }, [props.defaultShowSettings, settings])
