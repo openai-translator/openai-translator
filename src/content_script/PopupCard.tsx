@@ -1014,25 +1014,28 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }
 
-    const handleEditSpeakAction = () => {
+    const audioSourceRef = useRef<AudioBufferSourceNode>()
+    const handleEditSpeakAction = async () => {
         if (typeof window.speechSynthesis === 'undefined') {
             return
         }
 
         if (isSpeakingEditableText) {
             speechSynthesis.cancel()
+            audioSourceRef.current?.stop()
             setIsSpeakingEditableText(false)
             return
         }
         setIsSpeakingEditableText(true)
-        speak({
+        const { source } = await speak({
             text: editableText,
             lang: originalLang,
             onFinish: handleSpeakDone,
         })
+        audioSourceRef.current = source
     }
 
-    const handleTranslatedSpeakAction = () => {
+    const handleTranslatedSpeakAction = async () => {
         if (typeof window.speechSynthesis === 'undefined') {
             return
         }

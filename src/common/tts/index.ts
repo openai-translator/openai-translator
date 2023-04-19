@@ -1,10 +1,6 @@
-import { getSettings } from './utils'
-
-interface SpeakOptions {
-    text: string
-    lang?: string
-    onFinish?: () => void
-}
+import { SpeakOptions } from './types'
+import { getSettings } from '../utils'
+import { speak as edgeSpeak } from './edge-tts'
 
 export const langCode2TTSLang: Record<string, string> = {
     'en': 'en-US',
@@ -60,5 +56,6 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
     )
     utterance.voice = settingsVoice ?? defaultVoice
 
-    speechSynthesis.speak(utterance)
+    return edgeSpeak({ text, lang: langTag, onFinish })
+    // speechSynthesis.speak(utterance)
 }
