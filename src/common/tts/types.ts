@@ -3,3 +3,5 @@ export interface SpeakOptions {
     lang?: string
     onFinish?: () => void
 }
+
+export type TTSProvider = 'WebSpeech' | 'EdgeTTS'

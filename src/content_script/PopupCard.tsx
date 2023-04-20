@@ -1014,43 +1014,42 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }
 
-    const audioSourceRef = useRef<AudioBufferSourceNode>()
-    const handleEditSpeakAction = async () => {
-        if (typeof window.speechSynthesis === 'undefined') {
-            return
+    const stopSpeakRef = useRef<() => void>(() => null)
+    useEffect(() => {
+        return () => {
+            stopSpeakRef.current()
         }
-
+    }, [])
+    const handleEditSpeakAction = async () => {
         if (isSpeakingEditableText) {
-            speechSynthesis.cancel()
-            audioSourceRef.current?.stop()
+            stopSpeakRef.current()
             setIsSpeakingEditableText(false)
             return
         }
         setIsSpeakingEditableText(true)
-        const { source } = await speak({
+        stopSpeakRef.current()
+        const { stopSpeak } = await speak({
             text: editableText,
             lang: originalLang,
             onFinish: handleSpeakDone,
         })
-        audioSourceRef.current = source
+        stopSpeakRef.current = stopSpeak
     }
 
     const handleTranslatedSpeakAction = async () => {
-        if (typeof window.speechSynthesis === 'undefined') {
-            return
-        }
-
         if (isSpeakingTranslatedText) {
-            speechSynthesis.cancel()
+            stopSpeakRef.current()
             setIsSpeakingTranslatedText(false)
             return
         }
         setIsSpeakingTranslatedText(true)
-        speak({
+        stopSpeakRef.current()
+        const { stopSpeak } = await speak({
             text: translatedText,
             lang: targetLang,
             onFinish: handleSpeakDone,
         })
+        stopSpeakRef.current = stopSpeak
     }
 
     return (
@@ -1428,11 +1427,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <>
                                                     <Tooltip content={t('Speak')} placement='bottom'>
                                                         <div
-                                                            className={
-                                                                window.speechSynthesis
-                                                                    ? styles.actionButton
-                                                                    : styles.actionButtonDisabled
-                                                            }
+                                                            className={styles.actionButton}
                                                             onClick={handleEditSpeakAction}
                                                         >
                                                             {isSpeakingEditableText ? (
@@ -1583,11 +1578,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             <div style={{ marginRight: 'auto' }} />
                                                             <Tooltip content={t('Speak')} placement='bottom'>
                                                                 <div
-                                                                    className={
-                                                                        window.speechSynthesis
-                                                                            ? styles.actionButton
-                                                                            : styles.actionButtonDisabled
-                                                                    }
+                                                                    className={styles.actionButton}
                                                                     onClick={handleTranslatedSpeakAction}
                                                                 >
                                                                     {isSpeakingTranslatedText ? (

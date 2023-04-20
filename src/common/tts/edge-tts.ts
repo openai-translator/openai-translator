@@ -30,11 +30,11 @@ function getHeadersAndData(data: string) {
     return { headers, data: data.slice(data.indexOf('\r\n\r\n') + 4) }
 }
 
-const TRUSTED_CLIENT_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
-const WSS_URL =
+const trustedClientToken = '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
+const wssURL =
     'wss://speech.platform.bing.com/consumer/speech/synthesize/' +
     'readaloud/edge/v1?TrustedClientToken=' +
-    TRUSTED_CLIENT_TOKEN
+    trustedClientToken
 
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/e6faf6b7fc1febb45993b940617719e8ed1358b2/src/sdk/SpeechSynthesizer.ts#L216
 const languageToDefaultVoice: { [key: string]: string } = {
@@ -169,13 +169,13 @@ const languageToDefaultVoice: { [key: string]: string } = {
     ['zu-ZA']: 'zu-ZA-ThandoNeural',
 }
 
-export async function speak({ text, lang, onFinish }: SpeakOptions) {
+export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { voice?: string }) {
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const audioContext = new AudioContext()
     const audioBufferSource = audioContext.createBufferSource()
 
-    const ws = new WebSocket(`${WSS_URL}&ConnectionId=${connectId}`)
+    const ws = new WebSocket(`${wssURL}&ConnectionId=${connectId}`)
     ws.addEventListener('open', () => {
         ws.send(
             `X-Timestamp:${date}\r\n` +
@@ -187,7 +187,11 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
                 '}}}}\r\n'
         )
         ws.send(
-            ssmlHeadersPlusData(connectId, date, mkssml(text, languageToDefaultVoice[lang ?? 'en-US'], '+0%', '+0%'))
+            ssmlHeadersPlusData(
+                connectId,
+                date,
+                mkssml(text, voice ?? languageToDefaultVoice[lang ?? 'en-US'], '+0%', '+0%')
+            )
         )
     })
 
@@ -210,6 +214,7 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
                     audioBufferSource.start()
                     audioBufferSource.addEventListener('ended', () => {
                         onFinish?.()
+                        audioContext.close()
                     })
                     break
                 }
@@ -228,5 +233,42 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
         onFinish?.()
     })
 
-    return { source: audioBufferSource }
+    return { stopSpeak: () => audioBufferSource.stop() }
+}
+
+const voiceListURL =
+    'https://speech.platform.bing.com/consumer/speech/synthesize/' +
+    'readaloud/voices/list?trustedclienttoken=' +
+    trustedClientToken
+
+interface EdgeVoice {
+    FriendlyName: string
+    Gender: string
+    Locale: string
+    ShortName: string
+    Name: string
+    SuggestedCodec: string
+}
+export async function getEdgeVoices() {
+    const response = await fetch(voiceListURL, {
+        headers: {
+            'Authority': 'speech.platform.bing.com',
+            'Sec-CH-UA': '" Not;A Brand";v="99", "Microsoft Edge";v="91", "Chromium";v="91"',
+            'Sec-CH-UA-Mobile': '?0',
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
+            'Accept': '*/*',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': 'empty',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9',
+        },
+    })
+    const voices: EdgeVoice[] = await response.json()
+    return voices.map((voice) => ({
+        name: voice.FriendlyName,
+        lang: voice.Locale,
+        voiceURI: voice.Name,
+    })) as SpeechSynthesisVoice[]
 }
