@@ -1027,7 +1027,6 @@ export function PopupCard(props: IPopupCardProps) {
             return
         }
         setIsSpeakingEditableText(true)
-        stopSpeakRef.current()
         const { stopSpeak } = await speak({
             text: editableText,
             lang: originalLang,
@@ -1043,7 +1042,6 @@ export function PopupCard(props: IPopupCardProps) {
             return
         }
         setIsSpeakingTranslatedText(true)
-        stopSpeakRef.current()
         const { stopSpeak } = await speak({
             text: translatedText,
             lang: targetLang,
