@@ -185,6 +185,7 @@ export async function translate(query: TranslateQuery) {
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
         let stop = false
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let resp: any
         await backgroundFetch(utils.defaultChatGPTAPIAuthSession, {
             stream: false,
@@ -199,14 +200,27 @@ export async function translate(query: TranslateQuery) {
                 }
             },
             onError: (err) => {
+                stop = true
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const resp = (err as any).response
                 if (resp) {
                     query.onError(resp)
                     return
                 }
+                if (typeof err === 'string') {
+                    query.onError(err)
+                    return
+                }
+                if (err instanceof Error) {
+                    query.onError(err.message)
+                    return
+                }
                 const { error } = err
-                stop = true
-                query.onError(error.message)
+                if (error) {
+                    query.onError(error.message)
+                    return
+                }
+                query.onError(`Unknown error: ${String(err)}`)
             },
         })
         if (stop) {
