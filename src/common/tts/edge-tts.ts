@@ -176,6 +176,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
     const audioBufferSource = audioContext.createBufferSource()
 
     const ws = new WebSocket(`${wssURL}&ConnectionId=${connectId}`)
+    ws.binaryType = 'arraybuffer'
     ws.addEventListener('open', () => {
         ws.send(
             `X-Timestamp:${date}\r\n` +
@@ -195,7 +196,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
         )
     })
 
-    const chunks: Blob[] = []
+    const audioData = new ArrayBuffer(0)
     let downloadAudio = false
     ws.addEventListener('message', async (event) => {
         if (typeof event.data === 'string') {
@@ -207,7 +208,9 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
                     break
                 case 'turn.end': {
                     downloadAudio = false
-                    const audioData = await new Blob(chunks).arrayBuffer()
+                    if (!audioData) {
+                        return
+                    }
                     const buffer = await audioContext.decodeAudioData(audioData)
                     audioBufferSource.buffer = buffer
                     audioBufferSource.connect(audioContext.destination)
@@ -219,21 +222,34 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
                     break
                 }
             }
-        } else if (event.data instanceof Blob) {
+        } else if (event.data instanceof ArrayBuffer) {
             if (!downloadAudio) {
                 return
             }
-            const strData = await event.data.text()
-            const chunk = event.data.slice(strData.indexOf('Path:audio\r\n') + 12)
-            chunks.push(chunk)
+            // See: https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/d071d11d1e9f34d6f79d0ab6114c90eecb02ba1f/src/common.speech/WebsocketMessageFormatter.ts#L46-L47
+            const dataview = new DataView(event.data)
+            const headerLength = dataview.getInt16(0)
+            if (event.data.byteLength > headerLength + 2) {
+                const newBody = event.data.slice(2 + headerLength)
+                let audioData = new ArrayBuffer(0)
+                const newAudioData = new ArrayBuffer(audioData.byteLength + newBody.byteLength)
+                const mergedUint8Array = new Uint8Array(newAudioData)
+                mergedUint8Array.set(new Uint8Array(audioData), 0)
+                mergedUint8Array.set(new Uint8Array(newBody), audioData.byteLength)
+                audioData = newAudioData
+            }
         }
     })
 
-    ws.addEventListener('close', () => {
-        onFinish?.()
-    })
-
-    return { stopSpeak: () => audioBufferSource.stop() }
+    return {
+        stopSpeak: () => {
+            try {
+                audioBufferSource.stop()
+            } catch (e) {
+                // ignore
+            }
+        },
+    }
 }
 
 const voiceListURL =
