@@ -45,6 +45,17 @@ import Vocabulary from './Vocabulary'
 import { LocalDB, VocabularyItem } from '../common/db'
 import { useCollectedWordTotal } from '../common/hooks/useCollectedWordTotal'
 import { Modal } from 'baseui-sd/modal'
+import * as Sentry from '@sentry/react'
+
+Sentry.init({
+    dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
+    integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
+    // Performance Monitoring
+    tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+})
 
 const cache = new LRUCache({
     max: 500,

@@ -26,6 +26,7 @@
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.16",
     "@popperjs/core": "^2.11.6",
+    "@sentry/react": "^7.49.0",
     "@tauri-apps/api": "^1.2.0",
     "@types/franc": "^5.0.1",
     "@types/react-copy-to-clipboard": "^5.0.4",
