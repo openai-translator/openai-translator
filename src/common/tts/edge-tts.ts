@@ -196,7 +196,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
         )
     })
 
-    const audioData = new ArrayBuffer(0)
+    let audioData = new ArrayBuffer(0)
     let downloadAudio = false
     ws.addEventListener('message', async (event) => {
         if (typeof event.data === 'string') {
@@ -231,7 +231,6 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
             const headerLength = dataview.getInt16(0)
             if (event.data.byteLength > headerLength + 2) {
                 const newBody = event.data.slice(2 + headerLength)
-                let audioData = new ArrayBuffer(0)
                 const newAudioData = new ArrayBuffer(audioData.byteLength + newBody.byteLength)
                 const mergedUint8Array = new Uint8Array(newAudioData)
                 mergedUint8Array.set(new Uint8Array(audioData), 0)
