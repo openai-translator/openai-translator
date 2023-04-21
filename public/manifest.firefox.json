@@ -28,7 +28,7 @@
 
     "permissions": ["storage", "contextMenus"],
 
-    "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com/"],
+    "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com/", "https://*.ingest.sentry.io/"],
 
     "browser_specific_settings": {
         "gecko": {

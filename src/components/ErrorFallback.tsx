@@ -6,6 +6,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: { error: Error; res
             role='alert'
             style={{
                 padding: '20px',
+                background: '#fff',
             }}
         >
             <p
