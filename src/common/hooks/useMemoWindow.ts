@@ -18,8 +18,12 @@ export const useMemoWindow = (props: WindowMemoProps) => {
                 if (props.position) {
                     const storagePosition = localStorage.getItem('_position')
                     if (storagePosition) {
-                        const { x, y } = JSON.parse(storagePosition)
-                        await appWindow.setPosition(new PhysicalPosition(x, y))
+                        let { x, y } = JSON.parse(storagePosition)
+                        if (x < 0 || y < 0) {
+                            await appWindow.center()
+                        } else {
+                            await appWindow.setPosition(new PhysicalPosition(x, y))
+                        }
                     } else {
                         await appWindow.center()
                     }
@@ -29,7 +33,13 @@ export const useMemoWindow = (props: WindowMemoProps) => {
                 if (props.size) {
                     const storageSize = localStorage.getItem('_size')
                     if (storageSize) {
-                        const { height, width } = JSON.parse(storageSize)
+                        let { height, width } = JSON.parse(storageSize)
+                        if (height < 800) {
+                            height = 800
+                        }
+                        if (width < 600) {
+                            width = 600
+                        }
                         await appWindow.setSize(new PhysicalSize(width, height))
                     }
                 } else {
