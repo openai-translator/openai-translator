@@ -1014,15 +1014,17 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }
 
-    const stopSpeakRef = useRef<() => void>(() => null)
+    const editableStopSpeakRef = useRef<() => void>(() => null)
+    const translatedStopSpeakRef = useRef<() => void>(() => null)
     useEffect(() => {
         return () => {
-            stopSpeakRef.current()
+            editableStopSpeakRef.current()
+            translatedStopSpeakRef.current()
         }
     }, [])
     const handleEditSpeakAction = async () => {
         if (isSpeakingEditableText) {
-            stopSpeakRef.current()
+            editableStopSpeakRef.current()
             setIsSpeakingEditableText(false)
             return
         }
@@ -1032,12 +1034,12 @@ export function PopupCard(props: IPopupCardProps) {
             lang: originalLang,
             onFinish: handleSpeakDone,
         })
-        stopSpeakRef.current = stopSpeak
+        editableStopSpeakRef.current = stopSpeak
     }
 
     const handleTranslatedSpeakAction = async () => {
         if (isSpeakingTranslatedText) {
-            stopSpeakRef.current()
+            translatedStopSpeakRef.current()
             setIsSpeakingTranslatedText(false)
             return
         }
@@ -1047,7 +1049,7 @@ export function PopupCard(props: IPopupCardProps) {
             lang: targetLang,
             onFinish: handleSpeakDone,
         })
-        stopSpeakRef.current = stopSpeak
+        translatedStopSpeakRef.current = stopSpeak
     }
 
     return (
