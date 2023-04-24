@@ -209,7 +209,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
                     break
                 case 'turn.end': {
                     downloadAudio = false
-                    if (!audioData || stopped) {
+                    if (!audioData.byteLength || stopped) {
                         return
                     }
                     const buffer = await audioContext.decodeAudioData(audioData)
