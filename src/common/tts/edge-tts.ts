@@ -198,6 +198,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
 
     let audioData = new ArrayBuffer(0)
     let downloadAudio = false
+    let stopped = false
     ws.addEventListener('message', async (event) => {
         if (typeof event.data === 'string') {
             const { headers } = getHeadersAndData(event.data)
@@ -208,7 +209,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
                     break
                 case 'turn.end': {
                     downloadAudio = false
-                    if (!audioData) {
+                    if (!audioData || stopped) {
                         return
                     }
                     const buffer = await audioContext.decodeAudioData(audioData)
@@ -243,6 +244,7 @@ export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { vo
     return {
         stopSpeak: () => {
             try {
+                stopped = true
                 audioBufferSource.stop()
             } catch (e) {
                 // ignore
