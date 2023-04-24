@@ -848,11 +848,6 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }, [translateText, originalText, selectedWord, translationFlag])
 
-    const handleSpeakDone = () => {
-        setIsSpeakingEditableText(false)
-        setIsSpeakingTranslatedText(false)
-    }
-
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
@@ -1032,7 +1027,7 @@ export function PopupCard(props: IPopupCardProps) {
         const { stopSpeak } = await speak({
             text: editableText,
             lang: originalLang,
-            onFinish: handleSpeakDone,
+            onFinish: () => setIsSpeakingEditableText(false),
         })
         editableStopSpeakRef.current = stopSpeak
     }
@@ -1047,7 +1042,7 @@ export function PopupCard(props: IPopupCardProps) {
         const { stopSpeak } = await speak({
             text: translatedText,
             lang: targetLang,
-            onFinish: handleSpeakDone,
+            onFinish: () => setIsSpeakingTranslatedText(false),
         })
         translatedStopSpeakRef.current = stopSpeak
     }
