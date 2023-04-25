@@ -18,7 +18,7 @@ export const useMemoWindow = (props: WindowMemoProps) => {
                 if (props.position) {
                     const storagePosition = localStorage.getItem('_position')
                     if (storagePosition) {
-                        let { x, y } = JSON.parse(storagePosition)
+                        const { x, y } = JSON.parse(storagePosition)
                         if (x < 0 || y < 0) {
                             await appWindow.center()
                         } else {
