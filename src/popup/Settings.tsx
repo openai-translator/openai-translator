@@ -450,6 +450,7 @@ function APIModelSelector(props: APIModelSelectorProps) {
                     if (!models || !models.models) {
                         return
                     }
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     setOptions(models.models.map((model: any) => ({ label: model.title, id: model.slug })))
                 })
                 .catch((e) => {
@@ -690,6 +691,23 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
 }
 
 function ProviderSelector(props: IProviderSelectorProps) {
+    const options = utils.isDesktopApp()
+        ? ([
+              { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'Azure', id: 'Azure' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
+        : ([
+              { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'ChatGPT (Web)', id: 'ChatGPT' },
+              { label: 'Azure', id: 'Azure' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
+
     return (
         <Select
             size='compact'
@@ -705,16 +723,7 @@ function ProviderSelector(props: IProviderSelectorProps) {
             onChange={(params) => {
                 props.onChange?.(params.value[0].id as Provider | 'OpenAI')
             }}
-            options={
-                [
-                    { label: 'OpenAI', id: 'OpenAI' },
-                    { label: 'ChatGPT (Web)', id: 'ChatGPT' },
-                    { label: 'Azure', id: 'Azure' },
-                ] as {
-                    label: string
-                    id: Provider
-                }[]
-            }
+            options={options}
         />
     )
 }
