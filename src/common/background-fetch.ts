@@ -8,6 +8,11 @@ interface BackgroundFetchMessage
 export async function backgroundFetch(input: string, options: RequestInit) {
     return new Promise<Response>((resolve, reject) => {
         ;(async () => {
+            const { signal, ...fetchOptions } = options
+            if (signal?.aborted) {
+                reject(new DOMException('Aborted', 'AbortError'))
+            }
+
             const transformStream = new TransformStream<Uint8Array, Uint8Array>()
             const { writable, readable } = transformStream
             const writer = writable.getWriter()
@@ -21,10 +26,8 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                 return valueString
             }
 
-            const { signal, ...fetchOptions } = options
             const browser = await require('webextension-polyfill')
             let resolved = false
-
             const port = browser.runtime.connect({ name: 'background-fetch' })
             port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
             port.onMessage.addListener((msg: BackgroundFetchMessage) => {
@@ -37,7 +40,6 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                     return
                 }
                 writer.write(textEncoder.encode(data))
-
                 if (!resolved) {
                     resolve({
                         ...restResp,
@@ -54,6 +56,7 @@ export async function backgroundFetch(input: string, options: RequestInit) {
 
             function handleAbort() {
                 port.postMessage({ type: 'abort' })
+                console.log('background abort-----', fetchOptions.body)
             }
             port.onDisconnect.addListener(() => {
                 signal?.removeEventListener('abort', handleAbort)
