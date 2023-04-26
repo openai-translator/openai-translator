@@ -551,18 +551,22 @@ export function PopupCard(props: IPopupCardProps) {
         setEditableText(originalText)
         setSelectedWord('')
     }, [originalText])
-    const [detectFrom, setDetectFrom] = useState('')
-    const [detectTo, setDetectTo] = useState('')
-    const stopAutomaticallyChangeDetectTo = useRef(false)
+    const [originalLang, setOriginalLang] = useState('')
+    const [targetLang, setTargetLang] = useState('')
+    const stopAutomaticallyChangeTargetLang = useRef(false)
     useEffect(() => {
         ;(async () => {
-            const from = (await detectLang(originalText)) ?? 'en'
-            setDetectFrom(from)
+            const originalLang_ = (await detectLang(originalText)) ?? 'en'
+            setOriginalLang(originalLang_)
             if (
                 (translateMode === 'translate' || translateMode === 'analyze') &&
-                !stopAutomaticallyChangeDetectTo.current
+                !stopAutomaticallyChangeTargetLang.current
             ) {
-                setDetectTo(from === 'zh-Hans' || from === 'zh-Hant' ? 'en' : settings?.defaultTargetLanguage ?? 'en')
+                setTargetLang(
+                    originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
+                        ? 'en'
+                        : settings?.defaultTargetLanguage ?? 'en'
+                )
             }
         })()
     }, [originalText, translateMode, settings])
@@ -572,12 +576,12 @@ export function PopupCard(props: IPopupCardProps) {
     useEffect(() => {
         const editor = editorRef.current
         if (!editor) return
-        editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(detectFrom) ? 'rtl' : 'ltr'
-    }, [detectFrom, actionStr])
+        editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(originalLang) ? 'rtl' : 'ltr'
+    }, [originalLang, actionStr])
     const [translatedLanguageDirection, setTranslatedLanguageDirection] = useState<Theme['direction']>('ltr')
     useEffect(() => {
-        setTranslatedLanguageDirection(['ar', 'fa', 'he', 'ug', 'ur'].includes(detectTo) ? 'rtl' : 'ltr')
-    }, [detectTo])
+        setTranslatedLanguageDirection(['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr')
+    }, [targetLang])
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -731,13 +735,13 @@ export function PopupCard(props: IPopupCardProps) {
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
-            if (!text || !detectFrom || !detectTo || !translateMode) {
+            if (!text || !originalLang || !targetLang || !translateMode) {
                 return
             }
             const actionStrItem = actionStrItems[translateMode]
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
-                if (translateMode === 'translate' && detectFrom == detectTo) {
+                if (translateMode === 'translate' && originalLang == targetLang) {
                     actionStr = 'Polishing...'
                 }
                 setActionStr(actionStr)
@@ -759,14 +763,14 @@ export function PopupCard(props: IPopupCardProps) {
                     }
                 } else {
                     let actionStr = actionStrItem.afterStr
-                    if (translateMode === 'translate' && detectFrom == detectTo) {
+                    if (translateMode === 'translate' && originalLang == targetLang) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${translateMode}:${detectFrom}:${detectTo}:${text}:${selectedWord}`
+            const cachedKey = `translate:${translateMode}:${originalLang}:${targetLang}:${text}:${selectedWord}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -780,8 +784,8 @@ export function PopupCard(props: IPopupCardProps) {
                     signal,
                     text,
                     selectedWord,
-                    detectFrom,
-                    detectTo,
+                    detectFrom: originalLang,
+                    detectTo: targetLang,
                     onMessage: (message) => {
                         if (message.role) {
                             return
@@ -832,7 +836,7 @@ export function PopupCard(props: IPopupCardProps) {
                 }
             }
         },
-        [translateMode, detectFrom, detectTo]
+        [translateMode, originalLang, targetLang]
     )
 
     useEffect(() => {
@@ -1023,7 +1027,7 @@ export function PopupCard(props: IPopupCardProps) {
         setIsSpeakingEditableText(true)
         speak({
             text: editableText,
-            lang: detectFrom,
+            lang: originalLang,
             onFinish: handleSpeakDone,
         })
     }
@@ -1041,7 +1045,7 @@ export function PopupCard(props: IPopupCardProps) {
         setIsSpeakingTranslatedText(true)
         speak({
             text: translatedText,
-            lang: detectTo,
+            lang: targetLang,
             onFinish: handleSpeakDone,
         })
     }
@@ -1091,7 +1095,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 size='mini'
                                                 clearable={false}
                                                 options={langOptions}
-                                                value={[{ id: detectFrom }]}
+                                                value={[{ id: originalLang }]}
                                                 overrides={{
                                                     Root: {
                                                         style: {
@@ -1101,9 +1105,9 @@ export function PopupCard(props: IPopupCardProps) {
                                                 }}
                                                 onChange={({ value }) => {
                                                     if (value.length > 0) {
-                                                        setDetectFrom(value[0].id as string)
+                                                        setOriginalLang(value[0].id as string)
                                                     } else {
-                                                        setDetectFrom(langOptions[0].id as string)
+                                                        setOriginalLang(langOptions[0].id as string)
                                                     }
                                                 }}
                                             />
@@ -1112,8 +1116,8 @@ export function PopupCard(props: IPopupCardProps) {
                                             className={styles.arrow}
                                             onClick={() => {
                                                 setOriginalText(translatedText)
-                                                setDetectFrom(detectTo)
-                                                setDetectTo(detectFrom)
+                                                setOriginalLang(targetLang)
+                                                setTargetLang(originalLang)
                                             }}
                                         >
                                             <Tooltip content='Exchange' placement='top'>
@@ -1128,7 +1132,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 size='mini'
                                                 clearable={false}
                                                 options={langOptions}
-                                                value={[{ id: detectTo }]}
+                                                value={[{ id: targetLang }]}
                                                 overrides={{
                                                     Root: {
                                                         style: {
@@ -1137,11 +1141,11 @@ export function PopupCard(props: IPopupCardProps) {
                                                     },
                                                 }}
                                                 onChange={({ value }) => {
-                                                    stopAutomaticallyChangeDetectTo.current = true
+                                                    stopAutomaticallyChangeTargetLang.current = true
                                                     if (value.length > 0) {
-                                                        setDetectTo(value[0].id as string)
+                                                        setTargetLang(value[0].id as string)
                                                     } else {
-                                                        setDetectTo(langOptions[0].id as string)
+                                                        setTargetLang(langOptions[0].id as string)
                                                     }
                                                 }}
                                             />
@@ -1163,7 +1167,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
                                                 onClick={() => {
                                                     setTranslateMode('polishing')
-                                                    setDetectTo(detectFrom)
+                                                    setTargetLang(originalLang)
                                                 }}
                                             >
                                                 <IoColorPaletteOutline />
