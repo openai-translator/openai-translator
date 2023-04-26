@@ -9,11 +9,11 @@ const T =
     )
 
 export function isTraditional(str: string): boolean {
-    return detect(str)?.detectedCharacters == 'traditional'
+    return detect(str)?.detectedCharacters === 'traditional'
 }
 
 export function isSimplified(str: string) {
-    return detect(str)?.detectedCharacters == 'simplified'
+    return detect(str)?.detectedCharacters === 'simplified'
 }
 
 interface Result {
@@ -40,7 +40,7 @@ function detect(str: string): Result | undefined {
         } else if (charIsT(char)) {
             result.traditionalCharacters++
         }
-        if (i == str.length - 1) {
+        if (i === str.length - 1) {
             if (result.simplifiedCharacters > result.traditionalCharacters) {
                 result.detectedCharacters = 'simplified'
                 result.detectionRate = (result.simplifiedCharacters / result.traditionalCharacters) | 1

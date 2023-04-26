@@ -23,6 +23,7 @@ module.exports = {
     rules: {
         'react/react-in-jsx-scope': 'off',
         'camelcase': 'error',
+        'eqeqeq': ['error', 'always'],
         'spaced-comment': 'error',
         'no-duplicate-imports': 'error',
         'baseui/deprecated-theme-api': 'warn',

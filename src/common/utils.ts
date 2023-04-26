@@ -163,7 +163,7 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
     const processRow = function (row: T) {
         let s = ''
         for (const key of columns) {
-            if (key == 'updatedAt') {
+            if (key === 'updatedAt') {
                 s += '\t' + `${row[key]}` + ','
             } else {
                 s += '"' + `${row[key]}` + '"' + ','
