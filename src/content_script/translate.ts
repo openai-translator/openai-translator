@@ -184,49 +184,17 @@ export async function translate(query: TranslateQuery) {
         ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
-        let stop = false
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let resp: any
-        await backgroundFetch(utils.defaultChatGPTAPIAuthSession, {
-            stream: false,
-            signal: query.signal,
-            onMessage: (msg) => {
-                try {
-                    resp = JSON.parse(msg)
-                } catch {
-                    stop = true
-                    query.onFinish('stop')
-                    return
-                }
-            },
-            onError: (err) => {
-                stop = true
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const resp = (err as any).response
-                if (resp) {
-                    query.onError(resp)
-                    return
-                }
-                if (typeof err === 'string') {
-                    query.onError(err)
-                    return
-                }
-                if (err instanceof Error) {
-                    query.onError(err.message)
-                    return
-                }
-                const { error } = err
-                if (error) {
-                    query.onError(error.message)
-                    return
-                }
-                query.onError(`Unknown error: ${String(err)}`)
-            },
-        })
-        if (stop) {
-            return
+        let resp: Response | null = null
+        try {
+            resp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+            const respJson = await resp?.json()
+            apiKey = respJson.accessToken
+        } catch (error) {
+            if (error instanceof Error) {
+                query.onError(error.message)
+                return
+            }
         }
-        apiKey = resp.accessToken
         body = {
             action: 'next',
             messages: [
@@ -269,53 +237,43 @@ export async function translate(query: TranslateQuery) {
 
     if (settings.provider === 'ChatGPT') {
         let conversationId = ''
-        await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-            signal: query.signal,
-            onMessage: (msg) => {
-                let resp
-                try {
-                    resp = JSON.parse(msg)
-                    // eslint-disable-next-line no-empty
-                } catch {
-                    query.onFinish('stop')
-                    return
-                }
-                if (!conversationId) {
-                    conversationId = resp.conversation_id
-                }
+        try {
+            const resp = await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+                signal: query.signal,
+            })
+            const respJson = await resp.json()
+            if (!conversationId) {
+                conversationId = respJson.conversation_id
+            }
 
-                const { finish_details: finishDetails } = resp.message
-                if (finishDetails) {
-                    query.onFinish(finishDetails.type)
-                    return
-                }
+            const { finish_details: finishDetails } = respJson.message
+            if (finishDetails) {
+                query.onFinish(finishDetails.type)
+                return
+            }
 
-                let targetTxt = ''
+            let targetTxt = ''
 
-                const { content, author } = resp.message
-                if (author.role === 'assistant') {
-                    targetTxt = content.parts.join('')
-                    query.onMessage({ content: targetTxt, role: '', isWordMode, isFullText: true })
-                }
-            },
-            onError: (err) => {
-                const { error } = err
+            const { content, author } = respJson.message
+            if (author.role === 'assistant') {
+                targetTxt = content.parts.join('')
+                query.onMessage({ content: targetTxt, role: '', isWordMode, isFullText: true })
+            }
+        } catch (error) {
+            if (error instanceof Error) {
                 query.onError(error.message)
-            },
-        })
+                return
+            }
+        }
+
         if (conversationId) {
             await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
-                stream: false,
                 method: 'PATCH',
                 headers,
                 body: JSON.stringify({ is_visible: false }),
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onMessage: () => {},
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onError: () => {},
             })
         }
     } else {

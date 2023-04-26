@@ -1,5 +1,5 @@
 import { userscriptFetch } from './userscript-polyfill'
-import { isFirefox, isUserscript } from './utils'
+import { isDesktopApp, isUserscript } from './utils'
 import { ALLOWED_COUNTRY_CODES } from './geo-data' // a separate file for bypassing spell check
 import { backgroundFetch } from './background-fetch'
 
@@ -42,33 +42,14 @@ function parseResponse(response: string): OpenAICDNCGITraceResponse {
 const traceUrl = 'https://chat.openai.com/cdn-cgi/trace' // API endpoint of OpenAI's CDN that returns location information. No authentication needed.
 
 export async function getIpLocationInfo(): Promise<IpLocation> {
-    if (isFirefox) {
-        return new Promise((resolve) => {
-            ;(async () => {
-                await backgroundFetch(traceUrl, {
-                    stream: false,
-                    onMessage: (data) => {
-                        const parsed = parseResponse(data)
-                        const code = parsed.loc || ''
-                        resolve({
-                            supported: ALLOWED_COUNTRY_CODES.has(code),
-                            name: code,
-                        })
-                    },
-                    onError: (err) => {
-                        console.error(err.error)
-                    },
-                })
-            })()
-        })
-    }
-
     const fetch = isUserscript()
         ? (url: string, details: RequestInit) => userscriptFetch(url, details, false)
+        : !isDesktopApp()
+        ? backgroundFetch
         : window.fetch
 
     const code = await fetch(traceUrl, { cache: 'no-store' })
-        .then((response) => response.text() as string)
+        .then((response) => response.text())
         .then(parseResponse)
         .then((o) => o.loc || '')
         .catch(() => '')

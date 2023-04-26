@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill'
-import { createParser } from 'eventsource-parser'
 
 browser.contextMenus.create(
     {
@@ -23,18 +22,15 @@ browser.contextMenus.onClicked.addListener(async function (info) {
 
 interface BackgroundFetchMessage {
     type: 'open' | 'abort'
-    details: { url: string; options: { stream?: boolean } & RequestInit }
+    details: { url: string; options: RequestInit }
 }
 
 async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFetchMessage, signal: AbortSignal) {
-    const {
-        url,
-        options: { stream, ...fetchOptions },
-    } = message.details
+    const { url, options } = message.details
     let response: Response | null = null
 
     try {
-        response = await fetch(url, { ...fetchOptions, signal })
+        response = await fetch(url, { ...options, signal })
     } catch (error) {
         if (error instanceof Error) {
             const { message, name } = error
@@ -46,37 +42,21 @@ async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFe
         return
     }
 
-    if (!stream) {
-        port.postMessage({
-            status: response.status,
-            response: await response.text(),
-        })
-        return
-    }
-
-    if (response.status !== 200) {
-        port.postMessage({
-            status: response.status,
-            response: await response.json(),
-        })
-        return
+    const responseSend = {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        redirected: response.redirected,
+        type: response.type,
+        url: response.url,
     }
 
     const reader = response?.body?.getReader()
     if (!reader) {
-        port.postMessage({
-            status: response.status,
-        })
+        port.postMessage(responseSend)
         return
     }
-    const parser = createParser((event) => {
-        if (event.type === 'event') {
-            port.postMessage({
-                status: response?.status,
-                response: event.data,
-            })
-        }
-    })
+
     try {
         // eslint-disable-next-line no-constant-condition
         while (true) {
@@ -85,7 +65,10 @@ async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFe
                 break
             }
             const str = new TextDecoder().decode(value)
-            parser.feed(str)
+            port.postMessage({
+                ...responseSend,
+                data: str,
+            })
         }
     } catch (error) {
         console.log(error)
