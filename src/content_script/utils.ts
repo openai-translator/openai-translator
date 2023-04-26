@@ -1,7 +1,7 @@
 import { createParser } from 'eventsource-parser'
 import { backgroundFetch } from '../common/background-fetch'
 import { userscriptFetch } from '../common/userscript-polyfill'
-import { isFirefox, isUserscript } from '../common/utils'
+import { isDesktopApp, isUserscript } from '../common/utils'
 import { containerID, documentPadding, popupCardID, popupThumbID, zIndex } from './consts'
 
 function attachEventsToContainer($container: HTMLElement) {
@@ -68,11 +68,7 @@ interface FetchSSEOptions extends RequestInit {
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, ...fetchOptions } = options
 
-    if (isFirefox) {
-        return await backgroundFetch(input, options)
-    }
-
-    const fetch = isUserscript() ? userscriptFetch : window.fetch
+    const fetch = isUserscript() ? userscriptFetch : !isDesktopApp() ? backgroundFetch : window.fetch
     const resp = await fetch(input, fetchOptions)
     if (resp.status !== 200) {
         onError(await resp.json())
