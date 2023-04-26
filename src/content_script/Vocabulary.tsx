@@ -264,7 +264,7 @@ const Vocabulary = (props: IVocabularyProps) => {
             return
         }
         setArticle('')
-        const prompt = articleOptions.find((item) => item.id == articleType)?.prompt
+        const prompt = articleOptions.find((item) => item.id === articleType)?.prompt
         setIsLoading(true)
         controlRef.current.abort()
         controlRef.current = new AbortController()
@@ -351,14 +351,14 @@ const Vocabulary = (props: IVocabularyProps) => {
                 </div>
             </div>
             <div className={styles.list}>
-                {props.type == 'vocabulary' && (
+                {props.type === 'vocabulary' && (
                     <>
                         {collectedWordTotal > 0
                             ? words.map((item, index) => (
                                   <Button
                                       key={index}
                                       size='mini'
-                                      kind={selectedWord?.word == item.word ? 'primary' : 'secondary'}
+                                      kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
                                       onClick={() => setSelectedWord(item)}
                                   >
                                       {item.word}
@@ -367,7 +367,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                             : 'no words'}
                     </>
                 )}
-                {props.type == 'article' && (
+                {props.type === 'article' && (
                     <div className={styles.select}>
                         <Select
                             size='mini'
@@ -389,14 +389,14 @@ const Vocabulary = (props: IVocabularyProps) => {
                         </StatefulTooltip>
                     </div>
                 )}
-                {props.type == 'vocabulary' && (
+                {props.type === 'vocabulary' && (
                     <StatefulTooltip content={t('Random Change')} placement='bottom' showArrow>
                         <div className={styles.diceArea}>
                             <FaDice fontSize={20} className={styles.diceIcon} onClick={onRandomWords} />
                         </div>
                     </StatefulTooltip>
                 )}
-                {props.type == 'article' && isLoading && (
+                {props.type === 'article' && isLoading && (
                     <div className={styles.actionStr}>
                         {isLoading && (
                             <>
@@ -407,7 +407,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                     </div>
                 )}
             </div>
-            {props.type == 'vocabulary' && (
+            {props.type === 'vocabulary' && (
                 <div className={styles.display}>
                     {selectedWord?.word && (
                         <div
@@ -436,13 +436,13 @@ const Vocabulary = (props: IVocabularyProps) => {
                     )}
                 </div>
             )}
-            {props.type == 'article' && (
+            {props.type === 'article' && (
                 <div
                     className={`${styles.display} ${styles.articleDisplay}`}
                     dangerouslySetInnerHTML={{ __html: DangerArticle }}
                 ></div>
             )}
-            {props.type == 'article' && !isLoading && article.length > 0 && (
+            {props.type === 'article' && !isLoading && article.length > 0 && (
                 <div
                     className={styles.actionButtonsContainer}
                     style={{

@@ -741,7 +741,7 @@ export function PopupCard(props: IPopupCardProps) {
             const actionStrItem = actionStrItems[translateMode]
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
-                if (translateMode === 'translate' && originalLang == targetLang) {
+                if (translateMode === 'translate' && originalLang === targetLang) {
                     actionStr = 'Polishing...'
                 }
                 setActionStr(actionStr)
@@ -752,7 +752,7 @@ export function PopupCard(props: IPopupCardProps) {
             const afterTranslate = (reason: string) => {
                 stopLoading()
                 if (reason !== 'stop') {
-                    if (reason == 'length' || reason == 'max_tokens') {
+                    if (reason === 'length' || reason === 'max_tokens') {
                         toast(t('Chars Limited'), {
                             duration: 5000,
                             icon: '😥',
@@ -763,7 +763,7 @@ export function PopupCard(props: IPopupCardProps) {
                     }
                 } else {
                     let actionStr = actionStrItem.afterStr
-                    if (translateMode === 'translate' && originalLang == targetLang) {
+                    if (translateMode === 'translate' && originalLang === targetLang) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
@@ -1522,7 +1522,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             {translatedLines.map((line, i) => {
                                                                 return (
                                                                     <p className={styles.paragraph} key={`p-${i}`}>
-                                                                        {isWordMode && i == 0 ? (
+                                                                        {isWordMode && i === 0 ? (
                                                                             <div
                                                                                 style={{
                                                                                     display: 'flex',
