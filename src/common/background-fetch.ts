@@ -19,11 +19,18 @@ export async function backgroundFetch(input: string, options: RequestInit) {
             const textEncoder = new TextEncoder()
 
             async function readText() {
-                const reader = readable.getReader()
-                const { value } = await reader.read()
-                reader.releaseLock()
-                const valueString = new TextDecoder().decode(value)
-                return valueString
+                const decoder = new TextDecoderStream()
+                const reader = readable.pipeThrough(decoder).getReader()
+                let text = ''
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) {
+                        break
+                    }
+                    text += value
+                }
+                return text
             }
 
             const browser = await require('webextension-polyfill')
