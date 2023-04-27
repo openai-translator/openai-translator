@@ -3,6 +3,7 @@ import * as utils from '../common/utils'
 import { backgroundFetch } from '../common/background-fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
+import urlJoin from 'url-join'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -277,7 +278,8 @@ export async function translate(query: TranslateQuery) {
             })
         }
     } else {
-        await fetchSSE(`${settings.apiURL}${settings.apiURLPath}`, {
+        const url = urlJoin(settings.apiURL, settings.apiURLPath)
+        await fetchSSE(url, {
             method: 'POST',
             headers,
             body: JSON.stringify(body),
