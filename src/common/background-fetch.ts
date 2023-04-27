@@ -56,7 +56,6 @@ export async function backgroundFetch(input: string, options: RequestInit) {
 
             function handleAbort() {
                 port.postMessage({ type: 'abort' })
-                console.log('background abort-----', fetchOptions.body)
             }
             port.onDisconnect.addListener(() => {
                 signal?.removeEventListener('abort', handleAbort)
