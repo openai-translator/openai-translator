@@ -281,8 +281,15 @@ fn main() {
                 ..
             } = event
             {
-                let window = app.get_window(label.as_str()).unwrap();
-                window.hide().unwrap();
+                #[cfg(target_os = "macos")]
+                {
+                    tauri::AppHandle::hide(&app.app_handle()).unwrap();
+                }
+                #[cfg(target_os = "windows")]
+                {
+                    let window = app.get_window(label.as_str()).unwrap();
+                    window.hide().unwrap();
+                }
                 api.prevent_close();
             }
         });
