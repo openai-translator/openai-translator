@@ -74,6 +74,7 @@
     "tesseract.js": "^4.0.2",
     "underscore": "^1.13.6",
     "uuid": "^9.0.0",
+    "url-join": "^5.0.0",
     "xregexp": "^5.1.1"
   },
   "devDependencies": {
