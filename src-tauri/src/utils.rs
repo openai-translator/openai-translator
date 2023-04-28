@@ -52,22 +52,51 @@ pub fn copy() {
 
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    use clipboard::ClipboardProvider;
-    use clipboard::ClipboardContext;
-    let mut ctx: ClipboardContext = ClipboardProvider::new()?;
-    let current_text = ctx.get_contents().unwrap_or_default();
+    use arboard::Clipboard;
+
+    let old_clipboard = (
+        Clipboard::new()?.get_text(),
+        Clipboard::new()?.get_image(),
+    );
     copy();
-    let selected_text = ctx.get_contents().unwrap_or_default();
-    // creat a new thread to restore the clipboard
-    let current_text_cloned = current_text.clone();
-    std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(100));
-        ctx.set_contents(current_text_cloned).unwrap();
-    });
-    if selected_text.trim() == current_text.trim() {
-        return Ok(String::new());
+
+    let new_text = Clipboard::new()?.get_text();
+
+    let mut write_clipboard = Clipboard::new()?;
+
+    match old_clipboard {
+        (Ok(text), _) => {
+            // Old Content is Text
+            write_clipboard.set_text(text.clone())?;
+            if let Ok(new) = new_text {
+                if new.trim() == text.trim() {
+                    Ok(String::new())
+                } else {
+                    Ok(new)
+                }
+            } else {
+                Ok(String::new())
+            }
+        }
+        (_, Ok(image)) => {
+            // Old Content is Image
+            write_clipboard.set_image(image)?;
+            if let Ok(new) = new_text {
+                Ok(new)
+            } else {
+                Ok(String::new())
+            }
+        }
+        _ => {
+            // Old Content is Empty
+            write_clipboard.clear()?;
+            if let Ok(new) = new_text {
+                Ok(new)
+            } else {
+                Ok(String::new())
+            }
+        }
     }
-    Ok(selected_text.trim().to_string())
 }
 
 #[cfg(target_os = "macos")]
