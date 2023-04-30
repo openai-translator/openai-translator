@@ -66,7 +66,7 @@ export async function translate(query: TranslateQuery) {
     switch (query.mode) {
         case 'translate':
             if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
-                assistantPrompt = `翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
+                assistantPrompt = `请翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
             }
             if (fromChinese) {
                 if (query.detectTo === 'zh-Hant') {
