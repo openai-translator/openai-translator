@@ -40,6 +40,7 @@
         "https://*.openai.azure.com/",
         "https://*.ingest.sentry.io/",
         "*://speech.platform.bing.com/",
-        "https://*.googletagmanager.com/"
+        "https://*.googletagmanager.com/",
+        "https://*.google-analytics.com/"
     ]
 }
