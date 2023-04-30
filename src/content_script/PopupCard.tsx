@@ -773,7 +773,9 @@ export function PopupCard(props: IPopupCardProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${translateMode}:${originalLang}:${targetLang}:${text}:${selectedWord}`
+            const cachedKey = `translate:${settings?.provider ?? ''}:${
+                settings?.apiModel ?? ''
+            }:${translateMode}:${originalLang}:${targetLang}:${text}:${selectedWord}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -1055,7 +1057,11 @@ export function PopupCard(props: IPopupCardProps) {
                             paddingBottom: showSettings ? '0px' : '30px',
                         }}
                     >
-                        {showSettings ? (
+                        <div
+                            style={{
+                                display: showSettings ? 'block' : 'none',
+                            }}
+                        >
                             <Settings
                                 onSave={(oldSettings) => {
                                     setShowSettings(false)
@@ -1063,7 +1069,12 @@ export function PopupCard(props: IPopupCardProps) {
                                 }}
                                 engine={props.engine}
                             />
-                        ) : (
+                        </div>
+                        <div
+                            style={{
+                                display: !showSettings ? 'block' : 'none',
+                            }}
+                        >
                             <div style={props.containerStyle}>
                                 <div
                                     ref={headerRef}
@@ -1606,7 +1617,7 @@ export function PopupCard(props: IPopupCardProps) {
                                     )}
                                 </div>
                             </div>
-                        )}
+                        </div>
                         {props.showSettings && (
                             <div className={styles.footer}>
                                 <Tooltip
