@@ -63,12 +63,16 @@ pub fn show_main_window_with_selected_text() {
 }
 
 pub fn close_thumb() {
-    let handle = APP_HANDLE.get().unwrap();
-    match handle.get_window(THUMB_WIN_NAME) {
-        Some(window) => {
-            window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
-        },
-        None => {}
+    match APP_HANDLE.get() {
+        Some(handle) => {
+            match handle.get_window(THUMB_WIN_NAME) {
+                Some(window) => {
+                    window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
+                },
+                None => {}
+            }
+        }
+        None => {},
     }
 }
 
