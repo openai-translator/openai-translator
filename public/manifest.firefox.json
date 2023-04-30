@@ -28,7 +28,12 @@
 
     "permissions": ["storage", "contextMenus"],
 
-    "host_permissions": ["https://*.openai.com/", "https://*.openai.azure.com/", "https://*.ingest.sentry.io/"],
+    "host_permissions": [
+        "https://*.openai.com/",
+        "https://*.openai.azure.com/",
+        "https://*.ingest.sentry.io/",
+        "*://speech.platform.bing.com/"
+    ],
 
     "browser_specific_settings": {
         "gecko": {

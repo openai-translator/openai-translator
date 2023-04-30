@@ -849,11 +849,6 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }, [translateText, originalText, selectedWord, translationFlag])
 
-    const handleSpeakDone = () => {
-        setIsSpeakingEditableText(false)
-        setIsSpeakingTranslatedText(false)
-    }
-
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
@@ -1015,40 +1010,42 @@ export function PopupCard(props: IPopupCardProps) {
         }
     }
 
-    const handleEditSpeakAction = () => {
-        if (typeof window.speechSynthesis === 'undefined') {
-            return
+    const editableStopSpeakRef = useRef<() => void>(() => null)
+    const translatedStopSpeakRef = useRef<() => void>(() => null)
+    useEffect(() => {
+        return () => {
+            editableStopSpeakRef.current()
+            translatedStopSpeakRef.current()
         }
-
+    }, [])
+    const handleEditSpeakAction = async () => {
         if (isSpeakingEditableText) {
-            speechSynthesis.cancel()
+            editableStopSpeakRef.current()
             setIsSpeakingEditableText(false)
             return
         }
         setIsSpeakingEditableText(true)
-        speak({
+        const { stopSpeak } = await speak({
             text: editableText,
             lang: originalLang,
-            onFinish: handleSpeakDone,
+            onFinish: () => setIsSpeakingEditableText(false),
         })
+        editableStopSpeakRef.current = stopSpeak
     }
 
-    const handleTranslatedSpeakAction = () => {
-        if (typeof window.speechSynthesis === 'undefined') {
-            return
-        }
-
+    const handleTranslatedSpeakAction = async () => {
         if (isSpeakingTranslatedText) {
-            speechSynthesis.cancel()
+            translatedStopSpeakRef.current()
             setIsSpeakingTranslatedText(false)
             return
         }
         setIsSpeakingTranslatedText(true)
-        speak({
+        const { stopSpeak } = await speak({
             text: translatedText,
             lang: targetLang,
-            onFinish: handleSpeakDone,
+            onFinish: () => setIsSpeakingTranslatedText(false),
         })
+        translatedStopSpeakRef.current = stopSpeak
     }
 
     return (
@@ -1426,11 +1423,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                 <>
                                                     <Tooltip content={t('Speak')} placement='bottom'>
                                                         <div
-                                                            className={
-                                                                window.speechSynthesis
-                                                                    ? styles.actionButton
-                                                                    : styles.actionButtonDisabled
-                                                            }
+                                                            className={styles.actionButton}
                                                             onClick={handleEditSpeakAction}
                                                         >
                                                             {isSpeakingEditableText ? (
@@ -1581,11 +1574,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                             <div style={{ marginRight: 'auto' }} />
                                                             <Tooltip content={t('Speak')} placement='bottom'>
                                                                 <div
-                                                                    className={
-                                                                        window.speechSynthesis
-                                                                            ? styles.actionButton
-                                                                            : styles.actionButtonDisabled
-                                                                    }
+                                                                    className={styles.actionButton}
                                                                     onClick={handleTranslatedSpeakAction}
                                                                 >
                                                                     {isSpeakingTranslatedText ? (

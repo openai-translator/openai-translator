@@ -1,10 +1,6 @@
-import { getSettings } from './utils'
-
-interface SpeakOptions {
-    text: string
-    lang?: string
-    onFinish?: () => void
-}
+import { SpeakOptions } from './types'
+import { getSettings } from '../utils'
+import { speak as edgeSpeak } from './edge-tts'
 
 export const langCode2TTSLang: Record<string, string> = {
     'en': 'en-US',
@@ -44,21 +40,25 @@ if (window.speechSynthesis) {
 }
 
 export async function speak({ text, lang, onFinish }: SpeakOptions) {
+    const settings = await getSettings()
+    const langTag = langCode2TTSLang[lang ?? 'en'] ?? 'en-US'
+    const voiceCfg = settings.tts?.voices?.find((item) => item.lang === lang)
+    if (settings.tts?.provider === 'EdgeTTS') {
+        return edgeSpeak({ text, lang: langTag, onFinish, voice: voiceCfg?.voice })
+    }
+
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
         utterance.addEventListener('end', onFinish, { once: true })
     }
 
-    const langTag = langCode2TTSLang[lang ?? 'en'] ?? 'en-US'
     utterance.text = text
     utterance.lang = langTag
 
-    const settings = await getSettings()
     const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
-    const settingsVoice = supportVoices.find(
-        (v) => v.voiceURI === settings.ttsVoices?.find((item) => item.lang === lang)?.voice
-    )
+    const settingsVoice = supportVoices.find((v) => v.voiceURI === voiceCfg?.voice)
     utterance.voice = settingsVoice ?? defaultVoice
 
     speechSynthesis.speak(utterance)
+    return { stopSpeak: () => speechSynthesis.cancel() }
 }

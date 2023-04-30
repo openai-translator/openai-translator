@@ -1,5 +1,6 @@
 import { Theme } from 'baseui-sd/theme'
 import { TranslateMode, Provider } from '../content_script/translate'
+import { TTSProvider } from './tts/types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
@@ -55,10 +56,13 @@ export interface ISettings {
     ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
-    ttsVoices?: {
-        lang: string
-        voice: string
-    }[]
+    tts?: {
+        voices?: {
+            lang: string
+            voice: string
+        }[]
+        provider?: TTSProvider
+    }
     restorePreviousPosition?: boolean
     selectInputElementsText?: boolean
     runAtStartup?: boolean
