@@ -549,13 +549,12 @@ export function PopupCard(props: IPopupCardProps) {
         setIsLoading(false)
     }, [])
     useEffect(() => {
-        setEditableText(props.text)
         setOriginalText(props.text)
     }, [props.text, props.uuid])
     useEffect(() => {
         setEditableText(originalText)
         setSelectedWord('')
-    }, [originalText])
+    }, [originalText, props.uuid])
     const [originalLang, setOriginalLang] = useState('')
     const [targetLang, setTargetLang] = useState('')
     const stopAutomaticallyChangeTargetLang = useRef(false)
@@ -565,7 +564,7 @@ export function PopupCard(props: IPopupCardProps) {
             setOriginalLang(originalLang_)
             if (
                 (translateMode === 'translate' || translateMode === 'analyze') &&
-                !stopAutomaticallyChangeTargetLang.current
+                (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
             ) {
                 setTargetLang(
                     originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
@@ -574,7 +573,7 @@ export function PopupCard(props: IPopupCardProps) {
                 )
             }
         })()
-    }, [originalText, translateMode, settings])
+    }, [originalText, translateMode, settings, props.uuid, targetLang])
 
     const [actionStr, setActionStr] = useState('')
 

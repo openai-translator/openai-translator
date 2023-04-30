@@ -221,7 +221,10 @@ export async function translate(query: TranslateQuery) {
             },
             {
                 role: 'user',
-                content: isWordMode ? query.text : `${quoteStart}${query.text}${quoteEnd}`,
+                content:
+                    isWordMode || query.mode === 'explain-code' || query.mode === 'big-bang' || query.mode === 'analyze'
+                        ? query.text
+                        : `${quoteStart}${query.text}${quoteEnd}`,
             },
         ]
     }
