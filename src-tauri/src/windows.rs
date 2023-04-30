@@ -67,7 +67,7 @@ pub fn close_thumb() {
         Some(handle) => {
             match handle.get_window(THUMB_WIN_NAME) {
                 Some(window) => {
-                    window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
+                    window.close().unwrap();
                 },
                 None => {}
             }
