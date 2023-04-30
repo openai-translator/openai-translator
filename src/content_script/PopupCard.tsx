@@ -386,6 +386,7 @@ export interface TesseractResult extends RecognizeResult {
 }
 
 export interface IPopupCardProps {
+    uuid?: string
     text: string
     engine: Styletron
     autoFocus?: boolean
@@ -546,8 +547,9 @@ export function PopupCard(props: IPopupCardProps) {
         setIsLoading(false)
     }, [])
     useEffect(() => {
+        setEditableText(props.text)
         setOriginalText(props.text)
-    }, [props.text])
+    }, [props.text, props.uuid])
     useEffect(() => {
         setEditableText(originalText)
         setSelectedWord('')
@@ -802,16 +804,7 @@ export function PopupCard(props: IPopupCardProps) {
                     onFinish: (reason) => {
                         afterTranslate(reason)
                         setTranslatedText((translatedText) => {
-                            let result = translatedText
-                            if (
-                                translatedText &&
-                                ['”', '"', '」'].indexOf(translatedText[translatedText.length - 1]) >= 0
-                            ) {
-                                result = translatedText.slice(0, -1)
-                            }
-                            if (result && ['“', '"', '「'].indexOf(result[0]) >= 0) {
-                                result = result.slice(1)
-                            }
+                            const result = translatedText
                             cache.set(cachedKey, result)
                             return result
                         })

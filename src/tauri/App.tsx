@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { PopupCard } from '../content_script/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
@@ -7,6 +7,7 @@ import { invoke } from '@tauri-apps/api/tauri'
 import { bindHotkey, bindOCRHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
+import { v4 as uuidv4 } from 'uuid'
 
 const engine = new Styletron({
     prefix: '__yetone-openai-translator-styletron-',
@@ -19,8 +20,9 @@ export function App() {
     const minimizeIconRef = useRef<HTMLDivElement>(null)
     const maximizeIconRef = useRef<HTMLDivElement>(null)
     const closeIconRef = useRef<HTMLDivElement>(null)
-    const [text, setText] = React.useState('')
-    const [isPinned, setPinned] = React.useState(false)
+    const [text, setText] = useState('')
+    const [uuid, setUUID] = useState('')
+    const [isPinned, setPinned] = useState(false)
 
     useMemoWindow({ size: true, position: true })
 
@@ -36,6 +38,8 @@ export function App() {
             unlisten = await listen('change-text', async (event: Event<string>) => {
                 const selectedText = event.payload
                 if (selectedText) {
+                    const uuid_ = uuidv4().replace(/-/g, '').slice(0, 6)
+                    setUUID(uuid_)
                     setText(selectedText)
                 }
             })
@@ -137,6 +141,7 @@ export function App() {
                 )}
             </div>
             <PopupCard
+                uuid={uuid}
                 text={text}
                 engine={engine}
                 showSettings
