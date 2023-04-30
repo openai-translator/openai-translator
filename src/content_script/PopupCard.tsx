@@ -486,7 +486,9 @@ export function PopupCard(props: IPopupCardProps) {
             }
             const selectedWord_ = editor.value.substring(editor.selectionStart, editor.selectionEnd).trim()
             setSelectedWord(selectedWord_)
-            setHighlightWords([])
+            if (selectedWord_) {
+                setHighlightWords([])
+            }
         }
         const onBlur = onMouseUp
 
