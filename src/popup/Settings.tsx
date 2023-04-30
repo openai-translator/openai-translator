@@ -30,6 +30,7 @@ import { RiDeleteBin5Line } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../common/tts/types'
 import { getEdgeVoices } from '../common/tts/edge-tts'
+import { backgroundFetch } from '../common/background-fetch'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -487,13 +488,13 @@ function APIModelSelector(props: APIModelSelectorProps) {
                 { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
             ])
         } else if (props.provider === 'ChatGPT') {
-            fetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
+            backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
                 .then((response) => response.json())
                 .then((resp) => {
                     const headers: Record<string, string> = {
                         Authorization: `Bearer ${resp.accessToken}`,
                     }
-                    return fetch(`${utils.defaultChatGPTWebAPI}/models`, {
+                    return backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
                         cache: 'no-cache',
                         headers,
                     }).then((response) => response.json())

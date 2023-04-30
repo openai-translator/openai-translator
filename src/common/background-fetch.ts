@@ -11,6 +11,7 @@ export async function backgroundFetch(input: string, options: RequestInit) {
             const { signal, ...fetchOptions } = options
             if (signal?.aborted) {
                 reject(new DOMException('Aborted', 'AbortError'))
+                return
             }
 
             const transformStream = new TransformStream<Uint8Array, Uint8Array>()

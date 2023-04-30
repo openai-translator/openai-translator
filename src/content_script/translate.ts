@@ -190,16 +190,9 @@ export async function translate(query: TranslateQuery) {
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
         let resp: Response | null = null
-        try {
-            resp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
-            const respJson = await resp?.json()
-            apiKey = respJson.accessToken
-        } catch (error) {
-            if (error instanceof Error) {
-                query.onError(error.message)
-                return
-            }
-        }
+        resp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+        const respJson = await resp?.json()
+        apiKey = respJson.accessToken
         body = {
             action: 'next',
             messages: [
@@ -246,37 +239,62 @@ export async function translate(query: TranslateQuery) {
 
     if (settings.provider === 'ChatGPT') {
         let conversationId = ''
-        try {
-            const resp = await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(body),
-                signal: query.signal,
-            })
-            const respJson = await resp.json()
-            if (!conversationId) {
-                conversationId = respJson.conversation_id
-            }
+        let length = 0
+        await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+            fetcher: backgroundFetch,
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+            signal: query.signal,
+            onMessage: (msg) => {
+                let resp
+                try {
+                    resp = JSON.parse(msg)
+                    // eslint-disable-next-line no-empty
+                } catch {
+                    query.onFinish('stop')
+                    return
+                }
+                if (!conversationId) {
+                    conversationId = resp.conversation_id
+                }
+                const { finish_details: finishDetails } = resp.message
+                if (finishDetails) {
+                    query.onFinish(finishDetails.type)
+                    return
+                }
 
-            const { finish_details: finishDetails } = respJson.message
-            if (finishDetails) {
-                query.onFinish(finishDetails.type)
-                return
-            }
-
-            let targetTxt = ''
-
-            const { content, author } = respJson.message
-            if (author.role === 'assistant') {
-                targetTxt = content.parts.join('')
-                query.onMessage({ content: targetTxt, role: '', isWordMode, isFullText: true })
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                query.onError(error.message)
-                return
-            }
-        }
+                const { content, author } = resp.message
+                if (author.role === 'assistant') {
+                    const targetTxt = content.parts.join('')
+                    query.onMessage({ content: targetTxt.slice(length), role: '', isWordMode })
+                    length = targetTxt.length
+                }
+            },
+            onError: (err) => {
+                if (err instanceof Error) {
+                    query.onError(err.message)
+                    return
+                }
+                if (typeof err === 'string') {
+                    query.onError(err)
+                    return
+                }
+                if (typeof err === 'object') {
+                    const { detail } = err
+                    if (detail) {
+                        query.onError(detail)
+                        return
+                    }
+                }
+                const { error } = err
+                if (error instanceof Error) {
+                    query.onError(error.message)
+                    return
+                }
+                query.onError('Unknown error')
+            },
+        })
 
         if (conversationId) {
             await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
@@ -342,8 +360,20 @@ export async function translate(query: TranslateQuery) {
                 }
             },
             onError: (err) => {
+                if (err instanceof Error) {
+                    query.onError(err.message)
+                    return
+                }
+                if (typeof err === 'string') {
+                    query.onError(err)
+                    return
+                }
                 const { error } = err
-                query.onError(error.message)
+                if (error instanceof Error) {
+                    query.onError(error.message)
+                    return
+                }
+                query.onError('Unknown error')
             },
         })
     }
