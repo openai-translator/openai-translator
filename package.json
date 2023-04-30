@@ -61,6 +61,7 @@
     "react-dom": "^18.0.1",
     "react-dropzone": "^14.2.3",
     "react-error-boundary": "^3.1.4",
+    "react-ga4": "^2.1.0",
     "react-hooks-global-state": "^2.1.0",
     "react-hot-toast": "^2.4.0",
     "react-hotkeys-hook": "^4.3.7",
@@ -73,8 +74,8 @@
     "tauri-plugin-autostart-api": "https://github.com/tauri-apps/tauri-plugin-autostart",
     "tesseract.js": "^4.0.2",
     "underscore": "^1.13.6",
-    "uuid": "^9.0.0",
     "url-join": "^5.0.0",
+    "uuid": "^9.0.0",
     "xregexp": "^5.1.1"
   },
   "devDependencies": {

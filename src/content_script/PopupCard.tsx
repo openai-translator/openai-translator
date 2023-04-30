@@ -46,6 +46,7 @@ import { LocalDB, VocabularyItem } from '../common/db'
 import { useCollectedWordTotal } from '../common/hooks/useCollectedWordTotal'
 import { Modal } from 'baseui-sd/modal'
 import * as Sentry from '@sentry/react'
+import ReactGA from 'react-ga4'
 
 !isFirefox &&
     Sentry.init({
@@ -57,6 +58,8 @@ import * as Sentry from '@sentry/react'
         replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
         replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
     })
+
+ReactGA.initialize('G-D7054DX333')
 
 const cache = new LRUCache({
     max: 500,
