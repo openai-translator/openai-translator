@@ -169,77 +169,172 @@ const languageToDefaultVoice: { [key: string]: string } = {
     ['zu-ZA']: 'zu-ZA-ThandoNeural',
 }
 
+function dictReplace(s: string, d: Record<string, string>): string {
+    for (const [key, value] of Object.entries(d)) {
+        s = s.split(key).join(value)
+    }
+    return s
+}
+
+function escape(data: string, entities: Record<string, string> = {}): string {
+    data = data.replace(/&/g, '&amp;')
+    data = data.replace(/>/g, '&gt;')
+    data = data.replace(/</g, '&lt;')
+    if (Object.keys(entities).length > 0) {
+        data = dictReplace(data, entities)
+    }
+    return data
+}
+
+function removeIncompatibleCharacters(str: string): string {
+    const chars: string[] = Array.from(str)
+
+    for (let idx = 0; idx < chars.length; idx++) {
+        const char = chars[idx]
+        const code = char.charCodeAt(0)
+        if ((0 <= code && code <= 8) || (11 <= code && code <= 12) || (14 <= code && code <= 31)) {
+            chars[idx] = ' '
+        }
+    }
+
+    return chars.join('')
+}
+
+function* splitTextByByteLength(text: string, byteLength: number): Generator<string, void, void> {
+    if (byteLength <= 0) {
+        throw new Error('byteLength must be greater than 0')
+    }
+
+    while (text.length > byteLength) {
+        // Find the last space in the string
+        let splitAt = text.lastIndexOf(' ', byteLength)
+
+        // If no space found, splitAt is byteLength
+        splitAt = splitAt !== -1 ? splitAt : byteLength
+
+        // Verify all & are terminated with a ;
+        while (text.slice(0, splitAt).includes('&')) {
+            const ampersandIndex = text.lastIndexOf('&', splitAt)
+            if (text.slice(ampersandIndex, splitAt).includes(';')) {
+                break
+            }
+
+            splitAt = ampersandIndex - 1
+            if (splitAt < 0) {
+                throw new Error('Maximum byte length is too small or invalid text')
+            }
+            if (splitAt === 0) {
+                break
+            }
+        }
+
+        // Append the string to the list
+        const newText = text.slice(0, splitAt).trim()
+        if (newText.length > 0) {
+            yield newText
+        }
+        if (splitAt === 0) {
+            splitAt = 1
+        }
+        text = text.slice(splitAt)
+    }
+
+    text = text.trim()
+    if (text.length > 0) {
+        yield text
+    }
+}
+
+function calcMaxMesgSize(voice: string, rate: string, volume: string): number {
+    const connectId = uuidv4().replace(/-/g, '')
+    const date = new Date().toString()
+    const websocketMaxSize: number = 2 ** 16
+    const overheadPerMessage: number = ssmlHeadersPlusData(connectId, date, mkssml('', voice, rate, volume)).length + 50 // margin of error
+
+    return websocketMaxSize - overheadPerMessage
+}
+
 export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { voice?: string }) {
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const audioContext = new AudioContext()
     const audioBufferSource = audioContext.createBufferSource()
+    const rate = '+0%'
+    const volume = '+0%'
 
-    const ws = new WebSocket(`${wssURL}&ConnectionId=${connectId}`)
-    ws.binaryType = 'arraybuffer'
-    ws.addEventListener('open', () => {
-        ws.send(
-            `X-Timestamp:${date}\r\n` +
-                'Content-Type:application/json; charset=utf-8\r\n' +
-                'Path:speech.config\r\n\r\n' +
-                '{"context":{"synthesis":{"audio":{"metadataoptions":{' +
-                '"sentenceBoundaryEnabled":false,"wordBoundaryEnabled":true},' +
-                '"outputFormat":"audio-24khz-48kbitrate-mono-mp3"' +
-                '}}}}\r\n'
-        )
-        ws.send(
-            ssmlHeadersPlusData(
-                connectId,
-                date,
-                mkssml(text, voice ?? languageToDefaultVoice[lang ?? 'en-US'], '+0%', '+0%')
-            )
-        )
-    })
+    const texts = splitTextByByteLength(
+        escape(removeIncompatibleCharacters(text)),
+        calcMaxMesgSize(voice ?? languageToDefaultVoice[lang ?? 'en-US'], rate, volume)
+    )
 
-    let audioData = new ArrayBuffer(0)
-    let downloadAudio = false
     let stopped = false
-    ws.addEventListener('message', async (event) => {
-        if (typeof event.data === 'string') {
-            const { headers } = getHeadersAndData(event.data)
-            const path = headers['Path']
-            switch (path) {
-                case 'turn.start':
-                    downloadAudio = true
-                    break
-                case 'turn.end': {
-                    downloadAudio = false
-                    if (!audioData.byteLength || stopped) {
-                        return
+
+    for (const text of texts) {
+        const ws = new WebSocket(`${wssURL}&ConnectionId=${connectId}`)
+        ws.binaryType = 'arraybuffer'
+        ws.addEventListener('open', () => {
+            ws.send(
+                `X-Timestamp:${date}\r\n` +
+                    'Content-Type:application/json; charset=utf-8\r\n' +
+                    'Path:speech.config\r\n\r\n' +
+                    '{"context":{"synthesis":{"audio":{"metadataoptions":{' +
+                    '"sentenceBoundaryEnabled":false,"wordBoundaryEnabled":true},' +
+                    '"outputFormat":"audio-24khz-48kbitrate-mono-mp3"' +
+                    '}}}}\r\n'
+            )
+            ws.send(
+                ssmlHeadersPlusData(
+                    connectId,
+                    date,
+                    mkssml(text, voice ?? languageToDefaultVoice[lang ?? 'en-US'], rate, volume)
+                )
+            )
+        })
+
+        let audioData = new ArrayBuffer(0)
+        let downloadAudio = false
+        ws.addEventListener('message', async (event) => {
+            if (typeof event.data === 'string') {
+                const { headers } = getHeadersAndData(event.data)
+                const path = headers['Path']
+                switch (path) {
+                    case 'turn.start':
+                        downloadAudio = true
+                        break
+                    case 'turn.end': {
+                        downloadAudio = false
+                        if (!audioData.byteLength || stopped) {
+                            return
+                        }
+                        const buffer = await audioContext.decodeAudioData(audioData)
+                        audioBufferSource.buffer = buffer
+                        audioBufferSource.connect(audioContext.destination)
+                        audioBufferSource.start()
+                        audioBufferSource.addEventListener('ended', () => {
+                            onFinish?.()
+                            audioContext.close()
+                        })
+                        break
                     }
-                    const buffer = await audioContext.decodeAudioData(audioData)
-                    audioBufferSource.buffer = buffer
-                    audioBufferSource.connect(audioContext.destination)
-                    audioBufferSource.start()
-                    audioBufferSource.addEventListener('ended', () => {
-                        onFinish?.()
-                        audioContext.close()
-                    })
-                    break
+                }
+            } else if (event.data instanceof ArrayBuffer) {
+                if (!downloadAudio) {
+                    return
+                }
+                // See: https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/d071d11d1e9f34d6f79d0ab6114c90eecb02ba1f/src/common.speech/WebsocketMessageFormatter.ts#L46-L47
+                const dataview = new DataView(event.data)
+                const headerLength = dataview.getInt16(0)
+                if (event.data.byteLength > headerLength + 2) {
+                    const newBody = event.data.slice(2 + headerLength)
+                    const newAudioData = new ArrayBuffer(audioData.byteLength + newBody.byteLength)
+                    const mergedUint8Array = new Uint8Array(newAudioData)
+                    mergedUint8Array.set(new Uint8Array(audioData), 0)
+                    mergedUint8Array.set(new Uint8Array(newBody), audioData.byteLength)
+                    audioData = newAudioData
                 }
             }
-        } else if (event.data instanceof ArrayBuffer) {
-            if (!downloadAudio) {
-                return
-            }
-            // See: https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/d071d11d1e9f34d6f79d0ab6114c90eecb02ba1f/src/common.speech/WebsocketMessageFormatter.ts#L46-L47
-            const dataview = new DataView(event.data)
-            const headerLength = dataview.getInt16(0)
-            if (event.data.byteLength > headerLength + 2) {
-                const newBody = event.data.slice(2 + headerLength)
-                const newAudioData = new ArrayBuffer(audioData.byteLength + newBody.byteLength)
-                const mergedUint8Array = new Uint8Array(newAudioData)
-                mergedUint8Array.set(new Uint8Array(audioData), 0)
-                mergedUint8Array.set(new Uint8Array(newBody), audioData.byteLength)
-                audioData = newAudioData
-            }
-        }
-    })
+        })
+    }
 
     return {
         stopSpeak: () => {
