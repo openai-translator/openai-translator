@@ -4,7 +4,6 @@ import { backgroundFetch } from '../common/background-fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 import urlJoin from 'url-join'
-import { v4 as uuidv4 } from 'uuid'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -51,9 +50,6 @@ export const isAWord = (lang: string, text: string) => {
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
-    const quote = uuidv4().replace(/-/g, '').slice(0, 6)
-    const quoteStart = `<${quote}>`
-    const quoteEnd = `</${quote}>`
     const settings = await utils.getSettings()
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
@@ -209,7 +205,6 @@ export async function translate(query: TranslateQuery) {
             parent_message_id: utils.generateUUID(),
         }
     } else {
-        body['stop'] = [quoteEnd]
         body['messages'] = [
             {
                 role: 'system',
@@ -221,10 +216,7 @@ export async function translate(query: TranslateQuery) {
             },
             {
                 role: 'user',
-                content:
-                    isWordMode || query.mode === 'explain-code' || query.mode === 'big-bang' || query.mode === 'analyze'
-                        ? query.text
-                        : `${quoteStart}${query.text}${quoteEnd}`,
+                content: query.text,
             },
         ]
     }
@@ -308,7 +300,6 @@ export async function translate(query: TranslateQuery) {
         }
     } else {
         const url = urlJoin(settings.apiURL, settings.apiURLPath)
-        let idx = 0
         await fetchSSE(url, {
             method: 'POST',
             headers,
@@ -344,20 +335,6 @@ export async function translate(query: TranslateQuery) {
                     const { content = '', role } = choices[0].delta
 
                     targetTxt = content
-
-                    const newIdx = idx + targetTxt.length
-
-                    if (idx <= quoteStart.length - 1) {
-                        let endIdx = idx + targetTxt.length
-                        if (endIdx > quoteStart.length) {
-                            endIdx = quoteStart.length
-                        }
-                        if (quoteStart.slice(idx, endIdx) === targetTxt.slice(0, endIdx - idx)) {
-                            targetTxt = targetTxt.slice(endIdx - idx)
-                        }
-                    }
-
-                    idx = newIdx
 
                     query.onMessage({ content: targetTxt, role, isWordMode })
                 }
