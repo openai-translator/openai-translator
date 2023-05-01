@@ -52,15 +52,15 @@ class QuoteProcessor {
     private quote: string
     public quoteStart: string
     public quoteEnd: string
-    private idx: number
-    private buffer: string
+    private quoteStartBuffer: string
+    private quoteEndBuffer: string
 
     constructor() {
         this.quote = uuidv4().replace(/-/g, '').slice(0, 4)
         this.quoteStart = `<${this.quote}>`
         this.quoteEnd = `</${this.quote}>`
-        this.idx = 0
-        this.buffer = ''
+        this.quoteStartBuffer = ''
+        this.quoteEndBuffer = ''
     }
 
     public processText(textDelta: string): string {
@@ -71,63 +71,99 @@ class QuoteProcessor {
             return ''
         }
         let result = textDelta
-        const nextIdx = this.idx + textDelta.length
-        if (this.idx < this.quoteStart.length) {
-            let endIdx = this.idx + textDelta.length
-            if (endIdx > this.quoteStart.length) {
-                endIdx = this.quoteStart.length
-            }
-            if (this.quoteStart.slice(this.idx, endIdx) === textDelta.slice(0, endIdx - this.idx)) {
-                result = textDelta.slice(endIdx - this.idx)
-            }
-            this.idx = nextIdx
-        } else {
-            let buffer = this.buffer
-            console.debug('\n\n')
-            console.debug('---- start -----')
-            console.debug('textDelta', textDelta)
-            console.debug('this.buffer', this.buffer)
-            console.debug('start loop:')
-            let startIdx = 0
-            for (let i = 0; i < textDelta.length; i++) {
-                const char = textDelta[i]
-                console.debug(`---- i: ${i} ----`)
-                console.debug('char', char)
-                console.debug('buffer', buffer)
-                console.debug('result', result)
-                if (char === this.quoteEnd[buffer.length]) {
-                    if (this.buffer.length > 0) {
-                        if (i === startIdx) {
-                            buffer += char
-                            result = textDelta.slice(i + 1)
-                            startIdx += 1
-                        } else {
-                            result = this.buffer + textDelta
-                            buffer = ''
-                            break
-                        }
-                    } else {
-                        buffer += char
+        // process quote start
+        let quoteStartBuffer = this.quoteStartBuffer
+        // console.debug('\n\n')
+        // console.debug('---- process quote start -----')
+        // console.debug('textDelta', textDelta)
+        // console.debug('this.quoteStartbuffer', this.quoteStartBuffer)
+        // console.debug('start loop:')
+        let startIdx = 0
+        for (let i = 0; i < textDelta.length; i++) {
+            const char = textDelta[i]
+            // console.debug(`---- i: ${i} ----`)
+            // console.debug('char', char)
+            // console.debug('quoteStartBuffer', quoteStartBuffer)
+            // console.debug('result', result)
+            if (char === this.quoteStart[quoteStartBuffer.length]) {
+                if (this.quoteStartBuffer.length > 0) {
+                    if (i === startIdx) {
+                        quoteStartBuffer += char
                         result = textDelta.slice(i + 1)
+                        startIdx += 1
+                    } else {
+                        result = this.quoteStartBuffer + textDelta
+                        quoteStartBuffer = ''
+                        break
                     }
                 } else {
-                    if (buffer.length === this.quoteEnd.length) {
-                        buffer = ''
-                        break
-                    }
-                    if (buffer.length > 0) {
-                        result = this.buffer + textDelta
-                        buffer = ''
-                        break
-                    }
+                    quoteStartBuffer += char
+                    result = textDelta.slice(0, textDelta.length - quoteStartBuffer.length)
+                }
+            } else {
+                if (quoteStartBuffer.length === this.quoteStart.length) {
+                    quoteStartBuffer = ''
+                    break
+                }
+                if (quoteStartBuffer.length > 0) {
+                    result = this.quoteStartBuffer + textDelta
+                    quoteStartBuffer = ''
+                    break
                 }
             }
-            console.debug('end loop!')
-            this.buffer = buffer
-            console.debug('result', result)
-            console.debug('this.buffer', this.buffer)
-            console.debug('---- end -----')
         }
+        // console.debug('end loop!')
+        this.quoteStartBuffer = quoteStartBuffer
+        // console.debug('result', result)
+        // console.debug('this.quoteStartBuffer', this.quoteStartBuffer)
+        // console.debug('---- end of process quote start -----')
+        textDelta = result
+        // process quote end
+        let quoteEndBuffer = this.quoteEndBuffer
+        // console.debug('\n\n')
+        // console.debug('---- start process quote end -----')
+        console.debug('textDelta', textDelta)
+        // console.debug('this.quoteEndBuffer', this.quoteEndBuffer)
+        // console.debug('start loop:')
+        let endIdx = 0
+        for (let i = 0; i < textDelta.length; i++) {
+            const char = textDelta[i]
+            console.debug(`---- i: ${i}, endIdx: ${endIdx} ----`)
+            console.debug('char', char)
+            console.debug('quoteEndBuffer', quoteEndBuffer)
+            console.debug('result', result)
+            if (char === this.quoteEnd[quoteEndBuffer.length]) {
+                if (this.quoteEndBuffer.length > 0) {
+                    if (i === endIdx) {
+                        quoteEndBuffer += char
+                        result = textDelta.slice(i + 1)
+                        endIdx += 1
+                    } else {
+                        result = this.quoteEndBuffer + textDelta
+                        quoteEndBuffer = ''
+                        break
+                    }
+                } else {
+                    quoteEndBuffer += char
+                    result = textDelta.slice(0, textDelta.length - quoteEndBuffer.length)
+                }
+            } else {
+                if (quoteEndBuffer.length === this.quoteEnd.length) {
+                    quoteEndBuffer = ''
+                    break
+                }
+                if (quoteEndBuffer.length > 0) {
+                    result = this.quoteEndBuffer + textDelta
+                    quoteEndBuffer = ''
+                    break
+                }
+            }
+        }
+        // console.debug('end loop!')
+        this.quoteEndBuffer = quoteEndBuffer
+        console.debug('totally result', result)
+        // console.debug('this.quoteEndBuffer', this.quoteEndBuffer)
+        // console.debug('---- end of process quote end -----')
         return result
     }
 }
