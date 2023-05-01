@@ -294,7 +294,11 @@ const Vocabulary = (props: IVocabularyProps) => {
                         } else {
                             articleTxt.current += message.content
                         }
-                        if (articleUsedWord.current?.includes(message.content.toLowerCase().trim())) {
+                        if (
+                            articleUsedWord.current?.find(
+                                (word) => word.toLowerCase().trim() === message.content.toLowerCase().trim()
+                            )
+                        ) {
                             return e + `<b style="color: #f40;">${message.content}</b>`
                         } else {
                             return e + message.content

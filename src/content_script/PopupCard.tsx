@@ -558,6 +558,9 @@ export function PopupCard(props: IPopupCardProps) {
         setEditableText(originalText)
         setSelectedWord('')
     }, [originalText, props.uuid])
+    useEffect(() => {
+        setHighlightWords([])
+    }, [props.uuid])
     const [originalLang, setOriginalLang] = useState('')
     const [targetLang, setTargetLang] = useState('')
     const stopAutomaticallyChangeTargetLang = useRef(false)
