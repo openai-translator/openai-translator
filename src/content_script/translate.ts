@@ -4,6 +4,7 @@ import { backgroundFetch } from '../common/background-fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 import urlJoin from 'url-join'
+import { v4 as uuidv4 } from 'uuid'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -47,9 +48,94 @@ export const isAWord = (lang: string, text: string) => {
     return iterator.next().value?.segment === text
 }
 
+class QuoteProcessor {
+    private quote: string
+    public quoteStart: string
+    public quoteEnd: string
+    private idx: number
+    private buffer: string
+
+    constructor() {
+        this.quote = uuidv4().replace(/-/g, '').slice(0, 4)
+        this.quoteStart = `<${this.quote}>`
+        this.quoteEnd = `</${this.quote}>`
+        this.idx = 0
+        this.buffer = ''
+    }
+
+    public processText(textDelta: string): string {
+        if (textDelta === '') {
+            return ''
+        }
+        if (textDelta.trim() === this.quoteEnd) {
+            return ''
+        }
+        let result = textDelta
+        const nextIdx = this.idx + textDelta.length
+        if (this.idx < this.quoteStart.length) {
+            let endIdx = this.idx + textDelta.length
+            if (endIdx > this.quoteStart.length) {
+                endIdx = this.quoteStart.length
+            }
+            if (this.quoteStart.slice(this.idx, endIdx) === textDelta.slice(0, endIdx - this.idx)) {
+                result = textDelta.slice(endIdx - this.idx)
+            }
+            this.idx = nextIdx
+        } else {
+            let buffer = this.buffer
+            console.debug('\n\n')
+            console.debug('---- start -----')
+            console.debug('textDelta', textDelta)
+            console.debug('this.buffer', this.buffer)
+            console.debug('start loop:')
+            let startIdx = 0
+            for (let i = 0; i < textDelta.length; i++) {
+                const char = textDelta[i]
+                console.debug(`---- i: ${i} ----`)
+                console.debug('char', char)
+                console.debug('buffer', buffer)
+                console.debug('result', result)
+                if (char === this.quoteEnd[buffer.length]) {
+                    if (this.buffer.length > 0) {
+                        if (i === startIdx) {
+                            buffer += char
+                            result = textDelta.slice(i + 1)
+                            startIdx += 1
+                        } else {
+                            result = this.buffer + textDelta
+                            buffer = ''
+                            break
+                        }
+                    } else {
+                        buffer += char
+                        result = textDelta.slice(i + 1)
+                    }
+                } else {
+                    if (buffer.length === this.quoteEnd.length) {
+                        buffer = ''
+                        break
+                    }
+                    if (buffer.length > 0) {
+                        result = this.buffer + textDelta
+                        buffer = ''
+                        break
+                    }
+                }
+            }
+            console.debug('end loop!')
+            this.buffer = buffer
+            console.debug('result', result)
+            console.debug('this.buffer', this.buffer)
+            console.debug('---- end -----')
+        }
+        return result
+    }
+}
+
 const chineseLangs = ['zh-Hans', 'zh-Hant', 'wyw', 'yue']
 
 export async function translate(query: TranslateQuery) {
+    let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
@@ -63,7 +149,9 @@ export async function translate(query: TranslateQuery) {
     let isWordMode = false
     switch (query.mode) {
         case 'translate':
-            userPrompt = `${query.text} =>`
+            quoteProcessor = new QuoteProcessor()
+            assistantPrompt += ` Only translate the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+            userPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd} =>`
             if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
                 assistantPrompt = `请翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
             }
@@ -266,7 +354,11 @@ export async function translate(query: TranslateQuery) {
                 const { content, author } = resp.message
                 if (author.role === 'assistant') {
                     const targetTxt = content.parts.join('')
-                    query.onMessage({ content: targetTxt.slice(length), role: '', isWordMode })
+                    let textDelta = targetTxt.slice(length)
+                    if (quoteProcessor) {
+                        textDelta = quoteProcessor.processText(textDelta)
+                    }
+                    query.onMessage({ content: textDelta, role: '', isWordMode })
                     length = targetTxt.length
                 }
             },
@@ -334,11 +426,19 @@ export async function translate(query: TranslateQuery) {
                     // It's used for Azure OpenAI Service's legacy parameters.
                     targetTxt = choices[0].text
 
+                    if (quoteProcessor) {
+                        targetTxt = quoteProcessor.processText(targetTxt)
+                    }
+
                     query.onMessage({ content: targetTxt, role: '', isWordMode })
                 } else {
                     const { content = '', role } = choices[0].delta
 
                     targetTxt = content
+
+                    if (quoteProcessor) {
+                        targetTxt = quoteProcessor.processText(targetTxt)
+                    }
 
                     query.onMessage({ content: targetTxt, role, isWordMode })
                 }
