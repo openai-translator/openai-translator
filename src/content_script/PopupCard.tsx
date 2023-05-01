@@ -1047,6 +1047,8 @@ export function PopupCard(props: IPopupCardProps) {
         translatedStopSpeakRef.current = stopSpeak
     }
 
+    const enableVocabulary = isDesktopApp() || collectedWordTotal > 0
+
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <StyletronProvider value={props.engine}>
@@ -1371,7 +1373,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         </Dropzone>
                                                     </div>
                                                 </Tooltip>
-                                                {collectedWordTotal > 0 && (
+                                                {enableVocabulary && (
                                                     <StatefulTooltip
                                                         content={
                                                             <Trans
@@ -1392,7 +1394,7 @@ export function PopupCard(props: IPopupCardProps) {
                                                         </div>
                                                     </StatefulTooltip>
                                                 )}
-                                                {showWordbookButtons && collectedWordTotal > 0 && (
+                                                {showWordbookButtons && (
                                                     <>
                                                         <StatefulTooltip
                                                             content={t('Collection Review')}
@@ -1638,35 +1640,37 @@ export function PopupCard(props: IPopupCardProps) {
                                 </Tooltip>
                             </div>
                         )}
-                        <Modal
-                            isOpen={vocabularyType !== 'hide'}
-                            onClose={() => setVocabularyType('hide')}
-                            closeable
-                            overrides={{
-                                Close: {
-                                    style: {
-                                        display: 'none',
+                        {enableVocabulary && (
+                            <Modal
+                                isOpen={vocabularyType !== 'hide'}
+                                onClose={() => setVocabularyType('hide')}
+                                closeable
+                                overrides={{
+                                    Close: {
+                                        style: {
+                                            display: 'none',
+                                        },
                                     },
-                                },
-                            }}
-                            size='auto'
-                            autoFocus
-                            animate
-                            role='dialog'
-                        >
-                            <Vocabulary
-                                onCancel={() => setVocabularyType('hide')}
-                                onInsert={(content, highlightWords) => {
-                                    setEditableText(content)
-                                    setOriginalText(content)
-                                    setHighlightWords(highlightWords)
-                                    setSelectedWord('')
-                                    setTranslateMode('translate')
-                                    setVocabularyType('hide')
                                 }}
-                                type={vocabularyType as 'vocabulary' | 'article'}
-                            />
-                        </Modal>
+                                size='auto'
+                                autoFocus
+                                animate
+                                role='dialog'
+                            >
+                                <Vocabulary
+                                    onCancel={() => setVocabularyType('hide')}
+                                    onInsert={(content, highlightWords) => {
+                                        setEditableText(content)
+                                        setOriginalText(content)
+                                        setHighlightWords(highlightWords)
+                                        setSelectedWord('')
+                                        setTranslateMode('translate')
+                                        setVocabularyType('hide')
+                                    }}
+                                    type={vocabularyType as 'vocabulary' | 'article'}
+                                />
+                            </Modal>
+                        )}
                         <Toaster />
                     </div>
                 </BaseProvider>
