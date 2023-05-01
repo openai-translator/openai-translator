@@ -54,13 +54,16 @@ export async function translate(query: TranslateQuery) {
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
     let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
-    let assistantPrompt = `translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
+    let assistantPrompt = `Translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
-    }`
+    }. Only the translated text can be returned.`
+    let userPrompt = query.text
+
     // a word could be collected
     let isWordMode = false
     switch (query.mode) {
         case 'translate':
+            userPrompt = `${query.text} =>`
             if (query.detectTo === 'wyw' || query.detectTo === 'yue') {
                 assistantPrompt = `请翻译成${lang.langMap.get(query.detectTo) || query.detectTo}`
             }
@@ -84,11 +87,12 @@ export async function translate(query: TranslateQuery) {
                 isWordMode = true
                 // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
                 systemPrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
-                <原始文本>
+                <单词>
                 [<语种>] · / <单词音标>
                 [<词性缩写>] <中文含义>]
                 例句：
                 <序号><例句>(例句翻译)`
+                userPrompt = `单词是：${query.text}`
             }
             if (query.selectedWord) {
                 // 在选择的句子中，选择特定的单词。触发语境学习功能。
@@ -104,7 +108,7 @@ export async function translate(query: TranslateQuery) {
                     lang.langMap.get(query.detectTo) || query.detectTo
                 }解释例句。如果你明白了请说同意，然后我们开始。`
                 assistantPrompt = '好的，我明白了，请给我这个句子和单词。'
-                query.text = `句子是：${query.text}\n单词是：${query.selectedWord}`
+                userPrompt = `句子是：${query.text}\n单词是：${query.selectedWord}`
             }
             break
         case 'polishing':
@@ -182,7 +186,7 @@ export async function translate(query: TranslateQuery) {
         isChatAPI = false
         body[
             'prompt'
-        ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${query.text}\n<|im_end|>\n<|im_start|>assistant\n`
+        ] = `<|im_start|>system\n${systemPrompt}\n<|im_end|>\n<|im_start|>user\n${assistantPrompt}\n${userPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
         let resp: Response | null = null
@@ -197,7 +201,7 @@ export async function translate(query: TranslateQuery) {
                     role: 'user',
                     content: {
                         content_type: 'text',
-                        parts: [systemPrompt + '\n\n' + assistantPrompt + ':\n' + `${query.text}`],
+                        parts: [systemPrompt + '\n\n' + assistantPrompt + ':\n' + `${userPrompt}`],
                     },
                 },
             ],
@@ -216,7 +220,7 @@ export async function translate(query: TranslateQuery) {
             },
             {
                 role: 'user',
-                content: query.text,
+                content: userPrompt,
             },
         ]
     }
