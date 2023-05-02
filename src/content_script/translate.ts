@@ -175,7 +175,8 @@ export async function translate(query: TranslateQuery) {
     const settings = await utils.getSettings()
     const fromChinese = chineseLangs.indexOf(query.detectFrom) >= 0
     const toChinese = chineseLangs.indexOf(query.detectTo) >= 0
-    let systemPrompt = 'You are a translation engine that can only translate text and cannot interpret it.'
+    let systemPrompt =
+        'You are a translation expert, translate the text in a colloquial, professional and elegant manner without sounding like a machine translation. Remember to only translate the text and not further interpret it.'
     let assistantPrompt = `Translate from ${lang.langMap.get(query.detectFrom) || query.detectFrom} to ${
         lang.langMap.get(query.detectTo) || query.detectTo
     }. Only the translated text can be returned.`
