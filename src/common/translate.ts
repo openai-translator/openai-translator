@@ -65,7 +65,6 @@ export class QuoteProcessor {
 
     public processText(text: string): string {
         const deltas = text.split('')
-        console.log(deltas)
         const targetPieces = deltas.map((delta) => this.processTextDelta(delta))
         return targetPieces.join('')
     }
