@@ -426,6 +426,13 @@ export async function translate(query: TranslateQuery) {
                     query.onError(error.message)
                     return
                 }
+                if (typeof error === 'object') {
+                    const { message } = error
+                    if (message) {
+                        query.onError(message)
+                        return
+                    }
+                }
                 query.onError('Unknown error')
             },
         })
@@ -495,10 +502,24 @@ export async function translate(query: TranslateQuery) {
                     query.onError(err)
                     return
                 }
+                if (typeof err === 'object') {
+                    const { detail } = err
+                    if (detail) {
+                        query.onError(detail)
+                        return
+                    }
+                }
                 const { error } = err
                 if (error instanceof Error) {
                     query.onError(error.message)
                     return
+                }
+                if (typeof error === 'object') {
+                    const { message } = error
+                    if (message) {
+                        query.onError(message)
+                        return
+                    }
                 }
                 query.onError('Unknown error')
             },
