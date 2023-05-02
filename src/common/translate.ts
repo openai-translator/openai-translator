@@ -248,6 +248,7 @@ export async function translate(query: TranslateQuery) {
             rolePrompt =
                 'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
             commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLang} language! If the content is not code, return an error message. If the code has obvious errors, point them out.`
+            contentPrompt = '```\n' + query.text + '\n```'
             break
         case 'big-bang':
             rolePrompt = `You are a professional writer and you will write ${query.articlePrompt} based on the given words`
