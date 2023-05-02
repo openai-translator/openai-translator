@@ -12,6 +12,8 @@ export const supportLanguages: [string, string][] = [
     ['zh-Hant', '繁體中文'],
     ['yue', '粤语'],
     ['wyw', '古文'],
+    ['jdbhw', '近代白话文'],
+    ['xdbhw', '现代白话文'],
     ['ja', '日本語'],
     ['ko', '한국어'],
     ['fr', 'Français'],
@@ -82,13 +84,38 @@ export async function detectLang(text: string): Promise<string | null> {
     return lang
 }
 
+export function getLangName(langCode: string): string {
+    switch (langCode) {
+        case 'zh-Hans':
+            return 'Simplified Chinese'
+        case 'zh-Hant':
+            return 'Traditional Chinese'
+        case 'yue':
+            return 'Cantonese'
+        case 'hmn':
+            return 'Hmong'
+        default:
+    }
+    const langName = ISO6391.getName(langCode)
+    if (langName) {
+        return langName
+    }
+    return langMap.get(langCode) || langCode
+}
+
 export async function _detectLang(text: string): Promise<string | null> {
     const detectedText = text.trim()
     return new Promise((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const langName = (window as any).detectLanguage(detectedText)
+        console.debug('detected text:', detectedText)
+        console.debug('detected lang:', langName)
         if (langName === 'Chineset') {
             resolve('zh-Hant')
+            return
+        }
+        if (langName === 'Hmong') {
+            resolve('hmn')
             return
         }
         const langCode = ISO6391.getCode(langName)
