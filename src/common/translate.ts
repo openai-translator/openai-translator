@@ -52,18 +52,25 @@ export class QuoteProcessor {
     private quote: string
     public quoteStart: string
     public quoteEnd: string
-    private quoteStartBuffer: string
-    private quoteEndBuffer: string
+    private prevQuoteStartBuffer: string
+    private prevQuoteEndBuffer: string
 
     constructor() {
         this.quote = uuidv4().replace(/-/g, '').slice(0, 4)
         this.quoteStart = `<${this.quote}>`
         this.quoteEnd = `</${this.quote}>`
-        this.quoteStartBuffer = ''
-        this.quoteEndBuffer = ''
+        this.prevQuoteStartBuffer = ''
+        this.prevQuoteEndBuffer = ''
     }
 
-    public processText(textDelta: string): string {
+    public processText(text: string): string {
+        const deltas = text.split('')
+        console.log(deltas)
+        const targetPieces = deltas.map((delta) => this.processTextDelta(delta))
+        return targetPieces.join('')
+    }
+
+    private processTextDelta(textDelta: string): string {
         if (textDelta === '') {
             return ''
         }
@@ -72,7 +79,7 @@ export class QuoteProcessor {
         }
         let result = textDelta
         // process quote start
-        let quoteStartBuffer = this.quoteStartBuffer
+        let quoteStartBuffer = this.prevQuoteStartBuffer
         // console.debug('\n\n')
         // console.debug('---- process quote start -----')
         // console.debug('textDelta', textDelta)
@@ -86,13 +93,13 @@ export class QuoteProcessor {
             // console.debug('quoteStartBuffer', quoteStartBuffer)
             // console.debug('result', result)
             if (char === this.quoteStart[quoteStartBuffer.length]) {
-                if (this.quoteStartBuffer.length > 0) {
+                if (this.prevQuoteStartBuffer.length > 0) {
                     if (i === startIdx) {
                         quoteStartBuffer += char
                         result = textDelta.slice(i + 1)
                         startIdx += 1
                     } else {
-                        result = this.quoteStartBuffer + textDelta
+                        result = this.prevQuoteStartBuffer + textDelta
                         quoteStartBuffer = ''
                         break
                     }
@@ -106,20 +113,20 @@ export class QuoteProcessor {
                     break
                 }
                 if (quoteStartBuffer.length > 0) {
-                    result = this.quoteStartBuffer + textDelta
+                    result = this.prevQuoteStartBuffer + textDelta
                     quoteStartBuffer = ''
                     break
                 }
             }
         }
         // console.debug('end loop!')
-        this.quoteStartBuffer = quoteStartBuffer
+        this.prevQuoteStartBuffer = quoteStartBuffer
         // console.debug('result', result)
         // console.debug('this.quoteStartBuffer', this.quoteStartBuffer)
         // console.debug('---- end of process quote start -----')
         textDelta = result
         // process quote end
-        let quoteEndBuffer = this.quoteEndBuffer
+        let quoteEndBuffer = this.prevQuoteEndBuffer
         // console.debug('\n\n')
         // console.debug('---- start process quote end -----')
         console.debug('textDelta', textDelta)
@@ -133,13 +140,13 @@ export class QuoteProcessor {
             console.debug('quoteEndBuffer', quoteEndBuffer)
             console.debug('result', result)
             if (char === this.quoteEnd[quoteEndBuffer.length]) {
-                if (this.quoteEndBuffer.length > 0) {
+                if (this.prevQuoteEndBuffer.length > 0) {
                     if (i === endIdx) {
                         quoteEndBuffer += char
                         result = textDelta.slice(i + 1)
                         endIdx += 1
                     } else {
-                        result = this.quoteEndBuffer + textDelta
+                        result = this.prevQuoteEndBuffer + textDelta
                         quoteEndBuffer = ''
                         break
                     }
@@ -153,14 +160,14 @@ export class QuoteProcessor {
                     break
                 }
                 if (quoteEndBuffer.length > 0) {
-                    result = this.quoteEndBuffer + textDelta
+                    result = this.prevQuoteEndBuffer + textDelta
                     quoteEndBuffer = ''
                     break
                 }
             }
         }
         // console.debug('end loop!')
-        this.quoteEndBuffer = quoteEndBuffer
+        this.prevQuoteEndBuffer = quoteEndBuffer
         console.debug('totally result', result)
         // console.debug('this.quoteEndBuffer', this.quoteEndBuffer)
         // console.debug('---- end of process quote end -----')
