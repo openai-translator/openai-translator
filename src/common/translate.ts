@@ -3,7 +3,7 @@ import * as utils from '../common/utils'
 import { backgroundFetch } from '../common/background-fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
-import urlJoin from 'url-join'
+import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
@@ -48,7 +48,7 @@ export const isAWord = (lang: string, text: string) => {
     return iterator.next().value?.segment === text
 }
 
-class QuoteProcessor {
+export class QuoteProcessor {
     private quote: string
     public quoteStart: string
     public quoteEnd: string
@@ -81,7 +81,7 @@ class QuoteProcessor {
         let startIdx = 0
         for (let i = 0; i < textDelta.length; i++) {
             const char = textDelta[i]
-            // console.debug(`---- i: ${i} ----`)
+            // console.debug(`---- i: ${i} startIdx: ${startIdx} ----`)
             // console.debug('char', char)
             // console.debug('quoteStartBuffer', quoteStartBuffer)
             // console.debug('result', result)
@@ -98,7 +98,7 @@ class QuoteProcessor {
                     }
                 } else {
                     quoteStartBuffer += char
-                    result = textDelta.slice(0, textDelta.length - quoteStartBuffer.length)
+                    result = textDelta.slice(i + 1)
                 }
             } else {
                 if (quoteStartBuffer.length === this.quoteStart.length) {
