@@ -71,6 +71,15 @@ describe('QuoteProcessor', () => {
         expect(targetText).toEqual(text)
     })
 
+    it('should return the string without quote', () => {
+        const quoteProcessor = new QuoteProcessor()
+        const text = 'This is a test.'
+        const targetText = quoteProcessor.processText(
+            `${quoteProcessor.quoteStart}This${quoteProcessor.quoteStart} is ${quoteProcessor.quoteEnd}a${quoteProcessor.quoteStart} test.${quoteProcessor.quoteEnd}`
+        )
+        expect(targetText).toEqual(text)
+    })
+
     it('should return the same string if no quote exists', () => {
         const quoteProcessor = new QuoteProcessor()
         const deltas = [
