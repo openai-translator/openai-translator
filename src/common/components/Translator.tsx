@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isFirefox, isTauri } from '../utils'
+import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri } from '../utils'
 import { Settings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -48,18 +48,26 @@ import { Modal } from 'baseui-sd/modal'
 import * as Sentry from '@sentry/react'
 import ReactGA from 'react-ga4'
 
-!isFirefox &&
-    Sentry.init({
-        dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
-        integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
-        // Performance Monitoring
-        tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
-        // Session Replay
-        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-    })
+let isAnalysisSetupped = false
 
-ReactGA.initialize('G-D7054DX333')
+function setupAnalysis() {
+    if (isAnalysisSetupped) {
+        return
+    }
+    isAnalysisSetupped = true
+    if (isDesktopApp()) {
+        Sentry.init({
+            dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
+            integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
+            // Performance Monitoring
+            tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
+            // Session Replay
+            replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+            replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+        })
+    }
+    ReactGA.initialize('G-D7054DX333')
+}
 
 const cache = new LRUCache({
     max: 500,
@@ -406,6 +414,10 @@ export interface MovementXY {
 }
 
 export function Translator(props: IPopupCardProps) {
+    useEffect(() => {
+        setupAnalysis()
+    }, [])
+
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
