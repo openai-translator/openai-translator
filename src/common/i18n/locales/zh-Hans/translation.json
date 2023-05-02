@@ -60,5 +60,6 @@
   "last review": "最近查询时间",
   "vocabulary": "词汇表",
   "generate article": "生成文章",
-  "insert to editor": "插入编辑器"
+  "insert to editor": "插入编辑器",
+  "disable collecting statistics": "禁用统计"
 }

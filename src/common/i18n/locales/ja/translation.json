@@ -60,5 +60,6 @@
   "last review": "最近のクエリ時間",
   "vocabulary": "語彙",
   "generate article": "記事を生成",
-  "insert to editor": "エディタに挿入"
+  "insert to editor": "エディタに挿入",
+  "disable collecting statistics": "統計情報の収集を無効にする"
 }

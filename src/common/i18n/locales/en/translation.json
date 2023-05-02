@@ -60,5 +60,6 @@
   "last review": "Last Review Time",
   "vocabulary": "Vocabulary",
   "generate article": "Generate Article",
-  "insert to editor": "Insert to Editor"
+  "insert to editor": "Insert to Editor",
+  "disable collecting statistics": "Disable collecting statistics"
 }

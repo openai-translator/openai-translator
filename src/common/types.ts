@@ -66,4 +66,5 @@ export interface ISettings {
     restorePreviousPosition?: boolean
     selectInputElementsText?: boolean
     runAtStartup?: boolean
+    disableCollectingStatistics?: boolean
 }

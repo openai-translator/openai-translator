@@ -59,5 +59,6 @@
   "last review": "เวลาสอบถามล่าสุด",
   "vocabulary": "คำศัพท์",
   "generate article": "สร้างบทความ",
-  "insert to editor": "แทรกลงในตัวแก้ไข"
+  "insert to editor": "แทรกลงในตัวแก้ไข",
+  "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
 }

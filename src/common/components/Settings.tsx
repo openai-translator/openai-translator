@@ -553,6 +553,25 @@ function AutoTranslateCheckbox(props: AutoTranslateCheckboxProps) {
     )
 }
 
+interface MyCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function MyCheckbox(props: MyCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={props.value}
+            onChange={(e) => {
+                props.onChange?.(e.target.checked)
+                props.onBlur?.()
+            }}
+        />
+    )
+}
+
 interface RestorePreviousPositionCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -1023,6 +1042,9 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='disableCollectingStatistics' label={t('disable collecting statistics')}>
+                            <MyCheckbox onBlur={onBlur} />
                         </FormItem>
                         <div
                             style={{

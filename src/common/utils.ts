@@ -44,6 +44,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     restorePreviousPosition: 1,
     runAtStartup: 1,
     selectInputElementsText: 1,
+    disableCollectingStatistics: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -80,6 +81,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.i18n) {
         settings.i18n = defaulti18n
+    }
+    if (!settings.disableCollectingStatistics) {
+        settings.disableCollectingStatistics = false
     }
     if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
         settings.selectInputElementsText = defaultSelectInputElementsText

@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri } from '../utils'
+import { defaultAPIURL, exportToCsv, getSettings, isDesktopApp, isTauri } from '../utils'
 import { Settings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -50,11 +50,15 @@ import ReactGA from 'react-ga4'
 
 let isAnalysisSetupped = false
 
-function setupAnalysis() {
+async function setupAnalysis() {
     if (isAnalysisSetupped) {
         return
     }
     isAnalysisSetupped = true
+    const settings = await getSettings()
+    if (settings.disableCollectingStatistics) {
+        return
+    }
     if (isDesktopApp()) {
         Sentry.init({
             dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
