@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { PopupCard } from '../common/components/PopupCard'
+import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
@@ -140,7 +140,7 @@ export function App() {
                     </>
                 )}
             </div>
-            <PopupCard
+            <Translator
                 uuid={uuid}
                 text={text}
                 engine={engine}

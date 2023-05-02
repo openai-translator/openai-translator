@@ -1,5 +1,5 @@
 import React from 'react'
-import { PopupCard } from '../../common/components/PopupCard'
+import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 
 const engine = new Styletron({
@@ -17,7 +17,7 @@ export function App() {
             }}
         >
             <div className='draggable' />
-            <PopupCard
+            <Translator
                 text=''
                 engine={engine}
                 showSettings
