@@ -1,5 +1,5 @@
 import { Theme } from 'baseui-sd/theme'
-import { TranslateMode, Provider } from '../content_script/translate'
+import { TranslateMode, Provider } from './translate'
 import { TTSProvider } from './tts/types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

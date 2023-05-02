@@ -1,8 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { Settings } from '../popup/Settings'
+import { Settings } from '../../common/components/Settings'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import '../i18n.js'
+import '../../common/i18n.js'
 
 const engine = new Styletron()
 

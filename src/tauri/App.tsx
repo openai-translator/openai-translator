@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { PopupCard } from '../content_script/PopupCard'
+import { PopupCard } from '../common/components/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
