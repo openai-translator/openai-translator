@@ -1,8 +1,8 @@
-import * as utils from '../common/utils'
+import * as utils from '../../common/utils'
 import React from 'react'
-import icon from './assets/images/icon.png'
+import icon from '../../common/assets/images/icon.png'
 import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
-import { PopupCard } from './PopupCard'
+import { PopupCard } from '../../common/components/PopupCard'
 import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
@@ -10,7 +10,7 @@ import { JssProvider, createGenerateId } from 'react-jss'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
-import '../i18n.js'
+import '../../common/i18n.js'
 
 let root: Root | null = null
 const generateId = createGenerateId()

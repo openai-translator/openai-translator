@@ -1,8 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { PopupCard } from '../content_script/PopupCard'
+import { PopupCard } from '../../common/components/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import '../i18n.js'
+import '../../common/i18n.js'
 import './index.css'
 
 const engine = new Styletron({

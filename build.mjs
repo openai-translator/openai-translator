@@ -10,10 +10,10 @@ async function esbuildBrowserExtension() {
     await esbuild.build({
         target: ['es2015', 'safari11'],
         entryPoints: [
-            'src/content_script/index.tsx',
-            'src/background/index.ts',
-            'src/options/index.tsx',
-            'src/popup/index.tsx',
+            'src/browser-extension/content_script/index.tsx',
+            'src/browser-extension/background/index.ts',
+            'src/browser-extension/options/index.tsx',
+            'src/browser-extension/popup/index.tsx',
         ],
         bundle: true,
         outdir: browserExtensionOutDir,

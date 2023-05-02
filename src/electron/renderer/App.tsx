@@ -1,5 +1,5 @@
 import React from 'react'
-import { PopupCard } from '../../content_script/PopupCard'
+import { PopupCard } from '../../common/components/PopupCard'
 import { Client as Styletron } from 'styletron-engine-atomic'
 
 const engine = new Styletron({
