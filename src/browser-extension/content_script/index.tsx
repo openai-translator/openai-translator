@@ -2,7 +2,7 @@ import * as utils from '../../common/utils'
 import React from 'react'
 import icon from '../../common/assets/images/icon.png'
 import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
-import { PopupCard } from '../../common/components/PopupCard'
+import { Translator } from '../../common/components/Translator'
 import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
@@ -102,7 +102,7 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         <React.StrictMode>
             <div>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <PopupCard
+                    <Translator
                         text={text}
                         engine={engine}
                         autoFocus={autoFocus}

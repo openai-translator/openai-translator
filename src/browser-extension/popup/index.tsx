@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { PopupCard } from '../../common/components/PopupCard'
+import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import '../../common/i18n.js'
 import './index.css'
@@ -19,7 +19,7 @@ root.render(
                 position: 'relative',
             }}
         >
-            <PopupCard showSettings defaultShowSettings text='' engine={engine} autoFocus />
+            <Translator showSettings defaultShowSettings text='' engine={engine} autoFocus />
         </div>
     </React.StrictMode>
 )

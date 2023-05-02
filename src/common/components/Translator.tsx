@@ -405,7 +405,7 @@ export interface MovementXY {
     y: number
 }
 
-export function PopupCard(props: IPopupCardProps) {
+export function Translator(props: IPopupCardProps) {
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
