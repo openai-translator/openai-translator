@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, getSettings, isDesktopApp, isTauri } from '../utils'
+import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { Settings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -42,36 +42,11 @@ import { speak } from '../tts'
 import { Tooltip } from './Tooltip'
 import { useSettings } from '../hooks/useSettings'
 import Vocabulary from './Vocabulary'
-import { LocalDB, VocabularyItem } from '../db'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
 import { Modal } from 'baseui-sd/modal'
-import * as Sentry from '@sentry/react'
-import ReactGA from 'react-ga4'
-
-let isAnalysisSetupped = false
-
-async function setupAnalysis() {
-    if (isAnalysisSetupped) {
-        return
-    }
-    isAnalysisSetupped = true
-    const settings = await getSettings()
-    if (settings.disableCollectingStatistics) {
-        return
-    }
-    if (isDesktopApp()) {
-        Sentry.init({
-            dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
-            integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
-            // Performance Monitoring
-            tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
-            // Session Replay
-            replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-            replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-        })
-    }
-    ReactGA.initialize('G-D7054DX333')
-}
+import { setupAnalysis } from '../analysis'
+import { vocabularyService } from '../services/vocabulary'
+import { VocabularyItem } from '../internal-services/db'
 
 const cache = new LRUCache({
     max: 500,
@@ -535,13 +510,14 @@ export function Translator(props: IPopupCardProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
+
     const checkWordCollection = useCallback(async () => {
         try {
-            const arr = await LocalDB.vocabulary.where('word').equals(editableText.trim()).toArray()
-            if (arr.length > 0) {
-                await LocalDB.vocabulary.put({
-                    ...arr[0],
-                    reviewCount: arr[0].reviewCount + 1,
+            const item = await vocabularyService.getItem(editableText.trim())
+            if (item) {
+                await vocabularyService.putItem({
+                    ...item,
+                    reviewCount: item.reviewCount + 1,
                 })
                 setIsCollectedWord(true)
             } else {
@@ -551,11 +527,13 @@ export function Translator(props: IPopupCardProps) {
             console.error(e)
         }
     }, [editableText])
+
     useEffect(() => {
         if (isWordMode && !isLoading) {
             checkWordCollection()
         }
     }, [isWordMode, editableText, isLoading])
+
     useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
     }, [translatedText])
@@ -993,12 +971,12 @@ export function Translator(props: IPopupCardProps) {
     const onWordCollection = async () => {
         try {
             if (isCollectedWord) {
-                const wordInfo = await LocalDB.vocabulary.get(editableText)
-                await LocalDB.vocabulary.delete(wordInfo?.word ?? '')
+                const wordInfo = await vocabularyService.getItem(editableText.trim())
+                await vocabularyService.deleteItem(wordInfo?.word ?? '')
                 setIsCollectedWord(false)
                 setCollectedWordTotal((t) => t - 1)
             } else {
-                await LocalDB.vocabulary.put({
+                await vocabularyService.putItem({
                     word: editableText,
                     reviewCount: 1,
                     description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
@@ -1015,7 +993,7 @@ export function Translator(props: IPopupCardProps) {
 
     const onCsvExport = async () => {
         try {
-            const words = await LocalDB.vocabulary.toArray()
+            const words = await vocabularyService.listItems()
             await exportToCsv<VocabularyItem>(`openai-translator-collection-${new Date().valueOf()}`, words)
             if (isDesktopApp()) {
                 toast(t('csv file saved on Desktop'), {
@@ -1066,7 +1044,7 @@ export function Translator(props: IPopupCardProps) {
         translatedStopSpeakRef.current = stopSpeak
     }
 
-    const enableVocabulary = isDesktopApp() || collectedWordTotal > 0
+    const enableVocabulary = !isUserscript()
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>

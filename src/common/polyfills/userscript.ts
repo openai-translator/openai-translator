@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IBrowser } from './types'
+import { IBrowser } from '../types'
 
 class BrowserStorageSync {
     async get(keys: string[]): Promise<Record<string, any>> {

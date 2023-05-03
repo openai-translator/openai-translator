@@ -1,4 +1,8 @@
+/* eslint-disable no-case-declarations */
 import browser from 'webextension-polyfill'
+import { BackgroundEventNames } from '../../common/background/eventnames'
+import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '../../common/background/fetch'
+import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
 
 browser.contextMenus.create(
     {
@@ -11,6 +15,7 @@ browser.contextMenus.create(
         browser.runtime.lastError
     }
 )
+
 browser.contextMenus.onClicked.addListener(async function (info) {
     const [tab] = await chrome.tabs.query({ active: true })
     tab.id &&
@@ -20,12 +25,15 @@ browser.contextMenus.onClicked.addListener(async function (info) {
         })
 })
 
-interface BackgroundFetchMessage {
-    type: 'open' | 'abort'
-    details: { url: string; options: RequestInit }
-}
+async function fetchWithStream(
+    port: browser.Runtime.Port,
+    message: BackgroundFetchRequestMessage,
+    signal: AbortSignal
+) {
+    if (!message.details) {
+        throw new Error('No fetch details')
+    }
 
-async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFetchMessage, signal: AbortSignal) {
     const { url, options } = message.details
     let response: Response | null = null
 
@@ -42,7 +50,7 @@ async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFe
         return
     }
 
-    const responseSend = {
+    const responseSend: BackgroundFetchResponseMessage = {
         ok: response.ok,
         status: response.status,
         statusText: response.statusText,
@@ -79,21 +87,37 @@ async function fetchWithStream(port: browser.Runtime.Port, message: BackgroundFe
 }
 
 browser.runtime.onConnect.addListener(async function (port) {
-    if (port.name !== 'background-fetch') {
-        return
+    switch (port.name) {
+        case BackgroundEventNames.fetch:
+            const controller = new AbortController()
+            const { signal } = controller
+
+            port.onMessage.addListener(function (message: BackgroundFetchRequestMessage) {
+                switch (message.type) {
+                    case 'abort':
+                        controller.abort()
+                        break
+                    case 'open':
+                        fetchWithStream(port, message, signal)
+                        break
+                }
+            })
+            return
     }
+})
 
-    const controller = new AbortController()
-    const { signal } = controller
-
-    port.onMessage.addListener(function (message) {
-        switch (message.type) {
-            case 'abort':
-                controller.abort()
-                break
-            case 'open':
-                fetchWithStream(port, message, signal)
-                break
-        }
-    })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+browser.runtime.onMessage.addListener(async (request) => {
+    switch (request.type) {
+        case BackgroundEventNames.vocabularyService:
+            const { method, args } = request
+            const service = vocabularyInternalService
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const result = (service as any)[method](...args)
+            if (result instanceof Promise) {
+                const v = await result
+                return { result: v }
+            }
+            return { result }
+    }
 })
