@@ -1043,7 +1043,13 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='disableCollectingStatistics' label={t('disable collecting statistics')}>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp ? 'block' : 'none',
+                            }}
+                            name='disableCollectingStatistics'
+                            label={t('disable collecting statistics')}
+                        >
                             <MyCheckbox onBlur={onBlur} />
                         </FormItem>
                         <div
