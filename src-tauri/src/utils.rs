@@ -53,23 +53,28 @@ pub fn copy() {
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
+    use std::{thread, time::Duration};
 
-    let old_clipboard = (
-        Clipboard::new()?.get_text(),
-        Clipboard::new()?.get_image(),
-    );
-    copy();
-
-    let new_text = Clipboard::new()?.get_text();
+    let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
 
     let mut write_clipboard = Clipboard::new()?;
 
+    let not_selected_placeholder = "[[--yetone-not-selected--]]";
+
+    write_clipboard.set_text(not_selected_placeholder)?;
+
+    copy();
+
+    thread::sleep(Duration::from_millis(100));
+
+    let new_text = Clipboard::new()?.get_text();
+
     match old_clipboard {
-        (Ok(text), _) => {
+        (Ok(old_text), _) => {
             // Old Content is Text
-            write_clipboard.set_text(text.clone())?;
+            write_clipboard.set_text(old_text.clone())?;
             if let Ok(new) = new_text {
-                if new.trim() == text.trim() {
+                if new.trim() == not_selected_placeholder.trim() {
                     Ok(String::new())
                 } else {
                     Ok(new)
