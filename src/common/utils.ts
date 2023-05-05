@@ -136,7 +136,7 @@ export const isDarkMode = async () => {
     return settings.themeType === 'dark'
 }
 
-export const isFirefox = /firefox/i.test(navigator.userAgent)
+export const isFirefox = () => /firefox/i.test(navigator.userAgent)
 
 // source: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid#answer-8809472
 export function generateUUID() {

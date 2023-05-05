@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react'
 import ReactGA from 'react-ga4'
-import { getSettings, isDesktopApp, isUserscript } from './utils'
+import { getSettings, isDesktopApp, isFirefox, isUserscript } from './utils'
 
 export async function setupAnalysis() {
     if (isUserscript()) {
@@ -31,5 +31,7 @@ export async function doSetupAnalysis() {
             replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
         })
     }
-    ReactGA.initialize('G-D7054DX333')
+    if (!isFirefox()) {
+        ReactGA.initialize('G-D7054DX333')
+    }
 }
