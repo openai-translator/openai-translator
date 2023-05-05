@@ -20,5 +20,11 @@ class MyDexie extends Dexie {
     }
 }
 
-// init indexdb
-export const LocalDB = new MyDexie()
+let localDB: MyDexie
+
+export const getLocalDB = () => {
+    if (!localDB) {
+        localDB = new MyDexie()
+    }
+    return localDB
+}

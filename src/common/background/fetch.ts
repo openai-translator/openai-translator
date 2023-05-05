@@ -1,6 +1,13 @@
-interface BackgroundFetchMessage
+import { BackgroundEventNames } from './eventnames'
+
+export interface BackgroundFetchRequestMessage {
+    type: 'open' | 'abort'
+    details?: { url: string; options: RequestInit }
+}
+
+export interface BackgroundFetchResponseMessage
     extends Pick<Response, 'ok' | 'status' | 'statusText' | 'redirected' | 'type' | 'url'> {
-    error: { message: string; name: string }
+    error?: { message: string; name: string }
     status: number
     data?: string
 }
@@ -36,9 +43,13 @@ export async function backgroundFetch(input: string, options: RequestInit) {
 
             const browser = await require('webextension-polyfill')
             let resolved = false
-            const port = browser.runtime.connect({ name: 'background-fetch' })
-            port.postMessage({ type: 'open', details: { url: input, options: fetchOptions } })
-            port.onMessage.addListener((msg: BackgroundFetchMessage) => {
+            const port = browser.runtime.connect({ name: BackgroundEventNames.fetch })
+            const message: BackgroundFetchRequestMessage = {
+                type: 'open',
+                details: { url: input, options: fetchOptions },
+            }
+            port.postMessage(message)
+            port.onMessage.addListener((msg: BackgroundFetchResponseMessage) => {
                 const { data, error, ...restResp } = msg
                 if (error) {
                     const e = new Error()

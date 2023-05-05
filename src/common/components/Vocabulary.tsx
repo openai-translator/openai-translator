@@ -15,11 +15,12 @@ import { translate } from '../translate'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { format } from 'date-fns'
-import { LocalDB, VocabularyItem } from '../db'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
 import { RiPictureInPictureExitLine } from 'react-icons/ri'
 import { Tooltip } from './Tooltip'
 import { isDesktopApp } from '../utils'
+import { vocabularyService } from '../services/vocabulary'
+import { VocabularyItem } from '../internal-services/db'
 
 const RANDOM_SIZE = 10
 const MAX_WORDS = 50
@@ -190,11 +191,8 @@ const Vocabulary = (props: IVocabularyProps) => {
 
     const checkCollection = useCallback(async () => {
         try {
-            const count = await LocalDB.vocabulary
-                .where('word')
-                .equals(selectedWord?.word ?? '')
-                .count()
-            setIsCollectedWord(count > 0)
+            const isCollected = await vocabularyService.isCollected(selectedWord?.word ?? '')
+            setIsCollectedWord(isCollected)
         } catch (e) {
             console.error(e)
         }
@@ -206,26 +204,8 @@ const Vocabulary = (props: IVocabularyProps) => {
 
     const onRandomWords = async () => {
         try {
-            let randomWords: VocabularyItem[] = []
             setSelectedWord(undefined)
-            if (collectedWordTotal <= RANDOM_SIZE) {
-                randomWords = await LocalDB.vocabulary.toArray()
-            } else {
-                const idxSeen: Set<number> = new Set([])
-                while (idxSeen.size < RANDOM_SIZE) {
-                    // eslint-disable-next-line no-constant-condition
-                    while (true) {
-                        const idx = Math.floor(collectedWordTotal * Math.random())
-                        if (idxSeen.has(idx)) {
-                            continue
-                        }
-                        idxSeen.add(idx)
-                        const words_ = await LocalDB.vocabulary.offset(idx).limit(1).toArray()
-                        randomWords.push(words_[0])
-                        break
-                    }
-                }
-            }
+            const randomWords = await vocabularyService.listRandomItems(RANDOM_SIZE)
             setWords(randomWords)
         } catch (e) {
             console.error(e)
@@ -239,16 +219,18 @@ const Vocabulary = (props: IVocabularyProps) => {
     const onWordCollection = async () => {
         try {
             if (isCollectedWord) {
-                const wordInfo = await LocalDB.vocabulary.get(selectedWord?.word ?? '')
-                await LocalDB.vocabulary.delete(wordInfo?.word ?? '')
+                const wordInfo = await vocabularyService.getItem(selectedWord?.word ?? '')
+                await vocabularyService.deleteItem(wordInfo?.word ?? '')
                 setIsCollectedWord(false)
                 setCollectedWordTotal((prev) => prev - 1)
             } else {
-                const wordInfo = words.filter((item) => item.word === selectedWord?.word)
-                await LocalDB.vocabulary.put({
-                    ...wordInfo[0],
-                })
-                setIsCollectedWord(true)
+                const wordInfo = words.find((item) => item.word === selectedWord?.word)
+                if (wordInfo) {
+                    await vocabularyService.putItem({
+                        ...wordInfo,
+                    })
+                    setIsCollectedWord(true)
+                }
             }
         } catch (e) {
             console.error(e)
@@ -269,8 +251,7 @@ const Vocabulary = (props: IVocabularyProps) => {
         controlRef.current.abort()
         controlRef.current = new AbortController()
         const { signal } = controlRef.current
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const frequentWords = await (LocalDB.vocabulary.orderBy('reviewCount') as any).desc().limit(MAX_WORDS).toArray()
+        const frequentWords = await vocabularyService.listFrequencyItems(MAX_WORDS)
         const frequentWordsArr = frequentWords.map((item: VocabularyItem) => item.word)
         articleUsedWord.current = [...frequentWordsArr]
         articleTxt.current = ''

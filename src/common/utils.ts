@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createParser } from 'eventsource-parser'
-import { backgroundFetch } from './background-fetch'
-import { userscriptFetch } from './userscript-polyfill'
 import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import { IBrowser, ISettings } from './types'
+import { getUniversalFetch } from './universal-fetch'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -98,13 +97,13 @@ export async function setSettings(settings: Partial<ISettings>) {
 
 export async function getBrowser(): Promise<IBrowser> {
     if (isElectron()) {
-        return (await import('./electron-polyfill')).electronBrowser
+        return (await import('./polyfills/electron')).electronBrowser
     }
     if (isTauri()) {
-        return (await import('./tauri-polyfill')).tauriBrowser
+        return (await import('./polyfills/tauri')).tauriBrowser
     }
     if (isUserscript()) {
-        return (await import('./userscript-polyfill')).userscriptBrowser
+        return (await import('./polyfills/userscript')).userscriptBrowser
     }
     return await require('webextension-polyfill')
 }
@@ -114,6 +113,9 @@ export const isElectron = () => {
 }
 
 export const isTauri = () => {
+    if (typeof window === 'undefined') {
+        return false
+    }
     return window['__TAURI__' as any] !== undefined
 }
 
@@ -210,10 +212,7 @@ interface FetchSSEOptions extends RequestInit {
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
-    const { onMessage, onError, ...fetchOptions } = options
-
-    const fetcher =
-        options.fetcher ?? (isUserscript() ? userscriptFetch : !isDesktopApp() ? backgroundFetch : window.fetch)
+    const { onMessage, onError, fetcher = getUniversalFetch(), ...fetchOptions } = options
 
     const resp = await fetcher(input, fetchOptions)
     if (resp.status !== 200) {

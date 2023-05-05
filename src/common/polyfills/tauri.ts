@@ -1,10 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IBrowser } from './types'
+import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs'
+import { invoke } from '@tauri-apps/api/tauri'
+import { IBrowser } from '../types'
+
+async function getSettings(): Promise<Record<string, any>> {
+    const settings = await invoke<string>('get_config_content')
+    return JSON.parse(settings)
+}
 
 class BrowserStorageSync {
     async get(keys: string[]): Promise<Record<string, any>> {
-        return await (window['electronAPI' as any]['storeGets' as any] as any)(keys)
+        const settings = await getSettings()
+        return keys.reduce((acc, key) => {
+            return {
+                ...acc,
+                [key]: settings[key],
+            }
+        }, {})
     }
 
     async set(items: Record<string, any>): Promise<void> {
@@ -14,7 +27,11 @@ class BrowserStorageSync {
             }
             return { ...acc, [key]: value }
         }, {})
-        return await (window['electronAPI' as any]['storeSets' as any] as any)(newItems)
+        const settings = await getSettings()
+        const newSettings = { ...settings, ...newItems }
+        await writeTextFile('config.json', JSON.stringify(newSettings), {
+            dir: BaseDirectory.AppConfig,
+        })
     }
 }
 
@@ -70,4 +87,4 @@ class Browser implements IBrowser {
     }
 }
 
-export const electronBrowser = new Browser()
+export const tauriBrowser = new Browser()

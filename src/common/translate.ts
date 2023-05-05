@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
-import { backgroundFetch } from '../common/background-fetch'
+import { backgroundFetch } from '../common/background/fetch'
 import * as lang from './lang'
 import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
@@ -128,16 +128,16 @@ export class QuoteProcessor {
         let quoteEndBuffer = this.prevQuoteEndBuffer
         // console.debug('\n\n')
         // console.debug('---- start process quote end -----')
-        console.debug('textDelta', textDelta)
+        // console.debug('textDelta', textDelta)
         // console.debug('this.quoteEndBuffer', this.quoteEndBuffer)
         // console.debug('start loop:')
         let endIdx = 0
         for (let i = 0; i < textDelta.length; i++) {
             const char = textDelta[i]
-            console.debug(`---- i: ${i}, endIdx: ${endIdx} ----`)
-            console.debug('char', char)
-            console.debug('quoteEndBuffer', quoteEndBuffer)
-            console.debug('result', result)
+            // console.debug(`---- i: ${i}, endIdx: ${endIdx} ----`)
+            // console.debug('char', char)
+            // console.debug('quoteEndBuffer', quoteEndBuffer)
+            // console.debug('result', result)
             if (char === this.quoteEnd[quoteEndBuffer.length]) {
                 if (this.prevQuoteEndBuffer.length > 0) {
                     if (i === endIdx) {
@@ -167,7 +167,7 @@ export class QuoteProcessor {
         }
         // console.debug('end loop!')
         this.prevQuoteEndBuffer = quoteEndBuffer
-        console.debug('totally result', result)
+        // console.debug('totally result', result)
         // console.debug('this.quoteEndBuffer', this.quoteEndBuffer)
         // console.debug('---- end of process quote end -----')
         return result
