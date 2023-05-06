@@ -30,8 +30,8 @@ use crate::windows::{
 use mouce::Mouse;
 use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
-use tauri::{AppHandle, LogicalPosition, LogicalSize, PhysicalSize};
-use tauri::{Manager, PhysicalPosition};
+use tauri::Manager;
+use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
@@ -129,16 +129,17 @@ fn main() {
                             Ok(position) => {
                                 let scale_factor = window.scale_factor().unwrap_or(1.0);
                                 if let Ok(size) = window.outer_size() {
-                                    let PhysicalPosition { x: x1, y: y1 } = position;
-                                    let PhysicalSize {
+                                    let LogicalPosition { x: x1, y: y1 } =
+                                        position.to_logical::<i32>(scale_factor);
+                                    let LogicalSize {
                                         width: mut w,
                                         height: mut h,
-                                    } = size;
+                                    } = size.to_logical::<i32>(scale_factor);
                                     if cfg!(target_os = "windows") {
-                                        w = (20.0 as f64 * scale_factor) as u32;
-                                        h = (20.0 as f64 * scale_factor) as u32;
+                                        w = (20.0 as f64 * scale_factor) as i32;
+                                        h = (20.0 as f64 * scale_factor) as i32;
                                     }
-                                    let (x2, y2) = (x1 + w as i32, y1 + h as i32);
+                                    let (x2, y2) = (x1 + w, y1 + h);
                                     let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
                                     res
                                 } else {
