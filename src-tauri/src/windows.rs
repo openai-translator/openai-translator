@@ -176,8 +176,10 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 let monitor = window.current_monitor().unwrap().unwrap();
                 let monitor_size = monitor.size();
                 let scale_factor = window.scale_factor().unwrap_or(1.0);
-                let mouse_physical_position =
-                    LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
+                let mut mouse_physical_position = PhysicalPosition::new(x as u32, y as u32);
+                if cfg!(target_os = "macos") {
+                    mouse_physical_position = LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
+                }
                 let mut window_physical_position = mouse_physical_position;
                 if mouse_physical_position.x + window_size.width > monitor_size.width {
                     window_physical_position.x = monitor_size.width - window_size.width;
