@@ -64,16 +64,13 @@ pub fn show_main_window_with_selected_text() {
 
 pub fn close_thumb() {
     match APP_HANDLE.get() {
-        Some(handle) => {
-            match handle.get_window(THUMB_WIN_NAME) {
-                Some(window) => {
-                    window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
-                    window.set_always_on_top(false).unwrap();
-                    window.hide().unwrap();
-                },
-                None => {}
+        Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
+            Some(window) => {
+                window.set_always_on_top(false).unwrap();
+                window.hide().unwrap();
             }
-        }
+            None => {}
+        },
         None => {}
     }
 }
@@ -87,11 +84,17 @@ pub fn show_thumb(x: i32, y: i32) {
                     println!("Thumb window already exists");
                     if cfg!(target_os = "macos") {
                         window
-                            .set_position(LogicalPosition::new(x as f64 + position_offset, y as f64 + position_offset))
+                            .set_position(LogicalPosition::new(
+                                x as f64 + position_offset,
+                                y as f64 + position_offset,
+                            ))
                             .unwrap();
                     } else {
                         window
-                            .set_position(PhysicalPosition::new(x as f64 + position_offset, y as f64 + position_offset))
+                            .set_position(PhysicalPosition::new(
+                                x as f64 + position_offset,
+                                y as f64 + position_offset,
+                            ))
                             .unwrap();
                     }
                     window.unminimize().unwrap();
@@ -104,16 +107,16 @@ pub fn show_thumb(x: i32, y: i32) {
                         handle,
                         THUMB_WIN_NAME,
                         tauri::WindowUrl::App("thumb.html".into()),
-                        )
-                        .fullscreen(false)
-                        .focused(false)
-                        .inner_size(20.0, 20.0)
-                        .min_inner_size(20.0, 20.0)
-                        .max_inner_size(20.0, 20.0)
-                        .visible(true)
-                        .resizable(false)
-                        .skip_taskbar(true)
-                        .decorations(false);
+                    )
+                    .fullscreen(false)
+                    .focused(false)
+                    .inner_size(20.0, 20.0)
+                    .min_inner_size(20.0, 20.0)
+                    .max_inner_size(20.0, 20.0)
+                    .visible(true)
+                    .resizable(false)
+                    .skip_taskbar(true)
+                    .decorations(false);
 
                     #[cfg(target_os = "macos")]
                     let window = builder.hidden_title(true).build().unwrap();
@@ -123,11 +126,17 @@ pub fn show_thumb(x: i32, y: i32) {
 
                     if cfg!(target_os = "macos") {
                         window
-                            .set_position(LogicalPosition::new(x as f64 + position_offset, y as f64 + position_offset))
+                            .set_position(LogicalPosition::new(
+                                x as f64 + position_offset,
+                                y as f64 + position_offset,
+                            ))
                             .unwrap();
                     } else {
                         window
-                            .set_position(PhysicalPosition::new(x as f64 + position_offset, y as f64 + position_offset))
+                            .set_position(PhysicalPosition::new(
+                                x as f64 + position_offset,
+                                y as f64 + position_offset,
+                            ))
                             .unwrap();
                     }
 
@@ -142,7 +151,6 @@ pub fn show_thumb(x: i32, y: i32) {
         }
         None => {}
     }
-    
 }
 
 pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
@@ -168,7 +176,8 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 let monitor = window.current_monitor().unwrap().unwrap();
                 let monitor_size = monitor.size();
                 let scale_factor = window.scale_factor().unwrap_or(1.0);
-                let mouse_physical_position = LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
+                let mouse_physical_position =
+                    LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
                 let mut window_physical_position = mouse_physical_position;
                 if mouse_physical_position.x + window_size.width > monitor_size.width {
                     window_physical_position.x = monitor_size.width - window_size.width;
@@ -179,9 +188,7 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
                 }
-                window
-                    .set_position(window_physical_position)
-                    .unwrap();
+                window.set_position(window_physical_position).unwrap();
             } else {
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
