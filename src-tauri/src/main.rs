@@ -132,9 +132,13 @@ fn main() {
                                     let LogicalPosition { x: x1, y: y1 } =
                                         position.to_logical::<i32>(scale_factor);
                                     let LogicalSize {
-                                        width: w,
-                                        height: h,
+                                        width: mut w,
+                                        height: mut h,
                                     } = size.to_logical::<i32>(scale_factor);
+                                    if cfg!(target_os = "windows") {
+                                        w = (20.0 as f64 * scale_factor) as i32;
+                                        h = (20.0 as f64 * scale_factor) as i32;
+                                    }
                                     let (x2, y2) = (x1 + w, y1 + h);
                                     let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
                                     res
