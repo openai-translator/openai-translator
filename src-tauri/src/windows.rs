@@ -69,6 +69,7 @@ pub fn close_thumb() {
                 Some(window) => {
                     window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
                     window.set_always_on_top(false).unwrap();
+                    window.hide().unwrap();
                 },
                 None => {}
             }
