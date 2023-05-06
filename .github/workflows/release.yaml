@@ -184,24 +184,24 @@ jobs:
           asset_name: openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
           asset_content_type: application/javascript
 
-  # publish-release:
-  #   permissions:
-  #     contents: write
-  #   runs-on: ubuntu-20.04
-  #   needs: [create-release, build-tauri, build-browser-extension]
-  #
-  #   steps:
-  #     - name: publish release
-  #       id: publish-release
-  #       uses: actions/github-script@v6
-  #       env:
-  #         release_id: ${{ needs.create-release.outputs.release_id }}
-  #       with:
-  #         script: |
-  #           github.rest.repos.updateRelease({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             release_id: process.env.release_id,
-  #             draft: false,
-  #             prerelease: false
-  #           })
+  publish-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    needs: [create-release, build-tauri, build-browser-extension]
+
+    steps:
+      - name: publish release
+        id: publish-release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false,
+              prerelease: false
+            })
