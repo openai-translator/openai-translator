@@ -24,7 +24,7 @@ export function App() {
     const [uuid, setUUID] = useState('')
     const [isPinned, setPinned] = useState(false)
 
-    useMemoWindow({ size: true, position: true })
+    useMemoWindow({ size: true, position: false })
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
