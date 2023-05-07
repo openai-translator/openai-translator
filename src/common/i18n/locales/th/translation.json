@@ -60,5 +60,7 @@
   "vocabulary": "คำศัพท์",
   "generate article": "สร้างบทความ",
   "insert to editor": "แทรกลงในตัวแก้ไข",
+  "Show button when text is selected": "แสดงปุ่มเมื่อเลือกข้อความ",
+  "Show icon when text is selected": "แสดงไอคอนเมื่อเลือกข้อความ",
   "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
 }
