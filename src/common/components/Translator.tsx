@@ -84,7 +84,8 @@ const useStyles = createUseStyles({
                   paddingLeft: '16px',
                   display: 'flex',
                   alignItems: 'center',
-                  background: props.theme.colors.backgroundPrimary,
+                  background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(10px)',
               }
             : {
                   color: props.theme.colors.contentSecondary,
