@@ -1,4 +1,5 @@
 use tauri::Manager;
+use parking_lot::Mutex;
 
 use crate::APP_HANDLE;
 
@@ -15,12 +16,18 @@ pub fn copy() {
     enigo.key_click(Key::Layout('c'));
     enigo.key_up(Key::Control);
 }
+
+static COPY_PASTE: Mutex<()> = Mutex::new(());
+
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn copy() {
     // use std::{thread, time::Duration};
 
     use enigo::*;
+
+    let _guard = COPY_PASTE.lock();
+
     let mut enigo = Enigo::new();
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Meta);
@@ -36,6 +43,7 @@ pub fn copy() {
     // enigo.key_up(Key::Layout('c'));
     enigo.key_up(Key::Meta);
 }
+
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn copy() {
@@ -52,6 +60,10 @@ pub fn copy() {
 
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
+    get_selected_text_by_clipboard()
+}
+
+pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
     use std::{thread, time::Duration};
 
@@ -62,6 +74,8 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     let not_selected_placeholder = "[[--yetone-not-selected--]]";
 
     write_clipboard.set_text(not_selected_placeholder)?;
+
+    thread::sleep(Duration::from_millis(50));
 
     copy();
 
@@ -87,7 +101,11 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
             // Old Content is Image
             write_clipboard.set_image(image)?;
             if let Ok(new) = new_text {
-                Ok(new)
+                if new.trim() == not_selected_placeholder.trim() {
+                    Ok(String::new())
+                } else {
+                    Ok(new)
+                }
             } else {
                 Ok(String::new())
             }
@@ -96,7 +114,11 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
             // Old Content is Empty
             write_clipboard.clear()?;
             if let Ok(new) = new_text {
-                Ok(new)
+                if new.trim() == not_selected_placeholder.trim() {
+                    Ok(String::new())
+                } else {
+                    Ok(new)
+                }
             } else {
                 Ok(String::new())
             }
@@ -110,7 +132,7 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
         Ok(text) => Ok(text),
         Err(err) => {
             println!("get_selected_text_by_ax error: {}", err);
-            get_selected_text_by_clipboard()
+            get_selected_text_by_clipboard_using_applescript()
         }
     }
 }
@@ -152,7 +174,7 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<dyn std::error::Error>> {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()

@@ -1008,7 +1008,7 @@ export function Settings(props: IPopupProps) {
                         <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                             <TranslateModeSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='alwaysShowIcons' label={t('Always show icons')}>
+                        <FormItem name='alwaysShowIcons' label={t('Show icon when text is selected')}>
                             <AlwaysShowIconsCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
