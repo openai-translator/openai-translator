@@ -71,7 +71,7 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
 
     let mut write_clipboard = Clipboard::new()?;
 
-    let not_selected_placeholder = "[[--yetone-not-selected--]]";
+    let not_selected_placeholder = "";
 
     write_clipboard.set_text(not_selected_placeholder)?;
 
