@@ -564,7 +564,7 @@ export function Translator(props: IPopupCardProps) {
             const originalLang_ = (await detectLang(originalText)) ?? 'en'
             setOriginalLang(originalLang_)
             if (
-                (translateMode === 'translate' || translateMode === 'analyze') &&
+                translateMode === 'translate' &&
                 (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
             ) {
                 setTargetLang(
