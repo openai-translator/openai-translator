@@ -164,6 +164,22 @@ scoop install openai-translator
 
 [LICENSE](./LICENSE)
 
+# Group
+
+<p align="center">
+  <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
+</p>
+
+<p align="center">
+  <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" />
+</p>
+
 # Buy me a coffee
 
 <p align="center">
