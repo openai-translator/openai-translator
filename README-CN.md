@@ -50,8 +50,6 @@
 
 # 既是浏览器插件也是跨平台桌面端应用！
 
-**请注意！桌面端应用不支持划词后弹出图标，划词后必须按下快捷键才能够触发划词翻译**
-
 <p align="center">
   <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 </p>
@@ -71,7 +69,9 @@
 5. 支持一键复制
 6. 支持 TTS
 7. 有桌面端应用，全平台（Windows + macOS + Linux）支持！
-8. 同时支持 [OpenAI](https://openai.com/) 和 [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
+8. 支持截图翻译
+9. 支持生词本，同时支持基于生词本里的单词生成帮助记忆的内容
+10. 同时支持 [OpenAI](https://openai.com/) 和 [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
 
 # 使用准备
 
