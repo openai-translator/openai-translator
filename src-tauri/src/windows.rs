@@ -77,6 +77,7 @@ pub fn close_thumb() {
     match APP_HANDLE.get() {
         Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
             Some(window) => {
+                window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
                 window.set_always_on_top(false).unwrap();
                 window.hide().unwrap();
             }
