@@ -13,10 +13,14 @@
         width: 20px;
         overflow: hidden;
         background: transparent;
-        user-select: none;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
       }
       body * {
-        user-select: none;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
       }
       .thumb {
         width: 20px;
