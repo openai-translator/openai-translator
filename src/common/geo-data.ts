@@ -159,6 +159,7 @@ export const ALLOWED_COUNTRY_CODES = new Set([
     'GB',
     'US',
     'UY',
+    'VN',
     'VU',
     'ZM',
 ])
