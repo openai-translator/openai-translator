@@ -11,7 +11,7 @@ export const supportLanguages: [string, string][] = [
     ['zh-Hans', '简体中文'],
     ['zh-Hant', '繁體中文'],
     ['yue', '粤语'],
-    ['wyw', '古文'],
+    ['lzh', '古文'],
     ['jdbhw', '近代白话文'],
     ['xdbhw', '现代白话文'],
     ['ja', '日本語'],

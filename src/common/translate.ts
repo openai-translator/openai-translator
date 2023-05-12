@@ -174,7 +174,7 @@ export class QuoteProcessor {
     }
 }
 
-const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'wyw', 'yue', 'jdbhw', 'xdbhw']
+const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
 export async function translate(query: TranslateQuery) {
     const sourceLangCode = query.detectFrom
