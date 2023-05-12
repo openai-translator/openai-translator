@@ -1523,7 +1523,10 @@ export function Translator(props: IPopupCardProps) {
                                                     >
                                                         <div>
                                                             {translateMode === 'explain-code' ? (
-                                                                <ReactMarkdown>{translatedText}</ReactMarkdown>
+                                                                <>
+                                                                    <ReactMarkdown>{translatedText}</ReactMarkdown>
+                                                                    {isLoading && <span className={styles.caret} />}
+                                                                </>
                                                             ) : (
                                                                 translatedLines.map((line, i) => {
                                                                     return (
