@@ -174,7 +174,7 @@ export class QuoteProcessor {
     }
 }
 
-const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'wyw', 'yue', 'jdbhw', 'xdbhw']
+const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
 export async function translate(query: TranslateQuery) {
     const sourceLangCode = query.detectFrom
@@ -246,8 +246,8 @@ export async function translate(query: TranslateQuery) {
             break
         case 'explain-code':
             rolePrompt =
-                'You are a code explanation engine, you can only explain the code, do not interpret or translate it. Also, please report any bugs you find in the code to the author of the code.'
-            commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLang} language! If the content is not code, return an error message. If the code has obvious errors, point them out.`
+                'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
+            commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLang} language! You may use Markdown. If the content is not code, return an error message. If the code has obvious errors, point them out.`
             contentPrompt = '```\n' + query.text + '\n```'
             break
         case 'big-bang':

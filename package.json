@@ -1,6 +1,6 @@
 {
   "name": "openai-translator",
-  "version": "0.1.0",
+  "version": "0.0.44",
   "description": "openai-translator",
   "main": "index.js",
   "scripts": {
@@ -68,6 +68,7 @@
     "react-i18next": "^12.2.0",
     "react-icons": "^4.8.0",
     "react-jss": "^10.10.0",
+    "react-markdown": "^8.0.7",
     "react-popper": "^2.3.0",
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",

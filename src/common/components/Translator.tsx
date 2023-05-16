@@ -28,6 +28,7 @@ import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import { FcIdea } from 'react-icons/fc'
+import ReactMarkdown from 'react-markdown'
 import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
@@ -1521,57 +1522,70 @@ export function Translator(props: IPopupCardProps) {
                                                         className={styles.popupCardTranslatedContentContainer}
                                                     >
                                                         <div>
-                                                            {translatedLines.map((line, i) => {
-                                                                return (
-                                                                    <p className={styles.paragraph} key={`p-${i}`}>
-                                                                        {isWordMode && i === 0 ? (
-                                                                            <div
-                                                                                style={{
-                                                                                    display: 'flex',
-                                                                                    alignItems: 'center',
-                                                                                    gap: '5px',
-                                                                                }}
-                                                                            >
-                                                                                {line}
-                                                                                {!isLoading && (
-                                                                                    <StatefulTooltip
-                                                                                        content={
-                                                                                            isCollectedWord
-                                                                                                ? t(
-                                                                                                      'Remove from collection'
-                                                                                                  )
-                                                                                                : t('Add to collection')
-                                                                                        }
-                                                                                        showArrow
-                                                                                        placement='right'
-                                                                                    >
-                                                                                        <div
-                                                                                            className={
-                                                                                                styles.actionButton
+                                                            {translateMode === 'explain-code' ? (
+                                                                <>
+                                                                    <ReactMarkdown>{translatedText}</ReactMarkdown>
+                                                                    {isLoading && <span className={styles.caret} />}
+                                                                </>
+                                                            ) : (
+                                                                translatedLines.map((line, i) => {
+                                                                    return (
+                                                                        <p className={styles.paragraph} key={`p-${i}`}>
+                                                                            {isWordMode && i === 0 ? (
+                                                                                <div
+                                                                                    style={{
+                                                                                        display: 'flex',
+                                                                                        alignItems: 'center',
+                                                                                        gap: '5px',
+                                                                                    }}
+                                                                                >
+                                                                                    {line}
+                                                                                    {!isLoading && (
+                                                                                        <StatefulTooltip
+                                                                                            content={
+                                                                                                isCollectedWord
+                                                                                                    ? t(
+                                                                                                          'Remove from collection'
+                                                                                                      )
+                                                                                                    : t(
+                                                                                                          'Add to collection'
+                                                                                                      )
                                                                                             }
-                                                                                            onClick={onWordCollection}
+                                                                                            showArrow
+                                                                                            placement='right'
                                                                                         >
-                                                                                            {isCollectedWord ? (
-                                                                                                <MdGrade size={15} />
-                                                                                            ) : (
-                                                                                                <MdOutlineGrade
-                                                                                                    size={15}
-                                                                                                />
-                                                                                            )}
-                                                                                        </div>
-                                                                                    </StatefulTooltip>
-                                                                                )}
-                                                                            </div>
-                                                                        ) : (
-                                                                            line
-                                                                        )}
-                                                                        {isLoading &&
-                                                                            i === translatedLines.length - 1 && (
-                                                                                <span className={styles.caret} />
+                                                                                            <div
+                                                                                                className={
+                                                                                                    styles.actionButton
+                                                                                                }
+                                                                                                onClick={
+                                                                                                    onWordCollection
+                                                                                                }
+                                                                                            >
+                                                                                                {isCollectedWord ? (
+                                                                                                    <MdGrade
+                                                                                                        size={15}
+                                                                                                    />
+                                                                                                ) : (
+                                                                                                    <MdOutlineGrade
+                                                                                                        size={15}
+                                                                                                    />
+                                                                                                )}
+                                                                                            </div>
+                                                                                        </StatefulTooltip>
+                                                                                    )}
+                                                                                </div>
+                                                                            ) : (
+                                                                                line
                                                                             )}
-                                                                    </p>
-                                                                )
-                                                            })}
+                                                                            {isLoading &&
+                                                                                i === translatedLines.length - 1 && (
+                                                                                    <span className={styles.caret} />
+                                                                                )}
+                                                                        </p>
+                                                                    )
+                                                                })
+                                                            )}
                                                         </div>
                                                     </div>
                                                     {translatedText && (

@@ -7,7 +7,7 @@ export const langCode2TTSLang: Record<string, string> = {
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
     'yue': 'zh-HK',
-    'wyw': 'zh-CN',
+    'lzh': 'zh-CN',
     'ja': 'ja-JP',
     'ko': 'ko-KR',
     'fr': 'fr-FR',
