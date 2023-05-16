@@ -179,13 +179,6 @@ scoop install openai-translator
   <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
 </p>
 
-# 请作者喝一杯咖啡
-
-<p align="center">
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
-</p>
-
 # Star 历史
 
 <p align="center">
