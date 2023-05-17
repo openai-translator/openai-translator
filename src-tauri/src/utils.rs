@@ -128,11 +128,25 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
 
 #[cfg(target_os = "macos")]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
+    use crate::config::get_config;
+
     match get_selected_text_by_ax() {
         Ok(text) => Ok(text),
         Err(err) => {
             println!("get_selected_text_by_ax error: {}", err);
-            get_selected_text_by_clipboard_using_applescript()
+            match get_config() {
+                Ok(config) => {
+                    if config.allow_using_clipboard_when_selected_text_not_available.unwrap_or(false) {
+                        get_selected_text_by_clipboard_using_applescript()
+                    } else {
+                        Ok(String::new())
+                    }
+                }
+                Err(err) => {
+                    println!("get_config error: {}", err);
+                    Ok(String::new())
+                }
+            }
         }
     }
 }

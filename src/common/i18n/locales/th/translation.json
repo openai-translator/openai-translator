@@ -62,5 +62,7 @@
   "insert to editor": "แทรกลงในตัวแก้ไข",
   "Show button when text is selected": "แสดงปุ่มเมื่อเลือกข้อความ",
   "Show icon when text is selected": "แสดงไอคอนเมื่อเลือกข้อความ",
+  "Using clipboard": "ใช้คลิปบอร์ด",
+  "Allow using the clipboard to get the selected text when the selected text is not available": "อนุญาตให้ใช้คลิปบอร์ดเพื่อรับข้อความที่เลือกเมื่อข้อความที่เลือกไม่สามารถใช้ได้",
   "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
 }

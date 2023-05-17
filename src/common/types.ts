@@ -67,4 +67,5 @@ export interface ISettings {
     selectInputElementsText?: boolean
     runAtStartup?: boolean
     disableCollectingStatistics?: boolean
+    allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
 }

@@ -44,6 +44,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     runAtStartup: 1,
     selectInputElementsText: 1,
     disableCollectingStatistics: 1,
+    allowUsingClipboardWhenSelectedTextNotAvailable: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

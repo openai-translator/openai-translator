@@ -63,5 +63,7 @@
   "insert to editor": "插入編輯器",
   "Show button when text is selected": "選中文字時顯示按鈕",
   "Show icon when text is selected": "選中文字時顯示圖標",
+  "Using clipboard": "使用剪贴板",
+  "Allow using the clipboard to get the selected text when the selected text is not available": "當選中文字不可用時，允許使用剪貼板來獲取選中的文字",
   "disable collecting statistics": "停用統計"
 }
