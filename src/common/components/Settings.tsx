@@ -30,6 +30,7 @@ import { IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { backgroundFetch } from '../background/fetch'
+import { useThemeType } from '../hooks/useThemeType'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -801,13 +802,29 @@ function ProviderSelector(props: IProviderSelectorProps) {
 
 const { Form, FormItem, useForm } = createForm<ISettings>()
 
-interface IPopupProps {
+interface IInnerSettingsProps {
     onSave?: (oldSettings: ISettings) => void
+}
+
+interface ISettingsProps extends IInnerSettingsProps {
     engine: Styletron
 }
 
-export function Settings(props: IPopupProps) {
+export function Settings(props: ISettingsProps) {
     const { theme } = useTheme()
+    return (
+        <StyletronProvider value={props.engine}>
+            <BaseProvider theme={theme}>
+                <InnerSettings {...props} />
+            </BaseProvider>
+        </StyletronProvider>
+    )
+}
+
+export function InnerSettings(props: IInnerSettingsProps) {
+    const { theme } = useTheme()
+
+    const { setThemeType } = useThemeType()
 
     const { t } = useTranslation()
 
@@ -855,7 +872,11 @@ export function Settings(props: IPopupProps) {
     const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
         setValues(values_)
     }, [])
+
     const onSubmit = useCallback(async (data: ISettings) => {
+        if (data.themeType) {
+            setThemeType(data.themeType)
+        }
         setLoading(true)
         const oldSettings = await utils.getSettings()
         if (isTauri) {
@@ -906,186 +927,182 @@ export function Settings(props: IPopupProps) {
             }}
         >
             <style>{formStyles}</style>
-            <StyletronProvider value={props.engine}>
-                <BaseProvider theme={theme}>
-                    <nav
-                        style={{
-                            position: isDesktopApp ? 'fixed' : undefined,
-                            left: isDesktopApp ? 0 : undefined,
-                            top: isDesktopApp ? 0 : undefined,
-                            zIndex: 1,
-                            width: '100%',
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            padding: '15px 25px',
-                            color: '#333',
-                            background: `url(${beams}) no-repeat center center`,
-                            gap: 10,
-                        }}
-                        data-tauri-drag-region
+            <nav
+                style={{
+                    position: isDesktopApp ? 'fixed' : undefined,
+                    left: isDesktopApp ? 0 : undefined,
+                    top: isDesktopApp ? 0 : undefined,
+                    zIndex: 1,
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '15px 25px',
+                    color: '#333',
+                    background: `url(${beams}) no-repeat center center`,
+                    gap: 10,
+                }}
+                data-tauri-drag-region
+            >
+                <img width='22' src={icon} alt='logo' />
+                <h2>
+                    OpenAI Translator
+                    {AppConfig?.version ? (
+                        <a
+                            href='https://github.com/yetone/openai-translator/releases'
+                            target='_blank'
+                            rel='noreferrer'
+                            style={{
+                                fontSize: '0.65em',
+                                marginLeft: '5px',
+                                color: 'unset',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            {AppConfig.version}
+                        </a>
+                    ) : null}
+                </h2>
+            </nav>
+            <Form
+                form={form}
+                style={{
+                    padding: '20px 25px',
+                }}
+                onFinish={onSubmit}
+                initialValues={values}
+                onValuesChange={onChange}
+            >
+                <FormItem name='provider' label={t('Default Service Provider')}>
+                    <ProviderSelector />
+                </FormItem>
+                {values.provider !== 'ChatGPT' && (
+                    <FormItem
+                        required
+                        name='apiKeys'
+                        label={t('API Key')}
+                        caption={
+                            <div>
+                                {t('Go to the')}{' '}
+                                {values.provider === 'Azure' ? (
+                                    <a
+                                        target='_blank'
+                                        href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
+                                        rel='noreferrer'
+                                    >
+                                        {t('Azure OpenAI Service page')}
+                                    </a>
+                                ) : (
+                                    <a
+                                        target='_blank'
+                                        href='https://platform.openai.com/account/api-keys'
+                                        rel='noreferrer'
+                                    >
+                                        {t('OpenAI page')}
+                                    </a>
+                                )}{' '}
+                                {t(
+                                    'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                )}
+                            </div>
+                        }
                     >
-                        <img width='22' src={icon} alt='logo' />
-                        <h2>
-                            OpenAI Translator
-                            {AppConfig?.version ? (
-                                <a
-                                    href='https://github.com/yetone/openai-translator/releases'
-                                    target='_blank'
-                                    rel='noreferrer'
-                                    style={{
-                                        fontSize: '0.65em',
-                                        marginLeft: '5px',
-                                        color: 'unset',
-                                        textDecoration: 'none',
-                                    }}
-                                >
-                                    {AppConfig.version}
-                                </a>
-                            ) : null}
-                        </h2>
-                    </nav>
-                    <Form
-                        form={form}
+                        <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                    </FormItem>
+                )}
+                {values.provider !== 'Azure' && (
+                    <FormItem name='apiModel' label={t('API Model')}>
+                        <APIModelSelector provider={values.provider} onBlur={onBlur} />
+                    </FormItem>
+                )}
+                {values.provider !== 'ChatGPT' && (
+                    <>
+                        <FormItem required name='apiURL' label={t('API URL')}>
+                            <Input size='compact' onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
+                            <Input size='compact' />
+                        </FormItem>
+                    </>
+                )}
+                <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
+                    <TranslateModeSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='alwaysShowIcons' label={t('Show icon when text is selected')}>
+                    <AlwaysShowIconsCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp && isMacOS ? 'block' : 'none',
+                    }}
+                    name='allowUsingClipboardWhenSelectedTextNotAvailable'
+                    label={t('Using clipboard')}
+                    caption={t(
+                        'Allow using the clipboard to get the selected text when the selected text is not available'
+                    )}
+                >
+                    <MyCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='autoTranslate' label={t('Auto Translate')}>
+                    <AutoTranslateCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
+                    <RestorePreviousPositionCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
+                    <SelectInputElementsCheckbox onBlur={onBlur} />
+                </FormItem>
+                {isTauri && (
+                    <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                        <RunAtStartupCheckbox onBlur={onBlur} />
+                    </FormItem>
+                )}
+                <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
+                    <LanguageSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='themeType' label={t('Theme')}>
+                    <ThemeTypeSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='i18n' label={t('i18n')}>
+                    <Ii18nSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='tts' label={t('TTS')}>
+                    <TTSVoicesSettings onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='hotkey' label={t('Hotkey')}>
+                    <HotkeyRecorder onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
+                    <HotkeyRecorder onBlur={onBlur} />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='disableCollectingStatistics'
+                    label={t('disable collecting statistics')}
+                >
+                    <MyCheckbox onBlur={onBlur} />
+                </FormItem>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        gap: 10,
+                    }}
+                >
+                    <div
                         style={{
-                            padding: '20px 25px',
+                            marginRight: 'auto',
                         }}
-                        onFinish={onSubmit}
-                        initialValues={values}
-                        onValuesChange={onChange}
-                    >
-                        <FormItem name='provider' label={t('Default Service Provider')}>
-                            <ProviderSelector />
-                        </FormItem>
-                        {values.provider !== 'ChatGPT' && (
-                            <FormItem
-                                required
-                                name='apiKeys'
-                                label={t('API Key')}
-                                caption={
-                                    <div>
-                                        {t('Go to the')}{' '}
-                                        {values.provider === 'Azure' ? (
-                                            <a
-                                                target='_blank'
-                                                href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
-                                                rel='noreferrer'
-                                            >
-                                                {t('Azure OpenAI Service page')}
-                                            </a>
-                                        ) : (
-                                            <a
-                                                target='_blank'
-                                                href='https://platform.openai.com/account/api-keys'
-                                                rel='noreferrer'
-                                            >
-                                                {t('OpenAI page')}
-                                            </a>
-                                        )}{' '}
-                                        {t(
-                                            'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
-                                        )}
-                                    </div>
-                                }
-                            >
-                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
-                            </FormItem>
-                        )}
-                        {values.provider !== 'Azure' && (
-                            <FormItem name='apiModel' label={t('API Model')}>
-                                <APIModelSelector provider={values.provider} onBlur={onBlur} />
-                            </FormItem>
-                        )}
-                        {values.provider !== 'ChatGPT' && (
-                            <>
-                                <FormItem required name='apiURL' label={t('API URL')}>
-                                    <Input size='compact' onBlur={onBlur} />
-                                </FormItem>
-                                <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                                    <Input size='compact' />
-                                </FormItem>
-                            </>
-                        )}
-                        <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
-                            <TranslateModeSelector onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='alwaysShowIcons' label={t('Show icon when text is selected')}>
-                            <AlwaysShowIconsCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem
-                            style={{
-                                display: isDesktopApp && isMacOS ? 'block' : 'none',
-                            }}
-                            name='allowUsingClipboardWhenSelectedTextNotAvailable'
-                            label={t('Using clipboard')}
-                            caption={t(
-                                'Allow using the clipboard to get the selected text when the selected text is not available'
-                            )}
-                        >
-                            <MyCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='autoTranslate' label={t('Auto Translate')}>
-                            <AutoTranslateCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
-                            <RestorePreviousPositionCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
-                            <SelectInputElementsCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        {isTauri && (
-                            <FormItem name='runAtStartup' label={t('Run at Startup')}>
-                                <RunAtStartupCheckbox onBlur={onBlur} />
-                            </FormItem>
-                        )}
-                        <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
-                            <LanguageSelector onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='themeType' label={t('Theme')}>
-                            <ThemeTypeSelector onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='i18n' label={t('i18n')}>
-                            <Ii18nSelector onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='tts' label={t('TTS')}>
-                            <TTSVoicesSettings onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='hotkey' label={t('Hotkey')}>
-                            <HotkeyRecorder onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
-                            <HotkeyRecorder onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem
-                            style={{
-                                display: isDesktopApp ? 'block' : 'none',
-                            }}
-                            name='disableCollectingStatistics'
-                            label={t('disable collecting statistics')}
-                        >
-                            <MyCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexDirection: 'row',
-                                gap: 10,
-                            }}
-                        >
-                            <div
-                                style={{
-                                    marginRight: 'auto',
-                                }}
-                            />
-                            <Button isLoading={loading} size='compact'>
-                                {t('Save')}
-                            </Button>
-                        </div>
-                        <Toaster />
-                    </Form>
-                </BaseProvider>
-            </StyletronProvider>
+                    />
+                    <Button isLoading={loading} size='compact'>
+                        {t('Save')}
+                    </Button>
+                </div>
+                <Toaster />
+            </Form>
         </div>
     )
 }

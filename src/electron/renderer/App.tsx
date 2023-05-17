@@ -1,4 +1,3 @@
-import React from 'react'
 import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 

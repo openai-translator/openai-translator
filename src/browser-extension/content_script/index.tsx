@@ -103,7 +103,6 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
             <div>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
                     <Translator
-                        key={text}
                         text={text}
                         engine={engine}
                         autoFocus={autoFocus}

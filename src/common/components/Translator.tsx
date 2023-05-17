@@ -22,7 +22,7 @@ import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
-import { Settings } from './Settings'
+import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
@@ -377,10 +377,14 @@ export interface TesseractResult extends RecognizeResult {
     text: string
 }
 
-export interface IPopupCardProps {
+export interface MovementXY {
+    x: number
+    y: number
+}
+
+export interface IInnerTranslatorProps {
     uuid?: string
     text: string
-    engine: Styletron
     autoFocus?: boolean
     showSettings?: boolean
     defaultShowSettings?: boolean
@@ -389,12 +393,25 @@ export interface IPopupCardProps {
     onSettingsSave?: (oldSettings: ISettings) => void
 }
 
-export interface MovementXY {
-    x: number
-    y: number
+export interface ITranslatorProps extends IInnerTranslatorProps {
+    engine: Styletron
 }
 
-export function Translator(props: IPopupCardProps) {
+export function Translator(props: ITranslatorProps) {
+    const { theme } = useTheme()
+
+    return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <StyletronProvider value={props.engine}>
+                <BaseProvider theme={theme}>
+                    <InnerTranslator {...props} />
+                </BaseProvider>
+            </StyletronProvider>
+        </ErrorBoundary>
+    )
+}
+
+function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
     }, [])
@@ -455,10 +472,10 @@ export function Translator(props: IPopupCardProps) {
 
     const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
     useEffect(() => {
-        if (settings && settings.defaultTranslateMode !== 'nop') {
+        if (settings?.defaultTranslateMode && settings.defaultTranslateMode !== 'nop') {
             setTranslateMode(settings.defaultTranslateMode)
         }
-    }, [settings])
+    }, [settings?.defaultTranslateMode])
     const isTranslate = translateMode === 'translate'
     useEffect(() => {
         if (!isTranslate) {
@@ -513,6 +530,14 @@ export function Translator(props: IPopupCardProps) {
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
 
+    useEffect(() => {
+        setOriginalText(props.text)
+    }, [props.text, props.uuid])
+
+    useEffect(() => {
+        setEditableText(originalText)
+    }, [originalText])
+
     const checkWordCollection = useCallback(async () => {
         try {
             const item = await vocabularyService.getItem(editableText.trim())
@@ -565,7 +590,7 @@ export function Translator(props: IPopupCardProps) {
                 )
             }
         })()
-    }, [originalText, translateMode, settings, props.uuid, targetLang])
+    }, [originalText, translateMode, settings, targetLang, props.uuid])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -1040,644 +1065,576 @@ export function Translator(props: IPopupCardProps) {
     const enableVocabulary = !isUserscript()
 
     return (
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <StyletronProvider value={props.engine}>
-                <BaseProvider theme={theme}>
+        <div
+            className={clsx(styles.popupCard, {
+                'yetone-dark': themeType === 'dark',
+            })}
+            style={{
+                minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
+                background: theme.colors.backgroundPrimary,
+                paddingBottom: showSettings ? '0px' : '30px',
+            }}
+        >
+            <div
+                style={{
+                    display: showSettings ? 'block' : 'none',
+                }}
+            >
+                <InnerSettings
+                    onSave={(oldSettings) => {
+                        setShowSettings(false)
+                        props.onSettingsSave?.(oldSettings)
+                    }}
+                />
+            </div>
+            <div
+                style={{
+                    display: !showSettings ? 'block' : 'none',
+                }}
+            >
+                <div style={props.containerStyle}>
                     <div
-                        className={clsx(styles.popupCard, {
-                            'yetone-dark': themeType === 'dark',
-                        })}
+                        ref={headerRef}
+                        className={styles.popupCardHeaderContainer}
+                        data-tauri-drag-region
                         style={{
-                            minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
-                            background: theme.colors.backgroundPrimary,
-                            paddingBottom: showSettings ? '0px' : '30px',
+                            cursor: isDesktopApp() ? 'default' : 'move',
                         }}
                     >
-                        <div
-                            style={{
-                                display: showSettings ? 'block' : 'none',
-                            }}
-                        >
-                            <Settings
-                                onSave={(oldSettings) => {
-                                    setShowSettings(false)
-                                    props.onSettingsSave?.(oldSettings)
-                                }}
-                                engine={props.engine}
-                            />
-                        </div>
-                        <div
-                            style={{
-                                display: !showSettings ? 'block' : 'none',
-                            }}
-                        >
-                            <div style={props.containerStyle}>
-                                <div
-                                    ref={headerRef}
-                                    className={styles.popupCardHeaderContainer}
-                                    data-tauri-drag-region
-                                    style={{
-                                        cursor: isDesktopApp() ? 'default' : 'move',
-                                    }}
-                                >
-                                    <div data-tauri-drag-region className={styles.iconContainer}>
-                                        <img data-tauri-drag-region className={styles.icon} src={icon} />
-                                        <div data-tauri-drag-region className={styles.iconText}>
-                                            OpenAI Translator
-                                        </div>
-                                    </div>
-                                    <div className={styles.popupCardHeaderActionsContainer}>
-                                        <div className={styles.from}>
-                                            <Select
-                                                disabled={translateMode === 'explain-code'}
-                                                size='mini'
-                                                clearable={false}
-                                                options={langOptions}
-                                                value={[{ id: originalLang }]}
-                                                overrides={{
-                                                    Root: {
-                                                        style: {
-                                                            minWidth: '110px',
-                                                        },
-                                                    },
-                                                }}
-                                                onChange={({ value }) => {
-                                                    if (value.length > 0) {
-                                                        setOriginalLang(value[0].id as string)
-                                                    } else {
-                                                        setOriginalLang(langOptions[0].id as string)
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                        <div
-                                            className={styles.arrow}
-                                            onClick={() => {
-                                                setOriginalText(translatedText)
-                                                setOriginalLang(targetLang)
-                                                setTargetLang(originalLang)
-                                            }}
-                                        >
-                                            <Tooltip content='Exchange' placement='top'>
-                                                <div>
-                                                    <TbArrowsExchange />
-                                                </div>
-                                            </Tooltip>
-                                        </div>
-                                        <div className={styles.to}>
-                                            <Select
-                                                disabled={translateMode === 'polishing'}
-                                                size='mini'
-                                                clearable={false}
-                                                options={langOptions}
-                                                value={[{ id: targetLang }]}
-                                                overrides={{
-                                                    Root: {
-                                                        style: {
-                                                            minWidth: '110px',
-                                                        },
-                                                    },
-                                                }}
-                                                onChange={({ value }) => {
-                                                    stopAutomaticallyChangeTargetLang.current = true
-                                                    if (value.length > 0) {
-                                                        setTargetLang(value[0].id as string)
-                                                    } else {
-                                                        setTargetLang(langOptions[0].id as string)
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className={styles.popupCardHeaderButtonGroup}>
-                                        <Tooltip content={t('Translate')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                            <Button
-                                                size='mini'
-                                                kind={translateMode === 'translate' ? 'primary' : 'secondary'}
-                                                onClick={() => setTranslateMode('translate')}
-                                            >
-                                                <AiOutlineTranslation />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip content={t('Polishing')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                            <Button
-                                                size='mini'
-                                                kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
-                                                onClick={() => {
-                                                    setTranslateMode('polishing')
-                                                    setTargetLang(originalLang)
-                                                }}
-                                            >
-                                                <IoColorPaletteOutline />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip content={t('Summarize')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                            <Button
-                                                size='mini'
-                                                kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
-                                                onClick={() => {
-                                                    setTranslateMode('summarize')
-                                                }}
-                                            >
-                                                <MdOutlineSummarize />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip content={t('Analyze')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                            <Button
-                                                size='mini'
-                                                kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
-                                                onClick={() => setTranslateMode('analyze')}
-                                            >
-                                                <MdOutlineAnalytics />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip
-                                            content={t('Explain Code')}
-                                            placement={isDesktopApp() ? 'bottom' : 'top'}
-                                        >
-                                            <Button
-                                                size='mini'
-                                                kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
-                                                onClick={() => {
-                                                    setTranslateMode('explain-code')
-                                                    // no need to change detectTo
-                                                }}
-                                            >
-                                                <MdCode />
-                                            </Button>
-                                        </Tooltip>
-                                    </div>
-                                </div>
-                                <div className={styles.popupCardContentContainer}>
-                                    {settings?.apiURL === defaultAPIURL && (
-                                        <div>
-                                            <IpLocationNotification />
-                                        </div>
-                                    )}
-                                    <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
-                                        <div
-                                            style={{
-                                                height: 0,
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {editableText}
-                                        </div>
-                                        <Dropzone onDrop={onDrop} noClick={true}>
-                                            {({ getRootProps, isDragActive }) => (
-                                                <div {...getRootProps()}>
-                                                    {isDragActive ? (
-                                                        <div className={styles.fileDragArea}> Drop file below </div>
-                                                    ) : (
-                                                        <div
-                                                            className={styles.OCRStatusBar}
-                                                            style={{
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                gap: 8,
-                                                                opacity: showOCRProcessing ? 1 : 0,
-                                                                marginBottom: showOCRProcessing ? 10 : 0,
-                                                                fontSize: '11px',
-                                                                height: showOCRProcessing ? 26 : 0,
-                                                                transition: 'all 0.3s linear',
-                                                                overflow: 'hidden',
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    fontSize: '12px',
-                                                                }}
-                                                            >
-                                                                {isOCRProcessing ? 'OCR Processing...' : 'OCR Success'}
-                                                            </div>
-                                                            {showOCRProcessing && (
-                                                                <div>
-                                                                    <img
-                                                                        src={isOCRProcessing ? rocket : partyPopper}
-                                                                        width='20'
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <Textarea
-                                                        inputRef={editorRef}
-                                                        autoFocus={autoFocus}
-                                                        overrides={{
-                                                            Root: {
-                                                                style: {
-                                                                    width: '100%',
-                                                                    borderRadius: '0px',
-                                                                },
-                                                            },
-                                                            Input: {
-                                                                style: {
-                                                                    padding: '4px 8px',
-                                                                    color:
-                                                                        themeType === 'dark'
-                                                                            ? theme.colors.contentSecondary
-                                                                            : theme.colors.contentPrimary,
-                                                                    fontFamily:
-                                                                        translateMode === 'explain-code'
-                                                                            ? 'monospace'
-                                                                            : 'inherit',
-                                                                    textalign: 'start',
-                                                                },
-                                                            },
-                                                        }}
-                                                        value={editableText}
-                                                        size='mini'
-                                                        resize='vertical'
-                                                        rows={
-                                                            props.editorRows
-                                                                ? props.editorRows
-                                                                : Math.min(
-                                                                      Math.max(editableText.split('\n').length, 3),
-                                                                      12
-                                                                  )
-                                                        }
-                                                        onChange={(e) => setEditableText(e.target.value)}
-                                                        onKeyPress={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                if (!e.shiftKey) {
-                                                                    e.preventDefault()
-                                                                    if (!translateMode) {
-                                                                        setTranslateMode('translate')
-                                                                    }
-                                                                    setOriginalText(editableText)
-                                                                }
-                                                            }
-                                                        }}
-                                                    />
-                                                    <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'row',
-                                                            alignItems: 'center',
-                                                            paddingTop:
-                                                                editableText && editableText !== originalText ? 4 : 0,
-                                                            height:
-                                                                editableText && editableText !== originalText ? 18 : 0,
-                                                            transition: 'all 0.3s linear',
-                                                            overflow: 'hidden',
-                                                        }}
-                                                    >
-                                                        <div
-                                                            style={{
-                                                                marginRight: 'auto',
-                                                            }}
-                                                        />
-                                                        <div
-                                                            style={{
-                                                                color: '#999',
-                                                                fontSize: '11px',
-                                                                transform: 'scale(0.9)',
-                                                                marginRight: '-20px',
-                                                            }}
-                                                        >
-                                                            {`Please press <Enter> key to ${translateMode}. Press <Shift+Enter> to start a new line.`}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Dropzone>
-                                        <div className={styles.actionButtonsContainer}>
-                                            <>
-                                                <Tooltip
-                                                    content={t('Upload an image for OCR translation')}
-                                                    placement='bottom'
-                                                >
-                                                    <div className={styles.actionButton}>
-                                                        <Dropzone onDrop={onDrop}>
-                                                            {({ getRootProps, getInputProps }) => (
-                                                                <div
-                                                                    {...getRootProps()}
-                                                                    className={styles.actionButton}
-                                                                >
-                                                                    <input {...getInputProps({ multiple: false })} />
-                                                                    <BsTextareaT size={13} />
-                                                                </div>
-                                                            )}
-                                                        </Dropzone>
-                                                    </div>
-                                                </Tooltip>
-                                                {enableVocabulary && (
-                                                    <StatefulTooltip
-                                                        content={
-                                                            <Trans
-                                                                i18nKey='words are collected'
-                                                                values={{
-                                                                    collectTotal: collectedWordTotal,
-                                                                }}
-                                                            />
-                                                        }
-                                                        showArrow
-                                                        placement='top'
-                                                    >
-                                                        <div
-                                                            className={styles.actionButton}
-                                                            onClick={() => setShowWordbookButtons((e) => !e)}
-                                                        >
-                                                            <AiOutlineFileSync size={13} />
-                                                        </div>
-                                                    </StatefulTooltip>
-                                                )}
-                                                {showWordbookButtons && (
-                                                    <>
-                                                        <StatefulTooltip
-                                                            content={t('Collection Review')}
-                                                            showArrow
-                                                            placement='top'
-                                                        >
-                                                            <div className={styles.actionButton}>
-                                                                <MdGrade
-                                                                    size={13}
-                                                                    onClick={() => setVocabularyType('vocabulary')}
-                                                                />
-                                                            </div>
-                                                        </StatefulTooltip>
-                                                        <StatefulTooltip
-                                                            content={t('Export your collection as a csv file')}
-                                                            showArrow
-                                                            placement='top'
-                                                        >
-                                                            <div className={styles.actionButton} onClick={onCsvExport}>
-                                                                <TbCsv size={13} />
-                                                            </div>
-                                                        </StatefulTooltip>
-                                                        <StatefulTooltip content='Big Bang' showArrow placement='top'>
-                                                            <div className={styles.actionButton}>
-                                                                <FcIdea
-                                                                    size={13}
-                                                                    onClick={() => setVocabularyType('article')}
-                                                                />
-                                                            </div>
-                                                        </StatefulTooltip>
-                                                    </>
-                                                )}
-                                            </>
-                                            <div style={{ marginLeft: 'auto' }}></div>
-                                            {!!editableText.length && (
-                                                <>
-                                                    <Tooltip content={t('Speak')} placement='bottom'>
-                                                        <div
-                                                            className={styles.actionButton}
-                                                            onClick={handleEditSpeakAction}
-                                                        >
-                                                            {isSpeakingEditableText ? (
-                                                                <SpeakerMotion />
-                                                            ) : (
-                                                                <RxSpeakerLoud size={13} />
-                                                            )}
-                                                        </div>
-                                                    </Tooltip>
-                                                    <Tooltip content={t('Copy to clipboard')} placement='bottom'>
-                                                        <div>
-                                                            <CopyToClipboard
-                                                                text={editableText}
-                                                                onCopy={() => {
-                                                                    toast(t('Copy to clipboard'), {
-                                                                        duration: 3000,
-                                                                        icon: '👏',
-                                                                    })
-                                                                }}
-                                                                options={{ format: 'text/plain' }}
-                                                            >
-                                                                <div className={styles.actionButton}>
-                                                                    <RxCopy size={13} />
-                                                                </div>
-                                                            </CopyToClipboard>
-                                                        </div>
-                                                    </Tooltip>
-                                                    <Tooltip content={t('Clear input')} placement='bottom'>
-                                                        <div
-                                                            className={styles.actionButton}
-                                                            onClick={() => {
-                                                                setEditableText('')
-                                                                editorRef.current?.focus()
-                                                            }}
-                                                        >
-                                                            <div className={styles.actionButton}>
-                                                                <RxEraser size={13} />
-                                                            </div>
-                                                        </div>
-                                                    </Tooltip>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {originalText !== '' && (
-                                        <div
-                                            className={styles.popupCardTranslatedContainer}
-                                            dir={translatedLanguageDirection}
-                                        >
-                                            {actionStr && (
-                                                <div
-                                                    className={clsx({
-                                                        [styles.actionStr]: true,
-                                                        [styles.error]: !!errorMessage,
-                                                    })}
-                                                >
-                                                    <div>{actionStr}</div>
-                                                    {isLoading ? (
-                                                        <span className={styles.writing} key={'1'} />
-                                                    ) : errorMessage ? (
-                                                        <span key={'2'}>😢</span>
-                                                    ) : (
-                                                        <span key={'3'}>👍</span>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {errorMessage ? (
-                                                <div className={styles.errorMessage}>
-                                                    <span>{errorMessage}</span>
-                                                    <Tooltip content={t('Retry')} placement='bottom'>
-                                                        <div
-                                                            onClick={() => forceTranslate()}
-                                                            className={styles.actionButton}
-                                                        >
-                                                            <RxReload size={13} />
-                                                        </div>
-                                                    </Tooltip>
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    style={{
-                                                        width: '100%',
-                                                    }}
-                                                >
-                                                    <div
-                                                        ref={translatedContentRef}
-                                                        className={styles.popupCardTranslatedContentContainer}
-                                                    >
-                                                        <div>
-                                                            {translateMode === 'explain-code' ? (
-                                                                <>
-                                                                    <ReactMarkdown>{translatedText}</ReactMarkdown>
-                                                                    {isLoading && <span className={styles.caret} />}
-                                                                </>
-                                                            ) : (
-                                                                translatedLines.map((line, i) => {
-                                                                    return (
-                                                                        <p className={styles.paragraph} key={`p-${i}`}>
-                                                                            {isWordMode && i === 0 ? (
-                                                                                <div
-                                                                                    style={{
-                                                                                        display: 'flex',
-                                                                                        alignItems: 'center',
-                                                                                        gap: '5px',
-                                                                                    }}
-                                                                                >
-                                                                                    {line}
-                                                                                    {!isLoading && (
-                                                                                        <StatefulTooltip
-                                                                                            content={
-                                                                                                isCollectedWord
-                                                                                                    ? t(
-                                                                                                          'Remove from collection'
-                                                                                                      )
-                                                                                                    : t(
-                                                                                                          'Add to collection'
-                                                                                                      )
-                                                                                            }
-                                                                                            showArrow
-                                                                                            placement='right'
-                                                                                        >
-                                                                                            <div
-                                                                                                className={
-                                                                                                    styles.actionButton
-                                                                                                }
-                                                                                                onClick={
-                                                                                                    onWordCollection
-                                                                                                }
-                                                                                            >
-                                                                                                {isCollectedWord ? (
-                                                                                                    <MdGrade
-                                                                                                        size={15}
-                                                                                                    />
-                                                                                                ) : (
-                                                                                                    <MdOutlineGrade
-                                                                                                        size={15}
-                                                                                                    />
-                                                                                                )}
-                                                                                            </div>
-                                                                                        </StatefulTooltip>
-                                                                                    )}
-                                                                                </div>
-                                                                            ) : (
-                                                                                line
-                                                                            )}
-                                                                            {isLoading &&
-                                                                                i === translatedLines.length - 1 && (
-                                                                                    <span className={styles.caret} />
-                                                                                )}
-                                                                        </p>
-                                                                    )
-                                                                })
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {translatedText && (
-                                                        <div
-                                                            ref={actionButtonsRef}
-                                                            className={styles.actionButtonsContainer}
-                                                        >
-                                                            <div style={{ marginRight: 'auto' }} />
-                                                            <Tooltip content={t('Speak')} placement='bottom'>
-                                                                <div
-                                                                    className={styles.actionButton}
-                                                                    onClick={handleTranslatedSpeakAction}
-                                                                >
-                                                                    {isSpeakingTranslatedText ? (
-                                                                        <SpeakerMotion />
-                                                                    ) : (
-                                                                        <RxSpeakerLoud size={13} />
-                                                                    )}
-                                                                </div>
-                                                            </Tooltip>
-                                                            <Tooltip
-                                                                content={t('Copy to clipboard')}
-                                                                placement='bottom'
-                                                            >
-                                                                <div>
-                                                                    <CopyToClipboard
-                                                                        text={translatedText}
-                                                                        onCopy={() => {
-                                                                            toast(t('Copy to clipboard'), {
-                                                                                duration: 3000,
-                                                                                icon: '👏',
-                                                                            })
-                                                                        }}
-                                                                        options={{ format: 'text/plain' }}
-                                                                    >
-                                                                        <div className={styles.actionButton}>
-                                                                            <RxCopy size={13} />
-                                                                        </div>
-                                                                    </CopyToClipboard>
-                                                                </div>
-                                                            </Tooltip>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                        <div data-tauri-drag-region className={styles.iconContainer}>
+                            <img data-tauri-drag-region className={styles.icon} src={icon} />
+                            <div data-tauri-drag-region className={styles.iconText}>
+                                OpenAI Translator
                             </div>
                         </div>
-                        {props.showSettings && (
-                            <div className={styles.footer}>
-                                <Tooltip
-                                    content={showSettings ? t('Go to Translator') : t('Go to Settings')}
-                                    placement='right'
-                                >
-                                    <div onClick={() => setShowSettings((s) => !s)}>
-                                        {showSettings ? (
-                                            <AiOutlineTranslation size='14' />
-                                        ) : (
-                                            <IoSettingsOutline size='14' />
-                                        )}
+                        <div className={styles.popupCardHeaderActionsContainer}>
+                            <div className={styles.from}>
+                                <Select
+                                    disabled={translateMode === 'explain-code'}
+                                    size='mini'
+                                    clearable={false}
+                                    options={langOptions}
+                                    value={[{ id: originalLang }]}
+                                    overrides={{
+                                        Root: {
+                                            style: {
+                                                minWidth: '110px',
+                                            },
+                                        },
+                                    }}
+                                    onChange={({ value }) => {
+                                        if (value.length > 0) {
+                                            setOriginalLang(value[0].id as string)
+                                        } else {
+                                            setOriginalLang(langOptions[0].id as string)
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div
+                                className={styles.arrow}
+                                onClick={() => {
+                                    setOriginalText(translatedText)
+                                    setOriginalLang(targetLang)
+                                    setTargetLang(originalLang)
+                                }}
+                            >
+                                <Tooltip content='Exchange' placement='top'>
+                                    <div>
+                                        <TbArrowsExchange />
                                     </div>
                                 </Tooltip>
                             </div>
-                        )}
-                        {enableVocabulary && (
-                            <Modal
-                                isOpen={vocabularyType !== 'hide'}
-                                onClose={() => setVocabularyType('hide')}
-                                closeable
-                                overrides={{
-                                    Close: {
-                                        style: {
-                                            display: 'none',
+                            <div className={styles.to}>
+                                <Select
+                                    disabled={translateMode === 'polishing'}
+                                    size='mini'
+                                    clearable={false}
+                                    options={langOptions}
+                                    value={[{ id: targetLang }]}
+                                    overrides={{
+                                        Root: {
+                                            style: {
+                                                minWidth: '110px',
+                                            },
                                         },
-                                    },
-                                }}
-                                size='auto'
-                                autoFocus
-                                animate
-                                role='dialog'
-                            >
-                                <Vocabulary
-                                    onCancel={() => setVocabularyType('hide')}
-                                    onInsert={(content, highlightWords) => {
-                                        setEditableText(content)
-                                        setOriginalText(content)
-                                        setHighlightWords(highlightWords)
-                                        setSelectedWord('')
-                                        setTranslateMode('translate')
-                                        setVocabularyType('hide')
                                     }}
-                                    type={vocabularyType as 'vocabulary' | 'article'}
+                                    onChange={({ value }) => {
+                                        stopAutomaticallyChangeTargetLang.current = true
+                                        if (value.length > 0) {
+                                            setTargetLang(value[0].id as string)
+                                        } else {
+                                            setTargetLang(langOptions[0].id as string)
+                                        }
+                                    }}
                                 />
-                            </Modal>
-                        )}
-                        <Toaster />
+                            </div>
+                        </div>
+                        <div className={styles.popupCardHeaderButtonGroup}>
+                            <Tooltip content={t('Translate')} placement={isDesktopApp() ? 'bottom' : 'top'}>
+                                <Button
+                                    size='mini'
+                                    kind={translateMode === 'translate' ? 'primary' : 'secondary'}
+                                    onClick={() => setTranslateMode('translate')}
+                                >
+                                    <AiOutlineTranslation />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content={t('Polishing')} placement={isDesktopApp() ? 'bottom' : 'top'}>
+                                <Button
+                                    size='mini'
+                                    kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
+                                    onClick={() => {
+                                        setTranslateMode('polishing')
+                                        setTargetLang(originalLang)
+                                    }}
+                                >
+                                    <IoColorPaletteOutline />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content={t('Summarize')} placement={isDesktopApp() ? 'bottom' : 'top'}>
+                                <Button
+                                    size='mini'
+                                    kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
+                                    onClick={() => {
+                                        setTranslateMode('summarize')
+                                    }}
+                                >
+                                    <MdOutlineSummarize />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content={t('Analyze')} placement={isDesktopApp() ? 'bottom' : 'top'}>
+                                <Button
+                                    size='mini'
+                                    kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
+                                    onClick={() => setTranslateMode('analyze')}
+                                >
+                                    <MdOutlineAnalytics />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content={t('Explain Code')} placement={isDesktopApp() ? 'bottom' : 'top'}>
+                                <Button
+                                    size='mini'
+                                    kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
+                                    onClick={() => {
+                                        setTranslateMode('explain-code')
+                                        // no need to change detectTo
+                                    }}
+                                >
+                                    <MdCode />
+                                </Button>
+                            </Tooltip>
+                        </div>
                     </div>
-                </BaseProvider>
-            </StyletronProvider>
-        </ErrorBoundary>
+                    <div className={styles.popupCardContentContainer}>
+                        {settings?.apiURL === defaultAPIURL && (
+                            <div>
+                                <IpLocationNotification />
+                            </div>
+                        )}
+                        <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>
+                            <div
+                                style={{
+                                    height: 0,
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                {editableText}
+                            </div>
+                            <Dropzone onDrop={onDrop} noClick={true}>
+                                {({ getRootProps, isDragActive }) => (
+                                    <div {...getRootProps()}>
+                                        {isDragActive ? (
+                                            <div className={styles.fileDragArea}> Drop file below </div>
+                                        ) : (
+                                            <div
+                                                className={styles.OCRStatusBar}
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: 8,
+                                                    opacity: showOCRProcessing ? 1 : 0,
+                                                    marginBottom: showOCRProcessing ? 10 : 0,
+                                                    fontSize: '11px',
+                                                    height: showOCRProcessing ? 26 : 0,
+                                                    transition: 'all 0.3s linear',
+                                                    overflow: 'hidden',
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        fontSize: '12px',
+                                                    }}
+                                                >
+                                                    {isOCRProcessing ? 'OCR Processing...' : 'OCR Success'}
+                                                </div>
+                                                {showOCRProcessing && (
+                                                    <div>
+                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        <Textarea
+                                            inputRef={editorRef}
+                                            autoFocus={autoFocus}
+                                            overrides={{
+                                                Root: {
+                                                    style: {
+                                                        width: '100%',
+                                                        borderRadius: '0px',
+                                                    },
+                                                },
+                                                Input: {
+                                                    style: {
+                                                        padding: '4px 8px',
+                                                        color:
+                                                            themeType === 'dark'
+                                                                ? theme.colors.contentSecondary
+                                                                : theme.colors.contentPrimary,
+                                                        fontFamily:
+                                                            translateMode === 'explain-code' ? 'monospace' : 'inherit',
+                                                        textalign: 'start',
+                                                    },
+                                                },
+                                            }}
+                                            value={editableText}
+                                            size='mini'
+                                            resize='vertical'
+                                            rows={
+                                                props.editorRows
+                                                    ? props.editorRows
+                                                    : Math.min(Math.max(editableText.split('\n').length, 3), 12)
+                                            }
+                                            onChange={(e) => setEditableText(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    if (!e.shiftKey) {
+                                                        e.preventDefault()
+                                                        if (!translateMode) {
+                                                            setTranslateMode('translate')
+                                                        }
+                                                        setOriginalText(editableText)
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                paddingTop: editableText && editableText !== originalText ? 4 : 0,
+                                                height: editableText && editableText !== originalText ? 18 : 0,
+                                                transition: 'all 0.3s linear',
+                                                overflow: 'hidden',
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    marginRight: 'auto',
+                                                }}
+                                            />
+                                            <div
+                                                style={{
+                                                    color: '#999',
+                                                    fontSize: '11px',
+                                                    transform: 'scale(0.9)',
+                                                    marginRight: '-20px',
+                                                }}
+                                            >
+                                                {`Please press <Enter> key to ${translateMode}. Press <Shift+Enter> to start a new line.`}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </Dropzone>
+                            <div className={styles.actionButtonsContainer}>
+                                <>
+                                    <Tooltip content={t('Upload an image for OCR translation')} placement='bottom'>
+                                        <div className={styles.actionButton}>
+                                            <Dropzone onDrop={onDrop}>
+                                                {({ getRootProps, getInputProps }) => (
+                                                    <div {...getRootProps()} className={styles.actionButton}>
+                                                        <input {...getInputProps({ multiple: false })} />
+                                                        <BsTextareaT size={13} />
+                                                    </div>
+                                                )}
+                                            </Dropzone>
+                                        </div>
+                                    </Tooltip>
+                                    {enableVocabulary && (
+                                        <StatefulTooltip
+                                            content={
+                                                <Trans
+                                                    i18nKey='words are collected'
+                                                    values={{
+                                                        collectTotal: collectedWordTotal,
+                                                    }}
+                                                />
+                                            }
+                                            showArrow
+                                            placement='top'
+                                        >
+                                            <div
+                                                className={styles.actionButton}
+                                                onClick={() => setShowWordbookButtons((e) => !e)}
+                                            >
+                                                <AiOutlineFileSync size={13} />
+                                            </div>
+                                        </StatefulTooltip>
+                                    )}
+                                    {showWordbookButtons && (
+                                        <>
+                                            <StatefulTooltip content={t('Collection Review')} showArrow placement='top'>
+                                                <div className={styles.actionButton}>
+                                                    <MdGrade
+                                                        size={13}
+                                                        onClick={() => setVocabularyType('vocabulary')}
+                                                    />
+                                                </div>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip
+                                                content={t('Export your collection as a csv file')}
+                                                showArrow
+                                                placement='top'
+                                            >
+                                                <div className={styles.actionButton} onClick={onCsvExport}>
+                                                    <TbCsv size={13} />
+                                                </div>
+                                            </StatefulTooltip>
+                                            <StatefulTooltip content='Big Bang' showArrow placement='top'>
+                                                <div className={styles.actionButton}>
+                                                    <FcIdea size={13} onClick={() => setVocabularyType('article')} />
+                                                </div>
+                                            </StatefulTooltip>
+                                        </>
+                                    )}
+                                </>
+                                <div style={{ marginLeft: 'auto' }}></div>
+                                {!!editableText.length && (
+                                    <>
+                                        <Tooltip content={t('Speak')} placement='bottom'>
+                                            <div className={styles.actionButton} onClick={handleEditSpeakAction}>
+                                                {isSpeakingEditableText ? (
+                                                    <SpeakerMotion />
+                                                ) : (
+                                                    <RxSpeakerLoud size={13} />
+                                                )}
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                            <div>
+                                                <CopyToClipboard
+                                                    text={editableText}
+                                                    onCopy={() => {
+                                                        toast(t('Copy to clipboard'), {
+                                                            duration: 3000,
+                                                            icon: '👏',
+                                                        })
+                                                    }}
+                                                    options={{ format: 'text/plain' }}
+                                                >
+                                                    <div className={styles.actionButton}>
+                                                        <RxCopy size={13} />
+                                                    </div>
+                                                </CopyToClipboard>
+                                            </div>
+                                        </Tooltip>
+                                        <Tooltip content={t('Clear input')} placement='bottom'>
+                                            <div
+                                                className={styles.actionButton}
+                                                onClick={() => {
+                                                    setEditableText('')
+                                                    editorRef.current?.focus()
+                                                }}
+                                            >
+                                                <div className={styles.actionButton}>
+                                                    <RxEraser size={13} />
+                                                </div>
+                                            </div>
+                                        </Tooltip>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        {originalText !== '' && (
+                            <div className={styles.popupCardTranslatedContainer} dir={translatedLanguageDirection}>
+                                {actionStr && (
+                                    <div
+                                        className={clsx({
+                                            [styles.actionStr]: true,
+                                            [styles.error]: !!errorMessage,
+                                        })}
+                                    >
+                                        <div>{actionStr}</div>
+                                        {isLoading ? (
+                                            <span className={styles.writing} key={'1'} />
+                                        ) : errorMessage ? (
+                                            <span key={'2'}>😢</span>
+                                        ) : (
+                                            <span key={'3'}>👍</span>
+                                        )}
+                                    </div>
+                                )}
+                                {errorMessage ? (
+                                    <div className={styles.errorMessage}>
+                                        <span>{errorMessage}</span>
+                                        <Tooltip content={t('Retry')} placement='bottom'>
+                                            <div onClick={() => forceTranslate()} className={styles.actionButton}>
+                                                <RxReload size={13} />
+                                            </div>
+                                        </Tooltip>
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <div
+                                            ref={translatedContentRef}
+                                            className={styles.popupCardTranslatedContentContainer}
+                                        >
+                                            <div>
+                                                {translateMode === 'explain-code' ? (
+                                                    <>
+                                                        <ReactMarkdown>{translatedText}</ReactMarkdown>
+                                                        {isLoading && <span className={styles.caret} />}
+                                                    </>
+                                                ) : (
+                                                    translatedLines.map((line, i) => {
+                                                        return (
+                                                            <p className={styles.paragraph} key={`p-${i}`}>
+                                                                {isWordMode && i === 0 ? (
+                                                                    <div
+                                                                        style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '5px',
+                                                                        }}
+                                                                    >
+                                                                        {line}
+                                                                        {!isLoading && (
+                                                                            <StatefulTooltip
+                                                                                content={
+                                                                                    isCollectedWord
+                                                                                        ? t('Remove from collection')
+                                                                                        : t('Add to collection')
+                                                                                }
+                                                                                showArrow
+                                                                                placement='right'
+                                                                            >
+                                                                                <div
+                                                                                    className={styles.actionButton}
+                                                                                    onClick={onWordCollection}
+                                                                                >
+                                                                                    {isCollectedWord ? (
+                                                                                        <MdGrade size={15} />
+                                                                                    ) : (
+                                                                                        <MdOutlineGrade size={15} />
+                                                                                    )}
+                                                                                </div>
+                                                                            </StatefulTooltip>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    line
+                                                                )}
+                                                                {isLoading && i === translatedLines.length - 1 && (
+                                                                    <span className={styles.caret} />
+                                                                )}
+                                                            </p>
+                                                        )
+                                                    })
+                                                )}
+                                            </div>
+                                        </div>
+                                        {translatedText && (
+                                            <div ref={actionButtonsRef} className={styles.actionButtonsContainer}>
+                                                <div style={{ marginRight: 'auto' }} />
+                                                <Tooltip content={t('Speak')} placement='bottom'>
+                                                    <div
+                                                        className={styles.actionButton}
+                                                        onClick={handleTranslatedSpeakAction}
+                                                    >
+                                                        {isSpeakingTranslatedText ? (
+                                                            <SpeakerMotion />
+                                                        ) : (
+                                                            <RxSpeakerLoud size={13} />
+                                                        )}
+                                                    </div>
+                                                </Tooltip>
+                                                <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                                    <div>
+                                                        <CopyToClipboard
+                                                            text={translatedText}
+                                                            onCopy={() => {
+                                                                toast(t('Copy to clipboard'), {
+                                                                    duration: 3000,
+                                                                    icon: '👏',
+                                                                })
+                                                            }}
+                                                            options={{ format: 'text/plain' }}
+                                                        >
+                                                            <div className={styles.actionButton}>
+                                                                <RxCopy size={13} />
+                                                            </div>
+                                                        </CopyToClipboard>
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            {props.showSettings && (
+                <div className={styles.footer}>
+                    <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>
+                        <div onClick={() => setShowSettings((s) => !s)}>
+                            {showSettings ? <AiOutlineTranslation size='14' /> : <IoSettingsOutline size='14' />}
+                        </div>
+                    </Tooltip>
+                </div>
+            )}
+            {enableVocabulary && (
+                <Modal
+                    isOpen={vocabularyType !== 'hide'}
+                    onClose={() => setVocabularyType('hide')}
+                    closeable
+                    overrides={{
+                        Close: {
+                            style: {
+                                display: 'none',
+                            },
+                        },
+                    }}
+                    size='auto'
+                    autoFocus
+                    animate
+                    role='dialog'
+                >
+                    <Vocabulary
+                        onCancel={() => setVocabularyType('hide')}
+                        onInsert={(content, highlightWords) => {
+                            setEditableText(content)
+                            setOriginalText(content)
+                            setHighlightWords(highlightWords)
+                            setSelectedWord('')
+                            setTranslateMode('translate')
+                            setVocabularyType('hide')
+                        }}
+                        type={vocabularyType as 'vocabulary' | 'article'}
+                    />
+                </Modal>
+            )}
+            <Toaster />
+        </div>
     )
 }
