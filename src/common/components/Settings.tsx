@@ -894,6 +894,7 @@ export function Settings(props: IPopupProps) {
     }, [values])
 
     const isDesktopApp = utils.isDesktopApp()
+    const isMacOS = navigator.userAgent.includes('Mac OS X')
 
     return (
         <div
@@ -1010,6 +1011,18 @@ export function Settings(props: IPopupProps) {
                         </FormItem>
                         <FormItem name='alwaysShowIcons' label={t('Show icon when text is selected')}>
                             <AlwaysShowIconsCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp && isMacOS ? 'block' : 'none',
+                            }}
+                            name='allowUsingClipboardWhenSelectedTextNotAvailable'
+                            label={t('Using clipboard')}
+                            caption={t(
+                                'Allow using the clipboard to get the selected text when the selected text is not available'
+                            )}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />

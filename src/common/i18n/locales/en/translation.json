@@ -63,5 +63,7 @@
   "insert to editor": "Insert to Editor",
   "Show button when text is selected": "Show button when text is selected",
   "Show icon when text is selected": "Show icon when text is selected",
+  "Using clipboard": "Using clipboard",
+  "Allow using the clipboard to get the selected text when the selected text is not available": "Allow using the clipboard to get the selected text when the selected text is not available",
   "disable collecting statistics": "Disable collecting statistics"
 }
