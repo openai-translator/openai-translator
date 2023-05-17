@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { ThemeType } from '../types'
+import { useEffect } from 'react'
+import { useGlobalState } from './global'
 import { useSettings } from './useSettings'
 
 export const useThemeType = () => {
-    const [themeType, setThemeType] = useState<ThemeType>('followTheSystem')
+    const [themeType, setThemeType] = useGlobalState('themeType')
 
     const { settings } = useSettings()
 
