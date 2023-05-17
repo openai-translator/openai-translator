@@ -748,7 +748,7 @@ function HotkeyRecorder(props: IHotkeyRecorderProps) {
                 {!isRecording && hotKeys.length > 0 ? (
                     <IoCloseCircle
                         className={styles.clearHotkey}
-                        onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                        onClick={(e: React.MouseEvent<SVGElement>) => {
                             e.stopPropagation()
                             clearHotkey()
                         }}
