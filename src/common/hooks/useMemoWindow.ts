@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { appWindow, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect } from 'react'
+import { useEffect } from 'react'
 
 export type WindowMemoProps = {
     size: boolean

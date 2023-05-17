@@ -1,16 +1,9 @@
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useReducer,
-    useRef,
-    useState
-} from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
-import { BaseProvider, Theme } from 'baseui-sd'
+import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation, AiOutlineFileSync } from 'react-icons/ai'
@@ -582,7 +575,10 @@ export function Translator(props: IPopupCardProps) {
         editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(originalLang) ? 'rtl' : 'ltr'
     }, [originalLang, actionStr])
 
-    const translatedLanguageDirection = useMemo(() => ['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr', [])
+    const translatedLanguageDirection = useMemo(
+        () => (['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr'),
+        []
+    )
 
     const headerRef = useRef<HTMLDivElement>(null)
 
