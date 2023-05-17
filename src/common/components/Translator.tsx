@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState
+} from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
@@ -547,16 +554,6 @@ export function Translator(props: IPopupCardProps) {
     const stopLoading = useCallback(() => {
         setIsLoading(false)
     }, [])
-    useEffect(() => {
-        setOriginalText(props.text)
-    }, [props.text, props.uuid])
-    useEffect(() => {
-        setEditableText(originalText)
-        setSelectedWord('')
-    }, [originalText, props.uuid])
-    useEffect(() => {
-        setHighlightWords([])
-    }, [props.uuid])
     const [originalLang, setOriginalLang] = useState('')
     const [targetLang, setTargetLang] = useState('')
     const stopAutomaticallyChangeTargetLang = useRef(false)
@@ -584,10 +581,8 @@ export function Translator(props: IPopupCardProps) {
         if (!editor) return
         editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(originalLang) ? 'rtl' : 'ltr'
     }, [originalLang, actionStr])
-    const [translatedLanguageDirection, setTranslatedLanguageDirection] = useState<Theme['direction']>('ltr')
-    useEffect(() => {
-        setTranslatedLanguageDirection(['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr')
-    }, [targetLang])
+
+    const translatedLanguageDirection = useMemo(() => ['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr', [])
 
     const headerRef = useRef<HTMLDivElement>(null)
 

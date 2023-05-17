@@ -141,6 +141,7 @@ export function App() {
                 )}
             </div>
             <Translator
+                key={`${uuid}-${text}`}
                 uuid={uuid}
                 text={text}
                 engine={engine}
