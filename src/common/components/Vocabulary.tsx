@@ -222,7 +222,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                 const wordInfo = await vocabularyService.getItem(selectedWord?.word ?? '')
                 await vocabularyService.deleteItem(wordInfo?.word ?? '')
                 setIsCollectedWord(false)
-                setCollectedWordTotal((prev) => prev - 1)
+                setCollectedWordTotal((prev: number) => prev - 1)
             } else {
                 const wordInfo = words.find((item) => item.word === selectedWord?.word)
                 if (wordInfo) {

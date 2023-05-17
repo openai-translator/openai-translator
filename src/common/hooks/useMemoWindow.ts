@@ -34,12 +34,8 @@ export const useMemoWindow = (props: WindowMemoProps) => {
                     const storageSize = localStorage.getItem('_size')
                     if (storageSize) {
                         let { height, width } = JSON.parse(storageSize)
-                        if (height < 800) {
-                            height = 800
-                        }
-                        if (width < 600) {
-                            width = 600
-                        }
+                        height = Math.max(height, 800)
+                        width = Math.max(width, 600)
                         await appWindow.setSize(new PhysicalSize(width, height))
                     }
                 } else {
