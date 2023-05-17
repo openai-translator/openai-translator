@@ -1,0 +1,27 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install packages
+        run: yarn
+
+      - name: Run test
+        run: yarn test

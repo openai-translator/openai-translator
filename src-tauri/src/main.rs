@@ -14,12 +14,12 @@ mod windows;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
-use tauri_plugin_autostart::MacosLauncher;
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
+use tauri_plugin_autostart::MacosLauncher;
 
-use crate::config::{get_config_content, clear_config_cache};
+use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
 use crate::windows::{
@@ -30,7 +30,7 @@ use crate::windows::{
 use mouce::Mouse;
 use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
-use tauri::Manager;
+use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use window_shadows::set_shadow;
 
@@ -66,9 +66,7 @@ fn query_accessibility_permissions() -> bool {
 }
 
 fn main() {
-    let silently = env::args().any(|arg| {
-        arg == "--silently"
-    });
+    let silently = env::args().any(|arg| arg == "--silently");
 
     let mut mouse_manager = Mouse::new();
 
@@ -87,18 +85,25 @@ fn main() {
         }
         match event {
             mouce::common::MouseEvent::Press(mouce::common::MouseButton::Left) => {
-                let current_press_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
+                let current_press_time = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_millis();
                 *PREVIOUS_PRESS_TIME.lock() = current_press_time;
             }
             mouce::common::MouseEvent::Release(mouce::common::MouseButton::Left) => {
-                let current_release_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis();
+                let current_release_time = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_millis();
                 let mut is_text_selected_event = false;
                 let (x, y): (i32, i32) = windows::get_mouse_location().unwrap();
                 let (prev_release_x, prev_release_y) = { *PREVIOUS_RELEASE_POSITION.lock() };
                 {
                     *PREVIOUS_RELEASE_POSITION.lock() = (x, y);
                 }
-                let mouse_distance = (((x - prev_release_x).pow(2) + (y - prev_release_y).pow(2)) as f64).sqrt();
+                let mouse_distance =
+                    (((x - prev_release_x).pow(2) + (y - prev_release_y).pow(2)) as f64).sqrt();
                 let mut previous_press_time = 0;
                 let mut previous_release_time = 0;
                 {
@@ -110,7 +115,8 @@ fn main() {
                 }
                 let is_pressed = previous_release_time < previous_press_time;
                 let pressed_time = current_release_time - previous_press_time;
-                let is_double_click = current_release_time - previous_release_time < 700 && mouse_distance < 10.0;
+                let is_double_click =
+                    current_release_time - previous_release_time < 700 && mouse_distance < 10.0;
                 if is_pressed && pressed_time > 300 && mouse_distance > 20.0 {
                     is_text_selected_event = true;
                 }
@@ -118,33 +124,55 @@ fn main() {
                     is_text_selected_event = true;
                 }
                 let is_click_on_thumb = match APP_HANDLE.get() {
-                    Some(handle) => {
-                        match handle.get_window(windows::THUMB_WIN_NAME) {
-                            Some(window) => {
-                                match window.outer_position() {
-                                    Ok(position) => {
-                                        let scale_factor = window.scale_factor().unwrap_or(1.0);
-                                        if let Ok(size) = window.outer_size() {
-                                            let LogicalPosition{ x: x1, y: y1 } = position.to_logical::<i32>(scale_factor);
-                                            let LogicalSize{ width: w, height: h } = size.to_logical::<i32>(scale_factor);
-                                            let (x2, y2) = (x1 + w, y1 + h);
-                                            let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
-                                            res
-                                        } else {
-                                            false
+                    Some(handle) => match handle.get_window(windows::THUMB_WIN_NAME) {
+                        Some(window) => match window.outer_position() {
+                            Ok(position) => {
+                                let scale_factor = window.scale_factor().unwrap_or(1.0);
+                                if let Ok(size) = window.outer_size() {
+                                    if cfg!(target_os = "macos") {
+                                        let LogicalPosition { x: x1, y: y1 } =
+                                            position.to_logical::<i32>(scale_factor);
+                                        let LogicalSize {
+                                            width: mut w,
+                                            height: mut h,
+                                        } = size.to_logical::<i32>(scale_factor);
+                                        if cfg!(target_os = "windows") {
+                                            w = (20.0 as f64 * scale_factor) as i32;
+                                            h = (20.0 as f64 * scale_factor) as i32;
                                         }
+                                        let (x2, y2) = (x1 + w, y1 + h);
+                                        let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
+                                        res
+                                    } else {
+                                        let PhysicalPosition { x: x1, y: y1 } =
+                                            position;
+                                        let PhysicalSize {
+                                            width: mut w,
+                                            height: mut h,
+                                        } = size;
+                                        if cfg!(target_os = "windows") {
+                                            w = (20.0 as f64 * scale_factor) as u32;
+                                            h = (20.0 as f64 * scale_factor) as u32;
+                                        }
+                                        let (x2, y2) = (x1 + w as i32, y1 + h as i32);
+                                        let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
+                                        res
                                     }
-                                    Err(err) => {
-                                        println!("err: {:?}", err);
-                                        false
-                                    }
+                                } else {
+                                    false
                                 }
                             }
-                            None => false
-                        }
-                    }
-                    None => false
+                            Err(err) => {
+                                println!("err: {:?}", err);
+                                false
+                            }
+                        },
+                        None => false,
+                    },
+                    None => false,
                 };
+                // println!("is_text_selected_event: {}", is_text_selected_event);
+                // println!("is_click_on_thumb: {}", is_click_on_thumb);
                 if !is_text_selected_event && !is_click_on_thumb {
                     windows::close_thumb();
                     // println!("not text selected event");
@@ -158,6 +186,7 @@ fn main() {
 
                 if !is_click_on_thumb {
                     if RELEASE_THREAD_ID.is_locked() {
+                        // println!("release thread is locked");
                         return;
                     }
                     std::thread::spawn(move || {
@@ -169,6 +198,7 @@ fn main() {
                             }
                             windows::show_thumb(x, y);
                         } else {
+                            // println!("selected text is empty");
                             windows::close_thumb();
                         }
                     });
@@ -223,7 +253,10 @@ fn main() {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--silently"])))
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--silently"]),
+        ))
         // .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(move |app| {
             if silently {
@@ -281,8 +314,15 @@ fn main() {
                 ..
             } = event
             {
-                let window = app.get_window(label.as_str()).unwrap();
-                window.hide().unwrap();
+                #[cfg(target_os = "macos")]
+                {
+                    tauri::AppHandle::hide(&app.app_handle()).unwrap();
+                }
+                #[cfg(target_os = "windows")]
+                {
+                    let window = app.get_window(label.as_str()).unwrap();
+                    window.hide().unwrap();
+                }
                 api.prevent_close();
             }
         });

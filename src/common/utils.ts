@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { createParser } from 'eventsource-parser'
 import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import { IBrowser, ISettings } from './types'
+import { getUniversalFetch } from './universal-fetch'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
 export const defaultProvider = 'OpenAI'
 export const defaultAPIModel = 'gpt-3.5-turbo'
 
+export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
+export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
+
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultAlwaysShowIcons = true
-
+export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
 export async function getApiKey(): Promise<string> {
@@ -34,9 +39,11 @@ const settingKeys: Record<keyof ISettings, number> = {
     ocrHotkey: 1,
     themeType: 1,
     i18n: 1,
-    ttsVoices: 1,
+    tts: 1,
     restorePreviousPosition: 1,
     runAtStartup: 1,
+    selectInputElementsText: 1,
+    disableCollectingStatistics: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -79,6 +86,12 @@ export async function getSettings(): Promise<ISettings> {
     if (!settings.i18n) {
         settings.i18n = defaulti18n
     }
+    if (!settings.disableCollectingStatistics) {
+        settings.disableCollectingStatistics = false
+    }
+    if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
+        settings.selectInputElementsText = defaultSelectInputElementsText
+    }
     return settings
 }
 
@@ -89,13 +102,13 @@ export async function setSettings(settings: Partial<ISettings>) {
 
 export async function getBrowser(): Promise<IBrowser> {
     if (isElectron()) {
-        return (await import('./electron-polyfill')).electronBrowser
+        return (await import('./polyfills/electron')).electronBrowser
     }
     if (isTauri()) {
-        return (await import('./tauri-polyfill')).tauriBrowser
+        return (await import('./polyfills/tauri')).tauriBrowser
     }
     if (isUserscript()) {
-        return (await import('./userscript-polyfill')).userscriptBrowser
+        return (await import('./polyfills/userscript')).userscriptBrowser
     }
     return await require('webextension-polyfill')
 }
@@ -105,6 +118,9 @@ export const isElectron = () => {
 }
 
 export const isTauri = () => {
+    if (typeof window === 'undefined') {
+        return false
+    }
     return window['__TAURI__' as any] !== undefined
 }
 
@@ -125,7 +141,28 @@ export const isDarkMode = async () => {
     return settings.themeType === 'dark'
 }
 
-export const isFirefox = /firefox/i.test(navigator.userAgent)
+export const isFirefox = () => /firefox/i.test(navigator.userAgent)
+
+// source: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid#answer-8809472
+export function generateUUID() {
+    let d = new Date().getTime() // Timestamp
+    // Time in microseconds since page-load or 0 if unsupported
+    let d2 = (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        // random number between 0 and 16
+        let r = Math.random() * 16
+        if (d > 0) {
+            // Use timestamp until depleted
+            r = (d + r) % 16 | 0
+            d = Math.floor(d / 16)
+        } else {
+            // Use microseconds since page-load if supported
+            r = (d2 + r) % 16 | 0
+            d2 = Math.floor(d2 / 16)
+        }
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+    })
+}
 
 // js to csv
 export async function exportToCsv<T extends Record<string, string | number>>(filename: string, rows: T[]) {
@@ -140,7 +177,7 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
     const processRow = function (row: T) {
         let s = ''
         for (const key of columns) {
-            if (key == 'updatedAt') {
+            if (key === 'updatedAt') {
                 s += '\t' + `${row[key]}` + ','
             } else {
                 s += '"' + `${row[key]}` + '"' + ','
@@ -169,5 +206,42 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
             link.click()
             document.body.removeChild(link)
         }
+    }
+}
+
+interface FetchSSEOptions extends RequestInit {
+    onMessage(data: string): void
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError(error: any): void
+    fetcher?: (input: string, options: RequestInit) => Promise<Response>
+}
+
+export async function fetchSSE(input: string, options: FetchSSEOptions) {
+    const { onMessage, onError, fetcher = getUniversalFetch(), ...fetchOptions } = options
+
+    const resp = await fetcher(input, fetchOptions)
+    if (resp.status !== 200) {
+        onError(await resp.json())
+        return
+    }
+
+    const parser = createParser((event) => {
+        if (event.type === 'event') {
+            onMessage(event.data)
+        }
+    })
+    const reader = resp.body.getReader()
+    try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+                break
+            }
+            const str = new TextDecoder().decode(value)
+            parser.feed(str)
+        }
+    } finally {
+        reader.releaseLock()
     }
 }

@@ -110,7 +110,7 @@
         "title": "OpenAI Translator",
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
-        "visible": false
+        "visible": true
       }
     ],
     "systemTray": {

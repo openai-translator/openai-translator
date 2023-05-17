@@ -50,8 +50,6 @@
 
 # 既是浏览器插件也是跨平台桌面端应用！
 
-**请注意！桌面端应用不支持划词后弹出图标，划词后必须按下快捷键才能够触发划词翻译**
-
 <p align="center">
   <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 </p>
@@ -71,7 +69,9 @@
 5. 支持一键复制
 6. 支持 TTS
 7. 有桌面端应用，全平台（Windows + macOS + Linux）支持！
-8. 同时支持 [OpenAI](https://openai.com/) 和 [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
+8. 支持截图翻译
+9. 支持生词本，同时支持基于生词本里的单词生成帮助记忆的内容
+10. 同时支持 [OpenAI](https://openai.com/) 和 [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
 
 # 使用准备
 
@@ -163,11 +163,20 @@ scoop install openai-translator
 
 [LICENSE](./LICENSE)
 
-# 请作者喝一杯咖啡
+# 群组
 
 <p align="center">
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
+  <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" />
+</p>
+
+<p align="center">
+  <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
 </p>
 
 # Star 历史

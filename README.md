@@ -49,8 +49,6 @@ I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/
 
 What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
 
-**Attention! The desktop application does not support the pop-up icon after word selection. You must press the shortcut key to trigger the translation after selecting a word.**
-
 <p align="center">
   <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
 </p>
@@ -74,7 +72,9 @@ What began as a translation tool has now evolved to include surprisingly effecti
 5. One-click copying
 6. Text-to-Speech (TTS)
 7. Available on all platforms (Windows, macOS, and Linux) for both browsers and Desktop
-8. Supports both [OpenAI](https://openai.com/) and [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service) at the same time
+8. Support screenshot translation
+9. Support for vocabulary books, as well as support for generating memory aids based on the words in the vocabulary books
+10. Supports both [OpenAI](https://openai.com/) and [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service) at the same time
 
 # Preparation
 
@@ -164,11 +164,20 @@ scoop install openai-translator
 
 [LICENSE](./LICENSE)
 
-# Buy me a coffee
+# Group
 
 <p align="center">
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png" />
-  <img height="360" src="https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png" />
+  <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
+</p>
+
+<p align="center">
+  <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a>
+</p>
+<p align="center">
+  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" />
 </p>
 
 # Star History

@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import icon from '../content_script/assets/images/icon.png'
+import icon from '../common/assets/images/icon.png'
 import { useTheme } from '../common/hooks/useTheme'
 import { BaseProvider } from 'baseui-sd'
 
