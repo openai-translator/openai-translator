@@ -41,6 +41,7 @@ jobs:
     needs: create-release
     permissions:
       contents: write
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -129,6 +130,11 @@ jobs:
 
   build-browser-extension:
     runs-on: ubuntu-22.04
+
+    permissions:
+      contents: write
+      packages: write
+
     needs: create-release
 
     steps:
