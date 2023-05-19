@@ -163,10 +163,12 @@ scoop install openai-translator
 ## Configure Azure OpenAI Service
 
 ```ts
-const endpoint = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
+const API_URL = `https://${resourceName}.openai.azure.com`
+const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
 ```
 
-- deployName: Your Azure OpenAI Service model deploy name.
+- resourceName: Your Azure OpenAI Service resource name.
+- deployName: Your Azure OpenAI Service model deploy name, you can change your model here.
 - api-version: 2023-03-15-preview, or newer.
 
 # License
