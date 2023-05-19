@@ -160,6 +160,15 @@ scoop install openai-translator
 
 3. Refresh the page in the browser to enjoy the smooth translation experience 🎉!
 
+## Configure Azure OpenAI Service
+
+```ts
+const endpoint = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
+```
+
+- deployName: Your Azure OpenAI Service model deploy name.
+- api-version: 2023-03-15-preview, or newer.
+
 # License
 
 [LICENSE](./LICENSE)
