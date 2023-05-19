@@ -139,6 +139,16 @@ export const isDarkMode = async () => {
 
 export const isFirefox = () => /firefox/i.test(navigator.userAgent)
 
+export const isUsingOpenAIOfficialAPIEndpoint = async () => {
+    const settings = await getSettings()
+    return settings.provider === defaultProvider && settings.apiURL === defaultAPIURL
+}
+
+export const isUsingOpenAIOfficial = async () => {
+    const settings = await getSettings()
+    return settings.provider === 'ChatGPT' || (await isUsingOpenAIOfficialAPIEndpoint())
+}
+
 // source: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid#answer-8809472
 export function generateUUID() {
     let d = new Date().getTime() // Timestamp

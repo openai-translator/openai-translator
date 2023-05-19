@@ -1229,7 +1229,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     <div className={styles.popupCardContentContainer}>
                         {settings?.apiURL === defaultAPIURL && (
                             <div>
-                                <IpLocationNotification />
+                                <IpLocationNotification {...settings} />
                             </div>
                         )}
                         <div ref={editorContainerRef} className={styles.popupCardEditorContainer}>

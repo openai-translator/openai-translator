@@ -39,7 +39,7 @@
   "Run at Startup": "开机启动",
   "API Model": "API 模型",
   "Chars Limited": "字数超出限制",
-  "Country Not Supported": "您的 IP 属地为 {{name}}，不在 OpenAI <0>支持的地区</0> 范围内。如果不进行额外的网络配置继续使用，即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。",
+  "Country Not Supported": "您正在直接连接至 OpenAI，而您的 IP 属地为 {{name}}，不在 OpenAI <0>支持的地区</0> 范围内。如果不进行额外的网络配置继续使用，即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。",
   "Country Not Detected": "我们无法检查您的 IP 地址是否位于 OpenAI 的<0>支持的地区</0>，可能是由于您的网络环境无法访问 OpenAI。请检查您的网络连接，并确保您在支持的位置访问 API，否则即使订阅了 ChatGPT Plus 或账号内仍有余额，您的账户也会被 OpenAI 封禁。",
   "words are collected": "已收藏 {{collectTotal}} 个单词",
   "Collection Review": "单词复习",
