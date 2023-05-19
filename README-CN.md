@@ -159,6 +159,17 @@ scoop install openai-translator
 
 3. 刷新浏览器页面，即可享受丝滑般的划词翻译体验 🎉
 
+## 配置 Azure OpenAI Service
+
+```ts
+const API_URL = `https://${resourceName}.openai.azure.com`
+const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
+```
+
+- resourceName: 你的 Azure OpenAI Service 资源名称。
+- deployName: 你的 Azure OpenAI Service 模型部署名称，更改部署名称以切换模型。
+- api-version: 2023-03-15-preview，或者更新的版本。
+
 # License
 
 [LICENSE](./LICENSE)
