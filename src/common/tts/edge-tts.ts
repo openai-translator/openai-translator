@@ -192,7 +192,7 @@ function removeIncompatibleCharacters(str: string): string {
     for (let idx = 0; idx < chars.length; idx++) {
         const char = chars[idx]
         const code = char.charCodeAt(0)
-        if ((0 <= code && code <= 8) || (11 <= code && code <= 12) || (14 <= code && code <= 31)) {
+        if ((code >= 0 && code <= 8) || (code >= 11 && code <= 12) || (code >= 14 && code <= 31)) {
             chars[idx] = ' '
         }
     }

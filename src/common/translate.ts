@@ -39,7 +39,7 @@ export interface TranslateResult {
 
 export const isAWord = (langCode: string, text: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const Segmenter = (Intl as any).Segmenter
+    const { Segmenter } = Intl as any
     if (!Segmenter) {
         return false
     }

@@ -992,7 +992,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 const wordInfo = await vocabularyService.getItem(editableText.trim())
                 await vocabularyService.deleteItem(wordInfo?.word ?? '')
                 setIsCollectedWord(false)
-                setCollectedWordTotal((t) => t - 1)
+                setCollectedWordTotal((t: number) => t - 1)
             } else {
                 await vocabularyService.putItem({
                     word: editableText,
@@ -1002,7 +1002,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     createdAt: new Date().valueOf().toString(),
                 })
                 setIsCollectedWord(true)
-                setCollectedWordTotal((t) => t + 1)
+                setCollectedWordTotal((t: number) => t + 1)
             }
         } catch (e) {
             console.error(e)
