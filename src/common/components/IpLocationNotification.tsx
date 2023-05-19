@@ -4,14 +4,12 @@ import { Notification, KIND as NOTIFICATION_KIND } from 'baseui-sd/notification'
 import { StyledLink } from 'baseui-sd/link'
 import { IpLocation, getIpLocationInfo } from '../geo'
 import { isUsingOpenAIOfficial } from '../utils'
-import { ISettings } from '../types'
 
 export default function IpLocationNotification(props: { showSettings: boolean }) {
     const [ipLocation, setIpLocation] = useState<IpLocation | null>(null)
     useEffect(
         () => {
             ;(async () => {
-                console.log('refreshed!', props)
                 setIpLocation(
                     (await isUsingOpenAIOfficial())
                         ? await getIpLocationInfo()
