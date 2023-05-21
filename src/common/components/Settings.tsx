@@ -941,6 +941,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                     color: '#333',
                     background: `url(${beams}) no-repeat center center`,
                     gap: 10,
+                    boxSizing: 'border-box',
                 }}
                 data-tauri-drag-region
             >
