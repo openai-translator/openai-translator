@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Settings } from '../../common/components/Settings'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import '../../common/i18n.js'
+import './index.css'
 
 const engine = new Styletron()
 
