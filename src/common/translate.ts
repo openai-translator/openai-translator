@@ -235,15 +235,21 @@ export async function translate(query: TranslateQuery) {
         case 'polishing':
             rolePrompt =
                 'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
-            commandPrompt = `polish this text in ${sourceLang}`
+            quoteProcessor = new QuoteProcessor()
+            commandPrompt = `Please polish this text in ${sourceLang}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+            contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
             break
         case 'summarize':
             rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it."
-            commandPrompt = `summarize this text in the most concise language and must use ${targetLang} language!`
+            quoteProcessor = new QuoteProcessor()
+            commandPrompt = `Please summarize this text in the most concise language and must use ${targetLang} language! Only summarize the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+            contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
             break
         case 'analyze':
             rolePrompt = 'You are a professional translation engine and grammar analyzer.'
-            commandPrompt = `translate this text to ${targetLang} and explain the grammar in the original text using ${targetLang}`
+            quoteProcessor = new QuoteProcessor()
+            commandPrompt = `Please translate this text to ${targetLang} and explain the grammar in the original text using ${targetLang}. Only analyze the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+            contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
             break
         case 'explain-code':
             rolePrompt =
