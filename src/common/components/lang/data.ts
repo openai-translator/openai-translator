@@ -105,6 +105,18 @@ export const languageConfigs: LanguageConfigs = {
         name: '한국어', // Korean formal speech (GPT uses formal speech by default if not specified)
         phoneticNotation: 'Revised Romanization',
     },
+    'ko-banmal': {
+        nameEn: 'Korean',
+        name: '한국어 반말', // Korean casual / informal speech, especially Haera-che,
+        // used when talking to close friends or relatives of similar age, and by adults to children,
+        // in impersonal writing (books, newspapers, magazines and 報告書),
+        // grammar books or indirect quotations.
+        // see https://en.wikipedia.org/wiki/Korean_speech_levels
+        phoneticNotation: 'Revised Romanization',
+        isVariant: true,
+        genCommandPrompt: (sourceLanguageConfig, quoteStart, quoteEnd) =>
+            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use casual or informal (다) endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot intepret the content.`,
+    },
 
     'fr': {
         nameEn: 'French',
