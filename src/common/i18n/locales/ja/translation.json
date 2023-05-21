@@ -65,5 +65,6 @@
   "Show icon when text is selected": "テキストが選択されているときにアイコンを表示",
   "Using clipboard": "クリップボードを使用",
   "Allow using the clipboard to get the selected text when the selected text is not available": "選択されたテキストが利用できない場合、クリップボードを使用して選択されたテキストを取得することを許可する",
+  "Please login to ChatGPT Web": "ChatGPT Webにログインしてください",
   "disable collecting statistics": "統計情報の収集を無効にする"
 }

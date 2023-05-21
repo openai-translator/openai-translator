@@ -218,7 +218,6 @@ const useStyles = createUseStyles({
     },
     'popupCardTranslatedContainer': (props: IThemedStyleProps) => ({
         'position': 'relative',
-        'display': 'flex',
         'padding': '26px 16px 16px 16px',
         'border-top': `1px solid ${props.theme.colors.borderTransparent}`,
         '-ms-user-select': 'none',
@@ -754,6 +753,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [headerRef])
 
+    const [isNotLogin, setIsNotLogin] = useState(false)
+
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
@@ -810,6 +811,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     selectedWord,
                     detectFrom: originalLang,
                     detectTo: targetLang,
+                    onStatusCode: (statusCode) => {
+                        setIsNotLogin(statusCode === 401)
+                    },
                     onMessage: (message) => {
                         if (message.role) {
                             return
@@ -1587,6 +1591,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </Tooltip>
                                             </div>
                                         )}
+                                    </div>
+                                )}
+                                {isNotLogin && settings?.provider === 'ChatGPT' && (
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                        }}
+                                    >
+                                        <span>{t('Please login to ChatGPT Web')}: </span>
+                                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                                            Login
+                                        </a>
                                     </div>
                                 )}
                             </div>

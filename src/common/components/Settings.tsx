@@ -476,8 +476,15 @@ interface APIModelOption {
 }
 
 function APIModelSelector(props: APIModelSelectorProps) {
+    const { t } = useTranslation()
+    const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
+    const [errMsg, setErrMsg] = useState<string>()
+    const [isChatGPTNotLogin, setIsChatGPTNotLogin] = useState(false)
     useEffect(() => {
+        setIsChatGPTNotLogin(false)
+        setErrMsg('')
+        setOptions([])
         if (props.provider === 'OpenAI') {
             setOptions([
                 { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
@@ -488,50 +495,100 @@ function APIModelSelector(props: APIModelSelectorProps) {
                 { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
             ])
         } else if (props.provider === 'ChatGPT') {
-            backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
-                .then((response) => response.json())
-                .then((resp) => {
-                    const headers: Record<string, string> = {
-                        Authorization: `Bearer ${resp.accessToken}`,
+            setIsLoading(true)
+            try {
+                ;(async () => {
+                    const sessionResp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
+                    const sessionRespJsn = await sessionResp.json()
+                    if (sessionResp.status !== 200) {
+                        if (sessionResp.status === 401) {
+                            setIsChatGPTNotLogin(true)
+                        }
+                        setErrMsg(sessionRespJsn.detail.message)
+                        return
                     }
-                    return backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
+                    const headers: Record<string, string> = {
+                        Authorization: `Bearer ${sessionRespJsn.accessToken}`,
+                    }
+                    const modelsResp = await backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
                         cache: 'no-cache',
                         headers,
-                    }).then((response) => response.json())
-                })
-                .then((models) => {
-                    if (!models || !models.models) {
+                    })
+                    const modelsRespJsn = await modelsResp.json()
+                    if (!modelsRespJsn) {
+                        return
+                    }
+                    if (modelsResp.status !== 200) {
+                        if (modelsResp.status === 401) {
+                            setIsChatGPTNotLogin(true)
+                        }
+                        setErrMsg(modelsRespJsn.detail.message)
+                        return
+                    }
+                    const { models } = modelsRespJsn
+                    if (!models) {
                         return
                     }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    setOptions(models.models.map((model: any) => ({ label: model.title, id: model.slug })))
-                })
-                .catch((e) => {
-                    console.error(e)
-                })
+                    setOptions(models.map((model: any) => ({ label: model.title, id: model.slug })))
+                })()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (e: any) {
+                setErrMsg(JSON.stringify(e))
+            } finally {
+                setIsLoading(false)
+            }
         }
     }, [props.provider])
 
     return (
-        <Select
-            size='compact'
-            onBlur={props.onBlur}
-            searchable={false}
-            clearable={false}
-            value={
-                props.value
-                    ? [
-                          {
-                              id: props.value,
-                          },
-                      ]
-                    : undefined
-            }
-            onChange={(params) => {
-                props.onChange?.(params.value[0].id as APIModel)
-            }}
-            options={options}
-        />
+        <div>
+            <Select
+                isLoading={isLoading}
+                size='compact'
+                onBlur={props.onBlur}
+                searchable={false}
+                clearable={false}
+                value={
+                    props.value
+                        ? [
+                              {
+                                  id: props.value,
+                              },
+                          ]
+                        : undefined
+                }
+                onChange={(params) => {
+                    props.onChange?.(params.value[0].id as APIModel)
+                }}
+                options={options}
+            />
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                }}
+            >
+                {errMsg && (
+                    <div
+                        style={{
+                            color: 'red',
+                        }}
+                    >
+                        {errMsg}
+                    </div>
+                )}
+                {isChatGPTNotLogin && (
+                    <div>
+                        <span>{t('Please login to ChatGPT Web')}: </span>
+                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                            Login
+                        </a>
+                    </div>
+                )}
+            </div>
+        </div>
     )
 }
 
@@ -974,7 +1031,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
-                <FormItem name='provider' label={t('Default Service Provider')}>
+                <FormItem name='provider' label={t('Default Service Provider')} required>
                     <ProviderSelector />
                 </FormItem>
                 {values.provider !== 'ChatGPT' && (
@@ -1012,7 +1069,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                     </FormItem>
                 )}
                 {values.provider !== 'Azure' && (
-                    <FormItem name='apiModel' label={t('API Model')}>
+                    <FormItem name='apiModel' label={t('API Model')} required>
                         <APIModelSelector provider={values.provider} onBlur={onBlur} />
                     </FormItem>
                 )}
