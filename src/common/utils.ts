@@ -219,13 +219,15 @@ interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError(error: any): void
+    onStatusCode?: (statusCode: number) => void
     fetcher?: (input: string, options: RequestInit) => Promise<Response>
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
-    const { onMessage, onError, fetcher = getUniversalFetch(), ...fetchOptions } = options
+    const { onMessage, onError, onStatusCode, fetcher = getUniversalFetch(), ...fetchOptions } = options
 
     const resp = await fetcher(input, fetchOptions)
+    onStatusCode?.(resp.status)
     if (resp.status !== 200) {
         onError(await resp.json())
         return

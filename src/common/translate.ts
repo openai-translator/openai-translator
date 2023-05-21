@@ -26,6 +26,7 @@ export interface TranslateQuery {
     onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
+    onStatusCode?: (statusCode: number) => void
     signal: AbortSignal
     articlePrompt?: string
 }
@@ -349,6 +350,9 @@ export async function translate(query: TranslateQuery) {
             headers,
             body: JSON.stringify(body),
             signal: query.signal,
+            onStatusCode: (status) => {
+                query.onStatusCode?.(status)
+            },
             onMessage: (msg) => {
                 let resp
                 try {
@@ -390,9 +394,14 @@ export async function translate(query: TranslateQuery) {
                 if (typeof err === 'object') {
                     const { detail } = err
                     if (detail) {
-                        query.onError(detail)
-                        return
+                        const { message } = detail
+                        if (message) {
+                            query.onError(`ChatGPT Web: ${message}`)
+                            return
+                        }
                     }
+                    query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
+                    return
                 }
                 const { error } = err
                 if (error instanceof Error) {
