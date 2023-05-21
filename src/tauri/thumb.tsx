@@ -16,6 +16,7 @@ export function Thumb() {
                 }}
             >
                 <img
+                    draggable={false}
                     style={{
                         display: 'block',
                         width: '100%',
