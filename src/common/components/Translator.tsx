@@ -11,7 +11,7 @@ import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
-import { detectLang, supportLanguages } from '../lang'
+import { detectLang, supportedLanguages } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -58,7 +58,7 @@ const cache = new LRUCache({
     },
 })
 
-const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
+const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
         ...acc,
         {

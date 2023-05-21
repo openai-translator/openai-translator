@@ -14,7 +14,7 @@ import { Button } from 'baseui-sd/button'
 import { TranslateMode, Provider, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
-import { supportLanguages } from '../lang'
+import { supportedLanguages } from './lang/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
@@ -32,7 +32,7 @@ import { getEdgeVoices } from '../tts/edge-tts'
 import { backgroundFetch } from '../background/fetch'
 import { useThemeType } from '../hooks/useThemeType'
 
-const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
+const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
         ...acc,
         {
@@ -235,7 +235,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
 
     const getLangOptions = useCallback(
         (lang: string) => {
-            return supportLanguages.reduce((acc, [langCode, label]) => {
+            return supportedLanguages.reduce((acc, [langCode, label]) => {
                 const ttsLang = langCode2TTSLang[langCode]
                 if (ttsLang && supportVoices.find((v) => v.lang === ttsLang)) {
                     if (props.value?.voices?.find((item) => item.lang === langCode) && langCode !== lang) {
