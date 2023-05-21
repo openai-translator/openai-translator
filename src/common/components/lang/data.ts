@@ -31,6 +31,30 @@ export const languageConfigs: LanguageConfigs = {
         nameEn: 'English',
         phoneticNotation: 'IPA',
     },
+    'en-US': {
+        name: 'American English',
+        nameEn: 'English (US)',
+        phoneticNotation: 'IPA',
+        isSource: false,
+    },
+    'en-GB': {
+        name: 'British English',
+        nameEn: 'English (UK)',
+        phoneticNotation: 'IPA',
+        isSource: false,
+    },
+    'en-CA': {
+        name: 'Canadian English',
+        nameEn: 'English (Canada)',
+        phoneticNotation: 'IPA',
+        isSource: false,
+    },
+    'en-AU': {
+        name: 'Australian English',
+        nameEn: 'English (Australia)',
+        phoneticNotation: 'IPA',
+        isSource: false,
+    },
 
     // CJK
     // Chinese
