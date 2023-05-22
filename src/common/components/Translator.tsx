@@ -483,7 +483,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         highlightRef.current.handleInput()
     }, [selectedWord, highlightWords])
 
-    const [translateMode, setTranslateMode] = useState<TranslateMode | ''>('')
+    const [translateMode, setTranslateMode] = useState<Exclude<TranslateMode, 'big-bang'>>('translate')
     useEffect(() => {
         if (settings?.defaultTranslateMode && settings.defaultTranslateMode !== 'nop') {
             setTranslateMode(settings.defaultTranslateMode)

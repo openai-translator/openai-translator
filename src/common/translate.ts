@@ -18,18 +18,24 @@ export type APIModel =
     | 'gpt-4-32k-0314'
     | string
 
-export interface TranslateQuery {
+interface BaseTranslateQuery {
     text: string
     selectedWord: string
     detectFrom: SupportedLanguageCode
     detectTo: SupportedLanguageCode
-    mode: TranslateMode
+    mode: Exclude<TranslateMode, 'big-bang'>
     onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     signal: AbortSignal
-    articlePrompt?: string
 }
+
+type TranslateQueryBigBang = Omit<BaseTranslateQuery, 'mode' | 'selectedWord' | 'detectFrom' | 'detectTo'> & {
+    mode: 'big-bang'
+    articlePrompt: string
+}
+
+export type TranslateQuery = BaseTranslateQuery | TranslateQueryBigBang
 
 export interface TranslateResult {
     text?: string
@@ -178,49 +184,54 @@ export class QuoteProcessor {
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
 export async function translate(query: TranslateQuery) {
-    const sourceLangCode = query.detectFrom
-    const targetLangCode = query.detectTo
-    const sourceLangName = lang.getLangName(sourceLangCode)
-    const targetLangName = lang.getLangName(targetLangCode)
-    console.debug('sourceLang', sourceLangName)
-    console.debug('targetLang', targetLangName)
+    let rolePrompt = ''
+    let commandPrompt = ''
+    let contentPrompt = query.text
+    const assistantPrompts: string[] = []
     let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
-    const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
-    const targetLangConfig = getLangConfig(targetLangCode)
-    const sourceLangConfig = getLangConfig(sourceLangCode)
-    console.log('Source language is', sourceLangConfig)
-    let { rolePrompt } = targetLangConfig
-    const assistantPrompts: string[] = []
-    let commandPrompt: string
-    let contentPrompt = query.text
-
-    // a word could be collected
     let isWordMode = false
-    switch (query.mode) {
-        case 'translate':
-            quoteProcessor = new QuoteProcessor()
-            commandPrompt = targetLangConfig.genCommandPrompt(
-                sourceLangConfig,
-                quoteProcessor.quoteStart,
-                quoteProcessor.quoteEnd
-            )
-            console.log(commandPrompt)
-            if (query.text.length < 5 && toChinese) {
-                // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
-                rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLangName}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。按照下面格式用中文阐述：
+
+    if (query.mode === 'big-bang') {
+        rolePrompt = `You are a professional writer and you will write ${query.articlePrompt} based on the given words`
+        commandPrompt = `Write ${query.articlePrompt} of no more than 160 words. The article must contain the words in the following text. The more words you use, the better`
+    } else {
+        const sourceLangCode = query.detectFrom
+        const targetLangCode = query.detectTo
+        const sourceLangName = lang.getLangName(sourceLangCode)
+        const targetLangName = lang.getLangName(targetLangCode)
+        console.debug('sourceLang', sourceLangName)
+        console.debug('targetLang', targetLangName)
+        const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
+        const targetLangConfig = getLangConfig(targetLangCode)
+        const sourceLangConfig = getLangConfig(sourceLangCode)
+        console.log('Source language is', sourceLangConfig)
+        rolePrompt = targetLangConfig.rolePrompt
+
+        switch (query.mode) {
+            case 'translate':
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = targetLangConfig.genCommandPrompt(
+                    sourceLangConfig,
+                    quoteProcessor.quoteStart,
+                    quoteProcessor.quoteEnd
+                )
+                console.log(commandPrompt)
+                if (query.text.length < 5 && toChinese) {
+                    // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
+                    rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLangName}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。按照下面格式用中文阐述：
                     <序号><单词或短语> · /<${targetLangConfig.phoneticNotation}>/
                     [<词性缩写>] <适用语境（用中文阐述）>
                     例句：<例句>(例句翻译)`
-                commandPrompt = ''
-            }
-            if (isAWord(sourceLangCode, query.text.trim())) {
-                isWordMode = true
-                if (toChinese) {
-                    // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
-                    rolePrompt = `你是一个翻译引擎，请翻译给出的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、${
-                        targetLangConfig.phoneticNotation && '对应的音标或转写、'
-                    }所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
+                    commandPrompt = ''
+                }
+                if (isAWord(sourceLangCode, query.text.trim())) {
+                    isWordMode = true
+                    if (toChinese) {
+                        // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
+                        rolePrompt = `你是一个翻译引擎，请翻译给出的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、${
+                            targetLangConfig.phoneticNotation && '对应的音标或转写、'
+                        }所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
                 <单词>
                 [<语种>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
                 [<词性缩写>] <中文含义>]
@@ -228,15 +239,16 @@ export async function translate(query: TranslateQuery) {
                 <序号><例句>(例句翻译)
                 词源：
                 <词源>`
-                    commandPrompt = '好的，我明白了，请给我这个单词。'
-                    contentPrompt = `单词是：${query.text}`
-                } else {
-                    const isSameLanguage = sourceLangCode === targetLangCode
-                    rolePrompt = `You are a professional translation engine. Please translate the text into ${targetLangName} without explanation. When the text has only one word, please act as a professional ${sourceLangName}-${targetLangName} dictionary, and list the original form of the word (if any), the language of the word, ${
-                        targetLangConfig.phoneticNotation && 'the corresponding phonetic notation or transcription, '
-                    }all senses with parts of speech, ${
-                        isSameLanguage ? '' : 'bilingual '
-                    }sentence examples (at least 3) and etymology. Reply in the following format:
+                        commandPrompt = '好的，我明白了，请给我这个单词。'
+                        contentPrompt = `单词是：${query.text}`
+                    } else {
+                        const isSameLanguage = sourceLangCode === targetLangCode
+                        rolePrompt = `You are a professional translation engine. Please translate the text into ${targetLangName} without explanation. When the text has only one word, please act as a professional ${sourceLangName}-${targetLangName} dictionary, and list the original form of the word (if any), the language of the word, ${
+                            targetLangConfig.phoneticNotation &&
+                            'the corresponding phonetic notation or transcription, '
+                        }all senses with parts of speech, ${
+                            isSameLanguage ? '' : 'bilingual '
+                        }sentence examples (at least 3) and etymology. Reply in the following format:
                 <word> (<original form>)
                 [<language>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
                 [<part of speech>] ${isSameLanguage ? '' : '<translated meaning> / '}<meaning in source language>
@@ -244,42 +256,39 @@ export async function translate(query: TranslateQuery) {
                 <index>. <sentence>(<sentence translation>)
                 Etymology:
                 <etymology>`
-                    console.log(rolePrompt)
-                    commandPrompt = 'I understand. Please give me the word.'
-                    contentPrompt = `The word is: ${query.text}`
+                        console.log(rolePrompt)
+                        commandPrompt = 'I understand. Please give me the word.'
+                        contentPrompt = `The word is: ${query.text}`
+                    }
                 }
-            }
-            if (query.selectedWord) {
-                rolePrompt = `You are an expert in the semantic syntax of the ${sourceLangName} language and you are teaching me the ${sourceLangName} language. I give you a sentence in ${sourceLangName} and a word in that sentence. Please help me explain in ${targetLangName} language what the word means in the sentence and what the sentence itself means, and if the word is part of an idiom in the sentence, explain the idiom in the sentence and give a few examples in ${sourceLangName} with the same meaning and explain the examples in ${targetLangName} language, and must in ${targetLangName} language. If you understand, say yes, and then we will begin.`
-                commandPrompt = 'yes, I understand, please give me the sentence and the word.'
-                contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
-            }
-            break
-        case 'polishing':
-            rolePrompt =
-                'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
-            commandPrompt = `polish this text in ${sourceLangName}`
-            break
-        case 'summarize':
-            rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it."
-            commandPrompt = `summarize this text in the most concise language and must use ${targetLangName} language!`
-            break
-        case 'analyze':
-            rolePrompt = 'You are a professional translation engine and grammar analyzer.'
-            commandPrompt = `translate this text to ${targetLangName} and explain the grammar in the original text using ${targetLangName}`
-            break
-        case 'explain-code':
-            rolePrompt =
-                'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
-            commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLangName} language! You may use Markdown. If the content is not code, return an error message. If the code has obvious errors, point them out.`
-            contentPrompt = '```\n' + query.text + '\n```'
-            break
-        case 'big-bang':
-            rolePrompt = `You are a professional writer and you will write ${query.articlePrompt} based on the given words`
-            commandPrompt = `Write ${query.articlePrompt} of no more than 160 words. The article must contain the words in the following text. The more words you use, the better`
-            break
+                if (query.selectedWord) {
+                    rolePrompt = `You are an expert in the semantic syntax of the ${sourceLangName} language and you are teaching me the ${sourceLangName} language. I give you a sentence in ${sourceLangName} and a word in that sentence. Please help me explain in ${targetLangName} language what the word means in the sentence and what the sentence itself means, and if the word is part of an idiom in the sentence, explain the idiom in the sentence and give a few examples in ${sourceLangName} with the same meaning and explain the examples in ${targetLangName} language, and must in ${targetLangName} language. If you understand, say yes, and then we will begin.`
+                    commandPrompt = 'Yes, I understand. Please give me the sentence and the word.'
+                    contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
+                }
+                break
+            case 'polishing':
+                rolePrompt =
+                    'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
+                commandPrompt = `polish this text in ${sourceLangName}`
+                break
+            case 'summarize':
+                rolePrompt =
+                    "You are a professional text summarizer, you can only summarize the text, don't interpret it."
+                commandPrompt = `summarize this text in the most concise language and must use ${targetLangName} language!`
+                break
+            case 'analyze':
+                rolePrompt = 'You are a professional translation engine and grammar analyzer.'
+                commandPrompt = `translate this text to ${targetLangName} and explain the grammar in the original text using ${targetLangName}`
+                break
+            case 'explain-code':
+                rolePrompt =
+                    'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
+                commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLangName} language! You may use Markdown. If the content is not code, return an error message. If the code has obvious errors, point them out.`
+                contentPrompt = '```\n' + query.text + '\n```'
+                break
+        }
     }
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let body: Record<string, any> = {
         model: settings.apiModel,

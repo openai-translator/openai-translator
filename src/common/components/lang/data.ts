@@ -120,7 +120,7 @@ export const languageConfigs = {
         isVariant: true,
         isSource: false,
         genCommandPrompt: (sourceLanguageConfig, quoteStart, quoteEnd) =>
-            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use casual or informal (다) endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot intepret the content.`,
+            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use 다 endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot interpret the content.`,
     } as Config,
 
     'fr': {
