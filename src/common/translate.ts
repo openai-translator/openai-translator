@@ -6,6 +6,7 @@ import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
 import { getLangConfig } from './components/lang/lang'
+import { SupportedLanguageCode } from './components/lang/data'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -21,8 +22,8 @@ export type APIModel =
 export interface TranslateQuery {
     text: string
     selectedWord: string
-    detectFrom: string
-    detectTo: string
+    detectFrom: SupportedLanguageCode
+    detectTo: SupportedLanguageCode
     mode: TranslateMode
     onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
@@ -187,8 +188,10 @@ export async function translate(query: TranslateQuery) {
     let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
     const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
-    const langConfig = getLangConfig(sourceLangCode)
-    let { rolePrompt } = langConfig
+    const targetLangConfig = getLangConfig(targetLangCode)
+    const sourceLangConfig = getLangConfig(sourceLangCode)
+    console.log('Source language is', sourceLangConfig)
+    let { rolePrompt } = targetLangConfig
     const assistantPrompts: string[] = []
     let commandPrompt: string
     let contentPrompt = query.text
@@ -198,15 +201,16 @@ export async function translate(query: TranslateQuery) {
     switch (query.mode) {
         case 'translate':
             quoteProcessor = new QuoteProcessor()
-            commandPrompt = langConfig.genCommandPrompt(
-                getLangConfig(targetLangCode),
+            commandPrompt = targetLangConfig.genCommandPrompt(
+                sourceLangConfig,
                 quoteProcessor.quoteStart,
                 quoteProcessor.quoteEnd
             )
+            console.log(commandPrompt)
             if (query.text.length < 5 && toChinese) {
                 // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                 rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLangName}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。按照下面格式用中文阐述：
-                    <序号><单词或短语> · /<${langConfig.phoneticNotation}>/
+                    <序号><单词或短语> · /<${targetLangConfig.phoneticNotation}>/
                     [<词性缩写>] <适用语境（用中文阐述）>
                     例句：<例句>(例句翻译)`
                 commandPrompt = ''
@@ -216,7 +220,7 @@ export async function translate(query: TranslateQuery) {
                 // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
                 rolePrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标或转写、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
                 <单词>
-                [<语种>] · / <单词${langConfig.phoneticNotation}>
+                [<语种>] · / <单词${targetLangConfig.phoneticNotation}>
                 [<词性缩写>] <中文含义>]
                 例句：
                 <序号><例句>(例句翻译)`

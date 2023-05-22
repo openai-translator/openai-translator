@@ -11,7 +11,14 @@ import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
-import { detectLang, supportedLanguages } from './lang/lang'
+import {
+    detectLang,
+    getLangConfig,
+    intoSupportedLanguageCode,
+    sourceLanguages,
+    targetLanguages,
+    SupportedLanguageCode,
+} from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -58,15 +65,21 @@ const cache = new LRUCache({
     },
 })
 
-const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
-    return [
-        ...acc,
-        {
-            id,
-            label,
-        } as Option,
-    ]
-}, [] as Value)
+function genLangOptions(langs: [SupportedLanguageCode, string][]): Value {
+    return langs.reduce((acc, [id, label]) => {
+        return [
+            ...acc,
+            {
+                id,
+                label,
+            } as Option,
+        ]
+    }, [] as Value)
+}
+const sourceLangOptions = genLangOptions(sourceLanguages)
+console.log('sourceLangOptions', sourceLanguages, sourceLangOptions)
+const targetLangOptions = genLangOptions(targetLanguages)
+console.log('targetLangOptions', targetLanguages, targetLangOptions)
 
 const useStyles = createUseStyles({
     'popupCard': {
@@ -572,21 +585,23 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const stopLoading = useCallback(() => {
         setIsLoading(false)
     }, [])
-    const [originalLang, setOriginalLang] = useState('')
-    const [targetLang, setTargetLang] = useState('')
+    const [sourceLang, setOriginalLang] = useState('en' as SupportedLanguageCode)
+    const [targetLang, setTargetLang] = useState('en' as SupportedLanguageCode)
     const stopAutomaticallyChangeTargetLang = useRef(false)
     useEffect(() => {
         ;(async () => {
-            const originalLang_ = (await detectLang(originalText)) ?? 'en'
+            const originalLang_ = await detectLang(originalText)
             setOriginalLang(originalLang_)
             if (
                 translateMode === 'translate' &&
                 (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
             ) {
                 setTargetLang(
-                    originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
-                        ? 'en'
-                        : settings?.defaultTargetLanguage ?? 'en'
+                    intoSupportedLanguageCode(
+                        (['zh-Hans', 'zh-Hant'] as SupportedLanguageCode[]).includes(originalLang_)
+                            ? null
+                            : settings?.defaultTargetLanguage ?? null
+                    )
                 )
             }
         })()
@@ -597,13 +612,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         const editor = editorRef.current
         if (!editor) return
-        editor.dir = ['ar', 'fa', 'he', 'ug', 'ur'].includes(originalLang) ? 'rtl' : 'ltr'
-    }, [originalLang, actionStr])
+        editor.dir = getLangConfig(sourceLang).direction
+    }, [sourceLang, actionStr])
 
-    const translatedLanguageDirection = useMemo(
-        () => (['ar', 'fa', 'he', 'ug', 'ur'].includes(targetLang) ? 'rtl' : 'ltr'),
-        []
-    )
+    const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [])
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -757,13 +769,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
-            if (!text || !originalLang || !targetLang || !translateMode) {
+            if (!text || !sourceLang || !targetLang || !translateMode) {
                 return
             }
             const actionStrItem = actionStrItems[translateMode]
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
-                if (translateMode === 'translate' && originalLang === targetLang) {
+                if (translateMode === 'translate' && sourceLang === targetLang) {
                     actionStr = 'Polishing...'
                 }
                 setActionStr(actionStr)
@@ -785,7 +797,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     }
                 } else {
                     let actionStr = actionStrItem.afterStr
-                    if (translateMode === 'translate' && originalLang === targetLang) {
+                    if (translateMode === 'translate' && sourceLang === targetLang) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
@@ -794,7 +806,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             beforeTranslate()
             const cachedKey = `translate:${settings?.provider ?? ''}:${
                 settings?.apiModel ?? ''
-            }:${translateMode}:${originalLang}:${targetLang}:${text}:${selectedWord}`
+            }:${translateMode}:${sourceLang}:${targetLang}:${text}:${selectedWord}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -808,7 +820,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     signal,
                     text,
                     selectedWord,
-                    detectFrom: originalLang,
+                    detectFrom: sourceLang,
                     detectTo: targetLang,
                     onMessage: (message) => {
                         if (message.role) {
@@ -851,7 +863,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateMode, originalLang, targetLang]
+        [translateMode, sourceLang, targetLang]
     )
 
     useEffect(() => {
@@ -1041,7 +1053,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setIsSpeakingEditableText(true)
         const { stopSpeak } = await speak({
             text: editableText,
-            lang: originalLang,
+            lang: sourceLang,
             onFinish: () => setIsSpeakingEditableText(false),
         })
         editableStopSpeakRef.current = stopSpeak
@@ -1113,8 +1125,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     disabled={translateMode === 'explain-code'}
                                     size='mini'
                                     clearable={false}
-                                    options={langOptions}
-                                    value={[{ id: originalLang }]}
+                                    options={sourceLangOptions}
+                                    value={[{ id: sourceLang }]}
                                     overrides={{
                                         Root: {
                                             style: {
@@ -1123,11 +1135,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         },
                                     }}
                                     onChange={({ value }) => {
-                                        if (value.length > 0) {
-                                            setOriginalLang(value[0].id as string)
-                                        } else {
-                                            setOriginalLang(langOptions[0].id as string)
-                                        }
+                                        const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
+                                        setOriginalLang(langId as SupportedLanguageCode)
                                     }}
                                 />
                             </div>
@@ -1136,7 +1145,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 onClick={() => {
                                     setOriginalText(translatedText)
                                     setOriginalLang(targetLang)
-                                    setTargetLang(originalLang)
+                                    setTargetLang(sourceLang)
                                 }}
                             >
                                 <Tooltip content='Exchange' placement='top'>
@@ -1150,7 +1159,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     disabled={translateMode === 'polishing'}
                                     size='mini'
                                     clearable={false}
-                                    options={langOptions}
+                                    options={targetLangOptions}
                                     value={[{ id: targetLang }]}
                                     overrides={{
                                         Root: {
@@ -1161,11 +1170,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     }}
                                     onChange={({ value }) => {
                                         stopAutomaticallyChangeTargetLang.current = true
-                                        if (value.length > 0) {
-                                            setTargetLang(value[0].id as string)
-                                        } else {
-                                            setTargetLang(langOptions[0].id as string)
-                                        }
+                                        const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
+                                        setTargetLang(langId as SupportedLanguageCode)
                                     }}
                                 />
                             </div>
@@ -1186,7 +1192,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
                                     onClick={() => {
                                         setTranslateMode('polishing')
-                                        setTargetLang(originalLang)
+                                        setTargetLang(sourceLang)
                                     }}
                                 >
                                     <IoColorPaletteOutline />
