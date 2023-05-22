@@ -5,8 +5,7 @@ import * as lang from './components/lang/lang'
 import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
-import { getLangConfig } from './components/lang/lang'
-import { SupportedLanguageCode } from './components/lang/data'
+import { getLangConfig, SupportedLanguageCode } from './components/lang/lang'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -215,17 +214,40 @@ export async function translate(query: TranslateQuery) {
                     例句：<例句>(例句翻译)`
                 commandPrompt = ''
             }
-            if (toChinese && isAWord(sourceLangCode, query.text.trim())) {
+            if (isAWord(sourceLangCode, query.text.trim())) {
                 isWordMode = true
-                // 翻译为中文时，增加单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
-                rolePrompt = `你是一个翻译引擎，请将翻译给到的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、对应的音标或转写、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
+                if (toChinese) {
+                    // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
+                    rolePrompt = `你是一个翻译引擎，请翻译给出的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、${
+                        targetLangConfig.phoneticNotation && '对应的音标或转写、'
+                    }所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
                 <单词>
-                [<语种>] · / <单词${targetLangConfig.phoneticNotation}>
+                [<语种>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
                 [<词性缩写>] <中文含义>]
                 例句：
-                <序号><例句>(例句翻译)`
-                commandPrompt = '好的，我明白了，请给我这个单词。'
-                contentPrompt = `单词是：${query.text}`
+                <序号><例句>(例句翻译)
+                词源：
+                <词源>`
+                    commandPrompt = '好的，我明白了，请给我这个单词。'
+                    contentPrompt = `单词是：${query.text}`
+                } else {
+                    const isSameLanguage = sourceLangCode === targetLangCode
+                    rolePrompt = `You are a professional translation engine. Please translate the text into ${targetLangName} without explanation. When the text has only one word, please act as a professional ${sourceLangName}-${targetLangName} dictionary, and list the original form of the word (if any), the language of the word, ${
+                        targetLangConfig.phoneticNotation && 'the corresponding phonetic notation or transcription, '
+                    }all senses with parts of speech, ${
+                        isSameLanguage ? '' : 'bilingual '
+                    }sentence examples (at least 3) and etymology. Reply in the following format:
+                <word> (<original form>)
+                [<language>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
+                [<part of speech>] ${isSameLanguage ? '' : '<translated meaning> / '}<meaning in source language>
+                Examples:
+                <index>. <sentence>(<sentence translation>)
+                Etymology:
+                <etymology>`
+                    console.log(rolePrompt)
+                    commandPrompt = 'I understand. Please give me the word.'
+                    contentPrompt = `The word is: ${query.text}`
+                }
             }
             if (query.selectedWord) {
                 rolePrompt = `You are an expert in the semantic syntax of the ${sourceLangName} language and you are teaching me the ${sourceLangName} language. I give you a sentence in ${sourceLangName} and a word in that sentence. Please help me explain in ${targetLangName} language what the word means in the sentence and what the sentence itself means, and if the word is part of an idiom in the sentence, explain the idiom in the sentence and give a few examples in ${sourceLangName} with the same meaning and explain the examples in ${targetLangName} language, and must in ${targetLangName} language. If you understand, say yes, and then we will begin.`
