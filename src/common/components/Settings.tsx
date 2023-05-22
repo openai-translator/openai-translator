@@ -31,6 +31,7 @@ import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { backgroundFetch } from '../background/fetch'
 import { useThemeType } from '../hooks/useThemeType'
+import { Slider } from 'baseui-sd/slider'
 
 const langOptions: Value = supportLanguages.reduce((acc, [id, label]) => {
     return [
@@ -192,6 +193,13 @@ const useTTSSettingsStyles = createUseStyles({
     formControl: {
         marginBottom: '12px',
     },
+    tickBar: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: '16px',
+        paddingLeft: '16px',
+    },
 })
 
 interface TTSVoicesSettingsProps {
@@ -209,6 +217,7 @@ const ttsProviderOptions: {
 ]
 
 function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
+    const { t } = useTranslation()
     const { theme, themeType } = useTheme()
 
     const styles = useTTSSettingsStyles({ theme, themeType, isDesktopApp: utils.isDesktopApp() })
@@ -335,7 +344,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
     return (
         <div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>Provider</label>
+                <label className={styles.settingsLabel}>{t('Provider')}</label>
                 <div className={styles.providerSelector}>
                     <Select
                         size='compact'
@@ -349,7 +358,47 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
                 </div>
             </div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>Voice</label>
+                <label className={styles.settingsLabel}>{t('Rate')}</label>
+                <Slider
+                    min={1}
+                    max={20}
+                    step={1}
+                    value={[props.value?.rate ?? 10]}
+                    onChange={({ value }) => props.onChange?.({ ...props.value, rate: value[0] })}
+                    overrides={{
+                        ThumbValue: () => null,
+                        InnerThumb: () => null,
+                        TickBar: () => (
+                            <div className={styles.tickBar}>
+                                <div>{t('Slow')}</div>
+                                <div>{t('Fast')}</div>
+                            </div>
+                        ),
+                    }}
+                />
+            </div>
+            <div className={styles.formControl}>
+                <label className={styles.settingsLabel}>{t('Volume')}</label>
+                <Slider
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[props.value?.volume ?? 100]}
+                    onChange={({ value }) => props.onChange?.({ ...props.value, volume: value[0] })}
+                    overrides={{
+                        ThumbValue: () => null,
+                        InnerThumb: () => null,
+                        TickBar: () => (
+                            <div className={styles.tickBar}>
+                                <div>{t('Quiet')}</div>
+                                <div>{t('Loud')}</div>
+                            </div>
+                        ),
+                    }}
+                />
+            </div>
+            <div className={styles.formControl}>
+                <label className={styles.settingsLabel}>{t('Voice')}</label>
                 {(props.value?.voices ?? []).map(({ lang, voice }) => (
                     <div className={styles.voiceSelector} key={lang}>
                         <Select
@@ -412,7 +461,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
                             setShowLangSelector(true)
                         }}
                     >
-                        Add
+                        {t('Add')}
                     </Button>
                 </div>
             </div>

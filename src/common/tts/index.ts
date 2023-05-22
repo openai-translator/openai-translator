@@ -43,8 +43,11 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
     const settings = await getSettings()
     const langTag = langCode2TTSLang[lang ?? 'en'] ?? 'en-US'
     const voiceCfg = settings.tts?.voices?.find((item) => item.lang === lang)
+    const rate = (settings.tts?.rate ?? 10) / 10
+    const volume = settings.tts?.volume
+
     if (settings.tts?.provider === 'EdgeTTS') {
-        return edgeSpeak({ text, lang: langTag, onFinish, voice: voiceCfg?.voice })
+        return edgeSpeak({ text, lang: langTag, onFinish, voice: voiceCfg?.voice, rate, volume: volume ?? 100 })
     }
 
     const utterance = new SpeechSynthesisUtterance()
@@ -54,6 +57,8 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
 
     utterance.text = text
     utterance.lang = langTag
+    utterance.rate = rate
+    utterance.volume = volume ? volume / 100 : 1
 
     const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
     const settingsVoice = supportVoices.find((v) => v.voiceURI === voiceCfg?.voice)
