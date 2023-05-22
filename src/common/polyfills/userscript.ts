@@ -80,34 +80,44 @@ async function getStreamText(stream: ReadableStream) {
     return str
 }
 
-async function handleReadyStateChange(isStream: boolean, r: Tampermonkey.Response<any>) {
-    Object.assign(r, { status: r.status })
-
-    if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-        if (r.status === 200 && isStream) {
-            Object.assign(r, { body: r.response })
-            return r
-        } else {
-            const respText = await getStreamText(r.response)
-            Object.assign(r, { json: () => JSON.parse(respText), text: () => respText })
-            return r
-        }
-    }
-}
-
-export async function userscriptFetch(
-    url: string,
-    { body, headers, method, signal }: RequestInit,
-    isStream = true
-): Promise<any> {
+export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<any> {
+    // Only Tampermonkey support streaming responses
+    // eslint-disable-next-line camelcase
+    const responseType: any = GM_info.scriptHandler === 'Tampermonkey' ? 'stream' : 'text'
     return new Promise((resolve) => {
         const handle = GM_xmlhttpRequest({
             url,
             data: body as string,
             headers: headers as any,
             method: method as any,
-            responseType: 'stream' as any,
-            onreadystatechange: async (r) => resolve(await handleReadyStateChange(isStream, r)),
+            responseType,
+            onreadystatechange: async (r) => {
+                Object.assign(r, { status: r.status })
+                if (responseType === 'stream') {
+                    if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                        resolve({
+                            ...r,
+                            body: r.response,
+                            json: async () => JSON.parse(await getStreamText(r.response)),
+                            text: async () => await getStreamText(r.response),
+                        })
+                    }
+                } else {
+                    if (r.readyState === XMLHttpRequest.DONE) {
+                        resolve({
+                            ...r,
+                            body: new ReadableStream({
+                                start(controller) {
+                                    const str = new TextEncoder().encode(r.response)
+                                    controller.enqueue(str)
+                                },
+                            }),
+                            text: () => r.response,
+                            json: () => JSON.parse(r.response),
+                        })
+                    }
+                }
+            },
         })
         signal?.addEventListener('abort', () => {
             handle.abort()
