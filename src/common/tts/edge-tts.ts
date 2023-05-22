@@ -254,20 +254,13 @@ function calcMaxMesgSize(voice: string, rate: number, volume: number): number {
     return websocketMaxSize - overheadPerMessage
 }
 
-interface EdgeTTSExtraOptions {
+interface EdgeTTSOptions extends SpeakOptions {
     voice?: string
     rate?: number
     volume?: number
 }
 
-export async function speak({
-    text,
-    lang,
-    onFinish,
-    voice,
-    rate = 1,
-    volume = 100,
-}: SpeakOptions & EdgeTTSExtraOptions) {
+export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 100 }: EdgeTTSOptions) {
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const audioContext = new AudioContext()
