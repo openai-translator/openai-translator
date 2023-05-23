@@ -65,5 +65,7 @@
   "Using clipboard": "ใช้คลิปบอร์ด",
   "Allow using the clipboard to get the selected text when the selected text is not available": "อนุญาตให้ใช้คลิปบอร์ดเพื่อรับข้อความที่เลือกเมื่อข้อความที่เลือกไม่สามารถใช้ได้",
   "Please login to ChatGPT Web": "กรุณาเข้าสู่ระบบ ChatGPT Web",
+  "It is highly recommended to disable this feature and use the Clip Extension": "แนะนำให้ปิดใช้งานคุณสมบัตินี้และใช้ Clip Extension",
+  "Clip Extension": "ส่วนขยายคลิป",
   "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
 }

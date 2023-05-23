@@ -1135,7 +1135,30 @@ export function InnerSettings(props: IInnerSettingsProps) {
                 <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
                     <TranslateModeSelector onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='alwaysShowIcons' label={t('Show icon when text is selected')}>
+                <FormItem
+                    name='alwaysShowIcons'
+                    label={t('Show icon when text is selected')}
+                    caption={
+                        isDesktopApp && (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                }}
+                            >
+                                {t('It is highly recommended to disable this feature and use the Clip Extension')}
+                                <a
+                                    href='https://github.com/openai-translator/openai-translator/blob/main/CLIP-EXTENSIONS.md'
+                                    target='_blank'
+                                    rel='noreferrer'
+                                >
+                                    {t('Clip Extension')}
+                                </a>
+                            </div>
+                        )
+                    }
+                >
                     <AlwaysShowIconsCheckbox onBlur={onBlur} />
                 </FormItem>
                 <FormItem

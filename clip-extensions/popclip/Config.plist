@@ -29,7 +29,7 @@
         <key>Extension Image File</key>
         <string>openai-translator.png</string>
         <key>Extension Name</key>
-        <string>openai-translator</string>
+        <string>OpenAI Translator</string>
         <key>Required OS Version</key>
         <string>10.13</string>
     </dict>
