@@ -222,7 +222,6 @@ const useStyles = createUseStyles({
     },
     'popupCardTranslatedContainer': (props: IThemedStyleProps) => ({
         'position': 'relative',
-        'display': 'flex',
         'padding': '26px 16px 16px 16px',
         'border-top': `1px solid ${props.theme.colors.borderTransparent}`,
         '-ms-user-select': 'none',
@@ -460,6 +459,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [props.autoFocus])
 
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        editor.focus()
+        editor.spellcheck = false
+    }, [props.uuid])
+
     const [highlightWords, setHighlightWords] = useState<string[]>([])
 
     useEffect(() => {
@@ -583,20 +591,19 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         ;(async () => {
             const originalLang_ = await detectLang(originalText)
             setOriginalLang(originalLang_)
-            if (
-                translateMode === 'translate' &&
-                (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
-            ) {
-                setTargetLang(
-                    intoLangCode(
-                        (['zh-Hans', 'zh-Hant'] as LangCode[]).includes(originalLang_)
+            setTargetLang((targetLang_) => {
+                if (
+                    translateMode === 'translate' &&
+                    (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang_)
+                ) {
+                    return intoLangCode(originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
                             ? null
-                            : settings?.defaultTargetLanguage ?? null
-                    )
-                )
-            }
+                            : settings?.defaultTargetLanguage ?? null)
+                }
+                return intoLangCode(targetLang_)
+            })
         })()
-    }, [originalText, translateMode, settings, targetLang, props.uuid])
+    }, [originalText, translateMode, settings?.defaultTargetLanguage, props.uuid])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -757,6 +764,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [headerRef])
 
+    const [isNotLogin, setIsNotLogin] = useState(false)
+
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
@@ -813,6 +822,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     selectedWord,
                     detectFrom: sourceLang,
                     detectTo: targetLang,
+                    onStatusCode: (statusCode) => {
+                        setIsNotLogin(statusCode === 401)
+                    },
                     onMessage: (message) => {
                         if (message.role) {
                             return
@@ -1550,6 +1562,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 <CopyButton text={translatedText} styles={styles}></CopyButton>
                                             </div>
                                         )}
+                                    </div>
+                                )}
+                                {isNotLogin && settings?.provider === 'ChatGPT' && (
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                        }}
+                                    >
+                                        <span>{t('Please login to ChatGPT Web')}: </span>
+                                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                                            Login
+                                        </a>
                                     </div>
                                 )}
                             </div>

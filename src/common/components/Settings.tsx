@@ -31,6 +31,7 @@ import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { backgroundFetch } from '../background/fetch'
 import { useThemeType } from '../hooks/useThemeType'
+import { Slider } from 'baseui-sd/slider'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -192,6 +193,13 @@ const useTTSSettingsStyles = createUseStyles({
     formControl: {
         marginBottom: '12px',
     },
+    tickBar: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: '16px',
+        paddingLeft: '16px',
+    },
 })
 
 interface TTSVoicesSettingsProps {
@@ -209,6 +217,7 @@ const ttsProviderOptions: {
 ]
 
 function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
+    const { t } = useTranslation()
     const { theme, themeType } = useTheme()
 
     const styles = useTTSSettingsStyles({ theme, themeType, isDesktopApp: utils.isDesktopApp() })
@@ -335,7 +344,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
     return (
         <div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>Provider</label>
+                <label className={styles.settingsLabel}>{t('Provider')}</label>
                 <div className={styles.providerSelector}>
                     <Select
                         size='compact'
@@ -349,7 +358,47 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
                 </div>
             </div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>Voice</label>
+                <label className={styles.settingsLabel}>{t('Rate')}</label>
+                <Slider
+                    min={1}
+                    max={20}
+                    step={1}
+                    value={[props.value?.rate ?? 10]}
+                    onChange={({ value }) => props.onChange?.({ ...props.value, rate: value[0] })}
+                    overrides={{
+                        ThumbValue: () => null,
+                        InnerThumb: () => null,
+                        TickBar: () => (
+                            <div className={styles.tickBar}>
+                                <div>{t('Slow')}</div>
+                                <div>{t('Fast')}</div>
+                            </div>
+                        ),
+                    }}
+                />
+            </div>
+            <div className={styles.formControl}>
+                <label className={styles.settingsLabel}>{t('Volume')}</label>
+                <Slider
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[props.value?.volume ?? 100]}
+                    onChange={({ value }) => props.onChange?.({ ...props.value, volume: value[0] })}
+                    overrides={{
+                        ThumbValue: () => null,
+                        InnerThumb: () => null,
+                        TickBar: () => (
+                            <div className={styles.tickBar}>
+                                <div>{t('Quiet')}</div>
+                                <div>{t('Loud')}</div>
+                            </div>
+                        ),
+                    }}
+                />
+            </div>
+            <div className={styles.formControl}>
+                <label className={styles.settingsLabel}>{t('Voice')}</label>
                 {(props.value?.voices ?? []).map(({ lang, voice }) => (
                     <div className={styles.voiceSelector} key={lang}>
                         <Select
@@ -412,7 +461,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
                             setShowLangSelector(true)
                         }}
                     >
-                        Add
+                        {t('Add')}
                     </Button>
                 </div>
             </div>
@@ -476,8 +525,15 @@ interface APIModelOption {
 }
 
 function APIModelSelector(props: APIModelSelectorProps) {
+    const { t } = useTranslation()
+    const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
+    const [errMsg, setErrMsg] = useState<string>()
+    const [isChatGPTNotLogin, setIsChatGPTNotLogin] = useState(false)
     useEffect(() => {
+        setIsChatGPTNotLogin(false)
+        setErrMsg('')
+        setOptions([])
         if (props.provider === 'OpenAI') {
             setOptions([
                 { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
@@ -488,50 +544,100 @@ function APIModelSelector(props: APIModelSelectorProps) {
                 { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
             ])
         } else if (props.provider === 'ChatGPT') {
-            backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
-                .then((response) => response.json())
-                .then((resp) => {
-                    const headers: Record<string, string> = {
-                        Authorization: `Bearer ${resp.accessToken}`,
+            setIsLoading(true)
+            try {
+                ;(async () => {
+                    const sessionResp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
+                    const sessionRespJsn = await sessionResp.json()
+                    if (sessionResp.status !== 200) {
+                        if (sessionResp.status === 401) {
+                            setIsChatGPTNotLogin(true)
+                        }
+                        setErrMsg(sessionRespJsn.detail.message)
+                        return
                     }
-                    return backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
+                    const headers: Record<string, string> = {
+                        Authorization: `Bearer ${sessionRespJsn.accessToken}`,
+                    }
+                    const modelsResp = await backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
                         cache: 'no-cache',
                         headers,
-                    }).then((response) => response.json())
-                })
-                .then((models) => {
-                    if (!models || !models.models) {
+                    })
+                    const modelsRespJsn = await modelsResp.json()
+                    if (!modelsRespJsn) {
+                        return
+                    }
+                    if (modelsResp.status !== 200) {
+                        if (modelsResp.status === 401) {
+                            setIsChatGPTNotLogin(true)
+                        }
+                        setErrMsg(modelsRespJsn.detail.message)
+                        return
+                    }
+                    const { models } = modelsRespJsn
+                    if (!models) {
                         return
                     }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    setOptions(models.models.map((model: any) => ({ label: model.title, id: model.slug })))
-                })
-                .catch((e) => {
-                    console.error(e)
-                })
+                    setOptions(models.map((model: any) => ({ label: model.title, id: model.slug })))
+                })()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (e: any) {
+                setErrMsg(JSON.stringify(e))
+            } finally {
+                setIsLoading(false)
+            }
         }
     }, [props.provider])
 
     return (
-        <Select
-            size='compact'
-            onBlur={props.onBlur}
-            searchable={false}
-            clearable={false}
-            value={
-                props.value
-                    ? [
-                          {
-                              id: props.value,
-                          },
-                      ]
-                    : undefined
-            }
-            onChange={(params) => {
-                props.onChange?.(params.value[0].id as APIModel)
-            }}
-            options={options}
-        />
+        <div>
+            <Select
+                isLoading={isLoading}
+                size='compact'
+                onBlur={props.onBlur}
+                searchable={false}
+                clearable={false}
+                value={
+                    props.value
+                        ? [
+                              {
+                                  id: props.value,
+                              },
+                          ]
+                        : undefined
+                }
+                onChange={(params) => {
+                    props.onChange?.(params.value[0].id as APIModel)
+                }}
+                options={options}
+            />
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                }}
+            >
+                {errMsg && (
+                    <div
+                        style={{
+                            color: 'red',
+                        }}
+                    >
+                        {errMsg}
+                    </div>
+                )}
+                {isChatGPTNotLogin && (
+                    <div>
+                        <span>{t('Please login to ChatGPT Web')}: </span>
+                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                            Login
+                        </a>
+                    </div>
+                )}
+            </div>
+        </div>
     )
 }
 
@@ -974,7 +1080,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
-                <FormItem name='provider' label={t('Default Service Provider')}>
+                <FormItem name='provider' label={t('Default Service Provider')} required>
                     <ProviderSelector />
                 </FormItem>
                 {values.provider !== 'ChatGPT' && (
@@ -1012,7 +1118,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                     </FormItem>
                 )}
                 {values.provider !== 'Azure' && (
-                    <FormItem name='apiModel' label={t('API Model')}>
+                    <FormItem name='apiModel' label={t('API Model')} required>
                         <APIModelSelector provider={values.provider} onBlur={onBlur} />
                     </FormItem>
                 )}

@@ -62,6 +62,8 @@ export interface ISettings {
             voice: string
         }[]
         provider?: TTSProvider
+        volume?: number
+        rate?: number
     }
     restorePreviousPosition?: boolean
     selectInputElementsText?: boolean

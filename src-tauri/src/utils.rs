@@ -224,6 +224,15 @@ pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<
 }
 
 pub fn send_text(text: String) {
-    let handle = APP_HANDLE.get().unwrap();
-    handle.emit_all("change-text", text).unwrap();
+    match APP_HANDLE.get() {
+        Some(handle) => handle.emit_all("change-text", text).unwrap_or_default(),
+        None => {}
+    }
+}
+
+pub fn show() {
+    match APP_HANDLE.get() {
+        Some(handle) => handle.emit_all("show", "").unwrap_or_default(),
+        None => {}
+    }
 }

@@ -1,7 +1,7 @@
 import { SpeakOptions } from './types'
 import { v4 as uuidv4 } from 'uuid'
 
-function mkssml(text: string, voice: string, rate: string, volume: string) {
+function mkssml(text: string, voice: string, rate: number, volume: number) {
     return (
         "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>" +
         `<voice name='${voice}'><prosody pitch='+0Hz' rate='${rate}' volume='${volume}'>` +
@@ -245,7 +245,7 @@ function* splitTextByByteLength(text: string, byteLength: number): Generator<str
     }
 }
 
-function calcMaxMesgSize(voice: string, rate: string, volume: string): number {
+function calcMaxMesgSize(voice: string, rate: number, volume: number): number {
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const websocketMaxSize: number = 2 ** 16
@@ -254,13 +254,17 @@ function calcMaxMesgSize(voice: string, rate: string, volume: string): number {
     return websocketMaxSize - overheadPerMessage
 }
 
-export async function speak({ text, lang, onFinish, voice }: SpeakOptions & { voice?: string }) {
+interface EdgeTTSOptions extends SpeakOptions {
+    voice?: string
+    rate?: number
+    volume?: number
+}
+
+export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 100 }: EdgeTTSOptions) {
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const audioContext = new AudioContext()
     const audioBufferSource = audioContext.createBufferSource()
-    const rate = '+0%'
-    const volume = '+0%'
 
     const texts = splitTextByByteLength(
         escape(removeIncompatibleCharacters(text)),
