@@ -66,5 +66,7 @@
   "Using clipboard": "クリップボードを使用",
   "Allow using the clipboard to get the selected text when the selected text is not available": "選択されたテキストが利用できない場合、クリップボードを使用して選択されたテキストを取得することを許可する",
   "Please login to ChatGPT Web": "ChatGPT Webにログインしてください",
+  "It is highly recommended to disable this feature and use the Clip Extension": "この機能を無効にしてClip拡張機能を使用することを強くお勧めします",
+  "Clip Extension": "Clip拡張機能",
   "disable collecting statistics": "統計情報の収集を無効にする"
 }

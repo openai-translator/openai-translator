@@ -66,5 +66,7 @@
   "Using clipboard": "Using clipboard",
   "Allow using the clipboard to get the selected text when the selected text is not available": "Allow using the clipboard to get the selected text when the selected text is not available",
   "Please login to ChatGPT Web": "Please login to ChatGPT Web",
+  "It is highly recommended to disable this feature and use the Clip Extension": "It is highly recommended to disable this feature and use the Clip Extension",
+  "Clip Extension": "Clip Extension",
   "disable collecting statistics": "Disable collecting statistics"
 }
