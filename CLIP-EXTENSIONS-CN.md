@@ -19,11 +19,21 @@
 * 2. 下载 [openai-translator.popclipextz](https://github.com/yetone/openai-translator/releases/latest/download/openai-translator.popclipextz)
 * 3. 双击下载完毕的 openai-translator.popclipextz，点击弹出窗口中的 Install "OpenAI Translator" 按钮即可安装完毕
     
-    <img src="https://user-images.githubusercontent.com/1206493/240260692-8af6141a-3dba-4775-921d-505223addf9e.png" />
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/1206493/240260692-8af6141a-3dba-4775-921d-505223addf9e.png" />
+    </p>
 
 * 4. 在 PopClip 中开启 OpenAI Translator
     
-    <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+    </p>
+
+* 5. 效果如下
+
+    <p align="center">
+        <img width="600" src="https://user-images.githubusercontent.com/1206493/240355949-8f41d98d-f097-4ce4-a533-af60e1757ca1.gif" />
+    </p>
 
 # Windows
 
@@ -33,4 +43,9 @@
 * 2. 下载 [openai-translator.pbar](https://github.com/yetone/openai-translator/releases/latest/download/openai-translator.pbar)
 * 3. 双击下载完毕的 openai-translator.pbar 即可安装
 * 4. 在 SnipDo 的设置页面中启用 OpenAI Translator
+* 5. 效果如下
+
+    <p align="center">
+        <img width="600" src="https://user-images.githubusercontent.com/1206493/240358161-2788eb97-d00b-4808-aa86-a7fcfe3f71dd.gif" />
+    </p>
 
