@@ -66,5 +66,7 @@
   "Using clipboard": "使用剪贴板",
   "Allow using the clipboard to get the selected text when the selected text is not available": "当无法获得选中文本时允许使用剪贴板来获取选中文本",
   "Please login to ChatGPT Web": "请登录 ChatGPT Web",
+  "It is highly recommended to disable this feature and use the Clip Extension": "强烈建议您关闭此功能并使用 Clip 扩展",
+  "Clip Extension": "Clip 扩展",
   "disable collecting statistics": "禁用统计"
 }

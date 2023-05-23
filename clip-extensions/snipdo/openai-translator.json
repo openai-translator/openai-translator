@@ -1,0 +1,12 @@
+{
+    "name": "OpenAI Translator",
+    "identifier": "xyz.yetone.apps.openai-translator.clip-extensions.snipdo",
+    "icon": "icon.png",
+    "actions": [
+        {
+            "title": "OpenAI Translator",
+            "icon": "icon.png",
+            "powershellFile": "openai-translator.ps1"
+        }
+    ]
+}

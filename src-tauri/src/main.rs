@@ -15,6 +15,7 @@ mod windows;
 use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
 use std::env;
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_autostart::MacosLauncher;
@@ -33,6 +34,7 @@ use tauri::api::notification::Notification;
 use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use window_shadows::set_shadow;
+use tiny_http::{Header, Response as HttpResponse, Server};
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 pub static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
@@ -63,6 +65,20 @@ fn query_accessibility_permissions() -> bool {
 #[cfg(not(target_os = "macos"))]
 fn query_accessibility_permissions() -> bool {
     return true;
+}
+
+#[inline]
+fn launch_ipc_server(server: &Server) {
+    for mut req in server.incoming_requests() {
+        let mut selected_text = String::new();
+        req.as_reader().read_to_string(&mut selected_text).unwrap();
+        utils::send_text(selected_text);
+        let window = windows::show_main_window(false, false);
+        window.set_focus().unwrap();
+        utils::show();
+        let response = HttpResponse::from_string("ok");
+        req.respond(response).unwrap();
+    }
 }
 
 fn main() {
@@ -292,6 +308,20 @@ fn main() {
                 }
             }
             windows::show_thumb(-100, -100);
+            std::thread::spawn(move || {
+                #[cfg(target_os = "windows")]
+                {
+                    let server = Server::http("127.0.0.1:62007").unwrap();
+                    launch_ipc_server(&server);
+                }
+                #[cfg(not(target_os = "windows"))]
+                {
+                    let path = Path::new("/tmp/openai-translator.sock");
+                    std::fs::remove_file(path).unwrap_or_default();
+                    let server = Server::http_unix(path).unwrap();
+                    launch_ipc_server(&server);
+                }
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
