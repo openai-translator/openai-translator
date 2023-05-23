@@ -143,7 +143,7 @@ scoop install openai-translator
 详情请见 [桌面端划词扩展](./CLIP-EXTENSIONS-CN.md)
 
   <p align="center">
-      <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+    <img width="600" src="https://user-images.githubusercontent.com/1206493/240355949-8f41d98d-f097-4ce4-a533-af60e1757ca1.gif" />
   </p>
 
 ## 浏览器插件

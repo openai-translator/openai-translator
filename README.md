@@ -144,8 +144,8 @@ scoop install openai-translator
 For details, see [Desktop Clip Extension](./CLIP-EXTENSIONS.md)
 
   <p align="center">
-      <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
-  </p
+    <img width="600" src="https://user-images.githubusercontent.com/1206493/240355949-8f41d98d-f097-4ce4-a533-af60e1757ca1.gif" />
+  </p>
  
 ## Browser Extension
 
