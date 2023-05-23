@@ -455,6 +455,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [props.autoFocus])
 
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        editor.focus()
+        editor.spellcheck = false
+    }, [props.uuid])
+
     const [highlightWords, setHighlightWords] = useState<string[]>([])
 
     useEffect(() => {
@@ -578,18 +587,19 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         ;(async () => {
             const originalLang_ = (await detectLang(originalText)) ?? 'en'
             setOriginalLang(originalLang_)
-            if (
-                translateMode === 'translate' &&
-                (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
-            ) {
-                setTargetLang(
-                    originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
+            setTargetLang((targetLang_) => {
+                if (
+                    translateMode === 'translate' &&
+                    (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang_)
+                ) {
+                    return originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
                         ? 'en'
                         : settings?.defaultTargetLanguage ?? 'en'
-                )
-            }
+                }
+                return targetLang_
+            })
         })()
-    }, [originalText, translateMode, settings, targetLang, props.uuid])
+    }, [originalText, translateMode, settings?.defaultTargetLanguage, props.uuid])
 
     const [actionStr, setActionStr] = useState('')
 

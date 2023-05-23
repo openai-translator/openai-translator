@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
@@ -32,6 +32,7 @@ export function App() {
             return setPinned(pinned)
         })
     }, [])
+
     useEffect(() => {
         let unlisten
         ;(async () => {
@@ -42,6 +43,17 @@ export function App() {
                     setUUID(uuid_)
                     setText(selectedText)
                 }
+            })
+        })()
+        return unlisten
+    }, [])
+
+    useEffect(() => {
+        let unlisten
+        ;(async () => {
+            unlisten = await listen('show', async () => {
+                const uuid_ = uuidv4().replace(/-/g, '').slice(0, 6)
+                setUUID(uuid_)
             })
         })()
         return unlisten

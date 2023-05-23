@@ -71,6 +71,7 @@ pub fn show_main_window_with_selected_text() {
     }
 
     window.set_focus().unwrap();
+    utils::show();
 }
 
 pub fn close_thumb() {
