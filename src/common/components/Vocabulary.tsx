@@ -261,10 +261,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                 mode: 'big-bang',
                 signal,
                 text: str,
-                selectedWord: '',
-                detectFrom: '',
-                detectTo: '',
-                articlePrompt: prompt,
+                articlePrompt: prompt || '',
                 onMessage: (message) => {
                     if (message.role) {
                         return

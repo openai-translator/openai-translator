@@ -49,7 +49,7 @@ export interface ISettings {
     apiModel: string
     provider: Provider | 'OpenAI'
     autoTranslate: boolean
-    defaultTranslateMode: TranslateMode | 'nop'
+    defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string
     alwaysShowIcons: boolean
     hotkey?: string
