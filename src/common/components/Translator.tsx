@@ -590,7 +590,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         ;(async () => {
             const originalLang_ = await detectLang(originalText)
-            setOriginalLang(originalLang_)
+            setSourceLang(originalLang_)
             setTargetLang((targetLang_) => {
                 if (
                     translateMode === 'translate' &&
@@ -1141,7 +1141,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     }}
                                     onChange={({ value }) => {
                                         const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
-                                        setOriginalLang(langId as LangCode)
+                                        setSourceLang(langId as LangCode)
                                     }}
                                 />
                             </div>
@@ -1149,7 +1149,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 className={styles.arrow}
                                 onClick={() => {
                                     setOriginalText(translatedText)
-                                    setOriginalLang(targetLang)
+                                    setSourceLang(targetLang)
                                     setTargetLang(sourceLang)
                                 }}
                             >
