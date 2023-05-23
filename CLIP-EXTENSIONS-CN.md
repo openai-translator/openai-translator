@@ -16,7 +16,7 @@
 [PopClip](https://pilotmoon.com/popclip/) 是 macOS 上成熟的划词软件，它提供了完善的插件机制，我们提供了它的插件，安装步骤如下：
 
 * 1. 下载并安装 [PopClip](https://pilotmoon.com/popclip/)
-* 2. 下载 [openai-translator.popclipextz](https://github.com/yetone/openai-translator/releases/latest/download/openai-translator.popclipextz)
+* 2. 下载 [openai-translator.popclipextz](https://github.com/openai-translator/openai-translator/releases/latest/download/openai-translator.popclipextz)
 * 3. 双击下载完毕的 openai-translator.popclipextz，点击弹出窗口中的 Install "OpenAI Translator" 按钮即可安装完毕
     
     <p align="center">
@@ -40,7 +40,7 @@
 ## SnipDo
 
 * 1. 下载并安装 [SnipDo](https://apps.microsoft.com/store/detail/snipdo/9NPZ2TVKJVT7)
-* 2. 下载 [openai-translator.pbar](https://github.com/yetone/openai-translator/releases/latest/download/openai-translator.pbar)
+* 2. 下载 [openai-translator.pbar](https://github.com/openai-translator/openai-translator/releases/latest/download/openai-translator.pbar)
 * 3. 双击下载完毕的 openai-translator.pbar 即可安装
 * 4. 在 SnipDo 的设置页面中启用 OpenAI Translator
 * 5. 效果如下
