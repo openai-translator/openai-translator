@@ -144,10 +144,10 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - name: Build
+      - name: Build PopClip extension
         run: make build-popclip-extension
 
-      - name: Upload extensions to release
+      - name: Upload PopClip extension to release
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -156,6 +156,20 @@ jobs:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
           asset_path: dist/openai-translator.popclipextz
           asset_name: openai-translator.popclipextz
+          asset_content_type: application/zip
+
+      - name: Build SnipDo extension
+        run: make build-snipdo-extension
+
+      - name: Upload SnipDo extension to release
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
+          asset_path: dist/openai-translator.pbar
+          asset_name: openai-translator.pbar
           asset_content_type: application/zip
 
   build-browser-extension:
