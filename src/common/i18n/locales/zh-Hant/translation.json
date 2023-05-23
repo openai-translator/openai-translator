@@ -63,10 +63,10 @@
   "insert to editor": "插入編輯器",
   "Show button when text is selected": "選中文字時顯示按鈕",
   "Show icon when text is selected": "選中文字時顯示圖標",
-  "Using clipboard": "使用剪贴板",
-  "Allow using the clipboard to get the selected text when the selected text is not available": "當選中文字不可用時，允許使用剪貼板來獲取選中的文字",
-  "Please login to ChatGPT Web": "請登錄 ChatGPT Web",
-  "It is highly recommended to disable this feature and use the Clip Extension": "強烈建議您禁用此功能，並使用 Clip 擴展",
-  "Clip Extension": "Clip 擴展",
+  "Using clipboard": "使用剪貼簿",
+  "Allow using the clipboard to get the selected text when the selected text is not available": "當選中文字不可用時，允許使用剪貼簿來獲取選中的文字",
+  "Please login to ChatGPT Web": "請登入 ChatGPT Web",
+  "It is highly recommended to disable this feature and use the Clip Extension": "強烈建議您禁用此功能，並使用 Clip 擴充套件",
+  "Clip Extension": "Clip 擴充套件",
   "disable collecting statistics": "停用統計"
 }
