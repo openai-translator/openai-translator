@@ -537,6 +537,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [originalText, setOriginalText] = useState(props.text)
+    const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
@@ -547,8 +548,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [props.text, props.uuid])
 
     useEffect(() => {
-        setEditableText(originalText)
-    }, [originalText])
+        setEditableText(detectedOriginalText)
+    }, [detectedOriginalText])
 
     const checkWordCollection = useCallback(async () => {
         try {
@@ -587,25 +588,24 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [sourceLang, setSourceLang] = useState('en' as LangCode)
     const [targetLang, setTargetLang] = useState('en' as LangCode)
     const stopAutomaticallyChangeTargetLang = useRef(false)
+
     useEffect(() => {
         ;(async () => {
-            const originalLang_ = await detectLang(originalText)
-            setSourceLang(originalLang_)
+            const sourceLang_ = await detectLang(originalText)
+            setSourceLang(sourceLang_)
             setTargetLang((targetLang_) => {
-                if (
-                    translateMode === 'translate' &&
-                    (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang_)
-                ) {
+                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
                     return intoLangCode(
-                        originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
+                        sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
                             ? null
                             : settings?.defaultTargetLanguage ?? null
                     )
                 }
                 return intoLangCode(targetLang_)
             })
+            setDetectedOriginalText(originalText)
         })()
-    }, [originalText, translateMode, settings?.defaultTargetLanguage, props.uuid])
+    }, [originalText, isTranslate, settings?.defaultTargetLanguage, props.uuid])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -874,11 +874,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         const controller = new AbortController()
         const { signal } = controller
-        translateText(originalText, selectedWord, signal)
+        translateText(detectedOriginalText, selectedWord, signal)
         return () => {
             controller.abort()
         }
-    }, [translateText, originalText, selectedWord, translationFlag])
+    }, [translateText, detectedOriginalText, selectedWord, translationFlag])
 
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
@@ -1148,7 +1148,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             <div
                                 className={styles.arrow}
                                 onClick={() => {
-                                    setOriginalText(translatedText)
+                                    setDetectedOriginalText(translatedText)
                                     setSourceLang(targetLang)
                                     setTargetLang(sourceLang)
                                 }}
@@ -1337,8 +1337,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 display: 'flex',
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
-                                                paddingTop: editableText && editableText !== originalText ? 4 : 0,
-                                                height: editableText && editableText !== originalText ? 18 : 0,
+                                                paddingTop:
+                                                    editableText && editableText !== detectedOriginalText ? 4 : 0,
+                                                height: editableText && editableText !== detectedOriginalText ? 18 : 0,
                                                 transition: 'all 0.3s linear',
                                                 overflow: 'hidden',
                                             }}
@@ -1454,7 +1455,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 )}
                             </div>
                         </div>
-                        {originalText !== '' && (
+                        {detectedOriginalText !== '' && (
                             <div className={styles.popupCardTranslatedContainer} dir={translatedLanguageDirection}>
                                 {actionStr && (
                                     <div
