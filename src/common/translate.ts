@@ -5,7 +5,7 @@ import * as lang from './components/lang/lang'
 import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
-import { getLangConfig, SupportedLanguageCode } from './components/lang/lang'
+import { getLangConfig, LangCode } from './components/lang/lang'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -21,8 +21,8 @@ export type APIModel =
 interface BaseTranslateQuery {
     text: string
     selectedWord: string
-    detectFrom: SupportedLanguageCode
-    detectTo: SupportedLanguageCode
+    detectFrom: LangCode
+    detectTo: LangCode
     mode: Exclude<TranslateMode, 'big-bang'>
     onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void

@@ -3,28 +3,28 @@
 
 import { isTraditional } from '../../traditional-or-simplified'
 import ISO6391 from 'iso-639-1'
-import { languageConfigs, Config as OptionalLanguageConfig } from './data'
+import { LANG_CONFIGS, Config as OptionalLangConfig } from './data'
 
-export type LanguageConfig = Required<OptionalLanguageConfig>
-export type SupportedLanguageCode = keyof typeof languageConfigs
-export const supportedLanguages = Object.entries(languageConfigs).map(
-    ([code, config]) => [code, config.name] as [SupportedLanguageCode, string]
+export type LangCode = keyof typeof LANG_CONFIGS
+export type LanguageConfig = Required<OptionalLangConfig>
+export const supportedLanguages = Object.entries(LANG_CONFIGS).map(
+    ([code, config]) => [code, config.name] as [LangCode, string]
 )
-export const sourceLanguages = Object.entries(languageConfigs)
+export const sourceLanguages = Object.entries(LANG_CONFIGS)
     .filter(([, config]) => config.isSource !== false)
-    .map(([code, config]) => [code, config.name] as [SupportedLanguageCode, string])
-export const targetLanguages = Object.entries(languageConfigs)
+    .map(([code, config]) => [code, config.name] as [LangCode, string])
+export const targetLanguages = Object.entries(LANG_CONFIGS)
     .filter(([, config]) => config.isTarget !== false)
-    .map(([code, config]) => [code, config.name] as [SupportedLanguageCode, string])
-export const langMap = new Map(Object.entries(languageConfigs).map(([code, config]) => [code, config.name]))
-export const langMapReverse = new Map(Object.entries(languageConfigs).map(([code, config]) => [config.name, code]))
+    .map(([code, config]) => [code, config.name] as [LangCode, string])
+export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.name]))
+export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.name, code]))
 
-export async function detectLang(text: string): Promise<SupportedLanguageCode> {
+export async function detectLang(text: string): Promise<LangCode> {
     const lang = await _detectLang(text)
-    if (lang === ('zh' as SupportedLanguageCode)) {
-        return intoSupportedLanguageCode(isTraditional(text) ? 'zh-Hant' : 'zh-Hans')
+    if (lang === ('zh' as LangCode)) {
+        return intoLangCode(isTraditional(text) ? 'zh-Hant' : 'zh-Hans')
     }
-    return intoSupportedLanguageCode(lang)
+    return intoLangCode(lang)
 }
 
 export function getLangName(langCode: string): string {
@@ -32,7 +32,7 @@ export function getLangName(langCode: string): string {
     return langName || langMap.get(langCode) || langCode
 }
 
-export async function _detectLang(text: string): Promise<SupportedLanguageCode> {
+export async function _detectLang(text: string): Promise<LangCode> {
     const detectedText = text.trim()
     return new Promise((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,16 +40,16 @@ export async function _detectLang(text: string): Promise<SupportedLanguageCode> 
         console.debug('detected text:', detectedText)
         console.debug('detected lang:', langName)
         if (langName === 'Chineset') {
-            resolve('zh-Hant' as SupportedLanguageCode)
+            resolve('zh-Hant' as LangCode)
             return
         }
         const langCode = ISO6391.getCode(langName) || langMapReverse.get(langName) // can never be 'zh-CN' or 'zh-TW'
-        resolve(intoSupportedLanguageCode(langCode))
+        resolve(intoLangCode(langCode))
     })
 }
 
-export function getLangConfig(langCode: SupportedLanguageCode): LanguageConfig {
-    const config = languageConfigs[langCode]
+export function getLangConfig(langCode: LangCode): LanguageConfig {
+    const config = LANG_CONFIGS[langCode]
     const DEFAULT_CONFIG: LanguageConfig = {
         name: 'Unknown',
         nameEn: 'Unknown',
@@ -66,10 +66,10 @@ export function getLangConfig(langCode: SupportedLanguageCode): LanguageConfig {
     return { ...DEFAULT_CONFIG, ...config }
 }
 
-export function intoSupportedLanguageCode(langCode: string | null): SupportedLanguageCode {
-    const DEFAULT_LANGUAGE_CODE = 'en' as SupportedLanguageCode
-    if (langCode && langCode in languageConfigs) {
-        return langCode as SupportedLanguageCode
+export function intoLangCode(langCode: string | null): LangCode {
+    const DEFAULT_LANGUAGE_CODE = 'en' as LangCode
+    if (langCode && langCode in LANG_CONFIGS) {
+        return langCode as LangCode
     }
     return DEFAULT_LANGUAGE_CODE
 }

@@ -14,10 +14,10 @@ import { StatefulTooltip } from 'baseui-sd/tooltip'
 import {
     detectLang,
     getLangConfig,
-    intoSupportedLanguageCode,
+    intoLangCode,
     sourceLanguages,
     targetLanguages,
-    SupportedLanguageCode,
+    LangCode,
 } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
@@ -65,7 +65,7 @@ const cache = new LRUCache({
     },
 })
 
-function genLangOptions(langs: [SupportedLanguageCode, string][]): Value {
+function genLangOptions(langs: [LangCode, string][]): Value {
     return langs.reduce((acc, [id, label]) => {
         return [
             ...acc,
@@ -77,9 +77,7 @@ function genLangOptions(langs: [SupportedLanguageCode, string][]): Value {
     }, [] as Value)
 }
 const sourceLangOptions = genLangOptions(sourceLanguages)
-console.log('sourceLangOptions', sourceLanguages, sourceLangOptions)
 const targetLangOptions = genLangOptions(targetLanguages)
-console.log('targetLangOptions', targetLanguages, targetLangOptions)
 
 const useStyles = createUseStyles({
     'popupCard': {
@@ -585,8 +583,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const stopLoading = useCallback(() => {
         setIsLoading(false)
     }, [])
-    const [sourceLang, setOriginalLang] = useState('en' as SupportedLanguageCode)
-    const [targetLang, setTargetLang] = useState('en' as SupportedLanguageCode)
+    const [sourceLang, setOriginalLang] = useState('en' as LangCode)
+    const [targetLang, setTargetLang] = useState('en' as LangCode)
     const stopAutomaticallyChangeTargetLang = useRef(false)
     useEffect(() => {
         ;(async () => {
@@ -597,8 +595,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang)
             ) {
                 setTargetLang(
-                    intoSupportedLanguageCode(
-                        (['zh-Hans', 'zh-Hant'] as SupportedLanguageCode[]).includes(originalLang_)
+                    intoLangCode(
+                        (['zh-Hans', 'zh-Hant'] as LangCode[]).includes(originalLang_)
                             ? null
                             : settings?.defaultTargetLanguage ?? null
                     )
@@ -1136,7 +1134,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     }}
                                     onChange={({ value }) => {
                                         const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
-                                        setOriginalLang(langId as SupportedLanguageCode)
+                                        setOriginalLang(langId as LangCode)
                                     }}
                                 />
                             </div>
@@ -1171,7 +1169,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     onChange={({ value }) => {
                                         stopAutomaticallyChangeTargetLang.current = true
                                         const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
-                                        setTargetLang(langId as SupportedLanguageCode)
+                                        setTargetLang(langId as LangCode)
                                     }}
                                 />
                             </div>
