@@ -584,7 +584,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const stopLoading = useCallback(() => {
         setIsLoading(false)
     }, [])
-    const [sourceLang, setOriginalLang] = useState('en' as LangCode)
+    const [sourceLang, setSourceLang] = useState('en' as LangCode)
     const [targetLang, setTargetLang] = useState('en' as LangCode)
     const stopAutomaticallyChangeTargetLang = useRef(false)
     useEffect(() => {
