@@ -19,20 +19,12 @@ export const targetLanguages = Object.entries(LANG_CONFIGS)
 export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.name]))
 export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.name, code]))
 
-export async function detectLang(text: string): Promise<LangCode> {
-    const lang = await _detectLang(text)
-    if (lang === ('zh' as LangCode)) {
-        return intoLangCode(isTraditional(text) ? 'zh-Hant' : 'zh-Hans')
-    }
-    return intoLangCode(lang)
-}
-
 export function getLangName(langCode: string): string {
     const langName = ISO6391.getName(langCode)
     return langName || langMap.get(langCode) || langCode
 }
 
-export async function _detectLang(text: string): Promise<LangCode> {
+export async function detectLang(text: string): Promise<LangCode> {
     const detectedText = text.trim()
     return new Promise((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,6 +36,11 @@ export async function _detectLang(text: string): Promise<LangCode> {
             return
         }
         const langCode = ISO6391.getCode(langName) || langMapReverse.get(langName) // can never be 'zh-CN' or 'zh-TW'
+        console.debug('detected langCode:', langCode)
+        if (langCode === ('zh' as LangCode)) {
+            resolve(intoLangCode(isTraditional(detectedText) ? 'zh-Hant' : 'zh-Hans'))
+            return
+        }
         resolve(intoLangCode(langCode))
     })
 }
