@@ -13,7 +13,7 @@ Usually the clipboard is used to get the selected text, but this can cause bugs 
 
 ## PopClip
 
-[PopClip](https://pilotmoon.com/popclip/) is a well-established paddle word software on macOS, it provides a perfect plug-in mechanism, we provide its plug-in, the installation steps are as follows:
+[PopClip](https://pilotmoon.com/popclip/) is a well-established clip word software on macOS, it provides a perfect plug-in mechanism, we provide its plug-in, the installation steps are as follows:
 
 * 1. Download and install [PopClip](https://pilotmoon.com/popclip/)
 * 2. Download [openai-translator.popclipextz](https://github.com/yetone/openai-translator/releases/latest/download/openai-translator.popclipextz)
