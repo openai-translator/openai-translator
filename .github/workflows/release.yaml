@@ -128,6 +128,36 @@ jobs:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           args: --target aarch64-apple-darwin
 
+  build-clip-extension:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    needs: create-release
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - name: Build
+        run: make build-popclip-extension
+
+      - name: Upload extensions to release
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
+          asset_path: dist/openai-translator.popclipextz
+          asset_name: openai-translator.popclipextz
+          asset_content_type: application/zip
+
   build-browser-extension:
     runs-on: ubuntu-22.04
 
@@ -194,7 +224,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-20.04
-    needs: [create-release, build-tauri, build-browser-extension]
+    needs: [create-release, build-tauri, build-clip-extension, build-browser-extension]
 
     steps:
       - name: publish release

@@ -13,3 +13,8 @@ change-version:
 
 build: clean change-version
 	node build.mjs
+
+build-popclip-extension: clean
+	mkdir -p dist/openai-translator.popclipext
+	cp -r clip-extensions/popclip/* dist/openai-translator.popclipext
+	cd dist && zip -r openai-translator.popclipextz openai-translator.popclipext && rm -r openai-translator.popclipext
