@@ -11,18 +11,10 @@ import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
-import {
-    detectLang,
-    getLangConfig,
-    intoLangCode,
-    sourceLanguages,
-    targetLanguages,
-    LangCode,
-} from './lang/lang'
+import { detectLang, getLangConfig, intoLangCode, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { RxCopy, RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
@@ -55,6 +47,7 @@ import { Modal } from 'baseui-sd/modal'
 import { setupAnalysis } from '../analysis'
 import { vocabularyService } from '../services/vocabulary'
 import { VocabularyItem } from '../internal-services/db'
+import { CopyButton } from './CopyButton'
 
 const cache = new LRUCache({
     max: 500,
@@ -1429,24 +1422,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 )}
                                             </div>
                                         </Tooltip>
-                                        <Tooltip content={t('Copy to clipboard')} placement='bottom'>
-                                            <div>
-                                                <CopyToClipboard
-                                                    text={editableText}
-                                                    onCopy={() => {
-                                                        toast(t('Copy to clipboard'), {
-                                                            duration: 3000,
-                                                            icon: '👏',
-                                                        })
-                                                    }}
-                                                    options={{ format: 'text/plain' }}
-                                                >
-                                                    <div className={styles.actionButton}>
-                                                        <RxCopy size={13} />
-                                                    </div>
-                                                </CopyToClipboard>
-                                            </div>
-                                        </Tooltip>
+                                        <CopyButton text={editableText} styles={styles}></CopyButton>
                                         <Tooltip content={t('Clear input')} placement='bottom'>
                                             <div
                                                 className={styles.actionButton}
@@ -1571,24 +1547,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         )}
                                                     </div>
                                                 </Tooltip>
-                                                <Tooltip content={t('Copy to clipboard')} placement='bottom'>
-                                                    <div>
-                                                        <CopyToClipboard
-                                                            text={translatedText}
-                                                            onCopy={() => {
-                                                                toast(t('Copy to clipboard'), {
-                                                                    duration: 3000,
-                                                                    icon: '👏',
-                                                                })
-                                                            }}
-                                                            options={{ format: 'text/plain' }}
-                                                        >
-                                                            <div className={styles.actionButton}>
-                                                                <RxCopy size={13} />
-                                                            </div>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                </Tooltip>
+                                                <CopyButton text={translatedText} styles={styles}></CopyButton>
                                             </div>
                                         )}
                                     </div>
