@@ -138,6 +138,14 @@ scoop install openai-translator
       <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
     </p>
 
+## 安装桌面端划词扩展
+
+详情请见 [桌面端划词扩展](./CLIP-EXTENSIONS-CN.md)
+
+  <p align="center">
+      <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+  </p>
+
 ## 浏览器插件
 
 1. 访问你使用的浏览器的插件市场安装此插件：
@@ -176,19 +184,9 @@ const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=
 
 # 群组
 
-<p align="center">
-  <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a>
-</p>
-<p align="center">
-  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" />
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a>
-</p>
-<p align="center">
-  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
-</p>
+| <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a> | <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a> |
+| ------------- | ------------- |
+| <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" /> | <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" /> |
 
 # Star 历史
 

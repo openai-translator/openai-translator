@@ -138,6 +138,14 @@ scoop install openai-translator
       <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
       <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
     </p>
+
+## Installing Desktop Clip Extensions
+
+For details, see [Desktop Clip Extension](./CLIP-EXTENSIONS.md)
+
+  <p align="center">
+      <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+  </p
  
 ## Browser Extension
 
@@ -177,19 +185,9 @@ const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=
 
 # Group
 
-<p align="center">
-  <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a>
-</p>
-<p align="center">
-  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" />
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a>
-</p>
-<p align="center">
-  <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" />
-</p>
+| <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a> | <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a> |
+| ------------- | ------------- |
+| <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" /> | <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" /> |
 
 # Star History
 
