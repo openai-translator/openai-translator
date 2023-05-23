@@ -20,13 +20,13 @@
 * 3. 双击下载完毕的 openai-translator.popclipextz，点击弹出窗口中的 Install "OpenAI Translator" 按钮即可安装完毕
     
     <p align="center">
-        <img src="https://user-images.githubusercontent.com/1206493/240260692-8af6141a-3dba-4775-921d-505223addf9e.png" />
+        <img width="400" src="https://user-images.githubusercontent.com/1206493/240260692-8af6141a-3dba-4775-921d-505223addf9e.png" />
     </p>
 
 * 4. 在 PopClip 中开启 OpenAI Translator
     
     <p align="center">
-        <img src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
+        <img width="400" src="https://user-images.githubusercontent.com/1206493/240258859-c4f2ec91-255f-414c-a4a4-aca25fceb0b5.png" />
     </p>
 
 * 5. 效果如下
