@@ -596,9 +596,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     translateMode === 'translate' &&
                     (!stopAutomaticallyChangeTargetLang.current || originalLang_ === targetLang_)
                 ) {
-                    return intoLangCode(originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
+                    return intoLangCode(
+                        originalLang_ === 'zh-Hans' || originalLang_ === 'zh-Hant'
                             ? null
-                            : settings?.defaultTargetLanguage ?? null)
+                            : settings?.defaultTargetLanguage ?? null
+                    )
                 }
                 return intoLangCode(targetLang_)
             })

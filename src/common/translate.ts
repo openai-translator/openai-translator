@@ -268,31 +268,33 @@ export async function translate(query: TranslateQuery) {
                     contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
                 }
                 break
-          case 'polishing':
-              rolePrompt =
-                  'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
-              quoteProcessor = new QuoteProcessor()
-              commandPrompt = `Please polish this text in ${sourceLang}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
-              contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-              break
-          case 'summarize':
-              rolePrompt = "You are a professional text summarizer, you can only summarize the text, don't interpret it."
-              quoteProcessor = new QuoteProcessor()
-              commandPrompt = `Please summarize this text in the most concise language and must use ${targetLang} language! Only summarize the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
-              contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-              break
-          case 'analyze':
-              rolePrompt = 'You are a professional translation engine and grammar analyzer.'
-              quoteProcessor = new QuoteProcessor()
-              commandPrompt = `Please translate this text to ${targetLang} and explain the grammar in the original text using ${targetLang}. Only analyze the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
-              contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-              break
-          case 'explain-code':
-              rolePrompt =
-                  'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
-              commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLang} language! You may use Markdown. If the content is not code, return an error message. If the code has obvious errors, point them out.`
-              contentPrompt = '```\n' + query.text + '\n```'
-              break 
+            case 'polishing':
+                rolePrompt =
+                    'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                break
+            case 'summarize':
+                rolePrompt =
+                    "You are a professional text summarizer, you can only summarize the text, don't interpret it."
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = `Please summarize this text in the most concise language and must use ${targetLangName} language! Only summarize the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                break
+            case 'analyze':
+                rolePrompt = 'You are a professional translation engine and grammar analyzer.'
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = `Please translate this text to ${targetLangName} and explain the grammar in the original text using ${targetLangName}. Only analyze the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                break
+            case 'explain-code':
+                rolePrompt =
+                    'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
+                commandPrompt = `explain the provided code, regex or script in the most concise language and must use ${targetLangName} language! You may use Markdown. If the content is not code, return an error message. If the code has obvious errors, point them out.`
+                contentPrompt = '```\n' + query.text + '\n```'
+                break
+        }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let body: Record<string, any> = {
