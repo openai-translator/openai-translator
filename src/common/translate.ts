@@ -217,7 +217,7 @@ export async function translate(query: TranslateQuery) {
                     quoteProcessor.quoteStart,
                     quoteProcessor.quoteEnd
                 )
-                console.log(commandPrompt)
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 if (query.text.length < 5 && toChinese) {
                     // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                     rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLangName}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。按照下面格式用中文阐述：
