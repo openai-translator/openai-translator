@@ -81,19 +81,18 @@ async function getStreamText(stream: ReadableStream) {
 }
 
 export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<any> {
-    // Only Tampermonkey support streaming responses
     // eslint-disable-next-line camelcase
-    const responseType: any = GM_info.scriptHandler === 'Tampermonkey' ? 'stream' : 'text'
+    const isSupportStreaming = (GM_xmlhttpRequest as any)?.RESPONSE_TYPE_STREAM === 'stream' ? true : false
     return new Promise((resolve) => {
         const handle = GM_xmlhttpRequest({
             url,
             data: body as string,
             headers: headers as any,
             method: method as any,
-            responseType,
+            responseType: (isSupportStreaming ? 'stream' : 'text') as any,
             onreadystatechange: async (r) => {
                 Object.assign(r, { status: r.status })
-                if (responseType === 'stream') {
+                if (isSupportStreaming) {
                     if (r.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
                         resolve({
                             ...r,
