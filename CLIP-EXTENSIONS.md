@@ -2,7 +2,7 @@ Desktop Application Global Clip Extensions
 ------------------------------------------
 
 <p align="center">
-    <br> English | <a href="CLIP-EXTENSION-CN.md">中文</a>
+    <br> English | <a href="CLIP-EXTENSIONS-CN.md">中文</a>
 </p>
 
 Clip translation is the killer feature of this software. For browser plugins, the browser provides a simple API to get the selected text, but for desktop applications, there is no unified API for each operating system to get the selected text.

@@ -2,7 +2,7 @@
 ----------------------
 
 <p align="center">
-    <br> <a href="CLIP-EXTENSION.md">English</a> | 中文
+    <br> <a href="CLIP-EXTENSIONS.md">English</a> | 中文
 </p>
 
 划词翻译是本软件的杀手锏功能，对于浏览器插件来说，浏览器提供了简单的 API 来获得选中的文本，但是对于桌面端应用来说，各个操作系统都没有统一的 API 来获得选中的文本。
