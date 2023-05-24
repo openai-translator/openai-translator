@@ -11,7 +11,7 @@ import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
-import { detectLang, getLangConfig, intoLangCode, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
+import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
@@ -585,27 +585,33 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const stopLoading = useCallback(() => {
         setIsLoading(false)
     }, [])
-    const [sourceLang, setSourceLang] = useState('en' as LangCode)
-    const [targetLang, setTargetLang] = useState('en' as LangCode)
+    const [sourceLang, setSourceLang] = useState<LangCode>('en')
+    const [targetLang, setTargetLang] = useState<LangCode>()
     const stopAutomaticallyChangeTargetLang = useRef(false)
 
+    const settingsIsUndefined = settings === undefined
+
     useEffect(() => {
+        if (settingsIsUndefined) {
+            return
+        }
+
         ;(async () => {
             const sourceLang_ = await detectLang(originalText)
             setSourceLang(sourceLang_)
             setTargetLang((targetLang_) => {
                 if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
-                    return intoLangCode(
-                        sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
-                            ? null
-                            : settings?.defaultTargetLanguage ?? null
+                    return (
+                        (sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
+                            ? 'en'
+                            : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
                     )
                 }
-                return intoLangCode(targetLang_)
+                return targetLang_
             })
             setDetectedOriginalText(originalText)
         })()
-    }, [originalText, isTranslate, settings?.defaultTargetLanguage, props.uuid])
+    }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, props.uuid])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -935,9 +941,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     return
                 }
 
-                const worker = createWorker({
-                    // logger: (m) => console.log(m),
-                })
+                const worker = createWorker()
 
                 const binaryFile = await fs.readBinaryFile(filePath)
 
@@ -968,9 +972,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [])
 
     const onDrop = async (acceptedFiles: File[]) => {
-        const worker = createWorker({
-            // logger: (m) => console.log(m),
-        })
+        const worker = createWorker()
 
         setOriginalText('')
         setIsOCRProcessing(true)
@@ -1149,7 +1151,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 className={styles.arrow}
                                 onClick={() => {
                                     setDetectedOriginalText(translatedText)
-                                    setSourceLang(targetLang)
+                                    setSourceLang(targetLang ?? 'en')
                                     setTargetLang(sourceLang)
                                 }}
                             >

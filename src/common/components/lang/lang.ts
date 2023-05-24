@@ -5,7 +5,76 @@ import { isTraditional } from '../../traditional-or-simplified'
 import ISO6391 from 'iso-639-1'
 import { LANG_CONFIGS, Config as OptionalLangConfig } from './data'
 
-export type LangCode = keyof typeof LANG_CONFIGS
+export type LangCode =
+    | 'en'
+    | 'en-US'
+    | 'en-GB'
+    | 'en-CA'
+    | 'en-AU'
+    | 'zh-Hans'
+    | 'zh-Hant'
+    | 'yue'
+    | 'lzh'
+    | 'jdbhw'
+    | 'xdbhw'
+    | 'ja'
+    | 'ko'
+    | 'ko-banmal'
+    | 'fr'
+    | 'de'
+    | 'es'
+    | 'it'
+    | 'ru'
+    | 'pt'
+    | 'nl'
+    | 'pl'
+    | 'ar'
+    | 'af'
+    | 'am'
+    | 'az'
+    | 'be'
+    | 'bg'
+    | 'bn'
+    | 'bs'
+    | 'ca'
+    | 'ceb'
+    | 'co'
+    | 'cs'
+    | 'cy'
+    | 'da'
+    | 'el'
+    | 'eo'
+    | 'et'
+    | 'eu'
+    | 'fa'
+    | 'fi'
+    | 'fj'
+    | 'fy'
+    | 'ga'
+    | 'gd'
+    | 'gl'
+    | 'gu'
+    | 'ha'
+    | 'haw'
+    | 'he'
+    | 'hi'
+    | 'hmn'
+    | 'hr'
+    | 'ht'
+    | 'hu'
+    | 'hy'
+    | 'id'
+    | 'ig'
+    | 'is'
+    | 'jw'
+    | 'ka'
+    | 'kk'
+    | 'mn'
+    | 'tr'
+    | 'ug'
+    | 'uk'
+    | 'ur'
+    | 'vi'
 export type LanguageConfig = Required<OptionalLangConfig>
 export const supportedLanguages = Object.entries(LANG_CONFIGS).map(
     ([code, config]) => [code, config.name] as [LangCode, string]
@@ -32,13 +101,13 @@ export async function detectLang(text: string): Promise<LangCode> {
         console.debug('detected text:', detectedText)
         console.debug('detected lang:', langName)
         if (langName === 'Chineset') {
-            resolve('zh-Hant' as LangCode)
+            resolve('zh-Hant')
             return
         }
         const langCode = ISO6391.getCode(langName) || langMapReverse.get(langName) // can never be 'zh-CN' or 'zh-TW'
         console.debug('detected langCode:', langCode)
-        if (langCode === ('zh' as LangCode)) {
-            resolve(intoLangCode(isTraditional(detectedText) ? 'zh-Hant' : 'zh-Hans'))
+        if (langCode === 'zh') {
+            resolve(isTraditional(detectedText) ? 'zh-Hant' : 'zh-Hans')
             return
         }
         resolve(intoLangCode(langCode))
@@ -64,7 +133,7 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
 }
 
 export function intoLangCode(langCode: string | null): LangCode {
-    const DEFAULT_LANGUAGE_CODE = 'en' as LangCode
+    const DEFAULT_LANGUAGE_CODE = 'en'
     if (langCode && langCode in LANG_CONFIGS) {
         return langCode as LangCode
     }
