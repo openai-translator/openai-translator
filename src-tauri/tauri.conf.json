@@ -38,7 +38,7 @@
       },
       "fs": {
         "all": false,
-        "scope": ["**"],
+        "scope": ["**", "$CONFIG/*/**"],
         "writeFile": true,
         "readFile": true,
         "readDir": true
