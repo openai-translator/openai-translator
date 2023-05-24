@@ -91,16 +91,16 @@ fn main() {
     }
 
     let hook_result = mouse_manager.hook(Box::new(|event| {
-        let config = config::get_config().unwrap();
-        let always_show_icons = config.always_show_icons.unwrap_or(true);
-        if !always_show_icons {
-            return;
-        }
         if cfg!(target_os = "linux") {
             return;
         }
         match event {
             mouce::common::MouseEvent::Press(mouce::common::MouseButton::Left) => {
+                let config = config::get_config().unwrap();
+                let always_show_icons = config.always_show_icons.unwrap_or(true);
+                if !always_show_icons {
+                    return;
+                }
                 let current_press_time = std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)
                     .unwrap()
@@ -108,6 +108,12 @@ fn main() {
                 *PREVIOUS_PRESS_TIME.lock() = current_press_time;
             }
             mouce::common::MouseEvent::Release(mouce::common::MouseButton::Left) => {
+                let config = config::get_config().unwrap();
+                let always_show_icons = config.always_show_icons.unwrap_or(true);
+                if !always_show_icons {
+                    windows::delete_thumb();
+                    return;
+                }
                 let current_release_time = std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)
                     .unwrap()

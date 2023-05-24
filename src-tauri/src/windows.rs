@@ -74,6 +74,18 @@ pub fn show_main_window_with_selected_text() {
     utils::show();
 }
 
+pub fn delete_thumb() {
+    match APP_HANDLE.get() {
+        Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
+            Some(window) => {
+                window.close().unwrap();
+            }
+            None => {}
+        },
+        None => {}
+    }
+}
+
 pub fn close_thumb() {
     match APP_HANDLE.get() {
         Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
