@@ -131,7 +131,7 @@ pub fn show_thumb(x: i32, y: i32) {
                     let builder = tauri::WindowBuilder::new(
                         handle,
                         THUMB_WIN_NAME,
-                        tauri::WindowUrl::App("thumb.html".into()),
+                        tauri::WindowUrl::App("src/tauri/thumb.html".into()),
                     )
                     .fullscreen(false)
                     .focused(false)
@@ -233,7 +233,7 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
             let builder = tauri::WindowBuilder::new(
                 handle,
                 MAIN_WIN_NAME,
-                tauri::WindowUrl::App("index.html".into()),
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
             .fullscreen(false)
             .inner_size(600.0, 700.0)

@@ -106,7 +106,7 @@ export async function getBrowser(): Promise<IBrowser> {
     if (isUserscript()) {
         return (await import('./polyfills/userscript')).userscriptBrowser
     }
-    return await require('webextension-polyfill')
+    return (await import('webextension-polyfill')).default
 }
 
 export const isElectron = () => {

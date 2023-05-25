@@ -3,7 +3,7 @@
   "build": {
     "beforeBuildCommand": "pnpm build-tauri-renderer",
     "beforeDevCommand": "pnpm dev-tauri-renderer",
-    "devPath": "http://localhost:3000",
+    "devPath": "http://localhost:3333",
     "distDir": "../dist/tauri",
     "withGlobalTauri": true
   },
@@ -101,6 +101,7 @@
     },
     "windows": [
       {
+        "url": "src/tauri/index.html",
         "fullscreen": false,
         "height": 700,
         "width": 600,

@@ -921,8 +921,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
         ;(async () => {
-            const { listen } = await require('@tauri-apps/api/event')
-            const { fs } = await require('@tauri-apps/api')
+            const { listen } = await import('@tauri-apps/api/event')
+            const { fs } = await import('@tauri-apps/api')
             listen('tauri://file-drop', async (e: Event<string>) => {
                 if (e.payload.length !== 1) {
                     alert('Only one file can be uploaded at a time.')

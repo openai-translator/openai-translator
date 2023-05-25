@@ -4,7 +4,7 @@ import { IVocabularyInternalService } from '../../internal-services/vocabulary'
 import { BackgroundEventNames } from '../eventnames'
 
 const callMethod = async (methodName: string, args: any[]): Promise<any> => {
-    const browser = await require('webextension-polyfill')
+    const browser = (await import('webextension-polyfill')).default
     const resp = await browser.runtime.sendMessage({
         type: BackgroundEventNames.vocabularyService,
         method: methodName,

@@ -4,12 +4,12 @@
   "description": "openai-translator",
   "main": "index.js",
   "scripts": {
-    "build-tauri-renderer": "node build-tauri.mjs",
-    "dev-tauri-renderer": "node build-tauri.mjs --serve",
+    "build-tauri-renderer": "pnpm tsc && pnpm vite build -c vite.config.tauri.ts",
+    "dev-tauri-renderer": "pnpm vite -c vite.config.tauri.ts",
     "build-tauri": "tauri build",
     "dev-tauri": "tauri dev",
-    "dev-browser-extension": "chokidar src -c \"npm run build-browser-extension\"",
-    "build-browser-extension": "make build",
+    "dev-browser-extension": "pnpm vite -c vite.config.chromium.ts",
+    "build-browser-extension": "pnpm tsc && make build-browser-extension",
     "clean": "make clean",
     "test": "npx jest",
     "lint": "eslint src/**/*.{ts,tsx} --cache",
@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@samrum/vite-plugin-web-extension": "^4.1.0",
     "@tauri-apps/cli": "^1.2.3",
     "@types/chrome": "0.0.158",
     "@types/jest": "^29.5.1",
@@ -78,6 +79,7 @@
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "archiver": "^5.3.1",
     "base64-inline-loader": "^2.0.1",
     "chokidar-cli": "^3.0.0",
@@ -101,6 +103,9 @@
     "prettier": "^2.8.4",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.2",
+    "vite": "^4.3.8",
+    "vite-plugin-dynamic-import": "^1.4.0",
+    "vite-tsconfig-paths": "^4.2.0",
     "webextension-polyfill": "^0.10.0"
   },
   "build": {

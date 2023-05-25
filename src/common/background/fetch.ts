@@ -41,7 +41,7 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                 return text
             }
 
-            const browser = await require('webextension-polyfill')
+            const browser = (await import('webextension-polyfill')).default
             let resolved = false
             const port = browser.runtime.connect({ name: BackgroundEventNames.fetch })
             const message: BackgroundFetchRequestMessage = {
