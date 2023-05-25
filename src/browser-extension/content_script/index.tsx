@@ -11,6 +11,7 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
+import { PREFIX } from '../../common/constants'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -87,7 +88,7 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
-        prefix: '__yetone-openai-translator-styletron-',
+        prefix: `${PREFIX}-styletron-`,
     })
     const jss = create().setup({
         ...preset(),

@@ -8,9 +8,10 @@ import { bindHotkey, bindOCRHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
 import { v4 as uuidv4 } from 'uuid'
+import { PREFIX } from '../common/constants'
 
 const engine = new Styletron({
-    prefix: '__yetone-openai-translator-styletron-',
+    prefix: `${PREFIX}-styletron-`,
 })
 
 export function App() {

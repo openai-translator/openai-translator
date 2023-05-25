@@ -4,9 +4,10 @@ import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import '../../common/i18n.js'
 import './index.css'
+import { PREFIX } from '../../common/constants'
 
 const engine = new Styletron({
-    prefix: '__yetone-openai-translator-styletron-',
+    prefix: `${PREFIX}-styletron-`,
 })
 
 const root = createRoot(document.getElementById('root') as HTMLElement)

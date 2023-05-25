@@ -1,8 +1,9 @@
 import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
+import { PREFIX } from '../../common/constants'
 
 const engine = new Styletron({
-    prefix: '__yetone-openai-translator-styletron-',
+    prefix: `${PREFIX}-styletron-`,
 })
 
 export function App() {
