@@ -67,10 +67,15 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.5.1
+
       - name: setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
+          cache: 'pnpm'
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -97,10 +102,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: install frontend dependencies
-        run: yarn install # change this to npm or pnpm depending on which one you use
+        run: pnpm install # change this to npm or pnpm depending on which one you use
 
       - name: Change Version
         env:
@@ -181,21 +186,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.5.1
+
+      - name: setup node
+        uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'pnpm'
 
       - name: Get version
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Build
         run: make build
