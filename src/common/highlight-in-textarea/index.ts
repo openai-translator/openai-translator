@@ -1,4 +1,4 @@
-import styles from 'inline:./index.css'
+import styles from './index.css?inline'
 
 interface IConfig {
     highlight: string | RegExp | string[]

@@ -9,7 +9,6 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Input } from 'baseui-sd/input'
 import { createForm } from './Form'
-import formStyles from 'inline:./Form/index.module.css'
 import { Button } from 'baseui-sd/button'
 import { TranslateMode, Provider, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
@@ -966,7 +965,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
         if (settings) {
             ;(async () => {
                 if (isTauri) {
-                    const { isEnabled: autostartIsEnabled } = await require('tauri-plugin-autostart-api')
+                    const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
                     settings.runAtStartup = await autostartIsEnabled()
                 }
                 setValues(settings)
@@ -991,7 +990,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                     enable: autostartEnable,
                     disable: autostartDisable,
                     isEnabled: autostartIsEnabled,
-                } = await require('tauri-plugin-autostart-api')
+                } = await import('tauri-plugin-autostart-api')
                 if (data.runAtStartup) {
                     await autostartEnable()
                 } else {
@@ -1032,7 +1031,6 @@ export function InnerSettings(props: IInnerSettingsProps) {
                 minWidth: isDesktopApp ? 450 : 400,
             }}
         >
-            <style>{formStyles}</style>
             <nav
                 style={{
                     position: isDesktopApp ? 'fixed' : undefined,

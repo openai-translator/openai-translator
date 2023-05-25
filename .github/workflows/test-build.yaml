@@ -89,5 +89,5 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: make build
+        run: make build-browser-extension
       # todo: upload browser extension artifacts
