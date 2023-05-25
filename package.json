@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "openai-translator",
   "main": "index.js",
+  "packageManager": "pnpm@8.5.1",
   "scripts": {
     "build-tauri-renderer": "pnpm tsc && pnpm vite build -c vite.config.tauri.ts",
     "dev-tauri-renderer": "pnpm vite -c vite.config.tauri.ts",
