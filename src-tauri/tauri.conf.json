@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "yarn build-tauri-renderer",
-    "beforeDevCommand": "yarn dev-tauri-renderer",
+    "beforeBuildCommand": "pnpm build-tauri-renderer",
+    "beforeDevCommand": "pnpm dev-tauri-renderer",
     "devPath": "http://localhost:3000",
     "distDir": "../dist/tauri",
     "withGlobalTauri": true

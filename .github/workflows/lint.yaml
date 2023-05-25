@@ -26,16 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/cache@v2
+      - uses: pnpm/action-setup@v2
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          version: 8.5.1
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
 
       - name: Install packages
-        run: yarn
+        run: pnpm install
 
       - name: Run type check
-        run: yarn tsc
+        run: pnpm tsc
 
       - name: Run eslint
-        run: yarn lint
+        run: pnpm lint
