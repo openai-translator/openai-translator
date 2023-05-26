@@ -107,6 +107,7 @@ browser.runtime.onConnect.addListener(async function (port) {
     }
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callMethod(request: any, service: any): Promise<any> {
     const { method, args } = request
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

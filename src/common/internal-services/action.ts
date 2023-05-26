@@ -1,4 +1,4 @@
-import { Action, LocalDB, getLocalDB } from "./db"
+import { Action, LocalDB, getLocalDB } from './db'
 
 export interface IActionInternalService {
     put(action: Action): Promise<void>
@@ -28,6 +28,7 @@ class ActionInternalService implements IActionInternalService {
     }
 
     async list(): Promise<Action[]> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return await (this.db.action.orderBy('id') as any).desc().toArray()
     }
 
