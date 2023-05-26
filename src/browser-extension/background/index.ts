@@ -3,6 +3,7 @@ import browser from 'webextension-polyfill'
 import { BackgroundEventNames } from '../../common/background/eventnames'
 import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '../../common/background/fetch'
 import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
+import { actionInternalService } from '../../common/internal-services/action'
 
 browser.contextMenus.create(
     {
@@ -106,18 +107,23 @@ browser.runtime.onConnect.addListener(async function (port) {
     }
 })
 
+async function callMethod(request: any, service: any): Promise<any> {
+    const { method, args } = request
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = (service as any)[method](...args)
+    if (result instanceof Promise) {
+        const v = await result
+        return { result: v }
+    }
+    return { result }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 browser.runtime.onMessage.addListener(async (request) => {
     switch (request.type) {
         case BackgroundEventNames.vocabularyService:
-            const { method, args } = request
-            const service = vocabularyInternalService
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const result = (service as any)[method](...args)
-            if (result instanceof Promise) {
-                const v = await result
-                return { result: v }
-            }
-            return { result }
+            return await callMethod(request, vocabularyInternalService)
+        case BackgroundEventNames.actionService:
+            return await callMethod(request, actionInternalService)
     }
 })
