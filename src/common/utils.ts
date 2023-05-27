@@ -238,7 +238,8 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
             onMessage(event.data)
         }
     })
-    const reader = resp.body.getReader()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const reader = resp.body!.getReader()
     try {
         // eslint-disable-next-line no-constant-condition
         while (true) {

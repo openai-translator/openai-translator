@@ -80,7 +80,7 @@ async function getStreamText(stream: ReadableStream) {
     return str
 }
 
-export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<any> {
+export async function userscriptFetch(url: string, { body, headers, method, signal }: RequestInit): Promise<Response> {
     // eslint-disable-next-line camelcase
     const isSupportStreaming = (GM_xmlhttpRequest as any)?.RESPONSE_TYPE_STREAM === 'stream' ? true : false
     return new Promise((resolve) => {
@@ -99,7 +99,7 @@ export async function userscriptFetch(url: string, { body, headers, method, sign
                             body: r.response,
                             json: async () => JSON.parse(await getStreamText(r.response)),
                             text: async () => await getStreamText(r.response),
-                        })
+                        } as any as Response)
                     }
                 } else {
                     if (r.readyState === XMLHttpRequest.DONE) {
@@ -113,7 +113,7 @@ export async function userscriptFetch(url: string, { body, headers, method, sign
                             }),
                             text: () => r.response,
                             json: () => JSON.parse(r.response),
-                        })
+                        } as any as Response)
                     }
                 }
             },
