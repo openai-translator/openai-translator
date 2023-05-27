@@ -1,26 +1,28 @@
-import { IActionInternalService } from '../../internal-services/action'
+import { IActionInternalService, ICreateActionOption, IUpdateActionOption } from '../../internal-services/action'
 import { Action } from '../../internal-services/db'
 import { callMethod } from './base'
 
 class BackgroundActionService implements IActionInternalService {
-    async put(action: Action): Promise<void> {
-        return await callMethod('actionService', 'put', [action])
+    create(opt: ICreateActionOption): Promise<Action> {
+        return callMethod('actionService', 'create', [opt])
     }
-
-    async get(id: number): Promise<Action | undefined> {
-        return await callMethod('actionService', 'get', [id])
+    update(action: Action, opt: IUpdateActionOption): Promise<Action> {
+        return callMethod('actionService', 'update', [action, opt])
     }
-
-    async delete(id: number): Promise<void> {
-        return await callMethod('actionService', 'delete', [id])
+    get(id: number): Promise<Action | undefined> {
+        return callMethod('actionService', 'get', [id])
     }
-
-    async list(): Promise<Action[]> {
-        return await callMethod('actionService', 'list', [])
+    getByMode(mode: string): Promise<Action | undefined> {
+        return callMethod('actionService', 'getByMode', [mode])
     }
-
-    async count(): Promise<number> {
-        return await callMethod('actionService', 'count', [])
+    delete(id: number): Promise<void> {
+        return callMethod('actionService', 'delete', [id])
+    }
+    list(): Promise<Action[]> {
+        return callMethod('actionService', 'list', [])
+    }
+    count(): Promise<number> {
+        return callMethod('actionService', 'count', [])
     }
 }
 

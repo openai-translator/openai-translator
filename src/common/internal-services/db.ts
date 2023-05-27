@@ -11,10 +11,12 @@ export interface VocabularyItem {
 
 export interface Action {
     id?: number
+    idx: number
+    mode?: string
     name: string
-    icon: string
-    rolePrompt: string
-    commandPrompt: string
+    icon?: string
+    rolePrompt?: string
+    commandPrompt?: string
     updatedAt: string
     createdAt: string
 }
@@ -27,7 +29,7 @@ export class LocalDB extends Dexie {
         super('openai-translator')
         this.version(2).stores({
             vocabulary: 'word, reviewCount, description, updatedAt, createdAt',
-            action: '++id, name, icon, rolePrompt, commandPrompt, updatedAt, createdAt',
+            action: '++id, idx, mode, name, icon, rolePrompt, commandPrompt, updatedAt, createdAt',
         })
     }
 }
