@@ -28,9 +28,9 @@ import { RiDeleteBin5Line } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
-import { backgroundFetch } from '../background/fetch'
 import { useThemeType } from '../hooks/useThemeType'
 import { Slider } from 'baseui-sd/slider'
+import { getUniversalFetch } from '../universal-fetch'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -524,6 +524,7 @@ interface APIModelOption {
 }
 
 function APIModelSelector(props: APIModelSelectorProps) {
+    const fetcher = getUniversalFetch()
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
@@ -546,19 +547,17 @@ function APIModelSelector(props: APIModelSelectorProps) {
             setIsLoading(true)
             try {
                 ;(async () => {
-                    const sessionResp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
-                    const sessionRespJsn = await sessionResp.json()
+                    const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
                     if (sessionResp.status !== 200) {
-                        if (sessionResp.status === 401) {
-                            setIsChatGPTNotLogin(true)
-                        }
-                        setErrMsg(sessionRespJsn.detail.message)
+                        setIsChatGPTNotLogin(true)
+                        setErrMsg('Failed to fetch ChatGPT Web accessToken')
                         return
                     }
+                    const sessionRespJsn = await sessionResp.json()
                     const headers: Record<string, string> = {
                         Authorization: `Bearer ${sessionRespJsn.accessToken}`,
                     }
-                    const modelsResp = await backgroundFetch(`${utils.defaultChatGPTWebAPI}/models`, {
+                    const modelsResp = await fetcher(`${utils.defaultChatGPTWebAPI}/models`, {
                         cache: 'no-cache',
                         headers,
                     })

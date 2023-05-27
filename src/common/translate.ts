@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
-import { backgroundFetch } from '../common/background/fetch'
 import * as lang from './components/lang/lang'
 import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
 import { getLangConfig, LangCode } from './components/lang/lang'
+import { getUniversalFetch } from './universal-fetch'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -185,6 +185,7 @@ export class QuoteProcessor {
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
 export async function translate(query: TranslateQuery) {
+    const fetcher = getUniversalFetch()
     let rolePrompt = ''
     let commandPrompt = ''
     let contentPrompt = query.text
@@ -327,7 +328,12 @@ export async function translate(query: TranslateQuery) {
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
         let resp: Response | null = null
-        resp = await backgroundFetch(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+        resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+        if (resp.status !== 200) {
+            query.onError?.('Failed to fetch ChatGPT Web accessToken.')
+            query.onStatusCode?.(resp.status)
+            return
+        }
         const respJson = await resp?.json()
         apiKey = respJson.accessToken
         body = {
@@ -384,7 +390,6 @@ export async function translate(query: TranslateQuery) {
         let conversationId = ''
         let length = 0
         await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
-            fetcher: backgroundFetch,
             method: 'POST',
             headers,
             body: JSON.stringify(body),
@@ -459,7 +464,7 @@ export async function translate(query: TranslateQuery) {
         })
 
         if (conversationId) {
-            await backgroundFetch(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
+            await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
                 method: 'PATCH',
                 headers,
                 body: JSON.stringify({ is_visible: false }),

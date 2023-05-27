@@ -831,7 +831,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     detectFrom: sourceLang,
                     detectTo: targetLang,
                     onStatusCode: (statusCode) => {
-                        setIsNotLogin(statusCode === 401)
+                        setIsNotLogin(statusCode === 401 || statusCode === 403)
                     },
                     onMessage: (message) => {
                         if (message.role) {
