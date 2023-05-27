@@ -7,9 +7,10 @@ import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation, AiOutlineFileSync } from 'react-icons/ai'
-import { IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
+import { IoSettingsOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
-import { MdOutlineSummarize, MdOutlineAnalytics, MdCode, MdOutlineGrade, MdGrade } from 'react-icons/md'
+import { MdOutlineGrade, MdGrade } from 'react-icons/md'
+import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
@@ -43,11 +44,20 @@ import { Tooltip } from './Tooltip'
 import { useSettings } from '../hooks/useSettings'
 import Vocabulary from './Vocabulary'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
-import { Modal } from 'baseui-sd/modal'
+import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 import { setupAnalysis } from '../analysis'
 import { vocabularyService } from '../services/vocabulary'
-import { VocabularyItem } from '../internal-services/db'
+import { Action, VocabularyItem } from '../internal-services/db'
 import { CopyButton } from './CopyButton'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { actionService } from '../services/action'
+import { ActionManager } from './ActionManager'
+import { invoke } from '@tauri-apps/api'
+import { GrMoreVertical } from 'react-icons/gr'
+import { StatefulPopover } from 'baseui-sd/popover'
+import { StatefulMenu } from 'baseui-sd/menu'
+import { IconType } from 'react-icons'
+import { GiPlatform } from 'react-icons/gi'
 
 const cache = new LRUCache({
     max: 500,
@@ -172,6 +182,20 @@ const useStyles = createUseStyles({
         'marginLeft': '10px',
         '@media screen and (max-width: 460px)': {
             marginLeft: props.isDesktopApp ? '5px' : undefined,
+        },
+    }),
+    'popupCardHeaderMoreActionsContainer': () => ({
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 5,
+    }),
+    'popupCardHeaderMoreActionsBtn': (props: IThemedStyleProps) => ({
+        'cursor': 'pointer',
+        '& *': {
+            fill: props.theme.colors.contentPrimary,
+            color: props.theme.colors.contentPrimary,
+            stroke: props.theme.colors.contentPrimary,
         },
     }),
     'popupCardHeaderActionsContainer': (props: IThemedStyleProps) => ({
@@ -419,6 +443,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setupAnalysis()
     }, [])
 
+    const [showActionManager, setShowActionManager] = useState(false)
+
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
@@ -482,12 +508,59 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         highlightRef.current.handleInput()
     }, [selectedWord, highlightWords])
 
-    const [translateMode, setTranslateMode] = useState<Exclude<TranslateMode, 'big-bang'>>('translate')
-    useEffect(() => {
+    const [actionID, setActionID] = useState<number>()
+
+    const translateMode = useLiveQuery(async () => {
+        if (!actionID) {
+            return undefined
+        }
+        const action = await actionService.get(actionID)
+        return action?.mode
+    }, [actionID])
+
+    useLiveQuery(async () => {
         if (settings?.defaultTranslateMode && settings.defaultTranslateMode !== 'nop') {
-            setTranslateMode(settings.defaultTranslateMode)
+            let action: Action | undefined
+            const actionID = parseInt(settings.defaultTranslateMode, 10)
+            if (isNaN(actionID)) {
+                action = await actionService.getByMode(settings.defaultTranslateMode)
+            } else {
+                action = await actionService.get(actionID)
+            }
+            setActionID(action?.id)
         }
     }, [settings?.defaultTranslateMode])
+
+    const actions = useLiveQuery(() => actionService.list())
+
+    const [displayedActions, setDisplayedActions] = useState<Action[]>([])
+    const [hiddenActions, setHiddenActions] = useState<Action[]>([])
+
+    useEffect(() => {
+        if (!actions) {
+            setDisplayedActions([])
+            setHiddenActions([])
+            return
+        }
+        const maxDisplayedActions = 4
+        let displayedActions = actions.slice(0, maxDisplayedActions)
+        let hiddenActions = actions.slice(maxDisplayedActions)
+        if (!displayedActions.find((action) => action.id === actionID)) {
+            const activatedAction = actions.find((a) => a.id === actionID)
+            if (activatedAction) {
+                const lastDisplayedAction = displayedActions[displayedActions.length - 1]
+                if (lastDisplayedAction) {
+                    displayedActions = displayedActions.slice(0, displayedActions.length - 1)
+                    hiddenActions = [lastDisplayedAction, ...hiddenActions]
+                }
+                displayedActions.push(activatedAction)
+                hiddenActions = hiddenActions.filter((a) => a.id !== activatedAction.id)
+            }
+        }
+        setDisplayedActions(displayedActions)
+        setHiddenActions(hiddenActions)
+    }, [actions, actionID])
+
     const isTranslate = translateMode === 'translate'
     useEffect(() => {
         if (!isTranslate) {
@@ -606,6 +679,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             ? 'en'
                             : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
                     )
+                }
+                if (!targetLang_) {
+                    return sourceLang_
                 }
                 return targetLang_
             })
@@ -777,10 +853,19 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
-            if (!text || !sourceLang || !targetLang || !translateMode) {
+            if (!text || !sourceLang || !targetLang || !actionID) {
                 return
             }
-            const actionStrItem = actionStrItems[translateMode]
+            const action = await actionService.get(actionID)
+            if (!action) {
+                return
+            }
+            const actionStrItem = translateMode
+                ? actionStrItems[translateMode]
+                : {
+                      beforeStr: 'Processing...',
+                      afterStr: 'Processed',
+                  }
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
                 if (translateMode === 'translate' && sourceLang === targetLang) {
@@ -812,9 +897,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${settings?.provider ?? ''}:${
-                settings?.apiModel ?? ''
-            }:${translateMode}:${sourceLang}:${targetLang}:${text}:${selectedWord}`
+            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
+                action.rolePrompt
+            }:${action.commandPrompt}:${sourceLang}:${targetLang}:${text}:${selectedWord}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -824,7 +909,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             let isStopped = false
             try {
                 await translate({
-                    mode: translateMode,
+                    action,
                     signal,
                     text,
                     selectedWord,
@@ -874,7 +959,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateMode, sourceLang, targetLang]
+        [translateMode, actionID, sourceLang, targetLang]
     )
 
     useEffect(() => {
@@ -1184,59 +1269,107 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         </div>
                         <div className={styles.popupCardHeaderButtonGroup}>
-                            <Tooltip content={t('Translate')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                <Button
-                                    size='mini'
-                                    kind={translateMode === 'translate' ? 'primary' : 'secondary'}
-                                    onClick={() => setTranslateMode('translate')}
-                                >
-                                    <AiOutlineTranslation />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip content={t('Polishing')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                <Button
-                                    size='mini'
-                                    kind={translateMode === 'polishing' ? 'primary' : 'secondary'}
-                                    onClick={() => {
-                                        setTranslateMode('polishing')
-                                        setTargetLang(sourceLang)
-                                    }}
-                                >
-                                    <IoColorPaletteOutline />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip content={t('Summarize')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                <Button
-                                    size='mini'
-                                    kind={translateMode === 'summarize' ? 'primary' : 'secondary'}
-                                    onClick={() => {
-                                        setTranslateMode('summarize')
-                                    }}
-                                >
-                                    <MdOutlineSummarize />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip content={t('Analyze')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                <Button
-                                    size='mini'
-                                    kind={translateMode === 'analyze' ? 'primary' : 'secondary'}
-                                    onClick={() => setTranslateMode('analyze')}
-                                >
-                                    <MdOutlineAnalytics />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip content={t('Explain Code')} placement={isDesktopApp() ? 'bottom' : 'top'}>
-                                <Button
-                                    size='mini'
-                                    kind={translateMode === 'explain-code' ? 'primary' : 'secondary'}
-                                    onClick={() => {
-                                        setTranslateMode('explain-code')
-                                        // no need to change detectTo
-                                    }}
-                                >
-                                    <MdCode />
-                                </Button>
-                            </Tooltip>
+                            {displayedActions?.map((action) => {
+                                return (
+                                    <Tooltip
+                                        key={action.id}
+                                        content={action.mode ? t(action.name) : action.name}
+                                        placement={isDesktopApp() ? 'bottom' : 'top'}
+                                    >
+                                        <Button
+                                            size='mini'
+                                            kind={action.id === actionID ? 'primary' : 'secondary'}
+                                            onClick={() => {
+                                                setActionID(action.id)
+                                                if (action.mode === 'polishing') {
+                                                    setTargetLang(sourceLang)
+                                                }
+                                            }}
+                                        >
+                                            {action.icon &&
+                                                React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {})}
+                                        </Button>
+                                    </Tooltip>
+                                )
+                            })}
+                        </div>
+                        <div className={styles.popupCardHeaderMoreActionsContainer}>
+                            <StatefulPopover
+                                autoFocus={false}
+                                triggerType='hover'
+                                showArrow
+                                placement='bottom'
+                                content={
+                                    <StatefulMenu
+                                        initialState={{
+                                            highlightedIndex: hiddenActions.findIndex(
+                                                (action) => action.id === actionID
+                                            ),
+                                        }}
+                                        onItemSelect={({ item }) => {
+                                            const actionID = item.id
+                                            if (actionID === '__manager__') {
+                                                if (isTauri()) {
+                                                    invoke('show_action_manager_window')
+                                                } else {
+                                                    setShowActionManager(true)
+                                                }
+                                                return
+                                            }
+                                            setActionID(actionID as number)
+                                        }}
+                                        items={[
+                                            ...hiddenActions.map((action) => {
+                                                return {
+                                                    id: action.id,
+                                                    label: (
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'row',
+                                                                alignItems: 'center',
+                                                                gap: 6,
+                                                            }}
+                                                        >
+                                                            {action.icon
+                                                                ? React.createElement(
+                                                                      (mdIcons as Record<string, IconType>)[
+                                                                          action.icon
+                                                                      ],
+                                                                      {}
+                                                                  )
+                                                                : undefined}
+                                                            {action.mode ? t(action.name) : action.name}
+                                                        </div>
+                                                    ),
+                                                }
+                                            }),
+                                            { divider: true },
+                                            {
+                                                id: '__manager__',
+                                                label: (
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
+                                                            gap: 6,
+                                                            fontWeight: 500,
+                                                        }}
+                                                    >
+                                                        <GiPlatform />
+                                                        {t('Action Manager')}
+                                                    </div>
+                                                ),
+                                            },
+                                        ]}
+                                    />
+                                }
+                            >
+                                <div className={styles.popupCardHeaderMoreActionsBtn}>
+                                    <GrMoreVertical />
+                                </div>
+                            </StatefulPopover>
                         </div>
                     </div>
                     <div className={styles.popupCardContentContainer}>
@@ -1326,8 +1459,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 if (e.key === 'Enter') {
                                                     if (!e.shiftKey) {
                                                         e.preventDefault()
-                                                        if (!translateMode) {
-                                                            setTranslateMode('translate')
+                                                        if (!actionID) {
+                                                            setActionID(
+                                                                actions?.find((action) => action.mode === 'translate')
+                                                                    ?.id
+                                                            )
                                                         }
                                                         setOriginalText(editableText)
                                                     }
@@ -1619,13 +1755,29 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             setOriginalText(content)
                             setHighlightWords(highlightWords)
                             setSelectedWord('')
-                            setTranslateMode('translate')
+                            setActionID(actions?.find((action) => action.mode === 'translate')?.id)
                             setVocabularyType('hide')
                         }}
                         type={vocabularyType as 'vocabulary' | 'article'}
                     />
                 </Modal>
             )}
+            <Modal
+                isOpen={!isDesktopApp() && showActionManager}
+                onClose={() => {
+                    setShowActionManager(false)
+                }}
+                closeable
+                size='full'
+                autoFocus
+                animate
+                role='dialog'
+            >
+                <ModalHeader>{t('Action Manager')}</ModalHeader>
+                <ModalBody>
+                    <ActionManager />
+                </ModalBody>
+            </Modal>
             <Toaster />
         </div>
     )

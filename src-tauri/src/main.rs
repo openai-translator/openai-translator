@@ -25,7 +25,7 @@ use crate::lang::detect_lang;
 use crate::ocr::ocr;
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top,
-    show_main_window_with_selected_text, MAIN_WIN_NAME,
+    show_main_window_with_selected_text, MAIN_WIN_NAME, show_action_manager_window,
 };
 
 use mouce::Mouse;
@@ -334,6 +334,7 @@ fn main() {
             get_config_content,
             clear_config_cache,
             show_main_window_with_selected_text,
+            show_action_manager_window,
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,
@@ -350,6 +351,10 @@ fn main() {
                 ..
             } = event
             {
+                if label != MAIN_WIN_NAME {
+                    return
+                }
+
                 #[cfg(target_os = "macos")]
                 {
                     tauri::AppHandle::hide(&app.app_handle()).unwrap();

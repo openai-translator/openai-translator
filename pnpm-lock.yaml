@@ -16,6 +16,9 @@ dependencies:
   '@types/react-icons':
     specifier: ^3.0.0
     version: 3.0.0(react@18.2.0)
+  '@types/react-window':
+    specifier: ^1.8.5
+    version: 1.8.5
   baseui-sd:
     specifier: ^12.2.4
     version: 12.2.4(@types/react@18.2.6)(react-dom@18.2.0)(react@18.2.0)(styletron-react@6.1.0)
@@ -28,6 +31,9 @@ dependencies:
   dexie:
     specifier: ^3.2.3
     version: 3.2.3
+  dexie-react-hooks:
+    specifier: ^1.1.3
+    version: 1.1.3(@types/react@18.2.6)(dexie@3.2.3)(react@18.2.0)
   electron-store:
     specifier: ^8.1.0
     version: 8.1.0
@@ -100,6 +106,9 @@ dependencies:
   react-markdown:
     specifier: ^8.0.7
     version: 8.0.7(@types/react@18.2.6)(react@18.2.0)
+  react-window:
+    specifier: ^1.8.9
+    version: 1.8.9(react-dom@18.2.0)(react@18.2.0)
   styletron-engine-atomic:
     specifier: ^1.5.0
     version: 1.5.0
@@ -3179,6 +3188,18 @@ packages:
     resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
     dev: true
     optional: true
+
+  /dexie-react-hooks@1.1.3(@types/react@18.2.6)(dexie@3.2.3)(react@18.2.0):
+    resolution: {integrity: sha512-bXXE1gfYtfuVYTNiOlyam+YVaO8KaqacgRuxFuP37YtpS6o/jxT6KOl5h+hhqY36s0UavlHWbL+HWJFMcQumIg==}
+    peerDependencies:
+      '@types/react': '>=16'
+      dexie: '>=3.1.0-alpha.1 <5.0.0'
+      react: '>=16'
+    dependencies:
+      '@types/react': 18.2.6
+      dexie: 3.2.3
+      react: 18.2.0
+    dev: false
 
   /dexie@3.2.3:
     resolution: {integrity: sha512-iHayBd4UYryDCVUNa3PMsJMEnd8yjyh5p7a+RFeC8i8n476BC9wMhVvqiImq5zJZJf5Tuer+s4SSj+AA3x+ZbQ==}

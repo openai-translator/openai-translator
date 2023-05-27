@@ -8,6 +8,7 @@ use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use window_shadows::set_shadow;
 
 pub const MAIN_WIN_NAME: &str = "main";
+pub const ACTION_MANAGER_WIN_NAME: &str = "action_manager";
 pub const THUMB_WIN_NAME: &str = "thumb";
 
 pub fn get_mouse_location() -> Result<(i32, i32), String> {
@@ -269,6 +270,56 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 set_shadow(&window, true).unwrap();
 
                 window
+            }
+        }
+    }
+}
+
+#[tauri::command]
+pub fn show_action_manager_window() {
+    let handle = APP_HANDLE.get().unwrap();
+    match handle.get_window(ACTION_MANAGER_WIN_NAME) {
+        Some(window) => {
+            window.unminimize().unwrap();
+            window.center().unwrap();
+            window.set_focus().unwrap();
+            window.show().unwrap();
+        }
+        None => {
+            let builder = tauri::WindowBuilder::new(
+                handle,
+                ACTION_MANAGER_WIN_NAME,
+                tauri::WindowUrl::App("src/tauri/action_manager.html".into()),
+            )
+            .fullscreen(false)
+            .inner_size(700.0, 700.0)
+            .min_inner_size(660.0, 600.0)
+            .resizable(true)
+            .skip_taskbar(true)
+            .center()
+            .focused(true)
+            .title("OpenAI Translator Action Manager");
+
+            #[cfg(target_os = "macos")]
+            {
+                builder
+                    .title_bar_style(tauri::TitleBarStyle::Overlay)
+                    .build()
+                    .unwrap();
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+
+                set_shadow(&window, true).unwrap();
+            }
+
+            #[cfg(target_os = "linux")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+
+                set_shadow(&window, true).unwrap();
             }
         }
     }

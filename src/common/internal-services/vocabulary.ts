@@ -1,4 +1,4 @@
-import { getLocalDB, LocalDB, VocabularyItem } from './db'
+import { getLocalDB, VocabularyItem } from './db'
 
 export interface IVocabularyInternalService {
     putItem(item: VocabularyItem): Promise<void>
@@ -12,10 +12,8 @@ export interface IVocabularyInternalService {
 }
 
 class VocabularyInternalService implements IVocabularyInternalService {
-    db: LocalDB
-
-    constructor() {
-        this.db = getLocalDB()
+    private get db() {
+        return getLocalDB()
     }
 
     public async putItem(item: VocabularyItem): Promise<void> {

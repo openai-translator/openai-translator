@@ -1,8 +1,10 @@
-import { Action, LocalDB, getLocalDB } from './db'
+import { builtinActionModes } from '../constants'
+import { TranslateMode } from '../translate'
+import { Action, getLocalDB } from './db'
 
 export interface ICreateActionOption {
     name: string
-    mode?: string
+    mode?: TranslateMode
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
@@ -11,7 +13,7 @@ export interface ICreateActionOption {
 export interface IUpdateActionOption {
     idx?: number
     name?: string
-    mode?: string
+    mode?: TranslateMode
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
@@ -28,13 +30,14 @@ export interface IActionInternalService {
 }
 
 class ActionInternalService implements IActionInternalService {
-    db: LocalDB
-
-    constructor() {
-        this.db = getLocalDB()
+    private get db() {
+        return getLocalDB()
     }
 
     async create(opt: ICreateActionOption): Promise<Action> {
+        if (!opt.name) {
+            throw new Error('name is required')
+        }
         const now = new Date().valueOf().toString()
         const action: Action = {
             idx: await this.db.action.count(),
@@ -96,8 +99,28 @@ class ActionInternalService implements IActionInternalService {
     }
 
     async list(): Promise<Action[]> {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return await (this.db.action.orderBy('id') as any).desc().toArray()
+        return this.db.transaction('rw', this.db.action, async () => {
+            let count = await this.db.action.count()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const actions = await (this.db.action.orderBy('idx') as any).desc().toArray()
+            builtinActionModes.forEach(async (m) => {
+                const now = new Date().valueOf().toString()
+                const action = actions.find((a: Action) => a.mode === m.mode)
+                if (action) {
+                    return
+                }
+                await this.db.action.add({
+                    idx: count++,
+                    name: m.name,
+                    mode: m.mode,
+                    icon: m.icon,
+                    createdAt: now,
+                    updatedAt: now,
+                })
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return await (this.db.action.orderBy('idx') as any).toArray()
+        })
     }
 
     async count(): Promise<number> {
