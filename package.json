@@ -9,6 +9,7 @@
     "build-tauri": "tauri build",
     "dev-tauri": "tauri dev",
     "dev-browser-extension": "pnpm vite -c vite.config.chromium.ts",
+    "dev-firefox": "NODE_ENV=development pnpm vite build -c vite.config.firefox.ts --watch",
     "build-browser-extension": "pnpm tsc && make build-browser-extension",
     "clean": "make clean",
     "test": "npx jest",
