@@ -14,7 +14,7 @@ import { IconPicker } from './IconPicker'
 
 const useStyles = createUseStyles({
     placeholder: (props: IThemedStyleProps) => ({
-        color: props.theme.colors.positive50,
+        color: props.theme.colors.positive,
     }),
 })
 

@@ -9,33 +9,33 @@ import { format } from 'date-fns'
 import { Button } from 'baseui-sd/button'
 import { List } from 'baseui-sd/dnd-list'
 import { RiDeleteBinLine } from 'react-icons/ri'
-import { GrFormAdd } from 'react-icons/gr'
-import { createElement, useState } from 'react'
+import { createElement, useReducer, useState } from 'react'
 import * as mdIcons from 'react-icons/md'
 import { Action } from '../internal-services/db'
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-sd/modal'
 import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
+import { isDesktopApp } from '../utils'
 
 const useStyles = createUseStyles({
-    root: {
+    root: () => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 20px 20px 20px',
+        padding: isDesktopApp() ? '40px 20px 20px 20px' : 0,
         boxSizing: 'border-box',
-        width: '100%',
-    },
+        width: isDesktopApp() ? '100%' : '600px',
+    }),
     operationListContainer: (props: IThemedStyleProps) => ({
         width: '100%',
-        padding: '30px 16px 16px',
+        padding: isDesktopApp() ? '30px 16px 16px' : 16,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        position: 'fixed',
+        position: isDesktopApp() ? 'fixed' : undefined,
         backdropFilter: 'blur(10px)',
         zIndex: 1,
         left: 0,
@@ -52,7 +52,7 @@ const useStyles = createUseStyles({
         gap: 10,
     },
     actionList: () => ({
-        paddingTop: 70,
+        paddingTop: isDesktopApp() ? 70 : 0,
         width: '100%',
     }),
     actionItem: () => ({
@@ -114,10 +114,11 @@ const useStyles = createUseStyles({
 })
 
 export function ActionManager() {
+    const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
     const { t } = useTranslation()
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType })
-    const actions = useLiveQuery(() => actionService.list(), [])
+    const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
     const [showActionForm, setShowActionForm] = useState(false)
     const [updatingAction, setUpdatingAction] = useState<Action>()
     const [deletingAction, setDeletingAction] = useState<Action>()
@@ -132,8 +133,7 @@ export function ActionManager() {
                 />
                 <div className={styles.operationList}>
                     <Button
-                        size='mini'
-                        startEnhancer={<GrFormAdd size={12} />}
+                        size='compact'
                         onClick={() => {
                             setUpdatingAction(undefined)
                             setShowActionForm(true)
@@ -145,12 +145,15 @@ export function ActionManager() {
             </div>
             <div className={styles.actionList}>
                 <List
-                    onChange={({ oldIndex, newIndex }) => {
+                    onChange={async ({ oldIndex, newIndex }) => {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const action = actions![oldIndex]
-                        actionService.update(action, {
+                        await actionService.update(action, {
                             idx: newIndex,
                         })
+                        if (!isDesktopApp()) {
+                            refreshActions()
+                        }
                     }}
                     items={actions?.map((action) => (
                         <div key={action.id} className={styles.actionItem}>
@@ -230,6 +233,9 @@ export function ActionManager() {
                         action={updatingAction}
                         onSubmit={() => {
                             setShowActionForm(false)
+                            if (!isDesktopApp()) {
+                                refreshActions()
+                            }
                         }}
                     />
                 </ModalBody>
@@ -259,8 +265,11 @@ export function ActionManager() {
                     </ModalButton>
                     <ModalButton
                         size='compact'
-                        onClick={() => {
-                            actionService.delete(deletingAction?.id as number)
+                        onClick={async () => {
+                            await actionService.delete(deletingAction?.id as number)
+                            if (!isDesktopApp()) {
+                                refreshActions()
+                            }
                             setDeletingAction(undefined)
                         }}
                     >

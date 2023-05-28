@@ -85,6 +85,7 @@ const targetLangOptions = genLangOptions(targetLanguages)
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
+        boxSizing: 'border-box',
     },
     'footer': (props: IThemedStyleProps) =>
         props.isDesktopApp
@@ -443,6 +444,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setupAnalysis()
     }, [])
 
+    const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
+
     const [showActionManager, setShowActionManager] = useState(false)
 
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
@@ -531,7 +534,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [settings?.defaultTranslateMode])
 
-    const actions = useLiveQuery(() => actionService.list())
+    const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
 
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
@@ -1783,9 +1786,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 isOpen={!isDesktopApp() && showActionManager}
                 onClose={() => {
                     setShowActionManager(false)
+                    if (!isDesktopApp()) {
+                        refreshActions()
+                    }
                 }}
                 closeable
-                size='full'
+                size='auto'
                 autoFocus
                 animate
                 role='dialog'
