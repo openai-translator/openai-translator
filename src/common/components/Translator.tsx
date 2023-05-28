@@ -899,7 +899,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             beforeTranslate()
             const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
                 action.rolePrompt
-            }:${action.commandPrompt}:${sourceLang}:${targetLang}:${text}:${selectedWord}`
+            }:${action.commandPrompt}:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -959,7 +959,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateMode, actionID, sourceLang, targetLang]
+        [translateMode, actionID, sourceLang, targetLang, translationFlag]
     )
 
     useEffect(() => {
@@ -969,7 +969,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             controller.abort()
         }
-    }, [translateText, detectedOriginalText, selectedWord, translationFlag])
+    }, [translateText, detectedOriginalText, selectedWord])
 
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
@@ -1688,6 +1688,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         {translatedText && (
                                             <div ref={actionButtonsRef} className={styles.actionButtonsContainer}>
                                                 <div style={{ marginRight: 'auto' }} />
+                                                {!isLoading && (
+                                                    <Tooltip content={t('Retry')} placement='bottom'>
+                                                        <div
+                                                            onClick={() => forceTranslate()}
+                                                            className={styles.actionButton}
+                                                        >
+                                                            <RxReload size={13} />
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
                                                 <Tooltip content={t('Speak')} placement='bottom'>
                                                     <div
                                                         className={styles.actionButton}
