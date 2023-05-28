@@ -7,7 +7,7 @@ import { useTheme } from '../hooks/useTheme'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Button } from 'baseui-sd/button'
-import { List } from 'baseui-sd/dnd-list'
+import { List, arrayMove } from 'baseui-sd/dnd-list'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import { createElement, useReducer, useState } from 'react'
 import * as mdIcons from 'react-icons/md'
@@ -16,6 +16,7 @@ import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-
 import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
 import { isDesktopApp } from '../utils'
+import { MdArrowDownward, MdArrowUpward } from 'react-icons/md'
 
 const useStyles = createUseStyles({
     root: () => ({
@@ -113,7 +114,11 @@ const useStyles = createUseStyles({
     }),
 })
 
-export function ActionManager() {
+export interface IActionManagerProps {
+    draggable?: boolean
+}
+
+export function ActionManager({ draggable = true }: IActionManagerProps) {
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
     const { t } = useTranslation()
     const { theme, themeType } = useTheme()
@@ -124,7 +129,12 @@ export function ActionManager() {
     const [deletingAction, setDeletingAction] = useState<Action>()
 
     return (
-        <div className={styles.root}>
+        <div
+            className={styles.root}
+            style={{
+                width: !draggable ? '800px' : undefined,
+            }}
+        >
             <div className={styles.operationListContainer} data-tauri-drag-region>
                 <div
                     style={{
@@ -147,15 +157,21 @@ export function ActionManager() {
                 <List
                     onChange={async ({ oldIndex, newIndex }) => {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const action = actions![oldIndex]
-                        await actionService.update(action, {
-                            idx: newIndex,
-                        })
+                        const newActions = arrayMove(actions!, oldIndex, newIndex)
+                        await actionService.bulkPut(
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            newActions.map((a, idx) => {
+                                return {
+                                    ...a,
+                                    idx,
+                                }
+                            })
+                        )
                         if (!isDesktopApp()) {
                             refreshActions()
                         }
                     }}
-                    items={actions?.map((action) => (
+                    items={actions?.map((action, idx) => (
                         <div key={action.id} className={styles.actionItem}>
                             <div className={styles.actionContent}>
                                 <div className={styles.name}>
@@ -187,11 +203,61 @@ export function ActionManager() {
                                 </div>
                             </div>
                             <div className={styles.actionOperation}>
+                                {!draggable && (
+                                    <>
+                                        <Button
+                                            size='mini'
+                                            disabled={idx === 0}
+                                            onClick={async (e) => {
+                                                e.preventDefault()
+                                                e.stopPropagation()
+                                                const newActions = arrayMove(actions, idx, idx - 1)
+                                                await actionService.bulkPut(
+                                                    newActions.map((a, idx) => {
+                                                        return {
+                                                            ...a,
+                                                            idx,
+                                                        }
+                                                    })
+                                                )
+                                                if (!isDesktopApp()) {
+                                                    refreshActions()
+                                                }
+                                            }}
+                                        >
+                                            <MdArrowUpward size={12} />
+                                        </Button>
+                                        <Button
+                                            size='mini'
+                                            disabled={idx === actions.length - 1}
+                                            onClick={async (e) => {
+                                                e.preventDefault()
+                                                e.stopPropagation()
+                                                const newActions = arrayMove(actions, idx, idx + 1)
+                                                await actionService.bulkPut(
+                                                    newActions.map((a, idx) => {
+                                                        return {
+                                                            ...a,
+                                                            idx,
+                                                        }
+                                                    })
+                                                )
+                                                if (!isDesktopApp()) {
+                                                    refreshActions()
+                                                }
+                                            }}
+                                        >
+                                            <MdArrowDownward size={12} />
+                                        </Button>
+                                    </>
+                                )}
                                 <Button
                                     size='mini'
                                     startEnhancer={<FiEdit size={12} />}
                                     disabled={!!action.mode}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
                                         setUpdatingAction(action)
                                         setShowActionForm(true)
                                     }}
@@ -202,7 +268,9 @@ export function ActionManager() {
                                     size='mini'
                                     startEnhancer={<RiDeleteBinLine size={12} />}
                                     disabled={!!action.mode}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
                                         setDeletingAction(action)
                                     }}
                                 >

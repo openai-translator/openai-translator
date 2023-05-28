@@ -22,6 +22,7 @@ export interface IUpdateActionOption {
 export interface IActionInternalService {
     create(opt: ICreateActionOption): Promise<Action>
     update(action: Action, opt: IUpdateActionOption): Promise<Action>
+    bulkPut(actions: Action[]): Promise<void>
     get(id: number): Promise<Action | undefined>
     getByMode(mode: string): Promise<Action | undefined>
     delete(id: number): Promise<void>
@@ -38,42 +39,50 @@ class ActionInternalService implements IActionInternalService {
         if (!opt.name) {
             throw new Error('name is required')
         }
-        const now = new Date().valueOf().toString()
-        const action: Action = {
-            idx: await this.db.action.count(),
-            name: opt.name,
-            mode: opt.mode,
-            icon: opt.icon,
-            rolePrompt: opt.rolePrompt,
-            commandPrompt: opt.commandPrompt,
-            createdAt: now,
-            updatedAt: now,
-        }
-        const id = await this.db.action.add(action)
-        action.id = id as number
-        return action
+        return this.db.transaction('rw', this.db.action, async () => {
+            const now = new Date().valueOf().toString()
+            const action: Action = {
+                idx: await this.db.action.count(),
+                name: opt.name,
+                mode: opt.mode,
+                icon: opt.icon,
+                rolePrompt: opt.rolePrompt,
+                commandPrompt: opt.commandPrompt,
+                createdAt: now,
+                updatedAt: now,
+            }
+            const id = await this.db.action.add(action)
+            action.id = id as number
+            return action
+        })
     }
 
     async update(action: Action, opt: IUpdateActionOption): Promise<Action> {
-        if (opt.idx !== undefined) {
-            let actions: Action[]
-            if (action.idx < opt.idx) {
-                actions = await this.db.action.where('idx').between(action.idx, opt.idx).toArray()
-                actions.forEach((a) => a.idx--)
-            } else {
-                actions = await this.db.action.where('idx').between(opt.idx, action.idx).toArray()
-                actions.forEach((a) => a.idx++)
+        return this.db.transaction('rw', this.db.action, async () => {
+            if (opt.idx !== undefined) {
+                let actions: Action[]
+                if (action.idx < opt.idx) {
+                    actions = await this.db.action.where('idx').between(action.idx, opt.idx).toArray()
+                    actions.forEach((a) => a.idx--)
+                } else {
+                    actions = await this.db.action.where('idx').between(opt.idx, action.idx).toArray()
+                    actions.forEach((a) => a.idx++)
+                }
+                await this.db.action.bulkPut(actions)
             }
-            await this.db.action.bulkPut(actions)
-        }
-        const now = new Date().valueOf().toString()
-        const newAction = {
-            ...action,
-            ...opt,
-            updatedAt: now,
-        }
-        await this.db.action.update(action.id as number, newAction)
-        return newAction
+            const now = new Date().valueOf().toString()
+            const newAction = {
+                ...action,
+                ...opt,
+                updatedAt: now,
+            }
+            await this.db.action.update(action.id as number, newAction)
+            return newAction
+        })
+    }
+
+    async bulkPut(actions: Action[]): Promise<void> {
+        await this.db.action.bulkPut(actions)
     }
 
     async get(id: number): Promise<Action | undefined> {
@@ -85,17 +94,19 @@ class ActionInternalService implements IActionInternalService {
     }
 
     async delete(id: number): Promise<void> {
-        const action = await this.db.action.get(id)
-        if (!action) {
-            return
-        }
-        if (action.mode) {
-            return
-        }
-        const actions = await this.db.action.where('idx').above(action.idx).toArray()
-        actions.forEach((a) => a.idx--)
-        await this.db.action.bulkPut(actions)
-        return await this.db.action.delete(id)
+        return this.db.transaction('rw', this.db.action, async () => {
+            const action = await this.db.action.get(id)
+            if (!action) {
+                return
+            }
+            if (action.mode) {
+                return
+            }
+            const actions = await this.db.action.where('idx').above(action.idx).toArray()
+            actions.forEach((a) => a.idx--)
+            await this.db.action.bulkPut(actions)
+            return await this.db.action.delete(id)
+        })
     }
 
     async list(): Promise<Action[]> {

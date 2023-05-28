@@ -9,6 +9,9 @@ class BackgroundActionService implements IActionInternalService {
     update(action: Action, opt: IUpdateActionOption): Promise<Action> {
         return callMethod('actionService', 'update', [action, opt])
     }
+    bulkPut(actions: Action[]): Promise<void> {
+        return callMethod('actionService', 'bulkPut', [actions])
+    }
     get(id: number): Promise<Action | undefined> {
         return callMethod('actionService', 'get', [id])
     }

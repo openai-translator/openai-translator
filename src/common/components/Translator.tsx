@@ -1798,7 +1798,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             >
                 <ModalHeader>{t('Action Manager')}</ModalHeader>
                 <ModalBody>
-                    <ActionManager />
+                    <ActionManager draggable={props.showSettings} />
                 </ModalBody>
             </Modal>
             <Toaster />
