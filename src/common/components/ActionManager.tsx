@@ -27,7 +27,7 @@ const useStyles = createUseStyles({
         boxSizing: 'border-box',
         width: '100%',
     },
-    operationListConainer: (props: IThemedStyleProps) => ({
+    operationListContainer: (props: IThemedStyleProps) => ({
         width: '100%',
         padding: '30px 16px 16px',
         boxSizing: 'border-box',
@@ -124,7 +124,7 @@ export function ActionManager() {
 
     return (
         <div className={styles.root}>
-            <div className={styles.operationListConainer} data-tauri-drag-region>
+            <div className={styles.operationListContainer} data-tauri-drag-region>
                 <div
                     style={{
                         marginRight: 'auto',
