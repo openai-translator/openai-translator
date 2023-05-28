@@ -508,15 +508,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         highlightRef.current.handleInput()
     }, [selectedWord, highlightWords])
 
-    const [actionID, setActionID] = useState<number>()
+    const [activateActionID, setActivateActionID] = useState<number>()
 
-    const translateMode = useLiveQuery(async () => {
-        if (!actionID) {
+    const currentTranslateMode = useLiveQuery(async () => {
+        if (!activateActionID) {
             return undefined
         }
-        const action = await actionService.get(actionID)
+        const action = await actionService.get(activateActionID)
         return action?.mode
-    }, [actionID])
+    }, [activateActionID])
 
     useLiveQuery(async () => {
         if (settings?.defaultTranslateMode && settings.defaultTranslateMode !== 'nop') {
@@ -527,7 +527,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             } else {
                 action = await actionService.get(actionID)
             }
-            setActionID(action?.id)
+            setActivateActionID(action?.id)
         }
     }, [settings?.defaultTranslateMode])
 
@@ -545,8 +545,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         const maxDisplayedActions = 4
         let displayedActions = actions.slice(0, maxDisplayedActions)
         let hiddenActions = actions.slice(maxDisplayedActions)
-        if (!displayedActions.find((action) => action.id === actionID)) {
-            const activatedAction = actions.find((a) => a.id === actionID)
+        if (!displayedActions.find((action) => action.id === activateActionID)) {
+            const activatedAction = actions.find((a) => a.id === activateActionID)
             if (activatedAction) {
                 const lastDisplayedAction = displayedActions[displayedActions.length - 1]
                 if (lastDisplayedAction) {
@@ -559,9 +559,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         setDisplayedActions(displayedActions)
         setHiddenActions(hiddenActions)
-    }, [actions, actionID])
+    }, [actions, activateActionID])
 
-    const isTranslate = translateMode === 'translate'
+    const isTranslate = currentTranslateMode === 'translate'
     useEffect(() => {
         if (!isTranslate) {
             setSelectedWord('')
@@ -853,22 +853,22 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             setShowWordbookButtons(false)
-            if (!text || !sourceLang || !targetLang || !actionID) {
+            if (!text || !sourceLang || !targetLang || !activateActionID) {
                 return
             }
-            const action = await actionService.get(actionID)
+            const action = await actionService.get(activateActionID)
             if (!action) {
                 return
             }
-            const actionStrItem = translateMode
-                ? actionStrItems[translateMode]
+            const actionStrItem = currentTranslateMode
+                ? actionStrItems[currentTranslateMode]
                 : {
                       beforeStr: 'Processing...',
                       afterStr: 'Processed',
                   }
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
-                if (translateMode === 'translate' && sourceLang === targetLang) {
+                if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
                     actionStr = 'Polishing...'
                 }
                 setActionStr(actionStr)
@@ -890,7 +890,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     }
                 } else {
                     let actionStr = actionStrItem.afterStr
-                    if (translateMode === 'translate' && sourceLang === targetLang) {
+                    if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
@@ -959,7 +959,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateMode, actionID, sourceLang, targetLang, translationFlag]
+        [currentTranslateMode, activateActionID, sourceLang, targetLang, translationFlag]
     )
 
     useEffect(() => {
@@ -1214,7 +1214,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         <div className={styles.popupCardHeaderActionsContainer}>
                             <div className={styles.from}>
                                 <Select
-                                    disabled={translateMode === 'explain-code'}
+                                    disabled={currentTranslateMode === 'explain-code'}
                                     size='mini'
                                     clearable={false}
                                     options={sourceLangOptions}
@@ -1248,7 +1248,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                             <div className={styles.to}>
                                 <Select
-                                    disabled={translateMode === 'polishing'}
+                                    disabled={currentTranslateMode === 'polishing'}
                                     size='mini'
                                     clearable={false}
                                     options={targetLangOptions}
@@ -1278,9 +1278,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     >
                                         <Button
                                             size='mini'
-                                            kind={action.id === actionID ? 'primary' : 'secondary'}
+                                            kind={action.id === activateActionID ? 'primary' : 'secondary'}
                                             onClick={() => {
-                                                setActionID(action.id)
+                                                setActivateActionID(action.id)
                                                 if (action.mode === 'polishing') {
                                                     setTargetLang(sourceLang)
                                                 }
@@ -1288,6 +1288,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         >
                                             {action.icon &&
                                                 React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {})}
+                                            {action.id === activateActionID && (
+                                                <div style={{ marginLeft: 4, lineHeight: 1 }}>
+                                                    {action.mode ? t(action.name) : action.name}
+                                                </div>
+                                            )}
                                         </Button>
                                     </Tooltip>
                                 )
@@ -1303,7 +1308,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     <StatefulMenu
                                         initialState={{
                                             highlightedIndex: hiddenActions.findIndex(
-                                                (action) => action.id === actionID
+                                                (action) => action.id === activateActionID
                                             ),
                                         }}
                                         onItemSelect={({ item }) => {
@@ -1316,7 +1321,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }
                                                 return
                                             }
-                                            setActionID(actionID as number)
+                                            setActivateActionID(actionID as number)
                                         }}
                                         items={[
                                             ...hiddenActions.map((action) => {
@@ -1441,7 +1446,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 ? theme.colors.contentSecondary
                                                                 : theme.colors.contentPrimary,
                                                         fontFamily:
-                                                            translateMode === 'explain-code' ? 'monospace' : 'inherit',
+                                                            currentTranslateMode === 'explain-code'
+                                                                ? 'monospace'
+                                                                : 'inherit',
                                                         textalign: 'start',
                                                     },
                                                 },
@@ -1459,8 +1466,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 if (e.key === 'Enter') {
                                                     if (!e.shiftKey) {
                                                         e.preventDefault()
-                                                        if (!actionID) {
-                                                            setActionID(
+                                                        if (!activateActionID) {
+                                                            setActivateActionID(
                                                                 actions?.find((action) => action.mode === 'translate')
                                                                     ?.id
                                                             )
@@ -1495,7 +1502,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     marginRight: '-20px',
                                                 }}
                                             >
-                                                {`Please press <Enter> key to ${translateMode}. Press <Shift+Enter> to start a new line.`}
+                                                {`Please press <Enter> key to ${currentTranslateMode}. Press <Shift+Enter> to start a new line.`}
                                             </div>
                                         </div>
                                     </div>
@@ -1632,7 +1639,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             className={styles.popupCardTranslatedContentContainer}
                                         >
                                             <div>
-                                                {translateMode === 'explain-code' ? (
+                                                {currentTranslateMode === 'explain-code' ? (
                                                     <>
                                                         <ReactMarkdown>{translatedText}</ReactMarkdown>
                                                         {isLoading && <span className={styles.caret} />}
@@ -1765,7 +1772,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             setOriginalText(content)
                             setHighlightWords(highlightWords)
                             setSelectedWord('')
-                            setActionID(actions?.find((action) => action.mode === 'translate')?.id)
+                            setActivateActionID(actions?.find((action) => action.mode === 'translate')?.id)
                             setVocabularyType('hide')
                         }}
                         type={vocabularyType as 'vocabulary' | 'article'}

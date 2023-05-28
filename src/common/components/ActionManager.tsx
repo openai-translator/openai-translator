@@ -158,7 +158,7 @@ export function ActionManager() {
                                 <div className={styles.name}>
                                     {action.icon &&
                                         createElement((mdIcons as Record<string, IconType>)[action.icon], { size: 16 })}
-                                    {action.name}
+                                    {action.mode ? t(action.name) : action.name}
                                     {action.mode && (
                                         <div
                                             style={{
