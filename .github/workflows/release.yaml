@@ -81,7 +81,7 @@ jobs:
           path: dist/tauri/
 
   build-tauri:
-    needs: build-tauri-renderer
+    needs: [create-release, build-tauri-renderer]
     permissions:
       contents: write
       packages: write
