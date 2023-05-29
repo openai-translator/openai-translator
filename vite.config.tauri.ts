@@ -20,13 +20,13 @@ export default defineConfig({
     envPrefix: ['VITE_', 'TAURI_'],
     build: {
         // Tauri supports es2021
-        target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari11',
+        target: ['es2015', 'safari11'],
         // don't minify for debug builds
         minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_DEBUG,
         rollupOptions: {
-            input: ['src/tauri/index.html', 'src/tauri/thumb.html'],
+            input: ['src/tauri/index.html', 'src/tauri/thumb.html', 'src/tauri/action_manager.html'],
             output: {
                 dir: 'dist/tauri',
             },

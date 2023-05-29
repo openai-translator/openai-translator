@@ -6,7 +6,7 @@
   "scripts": {
     "build-tauri-renderer": "tsc && vite build -c vite.config.tauri.ts",
     "dev-tauri-renderer": "vite -c vite.config.tauri.ts",
-    "build-tauri": "tauri build",
+    "build-tauri": "npm run build-tauri-renderer && tauri build",
     "dev-tauri": "tauri dev",
     "dev-browser-extension": "vite -c vite.config.chromium.ts",
     "dev-firefox": "NODE_ENV=development vite build -c vite.config.firefox.ts --watch",
