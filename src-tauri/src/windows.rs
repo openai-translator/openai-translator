@@ -238,7 +238,7 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
             )
             .fullscreen(false)
             .inner_size(600.0, 700.0)
-            .min_inner_size(560.0, 600.0)
+            .min_inner_size(520.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
             .center()

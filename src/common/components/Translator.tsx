@@ -1292,7 +1292,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             {action.icon &&
                                                 React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {})}
                                             {action.id === activateActionID && (
-                                                <div style={{ marginLeft: 4, lineHeight: 1 }}>
+                                                <div
+                                                    style={{
+                                                        marginLeft: 4,
+                                                        lineHeight: 1,
+                                                        maxWidth: 50,
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                >
                                                     {action.mode ? t(action.name) : action.name}
                                                 </div>
                                             )}
