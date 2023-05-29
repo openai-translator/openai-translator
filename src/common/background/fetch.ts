@@ -1,6 +1,6 @@
 import { isFirefox } from '../utils'
 import { BackgroundEventNames } from './eventnames'
-import { TransformStream as TransformStreamPolyfill } from 'web-streams-polyfill/ponyfill'
+import { ReadableStream as ReadableStreamPolyfill } from 'web-streams-polyfill/ponyfill'
 
 export interface BackgroundFetchRequestMessage {
     type: 'open' | 'abort'
@@ -38,52 +38,56 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                 return
             }
 
-            const TransformStream = isFirefox() ? TransformStreamPolyfill : window.TransformStream
-
-            const transformStream = new TransformStream<Uint8Array, Uint8Array>()
-            const { writable, readable } = transformStream
-            const writer = writable.getWriter()
+            const ReadableStream = isFirefox()
+                ? (ReadableStreamPolyfill as typeof window.ReadableStream)
+                : window.ReadableStream
             const textEncoder = new TextEncoder()
-
-            const browser = (await import('webextension-polyfill')).default
             let resolved = false
+            const browser = (await import('webextension-polyfill')).default
             const port = browser.runtime.connect({ name: BackgroundEventNames.fetch })
             const message: BackgroundFetchRequestMessage = {
                 type: 'open',
                 details: { url: input, options: fetchOptions },
             }
-            port.postMessage(message)
-            port.onMessage.addListener((msg: BackgroundFetchResponseMessage) => {
-                const { data, error, ...restResp } = msg
-                if (error) {
-                    const e = new Error()
-                    e.message = error.message
-                    e.name = error.name
-                    reject(e)
-                    return
-                }
-                writer.write(textEncoder.encode(data))
-                if (!resolved) {
-                    resolve({
-                        ...restResp,
-                        body: readable,
-                        text: () => readText(readable),
-                        json: async () => {
-                            const text = await readText(readable)
-                            return JSON.parse(text)
-                        },
-                    } as unknown as Response)
-                    resolved = true
-                }
+
+            const readableStream = new ReadableStream({
+                start(controller) {
+                    port.onMessage.addListener((msg: BackgroundFetchResponseMessage) => {
+                        const { data, error, ...restResp } = msg
+                        if (error) {
+                            const e = new Error()
+                            e.message = error.message
+                            e.name = error.name
+                            reject(e)
+                            return
+                        }
+                        controller.enqueue(textEncoder.encode(data))
+                        if (!resolved) {
+                            resolve({
+                                ...restResp,
+                                body: readableStream,
+                                text: () => readText(readableStream),
+                                json: async () => {
+                                    const text = await readText(readableStream)
+                                    return JSON.parse(text)
+                                },
+                            } as unknown as Response)
+                            resolved = true
+                        }
+                    })
+
+                    port.onDisconnect.addListener(() => {
+                        signal?.removeEventListener('abort', handleAbort)
+                        controller.close()
+                    })
+
+                    port.postMessage(message)
+                },
             })
 
             function handleAbort() {
                 port.postMessage({ type: 'abort' })
             }
-            port.onDisconnect.addListener(() => {
-                signal?.removeEventListener('abort', handleAbort)
-                writer.close()
-            })
             signal?.addEventListener('abort', handleAbort)
         })()
     })
