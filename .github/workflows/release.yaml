@@ -37,8 +37,51 @@ jobs:
           tag: ${{ steps.get_version.outputs.version }}
           body: "${{ steps.tag.outputs.message }}"
 
-  build-tauri:
+  build-tauri-renderer:
     needs: create-release
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.5.1
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: install frontend dependencies
+        run: pnpm install # change this to npm or pnpm depending on which one you use
+
+      - name: Change Version
+        env:
+          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
+        run: make change-version
+
+      - uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: build tauri renderer
+        run: pnpm build-tauri-renderer
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tauri-renderer
+          path: dist/tauri/
+
+  build-tauri:
+    needs: build-tauri-renderer
     permissions:
       contents: write
       packages: write
@@ -67,16 +110,6 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8.5.1
-
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'pnpm'
-
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -99,14 +132,6 @@ jobs:
         run: |
           rustup target add aarch64-apple-darwin
 
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: install frontend dependencies
-        run: pnpm install # change this to npm or pnpm depending on which one you use
-
       - name: Change Version
         env:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
@@ -115,6 +140,11 @@ jobs:
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: tauri-renderer
+          path: dist/tauri
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@dev

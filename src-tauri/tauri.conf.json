@@ -1,7 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "pnpm build-tauri-renderer",
     "beforeDevCommand": "pnpm dev-tauri-renderer",
     "devPath": "http://localhost:3333",
     "distDir": "../dist/tauri",
