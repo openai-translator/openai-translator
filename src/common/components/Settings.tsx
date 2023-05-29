@@ -194,13 +194,14 @@ const useTTSSettingsStyles = createUseStyles({
     formControl: {
         marginBottom: '12px',
     },
-    tickBar: {
+    tickBar: (props: IThemedStyleProps) => ({
+        color: props.theme.colors.contentPrimary,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingRight: '16px',
         paddingLeft: '16px',
-    },
+    }),
 })
 
 interface TTSVoicesSettingsProps {
