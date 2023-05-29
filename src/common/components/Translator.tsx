@@ -176,6 +176,7 @@ const useStyles = createUseStyles({
         '-ms-user-select': 'text',
         '-webkit-user-select': 'text',
         'user-select': 'text',
+        'fontSize': '14px',
     },
     'popupCardHeaderButtonGroup': (props: IThemedStyleProps) => ({
         'display': 'flex',
@@ -1465,12 +1466,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
+                                                        fontSize: '14px',
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                     },
                                                 },
                                                 Input: {
                                                     style: {
+                                                        fontSize: '14px',
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
