@@ -120,6 +120,9 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
+      - name: install frontend dependencies
+        run: pnpm install # change this to npm or pnpm depending on which one you use
+
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
