@@ -1,8 +1,4 @@
-lockfileVersion: '6.1'
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
+lockfileVersion: '6.0'
 
 dependencies:
   '@sentry/react':
@@ -111,7 +107,7 @@ dependencies:
     specifier: ^6.1.0
     version: 6.1.0(react@18.2.0)
   tauri-plugin-autostart-api:
-    specifier: github:tauri-apps/tauri-plugin-autostart
+    specifier: https://github.com/tauri-apps/tauri-plugin-autostart
     version: github.com/tauri-apps/tauri-plugin-autostart/8d2706d05568f71eb81a05c3c891db1291c3ca82
   tesseract.js:
     specifier: ^4.0.2
@@ -7937,7 +7933,7 @@ packages:
     dev: false
 
   github.com/tauri-apps/tauri-plugin-autostart/8d2706d05568f71eb81a05c3c891db1291c3ca82:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/8d2706d05568f71eb81a05c3c891db1291c3ca82}
+    resolution: {commit: 8d2706d05568f71eb81a05c3c891db1291c3ca82, repo: git+ssh://git@github.com/tauri-apps/tauri-plugin-autostart.git, type: git}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
