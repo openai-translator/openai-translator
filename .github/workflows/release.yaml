@@ -150,14 +150,14 @@ jobs:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
         run: make change-version
 
-      - uses: oNaiPs/secrets-to-env-action@v1
-        with:
-          secrets: ${{ toJSON(secrets) }}
-
       - uses: actions/download-artifact@v3
         with:
           name: tauri-renderer
           path: dist/tauri
+
+      - uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@dev
