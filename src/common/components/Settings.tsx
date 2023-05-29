@@ -31,6 +31,8 @@ import { getEdgeVoices } from '../tts/edge-tts'
 import { useThemeType } from '../hooks/useThemeType'
 import { Slider } from 'baseui-sd/slider'
 import { getUniversalFetch } from '../universal-fetch'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { actionService } from '../services/action'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -103,6 +105,7 @@ interface IProviderSelectorProps {
 }
 
 function TranslateModeSelector(props: ITranslateModeSelectorProps) {
+    const actions = useLiveQuery(() => actionService.list())
     const { t } = useTranslation()
 
     return (
@@ -123,15 +126,14 @@ function TranslateModeSelector(props: ITranslateModeSelectorProps) {
             }}
             options={
                 [
-                    { label: t('Translate'), id: 'translate' },
-                    { label: t('Polishing'), id: 'polishing' },
-                    { label: t('Summarize'), id: 'summarize' },
-                    { label: t('Analyze'), id: 'analyze' },
-                    { label: t('Explain Code'), id: 'explain-code' },
                     { label: t('Nop'), id: 'nop' },
+                    ...(actions?.map((item) => ({
+                        label: item.mode ? t(item.name) : item.name,
+                        id: item.mode ? item.mode : String(item.id),
+                    })) ?? []),
                 ] as {
                     label: string
-                    id: TranslateMode
+                    id: string
                 }[]
             }
         />
@@ -1129,7 +1131,7 @@ export function InnerSettings(props: IInnerSettingsProps) {
                         </FormItem>
                     </>
                 )}
-                <FormItem name='defaultTranslateMode' label={t('Default Translate Mode')}>
+                <FormItem name='defaultTranslateMode' label={t('Default Action')}>
                     <TranslateModeSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem

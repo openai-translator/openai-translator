@@ -8,6 +8,7 @@ use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use window_shadows::set_shadow;
 
 pub const MAIN_WIN_NAME: &str = "main";
+pub const ACTION_MANAGER_WIN_NAME: &str = "action_manager";
 pub const THUMB_WIN_NAME: &str = "thumb";
 
 pub fn get_mouse_location() -> Result<(i32, i32), String> {
@@ -90,7 +91,9 @@ pub fn close_thumb() {
     match APP_HANDLE.get() {
         Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
             Some(window) => {
-                window.set_position(LogicalPosition::new(-100.0, -100.0)).unwrap();
+                window
+                    .set_position(LogicalPosition::new(-100.0, -100.0))
+                    .unwrap();
                 window.set_always_on_top(false).unwrap();
                 window.hide().unwrap();
             }
@@ -203,7 +206,8 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 let scale_factor = window.scale_factor().unwrap_or(1.0);
                 let mut mouse_physical_position = PhysicalPosition::new(x as u32, y as u32);
                 if cfg!(target_os = "macos") {
-                    mouse_physical_position = LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
+                    mouse_physical_position =
+                        LogicalPosition::new(x as f64, y as f64).to_physical(scale_factor);
                 }
                 let mut window_physical_position = mouse_physical_position;
                 if mouse_physical_position.x + window_size.width > monitor_size.width {
@@ -237,7 +241,7 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
             )
             .fullscreen(false)
             .inner_size(600.0, 700.0)
-            .min_inner_size(560.0, 600.0)
+            .min_inner_size(540.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
             .center()
@@ -269,6 +273,59 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 set_shadow(&window, true).unwrap();
 
                 window
+            }
+        }
+    }
+}
+
+#[tauri::command]
+pub fn show_action_manager_window() {
+    let handle = APP_HANDLE.get().unwrap();
+    match handle.get_window(ACTION_MANAGER_WIN_NAME) {
+        Some(window) => {
+            window.unminimize().unwrap();
+            window.center().unwrap();
+            window.set_focus().unwrap();
+            window.show().unwrap();
+        }
+        None => {
+            let builder = tauri::WindowBuilder::new(
+                handle,
+                ACTION_MANAGER_WIN_NAME,
+                tauri::WindowUrl::App("src/tauri/action_manager.html".into()),
+            )
+            .fullscreen(false)
+            .inner_size(700.0, 700.0)
+            .min_inner_size(660.0, 600.0)
+            .resizable(true)
+            .skip_taskbar(true)
+            .center()
+            .focused(true)
+            .title("OpenAI Translator Action Manager");
+
+            #[cfg(target_os = "macos")]
+            {
+                builder
+                    .hidden_title(true)
+                    .title_bar_style(tauri::TitleBarStyle::Overlay)
+                    .build()
+                    .unwrap();
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+                window.set_always_on_top(true).unwrap();
+
+                set_shadow(&window, true).unwrap();
+            }
+
+            #[cfg(target_os = "linux")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+                window.set_always_on_top(true).unwrap();
+
+                set_shadow(&window, true).unwrap();
             }
         }
     }

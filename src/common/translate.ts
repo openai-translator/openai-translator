@@ -6,6 +6,7 @@ import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
 import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
+import { Action } from './internal-services/db'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -23,7 +24,8 @@ interface BaseTranslateQuery {
     selectedWord: string
     detectFrom: LangCode
     detectTo: LangCode
-    mode: Exclude<TranslateMode, 'big-bang'>
+    mode?: Exclude<TranslateMode, 'big-bang'>
+    action: Action
     onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
@@ -31,7 +33,10 @@ interface BaseTranslateQuery {
     signal: AbortSignal
 }
 
-type TranslateQueryBigBang = Omit<BaseTranslateQuery, 'mode' | 'selectedWord' | 'detectFrom' | 'detectTo'> & {
+type TranslateQueryBigBang = Omit<
+    BaseTranslateQuery,
+    'mode' | 'action' | 'selectedWord' | 'detectFrom' | 'detectTo'
+> & {
     mode: 'big-bang'
     articlePrompt: string
 }
@@ -210,7 +215,26 @@ export async function translate(query: TranslateQuery) {
         console.log('Source language is', sourceLangConfig)
         rolePrompt = targetLangConfig.rolePrompt
 
-        switch (query.mode) {
+        switch (query.action.mode) {
+            case null:
+            case undefined:
+                if (
+                    (query.action.rolePrompt ?? '').includes('${text}') ||
+                    (query.action.commandPrompt ?? '').includes('${text}')
+                ) {
+                    contentPrompt = ''
+                } else {
+                    contentPrompt = '"""' + query.text + '"""'
+                }
+                rolePrompt = (query.action.rolePrompt ?? '')
+                    .replace('${sourceLang}', sourceLangName)
+                    .replace('${targetLang}', targetLangName)
+                    .replace('${text}', query.text)
+                commandPrompt = (query.action.commandPrompt ?? '')
+                    .replace('${sourceLang}', sourceLangName)
+                    .replace('${targetLang}', targetLangName)
+                    .replace('${text}', query.text)
+                break
             case 'translate':
                 quoteProcessor = new QuoteProcessor()
                 commandPrompt = targetLangConfig.genCommandPrompt(
@@ -367,11 +391,13 @@ export async function translate(query: TranslateQuery) {
                 role: 'user',
                 content: commandPrompt,
             },
-            {
+        ]
+        if (contentPrompt) {
+            messages.push({
                 role: 'user',
                 content: contentPrompt,
-            },
-        ]
+            })
+        }
         body['messages'] = messages
     }
 

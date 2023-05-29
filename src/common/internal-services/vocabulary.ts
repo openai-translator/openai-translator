@@ -12,48 +12,44 @@ export interface IVocabularyInternalService {
 }
 
 class VocabularyInternalService implements IVocabularyInternalService {
+    private get db() {
+        return getLocalDB()
+    }
+
     public async putItem(item: VocabularyItem): Promise<void> {
-        const db = getLocalDB()
-        await db.vocabulary.put(item)
+        await this.db.vocabulary.put(item)
     }
 
     public async getItem(word: string): Promise<VocabularyItem | undefined> {
-        const db = getLocalDB()
-        return await db.vocabulary.get(word)
+        return await this.db.vocabulary.get(word)
     }
 
     public async deleteItem(word: string): Promise<void> {
-        const db = getLocalDB()
-        await db.vocabulary.delete(word)
+        await this.db.vocabulary.delete(word)
     }
 
     public async listFrequencyItems(limit: number): Promise<VocabularyItem[]> {
-        const db = getLocalDB()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return await (db.vocabulary.orderBy('reviewCount') as any).desc().limit(limit).toArray()
+        return await (this.db.vocabulary.orderBy('reviewCount') as any).desc().limit(limit).toArray()
     }
 
     public async countItems(): Promise<number> {
-        const db = getLocalDB()
-        return await db.vocabulary.count()
+        return await this.db.vocabulary.count()
     }
 
     public async isCollected(word: string): Promise<boolean> {
-        const db = getLocalDB()
-        const count = await db.vocabulary.where('word').equals(word).count()
+        const count = await this.db.vocabulary.where('word').equals(word).count()
         return count > 0
     }
 
     public async listItems(): Promise<VocabularyItem[]> {
-        const db = getLocalDB()
-        return await db.vocabulary.toArray()
+        return await this.db.vocabulary.toArray()
     }
 
     public async listRandomItems(limit: number): Promise<VocabularyItem[]> {
-        const db = getLocalDB()
-        const collectedWordTotal = await db.vocabulary.count()
+        const collectedWordTotal = await this.db.vocabulary.count()
         if (collectedWordTotal <= limit) {
-            return await db.vocabulary.toArray()
+            return await this.db.vocabulary.toArray()
         }
         const randomVocabularyItems: VocabularyItem[] = []
         const idxSeen: Set<number> = new Set([])
@@ -65,7 +61,7 @@ class VocabularyInternalService implements IVocabularyInternalService {
                     continue
                 }
                 idxSeen.add(idx)
-                const words_ = await db.vocabulary.offset(idx).limit(1).toArray()
+                const words_ = await this.db.vocabulary.offset(idx).limit(1).toArray()
                 randomVocabularyItems.push(words_[0])
                 break
             }
