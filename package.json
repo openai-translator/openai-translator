@@ -9,6 +9,7 @@
     "build-tauri": "tauri build",
     "dev-tauri": "tauri dev",
     "dev-browser-extension": "vite -c vite.config.chromium.ts",
+    "dev-firefox": "NODE_ENV=development vite build -c vite.config.firefox.ts --watch",
     "build-browser-extension": "tsc && make build-browser-extension",
     "clean": "make clean",
     "test": "npx jest",
@@ -61,11 +62,12 @@
     "react-window": "^1.8.9",
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",
-    "tauri-plugin-autostart-api": "https://github.com/tauri-apps/tauri-plugin-autostart",
+    "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart",
     "tesseract.js": "^4.0.2",
     "underscore": "^1.13.6",
     "url-join-ts": "^1.0.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "web-streams-polyfill": "^3.2.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

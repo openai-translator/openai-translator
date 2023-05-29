@@ -116,7 +116,7 @@ dependencies:
     specifier: ^6.1.0
     version: 6.1.0(react@18.2.0)
   tauri-plugin-autostart-api:
-    specifier: https://github.com/tauri-apps/tauri-plugin-autostart
+    specifier: github:tauri-apps/tauri-plugin-autostart
     version: github.com/tauri-apps/tauri-plugin-autostart/8d2706d05568f71eb81a05c3c891db1291c3ca82
   tesseract.js:
     specifier: ^4.0.2
@@ -130,6 +130,9 @@ dependencies:
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
+  web-streams-polyfill:
+    specifier: ^3.2.1
+    version: 3.2.1
 
 devDependencies:
   '@jest/globals':
@@ -7719,6 +7722,11 @@ packages:
 
   /wasm-feature-detect@1.5.1:
     resolution: {integrity: sha512-GHr23qmuehNXHY4902/hJ6EV5sUANIJC3R/yMfQ7hWDg3nfhlcJfnIL96R2ohpIwa62araN6aN4bLzzzq5GXkg==}
+    dev: false
+
+  /web-streams-polyfill@3.2.1:
+    resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
+    engines: {node: '>= 8'}
     dev: false
 
   /webextension-polyfill@0.10.0:

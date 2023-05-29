@@ -1,4 +1,6 @@
+import { isFirefox } from '../utils'
 import { BackgroundEventNames } from './eventnames'
+import { TransformStream as TransformStreamPolyfill } from 'web-streams-polyfill/ponyfill'
 
 export interface BackgroundFetchRequestMessage {
     type: 'open' | 'abort'
@@ -12,6 +14,21 @@ export interface BackgroundFetchResponseMessage
     data?: string
 }
 
+async function readText(stream: ReadableStream) {
+    const reader = stream.getReader()
+    let text = ''
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+            break
+        }
+        const str = new TextDecoder().decode(value)
+        text += str
+    }
+    return text
+}
+
 export async function backgroundFetch(input: string, options: RequestInit) {
     return new Promise<Response>((resolve, reject) => {
         ;(async () => {
@@ -21,25 +38,12 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                 return
             }
 
+            const TransformStream = isFirefox() ? TransformStreamPolyfill : window.TransformStream
+
             const transformStream = new TransformStream<Uint8Array, Uint8Array>()
             const { writable, readable } = transformStream
             const writer = writable.getWriter()
             const textEncoder = new TextEncoder()
-
-            async function readText() {
-                const decoder = new TextDecoderStream()
-                const reader = readable.pipeThrough(decoder).getReader()
-                let text = ''
-                // eslint-disable-next-line no-constant-condition
-                while (true) {
-                    const { done, value } = await reader.read()
-                    if (done) {
-                        break
-                    }
-                    text += value
-                }
-                return text
-            }
 
             const browser = (await import('webextension-polyfill')).default
             let resolved = false
@@ -63,12 +67,12 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                     resolve({
                         ...restResp,
                         body: readable,
-                        text: readText,
+                        text: () => readText(readable),
                         json: async () => {
-                            const text = await readText()
+                            const text = await readText(readable)
                             return JSON.parse(text)
                         },
-                    } as Response)
+                    } as unknown as Response)
                     resolved = true
                 }
             })
