@@ -16,6 +16,21 @@ const useStyles = createUseStyles({
     placeholder: (props: IThemedStyleProps) => ({
         color: props.theme.colors.positive,
     }),
+    promptCaptionContainer: () => ({
+        'lineHeight': 1.8,
+        '& *': {
+            '-ms-user-select': 'text',
+            '-webkit-user-select': 'text',
+            'user-select': 'text',
+        },
+    }),
+    placeholderCaptionContainer: () => ({
+        listStyle: 'square',
+        margin: 0,
+        padding: 0,
+        marginTop: 10,
+        paddingLeft: 20,
+    }),
 })
 
 export interface IActionFormProps {
@@ -48,44 +63,45 @@ export function ActionForm(props: IActionFormProps) {
         [props]
     )
 
-    const placeholdersCaption = (
-        <ul
-            style={{
-                listStyle: 'square',
-                margin: 0,
-                padding: 0,
-                marginTop: 10,
-                paddingLeft: 20,
-            }}
-        >
+    const rolePlaceholdersCaption = (
+        <ul className={styles.placeholderCaptionContainer}>
             <li>
-                <span className={styles.placeholder}>{'${sourceLang}'}</span> {t('means the source language')}
+                <span className={styles.placeholder}>{'${sourceLang}'}</span> {t('represents the source language')}
             </li>
             <li>
-                <span className={styles.placeholder}>{'${targetLang}'}</span> {t('means the target language')}
+                <span className={styles.placeholder}>{'${targetLang}'}</span> {t('represents the target language')}
+            </li>
+        </ul>
+    )
+
+    const commandPlaceholdersCaption = (
+        <ul className={styles.placeholderCaptionContainer}>
+            <li>
+                <span className={styles.placeholder}>{'${sourceLang}'}</span> {t('represents the source language')}
+            </li>
+            <li>
+                <span className={styles.placeholder}>{'${targetLang}'}</span> {t('represents the target language')}
+            </li>
+            <li>
+                <span className={styles.placeholder}>{'${text}'}</span>{' '}
+                {t(
+                    'represents the original text, which is usually not needed inside the prompt because it is automatically injected'
+                )}
             </li>
         </ul>
     )
 
     const rolePromptCaption = (
-        <div
-            style={{
-                lineHeight: 1.8,
-            }}
-        >
+        <div className={styles.promptCaptionContainer}>
             <div>{t('Role prompt indicates what role the action represents.')}</div>
             <div>{t('Role prompt example: You are a translator.')}</div>
             <div>{t('Placeholders')}:</div>
-            <div>{placeholdersCaption}</div>
+            <div>{rolePlaceholdersCaption}</div>
         </div>
     )
 
     const commandPromptCaption = (
-        <div
-            style={{
-                lineHeight: 1.8,
-            }}
-        >
+        <div className={styles.promptCaptionContainer}>
             <div>
                 {t(
                     'Command prompt indicates what command should be issued to the role represented by the action when the action is executed.'
@@ -95,7 +111,7 @@ export function ActionForm(props: IActionFormProps) {
                 {t('Command prompt example: Please translate the following text from ${sourceLang} to ${targetLang}.')}
             </div>
             <div>{t('Placeholders')}:</div>
-            <div>{placeholdersCaption}</div>
+            <div>{commandPlaceholdersCaption}</div>
         </div>
     )
 
@@ -127,7 +143,7 @@ export function ActionForm(props: IActionFormProps) {
                     }}
                 />
                 <Button isLoading={loading} size='compact'>
-                    {t('Save')}
+                    {t('Submit')}
                 </Button>
             </div>
         </Form>

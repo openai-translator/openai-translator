@@ -105,7 +105,7 @@
         "fullscreen": false,
         "height": 700,
         "width": 600,
-        "minWidth": 520,
+        "minWidth": 540,
         "minHeight": 600,
         "resizable": true,
         "title": "OpenAI Translator",

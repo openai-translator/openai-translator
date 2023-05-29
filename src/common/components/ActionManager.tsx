@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import icon from '../assets/images/icon.png'
 import { actionService } from '../services/action'
 import { FiEdit } from 'react-icons/fi'
 import { createUseStyles } from 'react-jss'
@@ -28,15 +29,16 @@ const useStyles = createUseStyles({
         boxSizing: 'border-box',
         width: isDesktopApp() ? '100%' : '600px',
     }),
-    operationListContainer: (props: IThemedStyleProps) => ({
+    header: (props: IThemedStyleProps) => ({
         width: '100%',
-        padding: isDesktopApp() ? '30px 16px 16px' : 16,
+        color: props.theme.colors.contentPrimary,
+        padding: isDesktopApp() ? '40px 20px 20px 20px' : 20,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        position: isDesktopApp() ? 'fixed' : undefined,
+        position: isDesktopApp() ? 'fixed' : 'block',
         backdropFilter: 'blur(10px)',
         zIndex: 1,
         left: 0,
@@ -45,6 +47,30 @@ const useStyles = createUseStyles({
         flexFlow: 'row nowrap',
         cursor: 'move',
         borderBottom: `1px solid ${props.theme.colors.borderTransparent}`,
+    }),
+    iconContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        flexShrink: 0,
+        marginRight: 'auto',
+    },
+    icon: {
+        'display': 'block',
+        'width': '16px',
+        'height': '16px',
+        '-ms-user-select': 'none',
+        '-webkit-user-select': 'none',
+        'user-select': 'none',
+    },
+    iconText: (props: IThemedStyleProps) => ({
+        'color': props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        'fontSize': '14px',
+        'fontWeight': 600,
+        'cursor': 'unset',
+        '@media screen and (max-width: 570px)': {
+            display: props.isDesktopApp ? 'none' : undefined,
+        },
     }),
     operationList: {
         display: 'flex',
@@ -135,7 +161,11 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                 width: !draggable ? '800px' : undefined,
             }}
         >
-            <div className={styles.operationListContainer} data-tauri-drag-region>
+            <div className={styles.header} data-tauri-drag-region>
+                <div className={styles.iconContainer}>
+                    <img data-tauri-drag-region className={styles.icon} src={icon} />
+                    <div className={styles.iconText}>{t('Action Manager')}</div>
+                </div>
                 <div
                     style={{
                         marginRight: 'auto',
@@ -143,8 +173,10 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                 />
                 <div className={styles.operationList}>
                     <Button
-                        size='compact'
-                        onClick={() => {
+                        size='mini'
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
                             setUpdatingAction(undefined)
                             setShowActionForm(true)
                         }}
@@ -288,7 +320,7 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                     setUpdatingAction(undefined)
                 }}
                 closeable
-                size='auto'
+                size='default'
                 autoFocus
                 animate
                 role='dialog'

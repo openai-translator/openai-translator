@@ -94,8 +94,8 @@
   "Ok": "确定",
   "Cancel": "取消",
   "Submit": "提交",
-  "means the source language": "表示源语言",
-  "means the target language": "表示目标语言",
-  "means the source text": "表示源文本",
+  "represents the source language": "代表源语言",
+  "represents the target language": "代表目标语言",
+  "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "代表原始文本，通常不需要在提示词中使用，因为它会自动注入",
   "disable collecting statistics": "禁用统计"
 }

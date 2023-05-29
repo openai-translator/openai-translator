@@ -44,7 +44,7 @@ import { Tooltip } from './Tooltip'
 import { useSettings } from '../hooks/useSettings'
 import Vocabulary from './Vocabulary'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
-import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
+import { Modal, ModalBody } from 'baseui-sd/modal'
 import { setupAnalysis } from '../analysis'
 import { vocabularyService } from '../services/vocabulary'
 import { Action, VocabularyItem } from '../internal-services/db'
@@ -58,6 +58,7 @@ import { StatefulPopover } from 'baseui-sd/popover'
 import { StatefulMenu } from 'baseui-sd/menu'
 import { IconType } from 'react-icons'
 import { GiPlatform } from 'react-icons/gi'
+import { LogicalSize, WebviewWindow } from '@tauri-apps/api/window'
 
 const cache = new LRUCache({
     max: 500,
@@ -1296,7 +1297,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     style={{
                                                         marginLeft: 4,
                                                         lineHeight: 1,
-                                                        maxWidth: 50,
+                                                        maxWidth: 70,
                                                         whiteSpace: 'nowrap',
                                                         overflow: 'hidden',
                                                         textOverflow: 'ellipsis',
@@ -1323,11 +1324,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 (action) => action.id === activateActionID
                                             ),
                                         }}
-                                        onItemSelect={({ item }) => {
+                                        onItemSelect={async ({ item }) => {
                                             const actionID = item.id
                                             if (actionID === '__manager__') {
                                                 if (isTauri()) {
-                                                    invoke('show_action_manager_window')
+                                                    if (!navigator.userAgent.includes('Windows')) {
+                                                        await invoke('show_action_manager_window')
+                                                    } else {
+                                                        const windowLabel = 'action_manager'
+                                                        let window = WebviewWindow.getByLabel(windowLabel)
+                                                        if (!window) {
+                                                            window = new WebviewWindow(windowLabel, {
+                                                                url: 'src/tauri/action_manager.html',
+                                                                decorations: false,
+                                                                visible: true,
+                                                                focus: true,
+                                                            })
+                                                        }
+                                                        await window.setDecorations(false)
+                                                        await window.setSize(new LogicalSize(600, 770))
+                                                        await window.center()
+                                                        await window.show()
+                                                    }
                                                 } else {
                                                     setShowActionManager(true)
                                                 }
@@ -1805,7 +1823,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 animate
                 role='dialog'
             >
-                <ModalHeader>{t('Action Manager')}</ModalHeader>
                 <ModalBody>
                     <ActionManager draggable={props.showSettings} />
                 </ModalBody>

@@ -17,10 +17,20 @@
                 overscroll-behavior: none;
                 scrollbar-width: none;
                 -ms-overflow-style: none;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
             }
 
             body::-webkit-scrollbar {
                 display: none;
+            }
+
+            *, a, button {
+                cursor: default;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
             }
 
             .titlebar {

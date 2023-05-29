@@ -24,17 +24,17 @@ use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
 use crate::windows::{
-    get_main_window_always_on_top, set_main_window_always_on_top,
-    show_main_window_with_selected_text, MAIN_WIN_NAME, show_action_manager_window,
+    get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
+    show_main_window_with_selected_text, MAIN_WIN_NAME,
 };
 
 use mouce::Mouse;
 use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
-use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
-use window_shadows::set_shadow;
+use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tiny_http::{Header, Response as HttpResponse, Server};
+use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 pub static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
@@ -166,8 +166,7 @@ fn main() {
                                         let res = x >= x1 && x <= x2 && y >= y1 && y <= y2;
                                         res
                                     } else {
-                                        let PhysicalPosition { x: x1, y: y1 } =
-                                            position;
+                                        let PhysicalPosition { x: x1, y: y1 } = position;
                                         let PhysicalSize {
                                             width: mut w,
                                             height: mut h,
@@ -281,13 +280,13 @@ fn main() {
         ))
         // .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(move |app| {
+            let app_handle = app.handle();
+            APP_HANDLE.get_or_init(|| app.handle());
             if silently {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
                 window.unminimize().unwrap();
                 window.hide().unwrap();
             }
-            let app_handle = app.handle();
-            APP_HANDLE.get_or_init(|| app.handle());
             if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
                 window.set_decorations(false)?;
@@ -313,7 +312,6 @@ fn main() {
                     NSWindow::setAllowsAutomaticWindowTabbing_(ns_window, cocoa::base::NO);
                 }
             }
-            windows::show_thumb(-100, -100);
             std::thread::spawn(move || {
                 #[cfg(target_os = "windows")]
                 {
@@ -352,7 +350,7 @@ fn main() {
             } = event
             {
                 if label != MAIN_WIN_NAME {
-                    return
+                    return;
                 }
 
                 #[cfg(target_os = "macos")]

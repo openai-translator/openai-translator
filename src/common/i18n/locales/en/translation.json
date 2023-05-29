@@ -94,8 +94,8 @@
   "Ok": "Ok",
   "Cancel": "Cancel",
   "Submit": "Submit",
-  "means the source language": "means the source language",
-  "means the target language": "means the target language",
-  "means the source text": "means the source text",
+  "represents the source language": "represents the source language",
+  "represents the target language": "represents the target language",
+  "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "represents the original text, which is usually not needed inside the prompt because it is automatically injected",
   "disable collecting statistics": "Disable collecting statistics"
 }
