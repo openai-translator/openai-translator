@@ -353,7 +353,7 @@ function TTSVoicesSettings(props: TTSVoicesSettingsProps) {
                         clearable={false}
                         searchable={false}
                         options={ttsProviderOptions}
-                        value={[{ id: props.value?.provider ?? 'WebSpeech' }]}
+                        value={[{ id: props.value?.provider ?? 'EdgeTTS' }]}
                         onChange={({ option }) => handleChangeProvider(option?.id as TTSProvider)}
                         onBlur={props.onBlur}
                     />

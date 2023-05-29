@@ -14,7 +14,7 @@ export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
-export const defaultAlwaysShowIcons = true
+export const defaultAlwaysShowIcons = false
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
