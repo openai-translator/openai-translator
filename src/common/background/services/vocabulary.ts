@@ -1,49 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { VocabularyItem } from '../../internal-services/db'
 import { IVocabularyInternalService } from '../../internal-services/vocabulary'
-import { BackgroundEventNames } from '../eventnames'
-
-const callMethod = async (methodName: string, args: any[]): Promise<any> => {
-    const browser = (await import('webextension-polyfill')).default
-    const resp = await browser.runtime.sendMessage({
-        type: BackgroundEventNames.vocabularyService,
-        method: methodName,
-        args: args,
-    })
-    return resp.result
-}
+import { callMethod } from './base'
 
 class BackgroundVocabularyService implements IVocabularyInternalService {
     async putItem(item: VocabularyItem): Promise<void> {
-        return await callMethod('putItem', [item])
+        return await callMethod('vocabularyService', 'putItem', [item])
     }
 
     async getItem(word: string): Promise<VocabularyItem | undefined> {
-        return await callMethod('getItem', [word])
+        return await callMethod('vocabularyService', 'getItem', [word])
     }
 
     async deleteItem(word: string): Promise<void> {
-        return await callMethod('deleteItem', [word])
+        return await callMethod('vocabularyService', 'deleteItem', [word])
     }
 
     async countItems(): Promise<number> {
-        return await callMethod('countItems', [])
+        return await callMethod('vocabularyService', 'countItems', [])
     }
 
     async listItems(): Promise<VocabularyItem[]> {
-        return await callMethod('listItems', [])
+        return await callMethod('vocabularyService', 'listItems', [])
     }
 
     async listRandomItems(limit: number): Promise<VocabularyItem[]> {
-        return await callMethod('listRandomItems', [limit])
+        return await callMethod('vocabularyService', 'listRandomItems', [limit])
     }
 
     async listFrequencyItems(limit: number): Promise<VocabularyItem[]> {
-        return await callMethod('listFrequencyItems', [limit])
+        return await callMethod('vocabularyService', 'listFrequencyItems', [limit])
     }
 
     async isCollected(word: string): Promise<boolean> {
-        return await callMethod('isCollected', [word])
+        return await callMethod('vocabularyService', 'isCollected', [word])
     }
 }
 
