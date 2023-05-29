@@ -177,7 +177,7 @@ const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=
 
 - resourceName: Your Azure OpenAI Service resource name.
 - deployName: Your Azure OpenAI Service model deploy name, you can change your model here.
-- api-version: 2023-03-15-preview, or newer.
+- api-version: 2023-05-15, or newer.
 
 # License
 
