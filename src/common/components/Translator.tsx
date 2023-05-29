@@ -59,6 +59,7 @@ import { StatefulMenu } from 'baseui-sd/menu'
 import { IconType } from 'react-icons'
 import { GiPlatform } from 'react-icons/gi'
 import { LogicalSize, WebviewWindow } from '@tauri-apps/api/window'
+import { IoIosRocket } from 'react-icons/io'
 
 const cache = new LRUCache({
     max: 500,
@@ -1496,6 +1497,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 if (e.key === 'Enter') {
                                                     if (!e.shiftKey) {
                                                         e.preventDefault()
+                                                        e.stopPropagation()
                                                         if (!activateActionID) {
                                                             setActivateActionID(
                                                                 actions?.find((action) => action.mode === 'translate')
@@ -1513,8 +1515,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
                                                 paddingTop:
-                                                    editableText && editableText !== detectedOriginalText ? 4 : 0,
-                                                height: editableText && editableText !== detectedOriginalText ? 18 : 0,
+                                                    editableText && editableText !== detectedOriginalText ? 6 : 0,
+                                                height: editableText && editableText !== detectedOriginalText ? 28 : 0,
                                                 transition: 'all 0.3s linear',
                                                 overflow: 'hidden',
                                             }}
@@ -1526,13 +1528,55 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             />
                                             <div
                                                 style={{
-                                                    color: '#999',
-                                                    fontSize: '11px',
-                                                    transform: 'scale(0.9)',
-                                                    marginRight: '-20px',
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    gap: 10,
                                                 }}
                                             >
-                                                {`Please press <Enter> key to ${currentTranslateMode}. Press <Shift+Enter> to start a new line.`}
+                                                <div
+                                                    style={{
+                                                        color: '#999',
+                                                        fontSize: '11px',
+                                                        transform: 'scale(0.9)',
+                                                        marginRight: '-20px',
+                                                    }}
+                                                >
+                                                    {
+                                                        'Please press <Enter> to submit. Press <Shift+Enter> to start a new line.'
+                                                    }
+                                                </div>
+                                                <Button
+                                                    size='mini'
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        if (!activateActionID) {
+                                                            setActivateActionID(
+                                                                actions?.find((action) => action.mode === 'translate')
+                                                                    ?.id
+                                                            )
+                                                        }
+                                                        setOriginalText(editableText)
+                                                    }}
+                                                    startEnhancer={<IoIosRocket size={12} />}
+                                                    overrides={{
+                                                        StartEnhancer: {
+                                                            style: {
+                                                                marginRight: '6px',
+                                                            },
+                                                        },
+                                                        BaseButton: {
+                                                            style: {
+                                                                fontWeight: 'normal',
+                                                                fontSize: '12px',
+                                                                padding: '4px 8px',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {t('Submit')}
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
