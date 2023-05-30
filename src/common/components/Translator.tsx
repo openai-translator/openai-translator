@@ -169,7 +169,7 @@ const useStyles = createUseStyles({
         'fontSize': '12px',
         'fontWeight': 600,
         'cursor': 'unset',
-        '@media screen and (max-width: 570px)': {
+        '@media screen and (max-width: 650px)': {
             display: props.isDesktopApp ? 'none' : undefined,
         },
     }),
