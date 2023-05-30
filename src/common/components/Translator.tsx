@@ -469,7 +469,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ;(i18n as any).changeLanguage(settings?.i18n)
         }
-    }, [settings])
+    }, [i18n, settings?.i18n])
 
     const [autoFocus, setAutoFocus] = useState(false)
 
@@ -652,7 +652,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (isWordMode && !isLoading) {
             checkWordCollection()
         }
-    }, [isWordMode, editableText, isLoading])
+    }, [isWordMode, isLoading, checkWordCollection])
 
     useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
@@ -707,7 +707,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.dir = getLangConfig(sourceLang).direction
     }, [sourceLang, actionStr])
 
-    const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [])
+    const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [sourceLang])
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -862,7 +862,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
-            setShowWordbookButtons(false)
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
                 return
             }
@@ -870,6 +869,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             if (!action) {
                 return
             }
+            setShowWordbookButtons(false)
             const actionStrItem = currentTranslateMode
                 ? actionStrItems[currentTranslateMode]
                 : {
@@ -895,8 +895,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             icon: '😥',
                         })
                     } else {
-                        setActionStr('Error')
-                        setErrorMessage(`${actionStr} failed: ${reason}`)
+                        setActionStr((actionStr_) => {
+                            setErrorMessage(`${actionStr_} failed: ${reason}`)
+                            return 'Error'
+                        })
                     }
                 } else {
                     let actionStr = actionStrItem.afterStr
@@ -971,17 +973,31 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [currentTranslateMode, activateAction?.id, sourceLang, targetLang, translationFlag]
+        [
+            sourceLang,
+            targetLang,
+            activateAction?.id,
+            currentTranslateMode,
+            settings?.provider,
+            settings?.apiModel,
+            translationFlag,
+            startLoading,
+            stopLoading,
+            t,
+        ]
     )
 
     useEffect(() => {
+        if (editableText !== detectedOriginalText) {
+            return
+        }
         const controller = new AbortController()
         const { signal } = controller
         translateText(detectedOriginalText, selectedWord, signal)
         return () => {
             controller.abort()
         }
-    }, [translateText, detectedOriginalText, selectedWord])
+    }, [translateText, editableText, detectedOriginalText, selectedWord])
 
     const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
