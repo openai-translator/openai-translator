@@ -7,7 +7,7 @@ export function useCollectedWordTotal() {
 
     useEffect(() => {
         vocabularyService.countItems().then(setCollectedWordTotal)
-    }, [])
+    }, [setCollectedWordTotal])
 
     return { collectedWordTotal, setCollectedWordTotal }
 }

@@ -208,7 +208,7 @@ const Vocabulary = (props: IVocabularyProps) => {
 
     useEffect(() => {
         checkCollection()
-    }, [selectedWord?.word])
+    }, [checkCollection])
 
     const onRandomWords = async () => {
         try {
