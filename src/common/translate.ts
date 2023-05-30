@@ -246,6 +246,7 @@ export async function translate(query: TranslateQuery) {
                     quoteProcessor.quoteEnd
                 )
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                console.debug('--------------', query)
                 if (query.text.length < 5 && toChinese) {
                     // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                     rolePrompt = `你是一个翻译引擎，请将给到的文本翻译成${targetLangName}。请列出3种（如果有）最常用翻译结果：单词或短语，并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。按照下面格式用中文阐述：
@@ -260,7 +261,7 @@ export async function translate(query: TranslateQuery) {
                         // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
                         rolePrompt = `你是一个翻译引擎，请翻译给出的文本，只需要翻译不需要解释。当且仅当文本只有一个单词时，请给出单词原始形态（如果有）、单词的语种、${
                             targetLangConfig.phoneticNotation && '对应的音标或转写、'
-                        }所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
+                        }所有含义（含词性）、双语示例，至少三条例句。如果你认为单词拼写错误，请提示我最可能的正确拼写，否则请严格按照下面格式给到翻译结果：
                 <单词>
                 [<语种>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
                 [<词性缩写>] <中文含义>]
@@ -277,7 +278,7 @@ export async function translate(query: TranslateQuery) {
                             'the corresponding phonetic notation or transcription, '
                         }all senses with parts of speech, ${
                             isSameLanguage ? '' : 'bilingual '
-                        }sentence examples (at least 3) and etymology. Reply in the following format:
+                        }sentence examples (at least 3) and etymology. If you think there is a spelling mistake, please tell me the most possible correct word otherwise reply in the following format:
                 <word> (<original form>)
                 [<language>] · / ${targetLangConfig.phoneticNotation && '<' + targetLangConfig.phoneticNotation + '>'}
                 [<part of speech>] ${isSameLanguage ? '' : '<translated meaning> / '}<meaning in source language>
