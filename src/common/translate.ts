@@ -234,6 +234,9 @@ export async function translate(query: TranslateQuery) {
                     .replace('${sourceLang}', sourceLangName)
                     .replace('${targetLang}', targetLangName)
                     .replace('${text}', query.text)
+                if (query.action.outputRenderingFormat) {
+                    commandPrompt += `. Format: ${query.action.outputRenderingFormat}`
+                }
                 break
             case 'translate':
                 quoteProcessor = new QuoteProcessor()

@@ -97,5 +97,6 @@
   "represents the source language": "はソース言語を表します",
   "represents the target language": "はターゲット言語を表します",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "は元のテキストを表します。通常、プロンプト内では必要ありません。自動的に挿入されるためです",
+  "Output rendering format": "出力レンダリング形式",
   "disable collecting statistics": "統計情報の収集を無効にする"
 }
