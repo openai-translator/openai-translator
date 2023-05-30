@@ -12,6 +12,7 @@ jobs:
     outputs:
       release_id: ${{ steps.create-release.outputs.id }}
       release_upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_body: "${{ steps.tag.outputs.message }}"
 
     steps:
       - uses: actions/checkout@v3
@@ -166,6 +167,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
+          releaseBody: ${{ needs.create-release.outputs.release_body }}
 
       - name: Build Tauri App (macOS aarch64)
         uses: tauri-apps/tauri-action@dev
@@ -174,6 +176,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
+          releaseBody: ${{ needs.create-release.outputs.release_body }}
           args: --target aarch64-apple-darwin
 
   build-clip-extension:
