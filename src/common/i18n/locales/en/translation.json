@@ -97,5 +97,6 @@
   "represents the source language": "represents the source language",
   "represents the target language": "represents the target language",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "represents the original text, which is usually not needed inside the prompt because it is automatically injected",
+  "Output rendering format": "Output rendering format",
   "disable collecting statistics": "Disable collecting statistics"
 }

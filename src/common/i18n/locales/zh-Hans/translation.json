@@ -97,5 +97,6 @@
   "represents the source language": "代表源语言",
   "represents the target language": "代表目标语言",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "代表原始文本，通常不需要在提示词中使用，因为它会自动注入",
+  "Output rendering format": "输出渲染格式",
   "disable collecting statistics": "禁用统计"
 }

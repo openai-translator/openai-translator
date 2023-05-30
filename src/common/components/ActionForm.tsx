@@ -11,6 +11,7 @@ import { createUseStyles } from 'react-jss'
 import { IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IconPicker } from './IconPicker'
+import { RenderingFormatSelector } from './RenderingFormatSelector'
 
 const useStyles = createUseStyles({
     placeholder: (props: IThemedStyleProps) => ({
@@ -128,6 +129,9 @@ export function ActionForm(props: IActionFormProps) {
             </FormItem>
             <FormItem required name='commandPrompt' label={t('Command Prompt')} caption={commandPromptCaption}>
                 <Textarea size='compact' />
+            </FormItem>
+            <FormItem name='outputRenderingFormat' label={t('Output rendering format')}>
+                <RenderingFormatSelector />
             </FormItem>
             <div
                 style={{

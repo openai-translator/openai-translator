@@ -96,5 +96,6 @@
   "represents the source language": "แสดงภาษาต้นทาง",
   "represents the target language": "แสดงภาษาปลายทาง",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "แสดงข้อความต้นฉบับซึ่งมักจะไม่จำเป็นต้องอยู่ใน prompt เนื่องจากถูกฉีกอัตโนมัติ",
+  "Output rendering format": "รูปแบบการแสดงผล",
   "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
 }

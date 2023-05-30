@@ -1,6 +1,6 @@
 import { builtinActionModes } from '../constants'
 import { TranslateMode } from '../translate'
-import { Action, getLocalDB } from './db'
+import { Action, ActionOutputRenderingFormat, getLocalDB } from './db'
 
 export interface ICreateActionOption {
     name: string
@@ -8,6 +8,7 @@ export interface ICreateActionOption {
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
+    outputRenderingFormat?: ActionOutputRenderingFormat
 }
 
 export interface IUpdateActionOption {
@@ -17,6 +18,7 @@ export interface IUpdateActionOption {
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
+    outputRenderingFormat?: ActionOutputRenderingFormat
 }
 
 export interface IActionInternalService {
@@ -48,6 +50,7 @@ class ActionInternalService implements IActionInternalService {
                 icon: opt.icon,
                 rolePrompt: opt.rolePrompt,
                 commandPrompt: opt.commandPrompt,
+                outputRenderingFormat: opt.outputRenderingFormat,
                 createdAt: now,
                 updatedAt: now,
             }
