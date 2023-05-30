@@ -240,7 +240,7 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
             .fullscreen(false)
-            .inner_size(600.0, 700.0)
+            .inner_size(620.0, 700.0)
             .min_inner_size(540.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)

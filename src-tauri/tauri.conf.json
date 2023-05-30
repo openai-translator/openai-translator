@@ -102,8 +102,8 @@
       {
         "url": "src/tauri/index.html",
         "fullscreen": false,
+        "width": 620,
         "height": 700,
-        "width": 600,
         "minWidth": 540,
         "minHeight": 600,
         "resizable": true,
