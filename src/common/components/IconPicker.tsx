@@ -42,7 +42,8 @@ export function IconPicker({ value, onChange }: IIconPickerProps) {
 
     useEffect(() => {
         onChange?.(currentValue)
-    }, [currentValue, onChange])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentValue])
 
     const [searchInputText, setSearchInputText] = useState('')
 

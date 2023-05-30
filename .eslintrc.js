@@ -30,6 +30,7 @@ module.exports = {
         'baseui/deprecated-component-api': 'warn',
         'baseui/no-deep-imports': 'warn',
         'prettier/prettier': 'error',
+        "react-hooks/rules-of-hooks": "error",
         'react-hooks/exhaustive-deps': 'warn',
     },
     settings: {

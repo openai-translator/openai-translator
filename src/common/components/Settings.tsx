@@ -282,7 +282,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
             })
             onChange?.({ ...value, voices: newVoices })
         },
-        [value, onChange]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [value]
     )
 
     const handleChangeLang = useCallback(
@@ -299,7 +300,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
             })
             onChange?.({ ...value, voices: newVoices })
         },
-        [onChange, value]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [value]
     )
 
     const handleAddLang = useCallback(
@@ -317,7 +319,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
             })
             setShowLangSelector(false)
         },
-        [onChange, value]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [value]
     )
 
     const handleChangeVoice = useCallback(
@@ -334,14 +337,16 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
             })
             onChange?.({ ...value, voices: newVoices })
         },
-        [onChange, value]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [value]
     )
 
     const handleChangeProvider = useCallback(
         (provider: TTSProvider) => {
             onChange?.({ ...value, provider })
         },
-        [onChange, value]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [value]
     )
 
     return (
@@ -810,13 +815,15 @@ function HotkeyRecorder({ value, onChange, onBlur }: IHotkeyRecorderProps) {
             setHotKeys(keys_)
             onChange?.(keys_.join('+'))
         }
-    }, [keys, onChange])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [keys])
 
     useEffect(() => {
         if (!isRecording) {
             onChange?.(hotKeys.join('+'))
         }
-    }, [hotKeys, isRecording, onChange])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hotKeys, isRecording])
 
     useEffect(() => {
         const stopRecording = () => {
