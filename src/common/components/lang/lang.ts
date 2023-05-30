@@ -4,6 +4,7 @@
 import { isTraditional } from '../../traditional-or-simplified'
 import ISO6391 from 'iso-639-1'
 import { LANG_CONFIGS, Config as OptionalLangConfig } from './data'
+import { oneLine } from 'common-tags'
 
 export type LangCode =
     | 'en'
@@ -124,10 +125,16 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
         isTarget: true,
         isVariant: false,
         direction: 'ltr',
-        rolePrompt:
-            'You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it.',
+        rolePrompt: oneLine`
+            You are a professional translation engine,
+            please translate the text into a colloquial,
+            professional, elegant and fluent content,
+            without the style of machine translation. 
+            You must only translate the text content, never interpret it.`,
         genCommandPrompt: (sourceLanguageConfig: LanguageConfig, quoteStart: string, quoteEnd: string) =>
-            `Translate from ${sourceLanguageConfig.name} to ${config.name}. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}.`,
+            oneLine`Translate from ${sourceLanguageConfig.name} to ${config.name}.
+            Return translated text only.
+            Only translate the text between ${quoteStart} and ${quoteEnd}.`,
     }
     return { ...DEFAULT_CONFIG, ...config }
 }
