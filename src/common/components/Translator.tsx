@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
@@ -62,6 +62,7 @@ import { IoIosRocket } from 'react-icons/io'
 import 'katex/dist/katex.min.css'
 import Latex from 'react-latex-next'
 import { Markdown } from './Markdown'
+import useResizeObserver from 'use-resize-observer'
 
 const cache = new LRUCache({
     max: 500,
@@ -165,20 +166,16 @@ const useStyles = createUseStyles({
         'user-select': 'none',
     },
     'iconText': (props: IThemedStyleProps) => ({
-        'color': props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
-        'fontSize': '12px',
-        'fontWeight': 600,
-        'cursor': 'unset',
-        '@media screen and (max-width: 650px)': {
-            display: props.isDesktopApp ? 'none' : undefined,
-        },
+        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        fontSize: '12px',
+        fontWeight: 600,
+        cursor: 'unset',
     }),
     'paragraph': {
         'margin': '0.5em 0',
         '-ms-user-select': 'text',
         '-webkit-user-select': 'text',
         'user-select': 'text',
-        'fontSize': '14px',
     },
     'popupCardHeaderButtonGroup': (props: IThemedStyleProps) => ({
         'display': 'flex',
@@ -205,6 +202,7 @@ const useStyles = createUseStyles({
         },
     }),
     'popupCardHeaderActionsContainer': (props: IThemedStyleProps) => ({
+        'box-sizing': 'border-box',
         'display': 'flex',
         'flexShrink': 0,
         'flexDirection': 'row',
@@ -287,6 +285,7 @@ const useStyles = createUseStyles({
         },
     },
     'popupCardTranslatedContentContainer': (props: IThemedStyleProps) => ({
+        fontSize: '15px',
         marginTop: '-14px',
         display: 'flex',
         overflowY: 'auto',
@@ -538,6 +537,74 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [settings?.defaultTranslateMode])
 
+    const headerRef = useRef<HTMLDivElement>(null)
+    const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
+
+    const logoTextRef = useRef<HTMLDivElement>(null)
+
+    const languagesSelectorRef = useRef<HTMLDivElement>(null)
+
+    const { width: languagesSelectorWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: languagesSelectorRef })
+
+    const headerActionButtonsRef = useRef<HTMLDivElement>(null)
+
+    const { width: headerActionButtonsWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerActionButtonsRef })
+
+    const editorContainerRef = useRef<HTMLDivElement>(null)
+
+    const translatedContentRef = useRef<HTMLDivElement>(null)
+
+    const actionButtonsRef = useRef<HTMLDivElement>(null)
+
+    const scrollYRef = useRef<number>(0)
+
+    const hasActivateAction = activateAction !== undefined
+    const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
+
+    useLayoutEffect(() => {
+        if (!isTauri()) {
+            return
+        }
+
+        const handleResize = () => {
+            const headerElem = headerRef.current
+            if (!headerElem) {
+                return
+            }
+            const logoTextElem = logoTextRef.current
+            if (!logoTextElem) {
+                return
+            }
+            const activateActionElem = headerElem.querySelector('.__yetone-activate-action')
+            if (hasActivateAction && !activateActionElem) {
+                return
+            }
+            const paddingWidth = 32
+            const logoWidth = 131
+            const iconWidth = 32
+            const iconWithTextWidth = activateActionElem ? activateActionElem.clientWidth : 105
+            const iconGap = 5
+            let count = Math.floor(
+                (headerWidth -
+                    paddingWidth -
+                    logoWidth -
+                    languagesSelectorWidth -
+                    10 -
+                    iconWithTextWidth * (hasActivateAction ? 1 : 0)) /
+                    (iconGap + iconWidth)
+            )
+            count = hasActivateAction ? count + 1 : count
+            if (count <= 0) {
+                logoTextElem.style.display = 'none'
+            } else {
+                logoTextElem.style.display = 'flex'
+            }
+            setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
+        }
+
+        handleResize()
+    }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
+
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
 
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
@@ -549,9 +616,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             setHiddenActions([])
             return
         }
-        const maxDisplayedActions = 4
-        let displayedActions = actions.slice(0, maxDisplayedActions)
-        let hiddenActions = actions.slice(maxDisplayedActions)
+        let displayedActions = actions.slice(0, displayedActionsMaxCount)
+        let hiddenActions = actions.slice(displayedActionsMaxCount)
         if (!displayedActions.find((action) => action.id === activateAction?.id)) {
             const activatedAction = actions.find((a) => a.id === activateAction?.id)
             if (activatedAction) {
@@ -566,7 +632,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         setDisplayedActions(displayedActions)
         setHiddenActions(hiddenActions)
-    }, [actions, activateAction?.id])
+    }, [actions, activateAction?.id, displayedActionsMaxCount])
 
     const isTranslate = currentTranslateMode === 'translate'
     useEffect(() => {
@@ -709,23 +775,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [sourceLang])
 
-    const headerRef = useRef<HTMLDivElement>(null)
-
-    const editorContainerRef = useRef<HTMLDivElement>(null)
-
-    const translatedContentRef = useRef<HTMLDivElement>(null)
-
-    const actionButtonsRef = useRef<HTMLDivElement>(null)
-
-    const scrollYRef = useRef<number>(0)
-
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
     // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
         const calculateTranslatedContentMaxHeight = (): number => {
             const { innerHeight } = window
-            const headerHeight = headerRef.current?.offsetHeight || 0
             const editorHeight = editorContainerRef.current?.offsetHeight || 0
             const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
             return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
@@ -761,7 +816,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
         }
-    }, [])
+    }, [headerHeight])
 
     useEffect(() => {
         if (isDesktopApp()) {
@@ -1235,11 +1290,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     >
                         <div data-tauri-drag-region className={styles.iconContainer}>
                             <img data-tauri-drag-region className={styles.icon} src={icon} />
-                            <div data-tauri-drag-region className={styles.iconText}>
+                            <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
                             </div>
                         </div>
-                        <div className={styles.popupCardHeaderActionsContainer}>
+                        <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
                             <div className={styles.from}>
                                 <Select
                                     disabled={currentTranslateMode === 'explain-code'}
@@ -1296,7 +1351,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 />
                             </div>
                         </div>
-                        <div className={styles.popupCardHeaderButtonGroup}>
+                        <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
                             {displayedActions?.map((action) => {
                                 return (
                                     <Tooltip
@@ -1307,6 +1362,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         <Button
                                             size='mini'
                                             kind={action.id === activateAction?.id ? 'primary' : 'secondary'}
+                                            className={
+                                                action.id === activateAction?.id
+                                                    ? '__yetone-activate-action'
+                                                    : undefined
+                                            }
                                             onClick={() => {
                                                 setActivateAction(action)
                                                 if (action.mode === 'polishing') {
@@ -1315,13 +1375,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }}
                                         >
                                             {action.icon &&
-                                                React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {})}
+                                                React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {
+                                                    size: 15,
+                                                })}
                                             {action.id === activateAction?.id && (
                                                 <div
                                                     style={{
                                                         marginLeft: 4,
                                                         lineHeight: 1,
-                                                        maxWidth: 70,
+                                                        maxWidth: 100,
                                                         whiteSpace: 'nowrap',
                                                         overflow: 'hidden',
                                                         textOverflow: 'ellipsis',
@@ -1395,7 +1457,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                       (mdIcons as Record<string, IconType>)[
                                                                           action.icon
                                                                       ],
-                                                                      {}
+                                                                      { size: 15 }
                                                                   )
                                                                 : undefined}
                                                             {action.mode ? t(action.name) : action.name}
@@ -1488,14 +1550,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
-                                                        fontSize: '14px',
+                                                        fontSize: '15px',
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                     },
                                                 },
                                                 Input: {
                                                     style: {
-                                                        fontSize: '14px',
+                                                        fontSize: '15px',
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
@@ -1539,7 +1601,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
                                                 paddingTop:
-                                                    editableText && editableText !== detectedOriginalText ? 6 : 0,
+                                                    editableText && editableText !== detectedOriginalText ? 8 : 0,
                                                 height: editableText && editableText !== detectedOriginalText ? 28 : 0,
                                                 transition: 'all 0.3s linear',
                                                 overflow: 'hidden',
@@ -1561,7 +1623,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 <div
                                                     style={{
                                                         color: '#999',
-                                                        fontSize: '11px',
+                                                        fontSize: '12px',
                                                         transform: 'scale(0.9)',
                                                         marginRight: '-20px',
                                                     }}
@@ -1582,7 +1644,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         }
                                                         setOriginalText(editableText)
                                                     }}
-                                                    startEnhancer={<IoIosRocket size={12} />}
+                                                    startEnhancer={<IoIosRocket size={13} />}
                                                     overrides={{
                                                         StartEnhancer: {
                                                             style: {
@@ -1613,7 +1675,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 {({ getRootProps, getInputProps }) => (
                                                     <div {...getRootProps()} className={styles.actionButton}>
                                                         <input {...getInputProps({ multiple: false })} />
-                                                        <BsTextareaT size={13} />
+                                                        <BsTextareaT size={15} />
                                                     </div>
                                                 )}
                                             </Dropzone>
@@ -1636,7 +1698,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 className={styles.actionButton}
                                                 onClick={() => setShowWordbookButtons((e) => !e)}
                                             >
-                                                <AiOutlineFileSync size={13} />
+                                                <AiOutlineFileSync size={15} />
                                             </div>
                                         </StatefulTooltip>
                                     )}
@@ -1645,7 +1707,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             <StatefulTooltip content={t('Collection Review')} showArrow placement='top'>
                                                 <div className={styles.actionButton}>
                                                     <MdGrade
-                                                        size={13}
+                                                        size={15}
                                                         onClick={() => setVocabularyType('vocabulary')}
                                                     />
                                                 </div>
@@ -1656,12 +1718,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 placement='top'
                                             >
                                                 <div className={styles.actionButton} onClick={onCsvExport}>
-                                                    <TbCsv size={13} />
+                                                    <TbCsv size={15} />
                                                 </div>
                                             </StatefulTooltip>
                                             <StatefulTooltip content='Big Bang' showArrow placement='top'>
                                                 <div className={styles.actionButton}>
-                                                    <FcIdea size={13} onClick={() => setVocabularyType('article')} />
+                                                    <FcIdea size={15} onClick={() => setVocabularyType('article')} />
                                                 </div>
                                             </StatefulTooltip>
                                         </>
@@ -1675,7 +1737,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 {isSpeakingEditableText ? (
                                                     <SpeakerMotion />
                                                 ) : (
-                                                    <RxSpeakerLoud size={13} />
+                                                    <RxSpeakerLoud size={15} />
                                                 )}
                                             </div>
                                         </Tooltip>
@@ -1689,7 +1751,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }}
                                             >
                                                 <div className={styles.actionButton}>
-                                                    <RxEraser size={13} />
+                                                    <RxEraser size={15} />
                                                 </div>
                                             </div>
                                         </Tooltip>
@@ -1721,7 +1783,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         <span>{errorMessage}</span>
                                         <Tooltip content={t('Retry')} placement='bottom'>
                                             <div onClick={() => forceTranslate()} className={styles.actionButton}>
-                                                <RxReload size={13} />
+                                                <RxReload size={15} />
                                             </div>
                                         </Tooltip>
                                     </div>
@@ -1804,7 +1866,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             onClick={() => forceTranslate()}
                                                             className={styles.actionButton}
                                                         >
-                                                            <RxReload size={13} />
+                                                            <RxReload size={15} />
                                                         </div>
                                                     </Tooltip>
                                                 )}
@@ -1816,7 +1878,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         {isSpeakingTranslatedText ? (
                                                             <SpeakerMotion />
                                                         ) : (
-                                                            <RxSpeakerLoud size={13} />
+                                                            <RxSpeakerLoud size={15} />
                                                         )}
                                                     </div>
                                                 </Tooltip>
@@ -1846,7 +1908,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 <div className={styles.footer}>
                     <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>
                         <div onClick={() => setShowSettings((s) => !s)}>
-                            {showSettings ? <AiOutlineTranslation size='14' /> : <IoSettingsOutline size='14' />}
+                            {showSettings ? <AiOutlineTranslation size={15} /> : <IoSettingsOutline size={15} />}
                         </div>
                     </Tooltip>
                 </div>
