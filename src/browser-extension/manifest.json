@@ -35,6 +35,16 @@
 
     "permissions": ["storage", "contextMenus"],
 
+    "commands": {
+        "open-popup": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Y",
+                "mac": "Command+Shift+Y"
+            },
+            "description": "Open the popup"
+        }
+    },
+
     "host_permissions": [
         "https://*.openai.com/",
         "https://*.openai.azure.com/",

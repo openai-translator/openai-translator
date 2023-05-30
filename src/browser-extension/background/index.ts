@@ -128,3 +128,14 @@ browser.runtime.onMessage.addListener(async (request) => {
             return await callMethod(request, actionInternalService)
     }
 })
+
+browser.commands.onCommand.addListener(async (command) => {
+    switch (command) {
+        case 'open-popup': {
+            await browser.windows.create({
+                type: 'popup',
+                url: '/src/browser-extension/popup/index.html',
+            })
+        }
+    }
+})
