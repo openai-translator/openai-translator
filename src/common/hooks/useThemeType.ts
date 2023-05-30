@@ -11,7 +11,7 @@ export const useThemeType = () => {
         if (settings?.themeType) {
             setThemeType(settings.themeType)
         }
-    }, [settings])
+    }, [setThemeType, settings?.themeType])
 
     return {
         themeType,

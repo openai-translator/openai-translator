@@ -29,22 +29,21 @@ export interface IIconPickerProps {
     onChange?: (value: string) => void
 }
 
-export function IconPicker(props: IIconPickerProps) {
+export function IconPicker({ value, onChange }: IIconPickerProps) {
     const { t } = useTranslation()
     const [showIcons, setShowIcons] = useState(false)
-    const [value, setValue] = useState(props.value ?? 'MdMusicVideo')
+    const [currentValue, setCurrentValue] = useState(value ?? 'MdMusicVideo')
 
     useEffect(() => {
-        if (props.value) {
-            setValue(props.value)
-        }
-    }, [props.value])
-
-    useEffect(() => {
-        if (props.onChange) {
-            props.onChange(value)
+        if (value) {
+            setCurrentValue(value)
         }
     }, [value])
+
+    useEffect(() => {
+        onChange?.(currentValue)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentValue])
 
     const [searchInputText, setSearchInputText] = useState('')
 
@@ -71,7 +70,7 @@ export function IconPicker(props: IIconPickerProps) {
                     setShowIcons((v) => !v)
                 }}
             >
-                {createElement((mdIcons as Record<string, IconType>)[value] as IconType, { size: 16 })}
+                {createElement((mdIcons as Record<string, IconType>)[currentValue] as IconType, { size: 16 })}
             </Button>
             {showIcons && (
                 <div className={styles.icons}>
@@ -127,12 +126,12 @@ export function IconPicker(props: IIconPickerProps) {
                             return (
                                 <div key={key} style={style}>
                                     <Button
-                                        kind={value === key ? 'primary' : 'secondary'}
+                                        kind={currentValue === key ? 'primary' : 'secondary'}
                                         size='mini'
                                         onClick={(e) => {
                                             e.stopPropagation()
                                             e.preventDefault()
-                                            setValue(key)
+                                            setCurrentValue(key)
                                             setShowIcons(false)
                                         }}
                                     >

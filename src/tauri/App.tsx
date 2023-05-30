@@ -88,17 +88,21 @@ export function App() {
         function handleClose() {
             appWindow.hide()
         }
-        pinIconRef.current?.addEventListener('click', handlePin)
-        minimizeIconRef.current?.addEventListener('click', handleMinimize)
-        maximizeIconRef.current?.addEventListener('click', handleMaximize)
-        closeIconRef.current?.addEventListener('click', handleClose)
+        const pinIcon = pinIconRef.current
+        const minimizeIcon = minimizeIconRef.current
+        const maximizeIcon = maximizeIconRef.current
+        const closeIcon = closeIconRef.current
+        pinIcon?.addEventListener('click', handlePin)
+        minimizeIcon?.addEventListener('click', handleMinimize)
+        maximizeIcon?.addEventListener('click', handleMaximize)
+        closeIcon?.addEventListener('click', handleClose)
         return () => {
-            pinIconRef.current?.removeEventListener('click', handlePin)
-            minimizeIconRef.current?.removeEventListener('click', handleMinimize)
-            maximizeIconRef.current?.removeEventListener('click', handleMaximize)
-            closeIconRef.current?.removeEventListener('click', handleClose)
+            pinIcon?.removeEventListener('click', handlePin)
+            minimizeIcon?.removeEventListener('click', handleMinimize)
+            maximizeIcon?.removeEventListener('click', handleMaximize)
+            closeIcon?.removeEventListener('click', handleClose)
         }
-    }, [])
+    }, [isLinux, isMacOS])
 
     const { theme, themeType } = useTheme()
 

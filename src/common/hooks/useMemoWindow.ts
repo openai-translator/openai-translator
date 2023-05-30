@@ -50,7 +50,7 @@ export const useMemoWindow = (props: WindowMemoProps) => {
             }
         }
         initWindow()
-    }, [])
+    }, [props.position, props.size])
 
     useEffect(() => {
         let unListenMove: (() => void) | undefined
