@@ -1359,7 +1359,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }
                                                 return
                                             }
-                                            setActivateAction(actions?.find((a) => a.idx === (actionID as number)))
+                                            setActivateAction(actions?.find((a) => a.id === (actionID as number)))
                                         }}
                                         items={[
                                             ...hiddenActions.map((action) => {
