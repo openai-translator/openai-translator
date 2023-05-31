@@ -315,7 +315,9 @@ export async function translate(query: TranslateQuery) {
                         otherwise reply in the following format:
                         `}
                             <word> (<original form>)
-                            [<language>]· / ${targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`}
+                            [<language>]· / ${
+                                targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`
+                            }
                             ${oneLine`
                             [<part of speech>]
                             ${isSameLanguage ? '' : '<translated meaning> / '}
