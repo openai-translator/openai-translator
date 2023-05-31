@@ -33,6 +33,7 @@ import { Slider } from 'baseui-sd/slider'
 import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
+import { GlobalSuspense } from './GlobalSuspense'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -930,7 +931,9 @@ export function Settings({ engine, ...props }: ISettingsProps) {
     return (
         <StyletronProvider value={engine}>
             <BaseProvider theme={theme}>
-                <InnerSettings {...props} />
+                <GlobalSuspense>
+                    <InnerSettings {...props} />
+                </GlobalSuspense>
             </BaseProvider>
         </StyletronProvider>
     )
