@@ -26,6 +26,9 @@ dependencies:
   clsx:
     specifier: ^1.2.1
     version: 1.2.1
+  common-tags:
+    specifier: ^1.8.2
+    version: 1.8.2
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
@@ -160,6 +163,9 @@ devDependencies:
   '@types/chrome':
     specifier: 0.0.158
     version: 0.0.158
+  '@types/common-tags':
+    specifier: ^1.8.1
+    version: 1.8.1
   '@types/jest':
     specifier: ^29.5.1
     version: 29.5.1
@@ -1698,6 +1704,10 @@ packages:
       '@types/har-format': 1.2.10
     dev: true
 
+  /@types/common-tags@1.8.1:
+    resolution: {integrity: sha512-20R/mDpKSPWdJs5TOpz3e7zqbeCNuMCPhV7Yndk9KU2Rbij2r5W4RzwDPkzC+2lzUqXYu9rFzTktCBnDjHuNQg==}
+    dev: true
+
   /@types/debug@4.1.8:
     resolution: {integrity: sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==}
     dependencies:
@@ -2727,6 +2737,11 @@ packages:
   /commander@8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /common-tags@1.8.2:
+    resolution: {integrity: sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==}
+    engines: {node: '>=4.0.0'}
     dev: false
 
   /compress-commons@4.1.1:
