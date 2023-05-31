@@ -1,5 +1,5 @@
 import { Theme } from 'baseui-sd/theme'
-import { TranslateMode, Provider } from './translate'
+import { TranslateMode, Provider, APIModel } from './translate'
 import { TTSProvider } from './tts/types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -42,12 +42,30 @@ export interface IThemedStyleProps {
     isDesktopApp?: boolean
 }
 
-export interface ISettings {
+export interface IProviderProps {
     apiKeys: string
     apiURL: string
     apiURLPath: string
     apiModel: string
+    subscriptionLinks?: string
+    extra?: Record<string, any>
+}
+
+export type OpenAIModelDetail = {
+    readonly id: APIModel
+    readonly name: string
+    readonly maxLength?: number
+    readonly tokenLimit?: number
+}
+
+export type AuthCodeModel = {
+    readonly authCode: string
+    readonly model?: OpenAIModelDetail
+}
+
+export interface ISettings {
     provider: Provider | 'OpenAI'
+    providersProps: Record<Provider, IProviderProps>
     autoTranslate: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string

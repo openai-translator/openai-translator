@@ -1,15 +1,16 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
 import * as lang from './components/lang/lang'
-import { fetchSSE } from './utils'
+import { fetchSSE, isDesktopApp } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
 import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
+import { AuthCodeModelManager, batchSubscribeApiKeys, defaultOpenAIModelDetail, filterApiKeys } from './subscribe'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
-export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
+export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'ThirdPartyChatGPT'
 export type APIModel =
     | 'gpt-3.5-turbo'
     | 'gpt-3.5-turbo-0301'
@@ -189,6 +190,18 @@ export class QuoteProcessor {
 
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
+const bodyTypes = ['OpenAI', 'ChatGPT', 'Azure', 'ProxiedOpenAI', 'AILink'] as const
+type BodyType = (typeof bodyTypes)[number]
+
+type RequestOptions = {
+    headers: Record<string, string>
+    apiURL: string
+    apiURLPath: string
+    bodyType: BodyType
+    auth?: boolean
+    eventStream?: boolean
+}
+
 export async function translate(query: TranslateQuery) {
     const fetcher = getUniversalFetch()
     let rolePrompt = ''
@@ -197,6 +210,7 @@ export async function translate(query: TranslateQuery) {
     const assistantPrompts: string[] = []
     let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
+    const providerProps = settings.providersProps[settings.provider]
     let isWordMode = false
 
     if (query.mode === 'big-bang') {
@@ -327,7 +341,7 @@ export async function translate(query: TranslateQuery) {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let body: Record<string, any> = {
-        model: settings.apiModel,
+        model: providerProps.apiModel || utils.defaultAPIModel,
         temperature: 0,
         max_tokens: 1000,
         top_p: 1,
@@ -336,249 +350,541 @@ export async function translate(query: TranslateQuery) {
         stream: true,
     }
 
-    let apiKey = ''
-    if (settings.provider !== 'ChatGPT') {
-        apiKey = await utils.getApiKey()
+    const generateRequestParams = async (): Promise<RequestOptions> => {
+        let apiURL = await utils.getApiURL(settings.provider)
+        let apiURLPath = providerProps.apiURLPath
+        let auth = false
+        let eventStream = false
+        let bodyType: BodyType = settings.provider === 'ChatGPT' ? 'ChatGPT' : 'OpenAI'
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+        if (settings.provider === 'Azure' && providerProps.apiURLPath.indexOf('/chat/completions') < 0) {
+            bodyType = 'Azure'
+        }
+
+        if (settings.provider === 'ThirdPartyChatGPT') {
+            headers['path'] = 'v1/chat/completions'
+
+            const index = apiURL.indexOf('/', 8)
+            if (index < 0 || index === apiURL.length - 1) {
+                apiURL = `${apiURL}${apiURLPath || utils.defaultProvidersProps['ThirdPartyChatGPT'].apiURLPath}`
+            }
+
+            const urlObj = new URL(apiURL)
+            apiURL = urlObj.origin
+            apiURLPath = urlObj.pathname
+            auth = urlObj.searchParams.get('auth')?.toLocaleLowerCase() === 'true'
+
+            eventStream = urlObj.searchParams.get('stream') === 'true'
+            const mode = urlObj.searchParams.get('mode')?.toLowerCase() || ''
+            if (mode) {
+                for (let i = 0; i < bodyType.length; i++) {
+                    const element = bodyTypes[i]
+                    if (element.toLowerCase() === mode.toLowerCase()) {
+                        bodyType = element
+                        break
+                    }
+                }
+            }
+        }
+
+        return { headers, apiURL, apiURLPath, bodyType: bodyType, auth, eventStream }
     }
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+
+    const { headers, apiURL, apiURLPath, bodyType: bodyType, auth, eventStream } = await generateRequestParams()
+    let apiKey = settings.provider === 'ChatGPT' ? '' : await utils.getApiKey(settings.provider)
+
+    if (!apiURL) {
+        query.onError('Invalid API URL')
+        return
     }
 
     let isChatAPI = true
-    if (settings.provider === 'Azure' && settings.apiURLPath && settings.apiURLPath.indexOf('/chat/completions') < 0) {
-        // Azure OpenAI Service supports multiple API.
-        // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
-        // If not, we should use the legacy parameters.
-        isChatAPI = false
-        body[
-            'prompt'
-        ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
-        body['stop'] = ['<|im_end|>']
-    } else if (settings.provider === 'ChatGPT') {
-        let resp: Response | null = null
-        resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
-        if (resp.status !== 200) {
-            query.onError?.('Failed to fetch ChatGPT Web accessToken.')
-            query.onStatusCode?.(resp.status)
+    switch (bodyType) {
+        case 'Azure':
+            // Azure OpenAI Service supports multiple API.
+            // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
+            // If not, we should use the legacy parameters.
+            isChatAPI = false
+            body[
+                'prompt'
+            ] = `<|im_start|>system\n${rolePrompt}\n<|im_end|>\n<|im_start|>user\n${commandPrompt}\n${contentPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
+            body['stop'] = ['<|im_end|>']
+            break
+        case 'ChatGPT': {
+            let resp: Response | null = null
+            resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
+            if (resp.status !== 200) {
+                query.onError?.('Failed to fetch ChatGPT Web accessToken.')
+                query.onStatusCode?.(resp.status)
+                return
+            }
+            const respJson = await resp?.json()
+            apiKey = respJson.accessToken
+            body = {
+                action: 'next',
+                messages: [
+                    {
+                        id: utils.generateUUID(),
+                        role: 'user',
+                        content: {
+                            content_type: 'text',
+                            parts: [rolePrompt + '\n\n' + commandPrompt + ':\n' + `${contentPrompt}`],
+                        },
+                    },
+                ],
+                model: providerProps.apiModel, // 'text-davinci-002-render-sha'
+                parent_message_id: utils.generateUUID(),
+            }
+            break
+        }
+        case 'AILink': {
+            body = {
+                temperature: 0,
+                continuous: true,
+                list: [
+                    {
+                        role: 'system',
+                        content: rolePrompt,
+                        isMe: true,
+                    },
+                    ...assistantPrompts.map((prompt) => {
+                        return {
+                            role: 'user',
+                            content: prompt,
+                            isMe: true,
+                        }
+                    }),
+                    {
+                        role: 'user',
+                        content: commandPrompt,
+                        isMe: true,
+                    },
+                    {
+                        role: 'user',
+                        content: contentPrompt,
+                        isMe: true,
+                    },
+                    {
+                        role: 'assistant',
+                        content: '...',
+                        isMe: false,
+                    },
+                ],
+            }
+            break
+        }
+        default: {
+            if (bodyType === 'ProxiedOpenAI') {
+                if (auth) {
+                    const authCodeModel = await AuthCodeModelManager.getInstance(settings).get(apiURL)
+                    if (!authCodeModel?.authCode) {
+                        query.onError('Cannot obtain authentication code')
+                        return
+                    }
+
+                    headers['x-auth-code'] = authCodeModel.authCode
+                    body['model'] = authCodeModel.model
+                } else {
+                    body['model'] = defaultOpenAIModelDetail
+                }
+            }
+
+            const messages = [
+                {
+                    role: 'system',
+                    content: rolePrompt,
+                },
+                ...assistantPrompts.map((prompt) => {
+                    return {
+                        role: 'user',
+                        content: prompt,
+                    }
+                }),
+                {
+                    role: 'user',
+                    content: commandPrompt,
+                },
+            ]
+            if (contentPrompt) {
+                messages.push({
+                    role: 'user',
+                    content: contentPrompt,
+                })
+            }
+            body['messages'] = messages
+            break
+        }
+    }
+
+    if (apiKey) {
+        switch (settings.provider) {
+            case 'OpenAI':
+            case 'ChatGPT':
+            case 'ThirdPartyChatGPT':
+                headers['Authorization'] = `Bearer ${apiKey}`
+                break
+
+            case 'Azure':
+                headers['api-key'] = `${apiKey}`
+                break
+        }
+    } else if (utils.requiredApiKeysProviders.includes(settings.provider) && providerProps.subscriptionLinks === '') {
+        query.onError('An API Key must be provided')
+        return
+    }
+
+    const removeUnreachableService = () => {
+        if (settings.provider !== 'ThirdPartyChatGPT' || (!auth && !providerProps.subscriptionLinks)) {
             return
         }
-        const respJson = await resp?.json()
-        apiKey = respJson.accessToken
-        body = {
-            action: 'next',
-            messages: [
-                {
-                    id: utils.generateUUID(),
-                    role: 'user',
-                    content: {
-                        content_type: 'text',
-                        parts: [rolePrompt + '\n\n' + commandPrompt + ':\n' + `${contentPrompt}`],
-                    },
-                },
-            ],
-            model: settings.apiModel, // 'text-davinci-002-render-sha'
-            parent_message_id: utils.generateUUID(),
+
+        // remove authCode
+        if (bodyType === 'ProxiedOpenAI' && auth) {
+            return AuthCodeModelManager.getInstance(settings).remove(apiURL)
         }
-    } else {
-        const messages = [
-            {
-                role: 'system',
-                content: rolePrompt,
-            },
-            ...assistantPrompts.map((prompt) => {
-                return {
-                    role: 'user',
-                    content: prompt,
+
+        const apiURLs = providerProps.apiURL?.split(',').filter((s) => !s.startsWith(apiURL)) || []
+        providerProps.apiURL = apiURLs.join(',') || ''
+
+        settings.providersProps[settings.provider] = providerProps
+        utils.setSettings(settings)
+    }
+
+    const extractTextWithRegex = (text: string, regex: RegExp, index: number, sep = '') => {
+        if (!text) return ''
+
+        index || (index = 1)
+        let match: RegExpExecArray | null
+        const contents: string[] = []
+        try {
+            while ((match = regex.exec(text)) !== null) {
+                contents.push(match[index])
+            }
+        } catch {
+            console.log(`invalid regex: ${regex}`)
+        }
+
+        return contents.join(sep)
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const commonHandleError = (err: any, regex: RegExp | null = null, index = 1) => {
+        if (err instanceof Error) {
+            query.onError(err.message)
+            return
+        }
+        if (typeof err === 'string') {
+            if (regex && index >= 0) {
+                const errorMessage = extractTextWithRegex(err, regex, index) || err
+                query.onError(errorMessage)
+            } else {
+                query.onError(err)
+            }
+
+            return
+        }
+        if (typeof err === 'object') {
+            const { detail } = err
+            if (detail) {
+                const { message } = detail
+                if (message) {
+                    query.onError(message)
+                    return
                 }
-            }),
-            {
-                role: 'user',
-                content: commandPrompt,
-            },
-        ]
-        if (contentPrompt) {
-            messages.push({
-                role: 'user',
-                content: contentPrompt,
-            })
+            }
         }
-        body['messages'] = messages
+        const { error } = err
+        if (error instanceof Error) {
+            query.onError(error.message)
+            return
+        }
+        if (typeof error === 'object') {
+            const { message } = error
+            if (message) {
+                query.onError(message)
+                return
+            }
+            query.onError(JSON.stringify(err))
+            return
+        }
+        query.onError('Unknown error')
     }
 
     switch (settings.provider) {
-        case 'OpenAI':
-        case 'ChatGPT':
-            headers['Authorization'] = `Bearer ${apiKey}`
-            break
-
-        case 'Azure':
-            headers['api-key'] = `${apiKey}`
-            break
-    }
-
-    if (settings.provider === 'ChatGPT') {
-        let conversationId = ''
-        let length = 0
-        await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-            signal: query.signal,
-            onStatusCode: (status) => {
-                query.onStatusCode?.(status)
-            },
-            onMessage: (msg) => {
-                let resp
-                try {
-                    resp = JSON.parse(msg)
-                    // eslint-disable-next-line no-empty
-                } catch {
-                    query.onFinish('stop')
-                    return
-                }
-                if (!conversationId) {
-                    conversationId = resp.conversation_id
-                }
-                const { finish_details: finishDetails } = resp.message
-                if (finishDetails) {
-                    query.onFinish(finishDetails.type)
-                    return
-                }
-
-                const { content, author } = resp.message
-                if (author.role === 'assistant') {
-                    const targetTxt = content.parts.join('')
-                    let textDelta = targetTxt.slice(length)
-                    if (quoteProcessor) {
-                        textDelta = quoteProcessor.processText(textDelta)
+        case 'ChatGPT': {
+            const url = `${apiURL}${apiURLPath}`
+            let conversationId = ''
+            let length = 0
+            await fetchSSE(`${url}/conversation`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+                signal: query.signal,
+                onStatusCode: (status) => {
+                    query.onStatusCode?.(status)
+                },
+                onMessage: (msg) => {
+                    let resp
+                    try {
+                        resp = JSON.parse(msg)
+                        // eslint-disable-next-line no-empty
+                    } catch {
+                        query.onFinish('stop')
+                        return
                     }
-                    query.onMessage({ content: textDelta, role: '', isWordMode })
-                    length = targetTxt.length
-                }
-            },
-            onError: (err) => {
-                if (err instanceof Error) {
-                    query.onError(err.message)
-                    return
-                }
-                if (typeof err === 'string') {
-                    query.onError(err)
-                    return
-                }
-                if (typeof err === 'object') {
-                    const { detail } = err
-                    if (detail) {
-                        const { message } = detail
-                        if (message) {
-                            query.onError(`ChatGPT Web: ${message}`)
+                    if (!conversationId) {
+                        conversationId = resp.conversation_id
+                    }
+                    const { finish_details: finishDetails } = resp.message
+                    if (finishDetails) {
+                        query.onFinish(finishDetails.type)
+                        return
+                    }
+
+                    const { content, author } = resp.message
+                    if (author.role === 'assistant') {
+                        const targetTxt = content.parts.join('')
+                        let textDelta = targetTxt.slice(length)
+                        if (quoteProcessor) {
+                            textDelta = quoteProcessor.processText(textDelta)
+                        }
+                        query.onMessage({ content: textDelta, role: '', isWordMode })
+                        length = targetTxt.length
+                    }
+                },
+                onError: (err) => {
+                    commonHandleError(err)
+                },
+            })
+
+            if (conversationId) {
+                await fetcher(`${url}/conversation/${conversationId}`, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify({ is_visible: false }),
+                })
+            }
+            break
+        }
+        case 'ThirdPartyChatGPT': {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const handleError = (err: any) => {
+                // process error
+                commonHandleError(err, /"message":(?:\s+)?"(.*?)"/g, 1)
+
+                // remove unavailable service
+                removeUnreachableService()
+            }
+
+            const url = `${apiURL}${apiURLPath}`
+
+            if (eventStream) {
+                await fetchSSE(url, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(body),
+                    signal: query.signal,
+                    onMessage: (msg) => {
+                        try {
+                            const resp = JSON.parse(msg)
+                            const { choices } = resp
+                            if (!choices || choices.length === 0) {
+                                return { error: 'No result' }
+                            }
+                            const { finish_reason: finishReason } = choices[0]
+                            if (finishReason) {
+                                query.onFinish(finishReason)
+                                return
+                            }
+
+                            const { content = '', role } = choices[0].delta
+                            const targetTxt = quoteProcessor ? quoteProcessor.processText(content) : content
+                            query.onMessage({ content: targetTxt, role, isWordMode })
+                            // eslint-disable-next-line no-empty
+                        } catch {
+                            query.onFinish('stop')
                             return
                         }
+                    },
+                    onError: (err) => {
+                        commonHandleError(err)
+                    },
+                })
+                return
+            }
+
+            try {
+                const resp = await fetcher(url, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(body),
+                    signal: query.signal,
+                })
+
+                if (!resp || resp.status !== 200 || resp.redirected) {
+                    const error = resp.redirected ? `Invalid API URL: ${url}` : await resp?.text()
+                    return handleError(error)
+                }
+
+                const content: string = (await resp.text()) || ''
+                let data, valid, targetTxt: string
+
+                try {
+                    // Content-Type: application/octet-stream
+                    const lastIndex = content.lastIndexOf('\n', content.length - 2)
+                    const message = lastIndex === -1 ? content : content.substring(lastIndex)
+                    data = JSON.parse(message)
+                    valid = data && typeof data === 'object'
+                } catch {
+                    valid = false
+                }
+
+                if (!valid) {
+                    if (content?.match(/"error":(\s+)?{/g)) {
+                        return handleError(content)
                     }
-                    query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
-                    return
+
+                    // Content-Type: plain/text
+                    if (content?.match(/"role":(\s+)?".*",(\s+)?"id":(\s+)?"[A-Za-z0-9\\-]+"/)) {
+                        const regex = /"text":(?:\s+)?"([\s\S]*?)"/g
+                        targetTxt = extractTextWithRegex(content, regex, 1) || ''
+                    } else {
+                        const regex = /"delta":(?:\s+)?{"content":(?:\s+)?"([\s\S]*?)"/g
+                        // extract, then remove first and last double quote or backslash
+                        targetTxt =
+                            (extractTextWithRegex(content, regex, 1) || content)?.replace(/^["\\](.*)["\\]$/, '$1') ||
+                            ''
+                    }
+                    if (!targetTxt) {
+                        return { error: 'No result' }
+                    }
+                } else {
+                    targetTxt = data.text || ''
+                    if (!targetTxt) {
+                        return handleError(data)
+                    }
                 }
-                const { error } = err
-                if (error instanceof Error) {
-                    query.onError(error.message)
-                    return
-                }
-                if (typeof error === 'object') {
-                    const { message } = error
-                    if (message) {
-                        query.onError(message)
+
+                targetTxt = quoteProcessor ? quoteProcessor.processText(targetTxt) : targetTxt
+                query.onMessage({ content: targetTxt, role: '', isWordMode, isFullText: true })
+                query.onFinish('stop')
+            } catch (error) {
+                handleError(error)
+            }
+            break
+        }
+        default: {
+            const url = urlJoin(apiURL, apiURLPath)
+            await fetchSSE(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+                signal: query.signal,
+                onMessage: (msg) => {
+                    let resp
+                    try {
+                        resp = JSON.parse(msg)
+                        // eslint-disable-next-line no-empty
+                    } catch {
+                        query.onFinish('stop')
                         return
                     }
-                }
-                query.onError('Unknown error')
-            },
-        })
 
-        if (conversationId) {
-            await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
-                method: 'PATCH',
-                headers,
-                body: JSON.stringify({ is_visible: false }),
+                    const { choices } = resp
+                    if (!choices || choices.length === 0) {
+                        return { error: 'No result' }
+                    }
+                    const { finish_reason: finishReason } = choices[0]
+                    if (finishReason) {
+                        query.onFinish(finishReason)
+                        return
+                    }
+
+                    let targetTxt = ''
+                    if (!isChatAPI) {
+                        // It's used for Azure OpenAI Service's legacy parameters.
+                        targetTxt = choices[0].text
+
+                        if (quoteProcessor) {
+                            targetTxt = quoteProcessor.processText(targetTxt)
+                        }
+
+                        query.onMessage({ content: targetTxt, role: '', isWordMode })
+                    } else {
+                        const { content = '', role } = choices[0].delta
+
+                        targetTxt = content
+
+                        if (quoteProcessor) {
+                            targetTxt = quoteProcessor.processText(targetTxt)
+                        }
+
+                        query.onMessage({ content: targetTxt, role, isWordMode })
+                    }
+                },
+                onError: (err) => {
+                    commonHandleError(err)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const postProcess = async (error: Record<string, any>) => {
+                        try {
+                            if (
+                                settings.provider === 'OpenAI' &&
+                                (error?.type === 'insufficient_quota' ||
+                                    error?.type === 'invalid_request_error' ||
+                                    error?.code === 'invalid_api_key')
+                            ) {
+                                let existApiKeys = (providerProps.apiKeys ?? '')
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter((s) => s !== '' && s !== apiKey)
+
+                                if (existApiKeys.length === 0 && providerProps.subscriptionLinks) {
+                                    const subscriptions = providerProps.subscriptionLinks.split(',')
+                                    let newApiKeys =
+                                        (await batchSubscribeApiKeys(subscriptions, query.signal))?.flat() || []
+
+                                    // due to chrome sync.storage limitation, up to 100 candidate apiKeys are kept
+                                    if (newApiKeys.length > 100 && !isDesktopApp()) {
+                                        // shuffle
+                                        let currentIndex = newApiKeys.length,
+                                            randomIndex
+                                        while (currentIndex !== 0) {
+                                            // pick a remaining element.
+                                            randomIndex = Math.floor(Math.random() * currentIndex)
+                                            currentIndex--
+                                            // swap it with the current element.
+                                            ;[newApiKeys[currentIndex], newApiKeys[randomIndex]] = [
+                                                newApiKeys[randomIndex],
+                                                newApiKeys[currentIndex],
+                                            ]
+                                        }
+
+                                        newApiKeys = newApiKeys.slice(0, 100)
+                                    }
+
+                                    const apiKeySet = new Set<string>(newApiKeys)
+                                    const validateUrl = `${apiURL}${providerProps.apiURLPath}`
+                                    existApiKeys = (await filterApiKeys(validateUrl, apiKeySet, query.signal, 20)) || []
+                                }
+
+                                providerProps.apiKeys = existApiKeys?.join(',') || ''
+                                settings.providersProps[settings.provider] = providerProps
+                                utils.setSettings(settings)
+                            } else {
+                                removeUnreachableService()
+                            }
+                        } catch (error) {
+                            console.error(error)
+                        }
+                    }
+
+                    if (typeof err === 'object' && err?.error) {
+                        const { error } = err
+                        postProcess(error)
+                    }
+                },
             })
         }
-    } else {
-        const url = urlJoin(settings.apiURL, settings.apiURLPath)
-        await fetchSSE(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-            signal: query.signal,
-            onMessage: (msg) => {
-                let resp
-                try {
-                    resp = JSON.parse(msg)
-                    // eslint-disable-next-line no-empty
-                } catch {
-                    query.onFinish('stop')
-                    return
-                }
-
-                const { choices } = resp
-                if (!choices || choices.length === 0) {
-                    return { error: 'No result' }
-                }
-                const { finish_reason: finishReason } = choices[0]
-                if (finishReason) {
-                    query.onFinish(finishReason)
-                    return
-                }
-
-                let targetTxt = ''
-                if (!isChatAPI) {
-                    // It's used for Azure OpenAI Service's legacy parameters.
-                    targetTxt = choices[0].text
-
-                    if (quoteProcessor) {
-                        targetTxt = quoteProcessor.processText(targetTxt)
-                    }
-
-                    query.onMessage({ content: targetTxt, role: '', isWordMode })
-                } else {
-                    const { content = '', role } = choices[0].delta
-
-                    targetTxt = content
-
-                    if (quoteProcessor) {
-                        targetTxt = quoteProcessor.processText(targetTxt)
-                    }
-
-                    query.onMessage({ content: targetTxt, role, isWordMode })
-                }
-            },
-            onError: (err) => {
-                if (err instanceof Error) {
-                    query.onError(err.message)
-                    return
-                }
-                if (typeof err === 'string') {
-                    query.onError(err)
-                    return
-                }
-                if (typeof err === 'object') {
-                    const { detail } = err
-                    if (detail) {
-                        query.onError(detail)
-                        return
-                    }
-                }
-                const { error } = err
-                if (error instanceof Error) {
-                    query.onError(error.message)
-                    return
-                }
-                if (typeof error === 'object') {
-                    const { message } = error
-                    if (message) {
-                        query.onError(message)
-                        return
-                    }
-                }
-                query.onError('Unknown error')
-            },
-        })
     }
 }

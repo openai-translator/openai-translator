@@ -17,10 +17,10 @@ import { supportedLanguages } from './lang/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { ISettings, IThemedStyleProps, ThemeType } from '../types'
+import { IProviderProps, ISettings, IThemedStyleProps, ThemeType } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IoCloseCircle } from 'react-icons/io5'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import AppConfig from '../../../package.json'
 import { useSettings } from '../hooks/useSettings'
 import { langCode2TTSLang } from '../tts'
@@ -43,6 +43,8 @@ const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
         } as Option,
     ]
 }, [] as Value)
+
+type ISettingsForm = Omit<ISettings, 'providersProps'> & IProviderProps
 
 interface ILanguageSelectorProps {
     value?: string
@@ -566,7 +568,8 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                     const headers: Record<string, string> = {
                         Authorization: `Bearer ${sessionRespJsn.accessToken}`,
                     }
-                    const modelsResp = await fetcher(`${utils.defaultChatGPTWebAPI}/models`, {
+                    const chatGPTWebApi = `${utils.defaultProvidersProps.ChatGPT.apiURL}${utils.defaultProvidersProps.ChatGPT.apiURLPath}`
+                    const modelsResp = await fetcher(`${chatGPTWebApi}/models`, {
                         cache: 'no-cache',
                         headers,
                     })
@@ -882,6 +885,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
         ? ([
               { label: 'OpenAI', id: 'OpenAI' },
               { label: 'Azure', id: 'Azure' },
+              { label: 'ThirdPartyChatGPT', id: 'ThirdPartyChatGPT' },
           ] as {
               label: string
               id: Provider
@@ -890,6 +894,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               { label: 'OpenAI', id: 'OpenAI' },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
+              { label: 'ThirdPartyChatGPT', id: 'ThirdPartyChatGPT' },
           ] as {
               label: string
               id: Provider
@@ -915,7 +920,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
     )
 }
 
-const { Form, FormItem, useForm } = createForm<ISettings>()
+const { Form, FormItem, useForm } = createForm<ISettingsForm>()
 
 interface IInnerSettingsProps {
     onSave?: (oldSettings: ISettings) => void
@@ -944,11 +949,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
     const { t } = useTranslation()
 
     const [loading, setLoading] = useState(false)
-    const [values, setValues] = useState<ISettings>({
-        apiKeys: '',
-        apiURL: utils.defaultAPIURL,
-        apiURLPath: utils.defaultAPIURLPath,
-        apiModel: utils.defaultAPIModel,
+    const [values, setValues] = useState<ISettingsForm>({
+        ...utils.defaultProvidersProps[utils.defaultProvider],
         provider: utils.defaultProvider,
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
@@ -960,7 +962,56 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         selectInputElementsText: utils.defaultSelectInputElementsText,
         runAtStartup: false,
     })
-    const [prevValues, setPrevValues] = useState<ISettings>(values)
+
+    function settingsToForm(currentSettings: ISettings): ISettingsForm {
+        const { providersProps, ...settingsForm } = currentSettings
+        const providerProps = providersProps[currentSettings.provider]
+        const defaultProviderProps = utils.defaultProvidersProps[currentSettings.provider]
+
+        // if apiURL or apiURLPath is empty, use the default values
+        providerProps.apiURL = providerProps.apiURL ?? defaultProviderProps.apiURL
+        providerProps.apiURLPath = providerProps.apiURLPath ?? defaultProviderProps.apiURLPath
+
+        return { ...settingsForm, ...providerProps }
+    }
+
+    const formToIProviderProps = useCallback(
+        (settingsForm: ISettingsForm, providerProps: IProviderProps): IProviderProps => {
+            const providerProperties = Object.keys(
+                utils.defaultProvidersProps[settingsForm.provider] || {}
+            ) as (keyof IProviderProps)[]
+            return utils.copyPropertyValues(settingsForm, providerProps, providerProperties)
+        },
+        []
+    )
+
+    const formToSettings = useCallback(
+        (settingsForm: ISettingsForm, existSettings: ISettings): ISettings => {
+            const { providersProps, ...restSettings } = existSettings
+            const provider = settingsForm.provider
+            let providerProps = { ...providersProps[provider] }
+
+            // copy properties from settingsForm to ISettings
+            const settingProperties = Object.keys(utils.settingKeys).filter(
+                (k: string) => k !== 'providersProps'
+            ) as (keyof Omit<ISettings, 'providersProps'>)[]
+            const newSettings = utils.copyPropertyValues(settingsForm, restSettings, settingProperties)
+
+            // copy properties from settingsForm to providerProps
+            providerProps = formToIProviderProps(settingsForm, providerProps)
+
+            // if apiURL or apiURLPath is empty, use the default values
+            providerProps.apiURL = providerProps.apiURL || utils.defaultProvidersProps[provider].apiURL
+            providerProps.apiURLPath = providerProps.apiURLPath || utils.defaultProvidersProps[provider].apiURLPath
+
+            // replace
+            providersProps[provider] = providerProps
+            return { ...newSettings, providersProps: providersProps }
+        },
+        [formToIProviderProps]
+    )
+
+    const [prevValues, setPrevValues] = useState<ISettingsForm>(values)
 
     const [form] = useForm()
 
@@ -978,18 +1029,87 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
                     settings.runAtStartup = await autostartIsEnabled()
                 }
-                setValues(settings)
-                setPrevValues(settings)
+
+                const primitiveForm = settingsToForm(settings)
+                setValues(primitiveForm)
+                setPrevValues(primitiveForm)
             })()
         }
     }, [isTauri, settings])
 
-    const onChange = useCallback((_changes: Partial<ISettings>, values_: ISettings) => {
-        setValues(values_)
-    }, [])
+    const validateSettings = useCallback(
+        (data: ISettingsForm, warn: boolean): boolean => {
+            if (data.provider === 'ChatGPT') {
+                return true
+            }
+
+            if (!data.subscriptionLinks && !data.apiURL) {
+                if (warn) {
+                    toast(t('Please fill in API URL and Path or Subscriptions'), {
+                        icon: '😥',
+                        duration: 3000,
+                    })
+                }
+                return false
+            }
+
+            if (data.apiURL && !utils.validateURL(data.apiURL)) {
+                if (warn) {
+                    toast(`${t('API URL')} ${t('Must start with http:// or https://')}`, {
+                        icon: '😥',
+                        duration: 3000,
+                    })
+                }
+                return false
+            }
+
+            if (data.subscriptionLinks && !utils.validateURL(data.subscriptionLinks)) {
+                if (warn) {
+                    toast(
+                        `${t('subsciption links', { name: data.provider === 'OpenAI' ? 'Keys' : 'URL' })} ${t(
+                            'Must start with http:// or https://'
+                        )}`,
+                        {
+                            icon: '😥',
+                            duration: 3000,
+                        }
+                    )
+                }
+                return false
+            }
+
+            if (utils.requiredApiKeysProviders.includes(data.provider) && !data.apiKeys && !data.subscriptionLinks) {
+                if (warn) {
+                    toast(t('Please fill in API Key or Subscriptions'), {
+                        icon: '😥',
+                        duration: 3000,
+                    })
+                }
+                return false
+            }
+
+            return true
+        },
+        [t]
+    )
+
+    const onChange = useCallback(
+        (_changes: Partial<ISettingsForm>, values_: ISettingsForm) => {
+            if (_changes.provider) {
+                utils.getSettings().then((s: ISettings) => {
+                    // change to new provider
+                    s.provider = values_.provider
+                    setSettings(s)
+                })
+            } else {
+                setValues(values_)
+            }
+        },
+        [setSettings]
+    )
 
     const onSubmit = useCallback(
-        async (data: ISettings) => {
+        async (data: ISettingsForm) => {
             if (data.themeType) {
                 setThemeType(data.themeType)
             }
@@ -1012,25 +1132,37 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     console.log('err', e)
                 }
             }
-            await utils.setSettings(data)
+
+            if (!validateSettings(data, true)) {
+                setLoading(false)
+                return
+            }
+
+            const newSettings = formToSettings(data, oldSettings)
+            await utils.setSettings(newSettings)
 
             toast(t('Saved'), {
                 icon: '👍',
                 duration: 3000,
             })
             setLoading(false)
-            setSettings(data)
+            setSettings(newSettings)
             onSave?.(oldSettings)
         },
-        [isTauri, onSave, setSettings, setThemeType, t]
+        [formToSettings, isTauri, onSave, setSettings, setThemeType, t, validateSettings]
     )
 
     const onBlur = useCallback(async () => {
-        if (values.apiKeys && !_.isEqual(values, prevValues)) {
-            await utils.setSettings(values)
+        if (!_.isEqual(values, prevValues)) {
+            if (!validateSettings(values, false)) {
+                return
+            }
+
+            const oldSettings = settings ? settings : await utils.getSettings()
+            await utils.setSettings(formToSettings(values, oldSettings))
             setPrevValues(values)
         }
-    }, [prevValues, values])
+    }, [prevValues, values, formToSettings, settings, validateSettings])
 
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
@@ -1094,9 +1226,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='provider' label={t('Default Service Provider')} required>
                     <ProviderSelector />
                 </FormItem>
-                {values.provider !== 'ChatGPT' && (
+                {utils.requiredApiKeysProviders.includes(values.provider) && (
                     <FormItem
-                        required
+                        required={false}
                         name='apiKeys'
                         label={t('API Key')}
                         caption={
@@ -1128,19 +1260,42 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                     </FormItem>
                 )}
-                {values.provider !== 'Azure' && (
+                {utils.enabledSubscribeProviders.includes(values.provider) && (
+                    <FormItem
+                        required={false}
+                        name='subscriptionLinks'
+                        label={
+                            <Trans
+                                i18nKey='subsciption links'
+                                values={{
+                                    name: values.provider === 'OpenAI' ? 'Keys' : 'URL',
+                                }}
+                            />
+                        }
+                        caption={<div>{t('Must start with http:// or https://')}</div>}
+                    >
+                        <Input size='compact' onBlur={onBlur} />
+                    </FormItem>
+                )}
+                {!utils.disabledSelectModelProviders.includes(values.provider) && (
                     <FormItem name='apiModel' label={t('API Model')} required>
                         <APIModelSelector provider={values.provider} onBlur={onBlur} />
                     </FormItem>
                 )}
                 {values.provider !== 'ChatGPT' && (
                     <>
-                        <FormItem required name='apiURL' label={t('API URL')}>
+                        <FormItem
+                            required={utils.requiredApiKeysProviders.includes(values.provider)}
+                            name='apiURL'
+                            label={values.provider === 'ThirdPartyChatGPT' ? t('API URL and Path') : t('API URL')}
+                        >
                             <Input size='compact' onBlur={onBlur} />
                         </FormItem>
-                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                            <Input size='compact' />
-                        </FormItem>
+                        {values.provider !== 'ThirdPartyChatGPT' && (
+                            <FormItem required={true} name='apiURLPath' label={t('API URL Path')}>
+                                <Input size='compact' />
+                            </FormItem>
+                        )}
                     </>
                 )}
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>

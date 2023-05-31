@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createParser } from 'eventsource-parser'
 import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
-import { IBrowser, ISettings } from './types'
+import { IBrowser, IProviderProps, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
+import { Provider } from './translate'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -10,7 +11,6 @@ export const defaultProvider = 'OpenAI'
 export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
-export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
@@ -18,19 +18,96 @@ export const defaultAlwaysShowIcons = false
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
-export async function getApiKey(): Promise<string> {
+export const defaultProvidersProps: Record<Provider, IProviderProps> = {
+    Azure: {
+        apiKeys: '',
+        apiURL: '',
+        apiURLPath: '',
+        apiModel: defaultAPIModel,
+        subscriptionLinks: '',
+    },
+    ChatGPT: {
+        apiKeys: '',
+        apiURL: 'https://chat.openai.com',
+        apiURLPath: '/backend-api',
+        apiModel: defaultAPIModel,
+        subscriptionLinks: '',
+    },
+    OpenAI: {
+        apiKeys: '',
+        apiURL: defaultAPIURL,
+        apiURLPath: defaultAPIURLPath,
+        apiModel: defaultAPIModel,
+        subscriptionLinks: '',
+    },
+    ThirdPartyChatGPT: {
+        apiKeys: '',
+        apiURL: '',
+        apiURLPath: '/api/chat-process',
+        apiModel: defaultAPIModel,
+        subscriptionLinks: '',
+    },
+}
+
+export const requiredApiKeysProviders: Provider[] = ['OpenAI', 'Azure']
+export const enabledSubscribeProviders: Provider[] = ['OpenAI', 'ThirdPartyChatGPT']
+export const disabledSelectModelProviders: Provider[] = ['Azure', 'ThirdPartyChatGPT']
+
+export async function getApiKey(provider: Provider): Promise<string> {
     const settings = await getSettings()
-    const apiKeys = (settings.apiKeys ?? '').split(',').map((s) => s.trim())
+    const apiKeys = (settings.providersProps[provider]?.apiKeys ?? '').split(',').map((s) => s.trim())
     return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
 }
 
+export async function getApiURL(provider: Provider): Promise<string> {
+    const settings = await getSettings()
+    const providerProps = settings.providersProps[provider]
+    let apiURLs = (settings.providersProps[provider]?.apiURL ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== '')
+    if (apiURLs.length === 0 && provider === 'ThirdPartyChatGPT' && providerProps && providerProps.subscriptionLinks) {
+        const apiURLSet = new Set<string>()
+        const subscriptions = providerProps.subscriptionLinks.split(',')
+        await Promise.all(
+            subscriptions.map(async (subscription) => {
+                await getUniversalFetch()(subscription, { method: 'GET' })
+                    .then((response) => {
+                        if (response?.status !== 200) {
+                            return ''
+                        }
+
+                        return response?.text() || ''
+                    })
+                    .then((content) => {
+                        content?.split(',').map((s) => {
+                            const flag = isIegalHTTPUrl(s)
+                            if (flag) {
+                                apiURLSet.add(s)
+                            }
+                        })
+                    })
+                    .catch(() => {
+                        console.log(`subscribe error, subscription: ${subscription}`)
+                    })
+            })
+        )
+
+        apiURLs = Array.from(apiURLSet)
+        if (apiURLs.length !== 0) {
+            providerProps.apiURL = apiURLs.join(',') || ''
+            settings.providersProps[provider] = providerProps
+            setSettings(settings)
+        }
+    }
+
+    return apiURLs[Math.floor(Math.random() * apiURLs.length)] ?? ''
+}
+
 // In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
-const settingKeys: Record<keyof ISettings, number> = {
-    apiKeys: 1,
-    apiURL: 1,
-    apiURLPath: 1,
-    apiModel: 1,
+export const settingKeys: Record<keyof ISettings, number> = {
     provider: 1,
+    providersProps: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
@@ -52,20 +129,11 @@ export async function getSettings(): Promise<ISettings> {
     const items = await browser.storage.sync.get(Object.keys(settingKeys))
 
     const settings = items as ISettings
-    if (!settings.apiKeys) {
-        settings.apiKeys = ''
-    }
-    if (!settings.apiURL) {
-        settings.apiURL = defaultAPIURL
-    }
-    if (!settings.apiURLPath) {
-        settings.apiURLPath = defaultAPIURLPath
-    }
-    if (!settings.apiModel) {
-        settings.apiModel = defaultAPIModel
-    }
     if (!settings.provider) {
         settings.provider = defaultProvider
+    }
+    if (!settings.providersProps) {
+        settings.providersProps = defaultProvidersProps
     }
     if (settings.autoTranslate === undefined || settings.autoTranslate === null) {
         settings.autoTranslate = defaultAutoTranslate
@@ -141,7 +209,7 @@ export const isFirefox = () => /firefox/i.test(navigator.userAgent)
 
 export const isUsingOpenAIOfficialAPIEndpoint = async () => {
     const settings = await getSettings()
-    return settings.provider === defaultProvider && settings.apiURL === defaultAPIURL
+    return settings.provider === defaultProvider && defaultProvidersProps[settings.provider].apiURL === defaultAPIURL
 }
 
 export const isUsingOpenAIOfficial = async () => {
@@ -215,6 +283,21 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
     }
 }
 
+export const copyPropertyValues = function <T, K extends keyof T>(source: Pick<T, K>, target: T, keys: K[]) {
+    if (!source || !keys) {
+        return target
+    }
+
+    target = target || ({} as T)
+    keys.forEach((k) => {
+        if (source[k] !== undefined) {
+            target[k] = source[k]
+        }
+    })
+
+    return target
+}
+
 interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -253,4 +336,26 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     } finally {
         reader.releaseLock()
     }
+}
+
+export function isIegalHTTPUrl(text: string) {
+    if (!text) {
+        return false
+    }
+
+    try {
+        const url = new URL(text)
+        return url ? url.protocol === 'http:' || url.protocol === 'https:' : false
+    } catch {
+        return false
+    }
+}
+
+export function validateURL(urls: string | undefined): boolean {
+    if (urls === undefined || !urls.trim()) {
+        return false
+    }
+
+    const illegalUrls = urls.split(',').filter((s) => !isIegalHTTPUrl(s)) || []
+    return illegalUrls.length === 0
 }

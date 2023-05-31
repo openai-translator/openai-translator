@@ -11,7 +11,7 @@ import { IoSettingsOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import * as mdIcons from 'react-icons/md'
-import { StatefulTooltip } from 'baseui-sd/tooltip'
+import { StatefulTooltip, Tooltip as SatelessTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
@@ -21,7 +21,15 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
+import {
+    defaultAPIURL,
+    defaultProvider,
+    requiredApiKeysProviders,
+    exportToCsv,
+    isDesktopApp,
+    isTauri,
+    isUserscript,
+} from '../utils'
 import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -964,11 +972,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
-                action.rolePrompt
-            }:${action.commandPrompt}:${
-                action.outputRenderingFormat
-            }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
+            const apiModel = settings?.providersProps[settings.provider ?? defaultProvider]?.apiModel ?? ''
+            const cachedKey = `translate:${settings?.provider ?? ''}:${apiModel}:${action.id}:${action.rolePrompt}:${
+                action.commandPrompt
+            }:${action.outputRenderingFormat}:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -1034,7 +1041,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             activateAction?.id,
             currentTranslateMode,
             settings?.provider,
-            settings?.apiModel,
+            settings?.providersProps,
             translationFlag,
             startLoading,
             stopLoading,
@@ -1055,15 +1062,30 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [translateText, editableText, detectedOriginalText, selectedWord])
 
     const [showSettings, setShowSettings] = useState(false)
+    const [gotoTips, setGotoTips] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
             return
         }
-        if (
-            settings &&
-            ((settings.provider === 'ChatGPT' && !settings.apiModel) ||
-                (settings.provider !== 'ChatGPT' && !settings.apiKeys))
-        ) {
+
+        const judge = (): boolean => {
+            if (!settings || !settings.providersProps[settings.provider]) {
+                return false
+            }
+
+            const provider = settings.provider
+            const providerProps = settings.providersProps[provider]
+            if (provider === 'ChatGPT' && !providerProps.apiModel) {
+                return true
+            } else if (requiredApiKeysProviders.includes(provider) && !providerProps.apiKeys) {
+                const illegal = provider !== 'OpenAI' ? true : providerProps.subscriptionLinks === ''
+                return illegal
+            } else if (provider === 'ThirdPartyChatGPT' && !providerProps.subscriptionLinks && !providerProps.apiURL) {
+                return true
+            }
+            return false
+        }
+        if (judge()) {
             setShowSettings(true)
         }
     }, [props.defaultShowSettings, settings])
@@ -1494,7 +1516,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         </div>
                     </div>
                     <div className={styles.popupCardContentContainer}>
-                        {settings?.apiURL === defaultAPIURL && (
+                        {settings?.providersProps[settings?.provider]?.apiURL === defaultAPIURL && (
                             <div>
                                 <IpLocationNotification showSettings={showSettings} />
                             </div>
@@ -1906,11 +1928,23 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             </div>
             {props.showSettings && (
                 <div className={styles.footer}>
-                    <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>
-                        <div onClick={() => setShowSettings((s) => !s)}>
-                            {showSettings ? <AiOutlineTranslation size={15} /> : <IoSettingsOutline size={15} />}
+                    <SatelessTooltip
+                        content={showSettings ? t('Go to Translator') : t('Go to Settings')}
+                        placement='right'
+                        isOpen={gotoTips}
+                        showArrow={true}
+                        onMouseEnter={() => setGotoTips(true)}
+                        onMouseLeave={() => setGotoTips(false)}
+                    >
+                        <div
+                            onClick={() => {
+                                setGotoTips(false)
+                                setShowSettings((s) => !s)
+                            }}
+                        >
+                            {showSettings ? <AiOutlineTranslation size='15' /> : <IoSettingsOutline size='15' />}
                         </div>
-                    </Tooltip>
+                    </SatelessTooltip>
                 </div>
             )}
             {enableVocabulary && (
