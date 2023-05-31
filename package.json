@@ -60,7 +60,7 @@
     "react-jss": "^10.10.0",
     "react-latex-next": "^2.2.0",
     "react-markdown": "^8.0.7",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "npm:@fengkx/react-syntax-highlighter@15.6.1",
     "react-window": "^1.8.9",
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",
