@@ -63,6 +63,7 @@ import 'katex/dist/katex.min.css'
 import Latex from 'react-latex-next'
 import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
+import _ from 'underscore'
 
 const cache = new LRUCache({
     max: 500,
@@ -786,7 +787,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
         }
 
-        const resizeHandle: ResizeObserverCallback = (entries) => {
+        const resizeHandle: ResizeObserverCallback = _.debounce((entries) => {
             // Listen for element height changes
             for (const entry of entries) {
                 const $popupCard = entry.target as HTMLElement
@@ -802,7 +803,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
                 }
             }
-        }
+        }, 500)
 
         const observer = new ResizeObserver(resizeHandle)
         queryPopupCardElement().then(($popupCard) => {
