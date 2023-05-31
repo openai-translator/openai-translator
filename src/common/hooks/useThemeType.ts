@@ -1,20 +1,18 @@
-import { useEffect } from 'react'
-import { useGlobalState } from './global'
-import { useSettings } from './useSettings'
+import useSWR from 'swr'
+import { getSettings } from '../utils'
 
 export const useThemeType = () => {
-    const [themeType, setThemeType] = useGlobalState('themeType')
-
-    const { settings } = useSettings()
-
-    useEffect(() => {
-        if (settings?.themeType) {
-            setThemeType(settings.themeType)
-        }
-    }, [setThemeType, settings?.themeType])
+    const { data: themeType, mutate: setThemeType } = useSWR(
+        [getSettings, 'themeType'],
+        async () => {
+            const settings = await getSettings()
+            return settings.themeType
+        },
+        { suspense: true }
+    )
 
     return {
-        themeType,
+        themeType: themeType ?? 'light',
         setThemeType,
     }
 }
