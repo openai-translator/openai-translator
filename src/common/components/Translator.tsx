@@ -72,6 +72,7 @@ import Latex from 'react-latex-next'
 import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
+import { GlobalSuspense } from './GlobalSuspense'
 
 const cache = new LRUCache({
     max: 500,
@@ -443,11 +444,15 @@ export function Translator(props: ITranslatorProps) {
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <StyletronProvider value={props.engine}>
-                <BaseProvider theme={theme}>
-                    <InnerTranslator {...props} />
-                </BaseProvider>
-            </StyletronProvider>
+            <div>
+                <StyletronProvider value={props.engine}>
+                    <BaseProvider theme={theme}>
+                        <GlobalSuspense>
+                            <InnerTranslator {...props} />
+                        </GlobalSuspense>
+                    </BaseProvider>
+                </StyletronProvider>
+            </div>
         </ErrorBoundary>
     )
 }
