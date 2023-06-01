@@ -88,6 +88,9 @@ export async function getSettings(): Promise<ISettings> {
     if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
         settings.selectInputElementsText = defaultSelectInputElementsText
     }
+    if (!settings.themeType) {
+        settings.themeType = 'followTheSystem'
+    }
     return settings
 }
 
