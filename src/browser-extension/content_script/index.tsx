@@ -1,3 +1,4 @@
+import '../enableDevHmr'
 import * as utils from '../../common/utils'
 import React from 'react'
 import icon from '../../common/assets/images/icon.png'
@@ -135,7 +136,11 @@ async function showPopupThumb(text: string, x: number, y: number) {
             event.stopPropagation()
         })
         const $img = document.createElement('img')
-        $img.src = icon
+        if (process.env.NODE_ENV === 'development') {
+            $img.src = new URL(icon, import.meta.url).href
+        } else {
+            $img.src = icon
+        }
         $img.style.display = 'block'
         $img.style.width = '100%'
         $img.style.height = '100%'

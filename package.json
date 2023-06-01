@@ -8,7 +8,7 @@
     "dev-tauri-renderer": "vite -c vite.config.tauri.ts",
     "build-tauri": "npm run build-tauri-renderer && tauri build",
     "dev-tauri": "tauri dev",
-    "dev-chromium": "NODE_ENV=development vite build -c vite.config.chromium.ts --watch",
+    "dev-chromium": "vite -c vite.config.chromium.ts",
     "dev-firefox": "NODE_ENV=development vite build -c vite.config.firefox.ts --watch",
     "build-browser-extension": "tsc && make build-browser-extension",
     "build-userscript": "make build-userscript",

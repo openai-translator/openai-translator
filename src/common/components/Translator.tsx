@@ -65,6 +65,11 @@ import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 
+let iconSrc = icon
+if (process.env.NODE_ENV === 'development') {
+    iconSrc = new URL(icon, import.meta.url).href
+}
+
 const cache = new LRUCache({
     max: 500,
     maxSize: 5000,
@@ -1235,7 +1240,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         }}
                     >
                         <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={icon} />
+                            <img data-tauri-drag-region className={styles.icon} src={iconSrc} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
                             </div>

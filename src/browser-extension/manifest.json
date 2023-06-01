@@ -13,24 +13,24 @@
     },
 
     "options_ui": {
-        "page": "/src/browser-extension/options/index.html"
+        "page": "src/browser-extension/options/index.html"
     },
 
     "action": {
         "default_icon": "icon.png",
-        "default_popup": "/src/browser-extension/popup/index.html"
+        "default_popup": "src/browser-extension/popup/index.html"
     },
 
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "all_frames": true,
-            "js": ["/src/browser-extension/content_script/index.tsx"]
+            "js": ["src/browser-extension/content_script/index.tsx"]
         }
     ],
 
     "background": {
-        "service_worker": "/src/browser-extension/background/index.ts"
+        "service_worker": "src/browser-extension/background/index.ts"
     },
 
     "permissions": ["storage", "contextMenus"],
