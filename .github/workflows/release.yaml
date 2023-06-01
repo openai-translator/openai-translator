@@ -62,7 +62,7 @@ jobs:
           cache: 'pnpm'
 
       - name: install frontend dependencies
-        run: pnpm install # change this to npm or pnpm depending on which one you use
+        run: pnpm install --no-frozen-lockfile # change this to npm or pnpm depending on which one you use
 
       - name: Change Version
         env:
@@ -122,7 +122,7 @@ jobs:
           cache: 'pnpm'
 
       - name: install frontend dependencies
-        run: pnpm install # change this to npm or pnpm depending on which one you use
+        run: pnpm install --no-frozen-lockfile # change this to npm or pnpm depending on which one you use
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -248,7 +248,7 @@ jobs:
         uses: battila7/get-version-action@v2
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: make build-browser-extension

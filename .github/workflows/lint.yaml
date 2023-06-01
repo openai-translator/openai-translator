@@ -36,7 +36,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install packages
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run type check
         run: pnpm tsc
