@@ -43,7 +43,7 @@ import { Tooltip } from './Tooltip'
 import { useSettings } from '../hooks/useSettings'
 import Vocabulary from './Vocabulary'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
-import { Modal, ModalBody } from 'baseui-sd/modal'
+import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 import { setupAnalysis } from '../analysis'
 import { vocabularyService } from '../services/vocabulary'
 import { Action, VocabularyItem } from '../internal-services/db'
@@ -568,10 +568,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
 
     useLayoutEffect(() => {
-        if (!isTauri()) {
-            return
-        }
-
         const handleResize = () => {
             const headerElem = headerRef.current
             if (!headerElem) {
@@ -608,7 +604,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
         }
 
-        handleResize()
+        const timer = setTimeout(() => handleResize(), 300)
+
+        return () => {
+            clearTimeout(timer)
+        }
     }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
@@ -1964,6 +1964,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 animate
                 role='dialog'
             >
+                <ModalHeader>
+                    <div
+                        style={{
+                            padding: 5,
+                        }}
+                    />
+                </ModalHeader>
                 <ModalBody>
                     <ActionManager draggable={props.showSettings} />
                 </ModalBody>
