@@ -946,6 +946,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const { t } = useTranslation()
 
+    const isTauri = utils.isTauri()
+
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<ISettings>({
         apiKeys: '',
@@ -956,7 +958,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
-        alwaysShowIcons: utils.defaultAlwaysShowIcons,
+        alwaysShowIcons: !isTauri,
         hotkey: '',
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
@@ -972,7 +974,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
     }, [form, values])
 
     const { settings, setSettings } = useSettings()
-    const isTauri = utils.isTauri()
 
     useEffect(() => {
         if (settings) {
