@@ -40,7 +40,7 @@ jobs:
           rustup target add aarch64-apple-darwin
 
       - name: install frontend dependencies
-        run: pnpm install # change this to npm or pnpm depending on which one you use
+        run: pnpm install --no-frozen-lockfile # change this to npm or pnpm depending on which one you use
 
       - name: Build Tauri App (MacOS Universal)
         uses: tauri-apps/tauri-action@dev
@@ -86,7 +86,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: make build-browser-extension

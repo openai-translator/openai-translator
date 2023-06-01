@@ -14,7 +14,6 @@ export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/se
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
-export const defaultAlwaysShowIcons = false
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
@@ -145,7 +144,7 @@ export async function getSettings(): Promise<ISettings> {
         settings.defaultTargetLanguage = defaultTargetLanguage
     }
     if (settings.alwaysShowIcons === undefined || settings.alwaysShowIcons === null) {
-        settings.alwaysShowIcons = defaultAlwaysShowIcons
+        settings.alwaysShowIcons = !isTauri()
     }
     if (!settings.i18n) {
         settings.i18n = defaulti18n
@@ -155,6 +154,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
         settings.selectInputElementsText = defaultSelectInputElementsText
+    }
+    if (!settings.themeType) {
+        settings.themeType = 'followTheSystem'
     }
     return settings
 }
