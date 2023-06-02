@@ -19,5 +19,5 @@
         "typeRoots": ["node_modules/@types"],
         "resolveJsonModule": true
     },
-    "include": ["src", "src-tauri", "vite.config.*.ts", ".eslintrc.js"]
+    "include": ["src", "src-tauri", "vite.config.*.ts", ".eslintrc.js", "playwright.config.ts", "e2e"]
 }

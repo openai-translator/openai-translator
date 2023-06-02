@@ -13,6 +13,7 @@
     "build-browser-extension": "tsc && make build-browser-extension",
     "clean": "make clean",
     "test": "npx jest",
+    "test:e2e": "playwright test",
     "lint": "eslint 'src/**/*.{ts,tsx}' --cache",
     "lint:fix": "eslint --fix 'src/**/*.{ts,tsx}'",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc --cache"
@@ -76,10 +77,12 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@playwright/test": "^1.34.3",
     "@samrum/vite-plugin-web-extension": "^5.0.0",
     "@tauri-apps/cli": "^1.3.1",
     "@types/chrome": "0.0.237",
     "@types/common-tags": "^1.8.1",
+    "@types/fs-extra": "^11.0.1",
     "@types/jest": "^29.5.1",
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.6",

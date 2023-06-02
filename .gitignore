@@ -15,3 +15,6 @@ npm-error.log
 .eslintcache
 .yarn
 .yarnrc.yml
+/test-results/
+/playwright-report/
+/playwright/.cache/
