@@ -1371,6 +1371,17 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     ? '__yetone-activate-action'
                                                     : undefined
                                             }
+                                            overrides={{
+                                                Root: {
+                                                    style: {
+                                                        height: '27px',
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                    },
+                                                },
+                                            }}
                                             onClick={() => {
                                                 setActivateAction(action)
                                                 if (action.mode === 'polishing') {
@@ -1385,8 +1396,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             {action.id === activateAction?.id && (
                                                 <div
                                                     style={{
-                                                        marginLeft: 4,
-                                                        lineHeight: 1,
                                                         maxWidth: 100,
                                                         whiteSpace: 'nowrap',
                                                         overflow: 'hidden',
