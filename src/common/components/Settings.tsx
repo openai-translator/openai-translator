@@ -375,7 +375,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                     max={20}
                     step={1}
                     value={[value?.rate ?? 10]}
-                    onChange={({ value }) => onChange?.({ ...value, rate: value[0] })}
+                    onChange={(params) => onChange?.({ ...value, rate: params.value[0] })}
                     overrides={{
                         ThumbValue: () => null,
                         InnerThumb: () => null,
@@ -395,7 +395,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                     max={100}
                     step={1}
                     value={[value?.volume ?? 100]}
-                    onChange={({ value }) => onChange?.({ ...value, volume: value[0] })}
+                    onChange={(params) => onChange?.({ ...value, volume: params.value[0] })}
                     overrides={{
                         ThumbValue: () => null,
                         InnerThumb: () => null,

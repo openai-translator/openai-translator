@@ -39,7 +39,7 @@ import { FcIdea } from 'react-icons/fc'
 import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
-import { Event } from '@tauri-apps/api/event'
+import type { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
@@ -59,13 +59,11 @@ import { CopyButton } from './CopyButton'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { ActionManager } from './ActionManager'
-import { invoke } from '@tauri-apps/api'
 import { GrMoreVertical } from 'react-icons/gr'
 import { StatefulPopover } from 'baseui-sd/popover'
 import { StatefulMenu } from 'baseui-sd/menu'
 import { IconType } from 'react-icons'
 import { GiPlatform } from 'react-icons/gi'
-import { LogicalSize, WebviewWindow } from '@tauri-apps/api/window'
 import { IoIosRocket } from 'react-icons/io'
 import 'katex/dist/katex.min.css'
 import Latex from 'react-latex-next'
@@ -1395,6 +1393,17 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     ? '__yetone-activate-action'
                                                     : undefined
                                             }
+                                            overrides={{
+                                                Root: {
+                                                    style: {
+                                                        height: '27px',
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                    },
+                                                },
+                                            }}
                                             onClick={() => {
                                                 setActivateAction(action)
                                                 if (action.mode === 'polishing') {
@@ -1409,8 +1418,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             {action.id === activateAction?.id && (
                                                 <div
                                                     style={{
-                                                        marginLeft: 4,
-                                                        lineHeight: 1,
                                                         maxWidth: 100,
                                                         whiteSpace: 'nowrap',
                                                         overflow: 'hidden',
@@ -1442,9 +1449,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             const actionID = item.id
                                             if (actionID === '__manager__') {
                                                 if (isTauri()) {
+                                                    const { invoke } = await import('@tauri-apps/api')
                                                     if (!navigator.userAgent.includes('Windows')) {
                                                         await invoke('show_action_manager_window')
                                                     } else {
+                                                        const { LogicalSize, WebviewWindow } = await import(
+                                                            '@tauri-apps/api/window'
+                                                        )
                                                         const windowLabel = 'action_manager'
                                                         let window = WebviewWindow.getByLabel(windowLabel)
                                                         if (!window) {
@@ -1769,7 +1780,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 )}
                                             </div>
                                         </Tooltip>
-                                        <CopyButton text={editableText} styles={styles}></CopyButton>
+                                        <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                            <div className={styles.actionButton}>
+                                                <CopyButton text={editableText} styles={styles}></CopyButton>
+                                            </div>
+                                        </Tooltip>
                                         <Tooltip content={t('Clear input')} placement='bottom'>
                                             <div
                                                 className={styles.actionButton}
@@ -1910,7 +1925,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         )}
                                                     </div>
                                                 </Tooltip>
-                                                <CopyButton text={translatedText} styles={styles}></CopyButton>
+                                                <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                                    <div className={styles.actionButton}>
+                                                        <CopyButton text={translatedText} styles={styles}></CopyButton>
+                                                    </div>
+                                                </Tooltip>
                                             </div>
                                         )}
                                     </div>
