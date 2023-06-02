@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createParser } from 'eventsource-parser'
-import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 
@@ -199,6 +198,7 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
     }
 
     if (isDesktopApp()) {
+        const { BaseDirectory, writeTextFile } = await import('@tauri-apps/api/fs')
         try {
             return await writeTextFile(filename, csvFile, { dir: BaseDirectory.Desktop })
         } catch (e) {

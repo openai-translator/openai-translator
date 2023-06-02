@@ -31,7 +31,7 @@ import { FcIdea } from 'react-icons/fc'
 import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
-import { Event } from '@tauri-apps/api/event'
+import type { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
@@ -51,13 +51,11 @@ import { CopyButton } from './CopyButton'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { ActionManager } from './ActionManager'
-import { invoke } from '@tauri-apps/api'
 import { GrMoreVertical } from 'react-icons/gr'
 import { StatefulPopover } from 'baseui-sd/popover'
 import { StatefulMenu } from 'baseui-sd/menu'
 import { IconType } from 'react-icons'
 import { GiPlatform } from 'react-icons/gi'
-import { LogicalSize, WebviewWindow } from '@tauri-apps/api/window'
 import { IoIosRocket } from 'react-icons/io'
 import 'katex/dist/katex.min.css'
 import Latex from 'react-latex-next'
@@ -1420,9 +1418,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             const actionID = item.id
                                             if (actionID === '__manager__') {
                                                 if (isTauri()) {
+                                                    const { invoke } = await import('@tauri-apps/api')
                                                     if (!navigator.userAgent.includes('Windows')) {
                                                         await invoke('show_action_manager_window')
                                                     } else {
+                                                        const { LogicalSize, WebviewWindow } = await import(
+                                                            '@tauri-apps/api/window'
+                                                        )
                                                         const windowLabel = 'action_manager'
                                                         let window = WebviewWindow.getByLabel(windowLabel)
                                                         if (!window) {
