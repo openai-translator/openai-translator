@@ -71,10 +71,10 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $popupCard.style.minWidth = `${popupCardMinWidth}px`
         $popupCard.style.maxWidth = `${popupCardMaxWidth}px`
         $popupCard.style.lineHeight = '1.6'
-        $popupCard.style.fontSize = '13px'
+        $popupCard.style.fontSize = '1em'
         $popupCard.style.color = '#333'
         $popupCard.style.font =
-            '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
+            '1em/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
         const $container = await getContainer()
         $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
