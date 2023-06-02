@@ -1749,7 +1749,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 )}
                                             </div>
                                         </Tooltip>
-                                        <CopyButton text={editableText} styles={styles}></CopyButton>
+                                        <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                            <div className={styles.actionButton}>
+                                                <CopyButton text={editableText} styles={styles}></CopyButton>
+                                            </div>
+                                        </Tooltip>
                                         <Tooltip content={t('Clear input')} placement='bottom'>
                                             <div
                                                 className={styles.actionButton}
@@ -1890,7 +1894,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         )}
                                                     </div>
                                                 </Tooltip>
-                                                <CopyButton text={translatedText} styles={styles}></CopyButton>
+                                                <Tooltip content={t('Copy to clipboard')} placement='bottom'>
+                                                    <div className={styles.actionButton}>
+                                                        <CopyButton text={translatedText} styles={styles}></CopyButton>
+                                                    </div>
+                                                </Tooltip>
                                             </div>
                                         )}
                                     </div>
