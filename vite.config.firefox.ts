@@ -1,28 +1,29 @@
-import { defineConfig } from "vite";
-import webExtension from "@samrum/vite-plugin-web-extension";
+import { defineConfig } from 'vite'
+import webExtension from '@samrum/vite-plugin-web-extension'
 import manifest from './src/browser-extension/manifest.firefox.json'
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const isDev = process.env.NODE_ENV === 'development'
 
 export default defineConfig({
-  plugins: [
-    tsconfigPaths(), react(),
-    webExtension({
-      manifest: manifest as chrome.runtime.Manifest,
-      useDynamicUrlWebAccessibleResources: false,
-    }),
-  ],
-  build: {
-    assetsInlineLimit: 1024 * 1024, // 1mb
-    minify: !isDev,
-    sourcemap: isDev,
-    target: 'chrome105',
-    rollupOptions: {
-      output: {
-        dir: 'dist/browser-extension/firefox',
-      },
+    plugins: [
+        tsconfigPaths(),
+        react(),
+        webExtension({
+            manifest: manifest as chrome.runtime.Manifest,
+            useDynamicUrlWebAccessibleResources: false,
+        }),
+    ],
+    build: {
+        assetsInlineLimit: 1024 * 1024, // 1mb
+        minify: !isDev,
+        sourcemap: isDev,
+        target: 'chrome105',
+        rollupOptions: {
+            output: {
+                dir: 'dist/browser-extension/firefox',
+            },
+        },
     },
-  },
-});
+})

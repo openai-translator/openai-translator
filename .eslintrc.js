@@ -3,13 +3,9 @@ module.exports = {
         browser: true,
         es2021: true,
         jest: true,
+        node: true,
     },
-    extends: [
-        'eslint:recommended',
-        'plugin:react/recommended',
-        'plugin:@typescript-eslint/recommended',
-        'prettier',
-    ],
+    extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
     overrides: [],
     parser: '@typescript-eslint/parser',
     parserOptions: {
@@ -30,7 +26,7 @@ module.exports = {
         'baseui/deprecated-component-api': 'warn',
         'baseui/no-deep-imports': 'warn',
         'prettier/prettier': 'error',
-        "react-hooks/rules-of-hooks": "error",
+        'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
     },
     settings: {
