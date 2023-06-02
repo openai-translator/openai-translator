@@ -16,10 +16,8 @@
         "noEmit": true,
         "noEmitOnError": true,
         "jsx": "react-jsx",
-        "typeRoots": [
-            "node_modules/@types"
-        ],
+        "typeRoots": ["node_modules/@types"],
         "resolveJsonModule": true
     },
-    "include": ["src", "src-tauri"]
+    "include": ["src", "src-tauri", "vite.config.*.ts", ".eslintrc.js"]
 }
