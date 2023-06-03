@@ -235,3 +235,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         reader.releaseLock()
     }
 }
+
+export function getAssetUrl(asset: string) {
+    return process.env.NODE_ENV === 'development' ? new URL(asset, import.meta.url).href : asset
+}

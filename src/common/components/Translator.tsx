@@ -20,7 +20,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
+import { defaultAPIURL, exportToCsv, getAssetUrl, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -64,11 +64,6 @@ import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
-
-let iconSrc = icon
-if (process.env.NODE_ENV === 'development') {
-    iconSrc = new URL(icon, import.meta.url).href
-}
 
 const cache = new LRUCache({
     max: 500,
@@ -1240,7 +1235,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         }}
                     >
                         <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={iconSrc} />
+                            <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
                             </div>
