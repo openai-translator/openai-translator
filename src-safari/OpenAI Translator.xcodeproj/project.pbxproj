@@ -667,7 +667,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator.Extension";
 				PRODUCT_NAME = "OpenAI Translator Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -697,7 +697,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator.Extension";
 				PRODUCT_NAME = "OpenAI Translator Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -736,7 +736,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator";
 				PRODUCT_NAME = "OpenAI Translator";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -773,7 +773,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator";
 				PRODUCT_NAME = "OpenAI Translator";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -805,7 +805,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator.Extension";
 				PRODUCT_NAME = "OpenAI Translator Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -836,7 +836,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator.Extension";
 				PRODUCT_NAME = "OpenAI Translator Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -872,7 +872,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator";
 				PRODUCT_NAME = "OpenAI Translator";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -907,7 +907,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.moecoder.OpenAI-Translator";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.yetone.OpenAI-Translator";
 				PRODUCT_NAME = "OpenAI Translator";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
