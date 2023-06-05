@@ -1,9 +1,10 @@
+import path from 'node:path'
 import { expect, test } from './fixtures'
 import { containerID, popupThumbID, popupCardID } from '../src/browser-extension/content_script/consts'
 
 test('popup card should be visible', async ({ page }) => {
-    await page.goto('https://example.com')
-    const textLocator = page.locator('h1')
+    await page.goto(`file:${path.join(__dirname, 'test.html')}`)
+    const textLocator = page.getByTestId('example-text')
     const boundingBox = await textLocator.boundingBox()
     if (boundingBox) {
         // select text
