@@ -15,17 +15,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.0
+
     - uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
+        cache: 'pnpm'
+
     - name: Install dependencies
       run: pnpm install
+
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
+
     - name: Build Chromium extension
       run: pnpm vite build -c vite.config.chromium.ts
+
     - name: Run Playwright tests
       run: pnpm test:e2e
+
     - uses: actions/upload-artifact@v3
       if: always()
       with:
