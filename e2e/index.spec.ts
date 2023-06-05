@@ -3,7 +3,7 @@ import { containerID, popupThumbID, popupCardID } from '../src/browser-extension
 
 test('popup card should be visible', async ({ page }) => {
     await page.goto('https://example.com')
-    const textLocator = await page.locator('h1')
+    const textLocator = page.locator('h1')
     const boundingBox = await textLocator.boundingBox()
     if (boundingBox) {
         // select text
@@ -12,11 +12,11 @@ test('popup card should be visible', async ({ page }) => {
         await page.mouse.move(boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height)
         await page.mouse.up()
     }
-    const container = await page.locator(`#${containerID}`)
-    const thumb = await container.locator(`#${popupThumbID}`)
+    const container = page.locator(`#${containerID}`)
+    const thumb = container.locator(`#${popupThumbID}`)
     await expect(thumb).toBeVisible()
     await thumb.click()
-    const popupCard = await container.locator(`#${popupCardID}`)
+    const popupCard = container.locator(`#${popupCardID}`)
     await expect(popupCard).toBeVisible()
 })
 
