@@ -1,9 +1,14 @@
 name: Playwright Tests
+
 on:
+  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: 
+      - main
   pull_request:
-    branches: [ main, master ]
+    branches: 
+      - main
+
 jobs:
   test:
     timeout-minutes: 60
@@ -17,8 +22,10 @@ jobs:
       run: pnpm install
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
+    - name: Build Chromium extension
+      run: pnpm vite build -c vite.config.chromium.ts
     - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: pnpm test:e2e
     - uses: actions/upload-artifact@v3
       if: always()
       with:

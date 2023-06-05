@@ -1047,6 +1047,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 background: theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
             }}
+            data-testid='settings-container'
         >
             <nav
                 style={{
