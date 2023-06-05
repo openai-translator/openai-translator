@@ -1,8 +1,6 @@
 import path from 'node:path'
 import { type BrowserContext, test as base, chromium } from '@playwright/test'
 
-export { name } from '../package.json'
-
 export const extensionPath = path.join(__dirname, '../dist/browser-extension/chromium')
 
 export const test = base.extend<{
