@@ -29,7 +29,7 @@ jobs:
       run: pnpm install
 
     - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
+      run: pnpm exec playwright install chromium --with-deps
 
     - name: Build Chromium extension
       run: pnpm vite build -c vite.config.chromium.ts
