@@ -439,7 +439,7 @@ export async function translate(query: TranslateQuery) {
             action: 'next',
             messages: [
                 {
-                    id: utils.generateUUID(),
+                    id: uuidv4(),
                     role: 'user',
                     content: {
                         content_type: 'text',
@@ -455,7 +455,7 @@ export async function translate(query: TranslateQuery) {
                 },
             ],
             model: settings.apiModel, // 'text-davinci-002-render-sha'
-            parent_message_id: utils.generateUUID(),
+            parent_message_id: uuidv4(),
         }
     } else {
         const messages = [
