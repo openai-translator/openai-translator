@@ -8,8 +8,8 @@ export function useSettings() {
     const { data: settings, mutate } = useSWR<ISettings>(['settings', getSettings], getSettings, { suspense: true })
 
     const setSettings = useCallback(
-        (newSettings: ISettings) => {
-            saveSettings(newSettings)
+        async (newSettings: ISettings) => {
+            await saveSettings(newSettings)
             mutate(newSettings, {
                 optimisticData: newSettings,
             })
