@@ -46,7 +46,7 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
     const rate = (settings.tts?.rate ?? 10) / 10
     const volume = settings.tts?.volume
 
-    if (settings.tts?.provider === 'EdgeTTS') {
+    if (!settings.tts?.provider || settings.tts?.provider === 'EdgeTTS') {
         return edgeSpeak({ text, lang: langTag, onFinish, voice: voiceCfg?.voice, rate, volume: volume ?? 100 })
     }
 
