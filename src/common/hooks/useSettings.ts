@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 
 import { ISettings } from '../types'
-import { getSettings } from '../utils'
+import { getSettings, setSettings as saveSettings } from '../utils'
 import { useCallback } from 'react'
 
 export function useSettings() {
@@ -9,6 +9,7 @@ export function useSettings() {
 
     const setSettings = useCallback(
         (newSettings: ISettings) => {
+            saveSettings(newSettings)
             mutate(newSettings, {
                 optimisticData: newSettings,
             })
