@@ -12,6 +12,7 @@ change-version:
 	sed -i -E 's|openai-translator@[^/]+|openai-translator@v$(VERSION)|g' public/userscript.js
 
 build-browser-extension: change-version
+	pnpm vite build -c vite.config.userscript.ts
 	pnpm vite build -c vite.config.chromium.ts
 	pnpm vite build -c vite.config.firefox.ts
 	cd dist/browser-extension/chromium && zip -r ../chromium.zip .
