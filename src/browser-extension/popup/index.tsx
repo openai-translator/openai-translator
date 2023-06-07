@@ -22,6 +22,7 @@ function App() {
                 minHeight: '100vh',
                 background: theme.colors.backgroundPrimary,
             }}
+            data-testid='popup-container'
         >
             <Translator showSettings defaultShowSettings text='' engine={engine} autoFocus />
         </div>

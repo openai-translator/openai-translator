@@ -1,0 +1,37 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches: 
+      - main
+
+jobs:
+  e2e-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.0
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install --no-frozen-lockfile
+
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install chromium --with-deps
+
+    - name: Build Chromium extension
+      run: pnpm vite build -c vite.config.chromium.ts
+
+    - name: Run Playwright tests
+      run: pnpm test:e2e --reporter github
