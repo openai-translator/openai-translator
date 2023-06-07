@@ -1,7 +1,6 @@
 npm-debug.log
 node_modules/
-dist/*
-!dist/userscript/
+dist/
 tmp/
 release/
 yarn-error.log
