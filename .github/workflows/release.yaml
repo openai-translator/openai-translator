@@ -250,8 +250,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build
+      - name: Build browser extension
         run: make build-browser-extension
+        env:
+          VERSION: "${{ steps.get_version.outputs.version-without-v }}"
+
+      - name: Build userscript
+        run: make build-userscript
         env:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
 
@@ -259,7 +264,7 @@ jobs:
         run: |
           mkdir release
           mv dist/browser-extension/chromium release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
-          cp public/userscript.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
+          mv dist/openai-translator.user.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
           cd release
           zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
 

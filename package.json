@@ -11,6 +11,7 @@
     "dev-browser-extension": "vite -c vite.config.chromium.ts",
     "dev-firefox": "NODE_ENV=development vite build -c vite.config.firefox.ts --watch",
     "build-browser-extension": "tsc && make build-browser-extension",
+    "build-userscript": "make build-userscript",
     "clean": "make clean",
     "test": "npx jest",
     "test:e2e": "playwright test",
@@ -19,10 +20,10 @@
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc --cache"
   },
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yetone/openai-translator.git"
+    "url": "https://github.com/openai-translator/openai-translator.git"
   },
   "dependencies": {
     "@sentry/react": "^7.49.0",
@@ -115,10 +116,12 @@
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "prettier": "^2.8.4",
+    "rollup-plugin-visualizer": "^5.9.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.8",
     "vite-plugin-dynamic-import": "^1.4.0",
+    "vite-plugin-monkey": "^3.2.2",
     "vite-tsconfig-paths": "^4.2.0",
     "webextension-polyfill": "^0.10.0"
   },
