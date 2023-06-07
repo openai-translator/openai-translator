@@ -1,5 +1,8 @@
 VERSION ?= 0.1.0
 
+clean:
+	rm -rf dist
+
 change-version:
 	sed -i -e "s/\"version\": \".*\"/\"version\": \"$(VERSION)\"/" src/browser-extension/manifest.json
 	sed -i -e "s/\"version\": \".*\"/\"version\": \"$(VERSION)\"/" src/browser-extension/manifest.firefox.json
