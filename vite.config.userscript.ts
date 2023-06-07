@@ -34,6 +34,7 @@ export default defineConfig({
         assetsInlineLimit: 1024 * 1024, // 1mb
         minify: !isDev,
         sourcemap: isDev,
+        emptyOutDir: false,
         rollupOptions: {},
     },
 })
