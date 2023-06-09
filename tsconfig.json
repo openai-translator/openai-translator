@@ -17,7 +17,8 @@
         "noEmitOnError": true,
         "jsx": "react-jsx",
         "typeRoots": ["node_modules/@types"],
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "types": ["vite/client", "chrome", "tampermonkey"]
     },
     "include": ["src", "src-tauri", "vite.config*.ts", ".eslintrc.js", "playwright.config.ts", "e2e"]
 }
