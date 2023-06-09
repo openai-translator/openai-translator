@@ -32,7 +32,6 @@ export default defineConfig({
         minify: !isDev,
         sourcemap: isDev,
         target: 'chrome105',
-        copyPublicDir: false,
         rollupOptions: {
             output: {
                 dir: 'dist/browser-extension/chromium',
