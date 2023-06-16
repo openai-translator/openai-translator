@@ -1,9 +1,9 @@
 import * as utils from '../../common/utils'
 import React from 'react'
 import icon from '../../common/assets/images/icon.png'
-import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
+import { documentPadding, popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
 import { Translator } from '../../common/components/Translator'
-import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
 import preset from 'jss-preset-default'
 import { JssProvider, createGenerateId } from 'react-jss'
@@ -14,6 +14,7 @@ import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
 import { getPageX, getPageY, UserEventType } from '../../common/user-event'
 import { GlobalSuspense } from '../../common/components/GlobalSuspense'
+import { computePosition, shift, autoUpdate, flip, offset, ReferenceElement } from '@floating-ui/dom'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -26,9 +27,7 @@ async function popupThumbClickHandler(event: UserEventType) {
     if (!$popupThumb) {
         return
     }
-    const x = $popupThumb.offsetLeft
-    const y = $popupThumb.offsetTop
-    showPopupCard(x, y, $popupThumb.dataset['text'] || '')
+    showPopupCard($popupThumb, $popupThumb.dataset['text'] || '')
 }
 
 async function removeContainer() {
@@ -57,11 +56,12 @@ async function hidePopupCard() {
     removeContainer()
 }
 
-async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
+async function showPopupCard(reference: ReferenceElement, text: string, autoFocus: boolean | undefined = false) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
-        $popupThumb.style.display = 'none'
+        $popupThumb.style.visibility = 'hidden'
     }
+
     let $popupCard: HTMLDivElement | null = await queryPopupCardElement()
     if (!$popupCard) {
         $popupCard = document.createElement('div')
@@ -81,12 +81,22 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
         $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
-    $popupCard.style.width = 'auto'
-    $popupCard.style.height = 'auto'
+    $popupCard.style.width = 'max-content'
+    $popupCard.style.minHeight = '200px'
     $popupCard.style.opacity = '100'
-    const [maxX, maxY] = calculateMaxXY($popupCard)
-    $popupCard.style.left = `${Math.min(maxX, x)}px`
-    $popupCard.style.top = `${Math.min(maxY, y)}px`
+
+    autoUpdate(reference, $popupCard, async () => {
+        if (!$popupCard) {
+            return
+        }
+        const { x, y } = await computePosition(reference, $popupCard, {
+            placement: 'bottom',
+            middleware: [shift({ padding: documentPadding }), flip(), offset(10)],
+        })
+        $popupCard.style.left = `${x}px`
+        $popupCard.style.top = `${y}px`
+    })
+
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         container: $popupCard.parentElement as any,
@@ -161,7 +171,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $container.shadowRoot?.querySelector('div')?.appendChild($popupThumb)
     }
     $popupThumb.dataset['text'] = text
-    $popupThumb.style.display = 'block'
+    $popupThumb.style.visibility = 'visible'
     $popupThumb.style.opacity = '100'
     $popupThumb.style.left = `${x}px`
     $popupThumb.style.top = `${y}px`
@@ -182,7 +192,8 @@ async function main() {
             return
         }
         window.setTimeout(async () => {
-            let text = (window.getSelection()?.toString() ?? '').trim()
+            const sel = window.getSelection()
+            let text = (sel?.toString() ?? '').trim()
             if (!text) {
                 if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                     const elem = event.target
@@ -190,7 +201,9 @@ async function main() {
                 }
             } else {
                 if (settings.autoTranslate === true) {
-                    showPopupCard(getPageX(event) + 7, getPageY(event) + 7, text)
+                    const pageX = getPageX(event)
+                    const pageY = getPageY(event)
+                    showPopupCard({ getBoundingClientRect: () => new DOMRect(pageX, pageY, 7, 7) }, text)
                 } else if (settings.alwaysShowIcons === true) {
                     showPopupThumb(text, getPageX(event) + 7, getPageY(event) + 7)
                 }
@@ -207,7 +220,7 @@ async function main() {
             const text = request.info.selectionText ?? ''
             const pageX = lastMouseEvent ? getPageX(lastMouseEvent) : 0
             const pageY = lastMouseEvent ? getPageY(lastMouseEvent) : 0
-            showPopupCard(pageX, pageY, text)
+            showPopupCard({ getBoundingClientRect: () => new DOMRect(pageX, pageY, 7, 7) }, text)
         }
     })
 
@@ -233,21 +246,16 @@ export async function bindHotKey(hotkey_: string | undefined) {
 
     hotkeys(hotkey, (event) => {
         event.preventDefault()
-        let text = (window.getSelection()?.toString() ?? '').trim()
+        const sel = window.getSelection()
+        let text = (sel?.toString() ?? '').trim()
         if (!text) {
             if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                 const elem = event.target
                 text = elem.value.substring(elem.selectionStart ?? 0, elem.selectionEnd ?? 0)
             }
         }
-        hidePopupCard()
-        // showPopupCard in center of screen
-        showPopupCard(
-            window.innerWidth / 2 + window.scrollX - 506 / 2,
-            window.innerHeight / 2 + window.scrollY - 226 / 2,
-            text,
-            true
-        )
+        const selRange = sel?.getRangeAt(0)
+        selRange && showPopupCard({ getBoundingClientRect: () => selRange.getBoundingClientRect() }, text)
     })
 }
 

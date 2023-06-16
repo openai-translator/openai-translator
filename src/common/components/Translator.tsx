@@ -818,30 +818,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
         }
 
-        const resizeHandle: ResizeObserverCallback = _.debounce((entries) => {
+        const resizeHandle: ResizeObserverCallback = _.debounce(() => {
             // Listen for element height changes
-            for (const entry of entries) {
-                const $popupCard = entry.target as HTMLElement
-                const [maxX, maxY] = calculateMaxXY($popupCard)
-                const yList = [maxY, $popupCard.offsetTop].filter((item) => item > documentPadding)
-                $popupCard.style.top = `${Math.min(...yList) || documentPadding}px`
-                const xList = [maxX, $popupCard.offsetLeft].filter((item) => item > documentPadding)
-                $popupCard.style.left = `${Math.min(...xList) || documentPadding}px`
-
-                const $translatedContent = translatedContentRef.current
-                if ($translatedContent) {
-                    const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
-                    $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
-                }
+            const $translatedContent = translatedContentRef.current
+            if ($translatedContent) {
+                const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
+                $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
             }
         }, 500)
 
         const observer = new ResizeObserver(resizeHandle)
         queryPopupCardElement().then(($popupCard) => {
             if ($popupCard) {
-                const rect = $popupCard.getBoundingClientRect()
-                const x = Math.min(window.innerWidth - 600, rect.x)
-                $popupCard.style.left = x + 'px'
                 observer.observe($popupCard)
             }
         })
