@@ -133,7 +133,7 @@ dependencies:
     version: 2.1.5(react@18.2.0)
   tauri-plugin-autostart-api:
     specifier: github:tauri-apps/tauri-plugin-autostart
-    version: github.com/tauri-apps/tauri-plugin-autostart/8d2706d05568f71eb81a05c3c891db1291c3ca82
+    version: github.com/tauri-apps/tauri-plugin-autostart/b331e5700ca2a5d340563efab7398c61812c69f7
   tesseract.js:
     specifier: ^4.0.2
     version: 4.0.2(eslint@8.41.0)
@@ -1253,7 +1253,7 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
     dependencies:
-      '@types/node': 18.14.6
+      '@types/node': 20.2.5
       playwright-core: 1.34.3
     optionalDependencies:
       fsevents: 2.3.2
@@ -1562,7 +1562,7 @@ packages:
     resolution: {integrity: sha512-MxObHvNl4A69ofaTRU8DFqvgzzv8s9yRtaPPm5gud9HDNvpB3GPQFvNuTWAI59B9huVGV5jXYJwbCsmBsOGYWA==}
     dependencies:
       '@types/jsonfile': 6.1.1
-      '@types/node': 18.14.6
+      '@types/node': 20.2.5
     dev: true
 
   /@types/graceful-fs@4.1.6:
@@ -1627,7 +1627,7 @@ packages:
   /@types/jsonfile@6.1.1:
     resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
     dependencies:
-      '@types/node': 18.14.6
+      '@types/node': 20.2.5
     dev: true
 
   /@types/keyv@3.1.4:
@@ -8078,8 +8078,8 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-autostart/8d2706d05568f71eb81a05c3c891db1291c3ca82:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/8d2706d05568f71eb81a05c3c891db1291c3ca82}
+  github.com/tauri-apps/tauri-plugin-autostart/b331e5700ca2a5d340563efab7398c61812c69f7:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/b331e5700ca2a5d340563efab7398c61812c69f7}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
