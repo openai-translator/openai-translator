@@ -16,7 +16,7 @@ test.fixme('hotkey should work', async ({ page, extensionId }) => {
         await page.getByText('Save').click()
     })
 
-    await test.step('select example text', async () => {
+    const popupCard = await test.step('select example text', async () => {
         await page.goto(`file:${path.join(__dirname, 'test.html')}`)
         await selectExampleText(page)
 
@@ -26,7 +26,8 @@ test.fixme('hotkey should work', async ({ page, extensionId }) => {
         await page.keyboard.down('Alt')
         await page.keyboard.press('x')
 
-        const popupCard = container.locator(`#${popupCardID}`)
-        await expect(popupCard).toBeVisible()
+        return container.locator(`#${popupCardID}`)
     })
+
+    await expect(popupCard).toBeVisible()
 })
