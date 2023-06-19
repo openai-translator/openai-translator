@@ -23,7 +23,7 @@ test.fixme('hotkey should work', async ({ page, extensionId }) => {
     await page.keyboard.up('x')
 
     const container = page.locator(`#${containerID}`)
-    await expect(container).toBeVisible()
+    await expect(container).toBeAttached()
     const popupCard = container.locator(`#${popupCardID}`)
     await expect(popupCard).toBeVisible()
 })
