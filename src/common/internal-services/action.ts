@@ -4,6 +4,7 @@ import { Action, ActionOutputRenderingFormat, getLocalDB } from './db'
 
 export interface ICreateActionOption {
     name: string
+    group?: string
     mode?: TranslateMode
     icon?: string
     rolePrompt?: string
@@ -14,6 +15,7 @@ export interface ICreateActionOption {
 export interface IUpdateActionOption {
     idx?: number
     name?: string
+    group?: string
     mode?: TranslateMode
     icon?: string
     rolePrompt?: string
@@ -51,6 +53,7 @@ class ActionInternalService implements IActionInternalService {
                 rolePrompt: opt.rolePrompt,
                 commandPrompt: opt.commandPrompt,
                 outputRenderingFormat: opt.outputRenderingFormat,
+                group: opt.group,
                 createdAt: now,
                 updatedAt: now,
             }

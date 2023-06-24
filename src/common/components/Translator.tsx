@@ -519,8 +519,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         highlightRef.current.handleInput()
     }, [selectedWord, highlightWords])
 
-    const [activateAction, setActivateAction] = useState<Action>()
-
+    const [activateAction, setActivateAction] = useState<Action | undefined>(() => {
+        const savedAction = localStorage.getItem('savedAction');
+        return savedAction ? JSON.parse(savedAction) : undefined;
+      })
     const currentTranslateMode = useMemo(() => {
         if (!activateAction) {
             return undefined
@@ -559,11 +561,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const translatedContentRef = useRef<HTMLDivElement>(null)
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
-
+  
     const scrollYRef = useRef<number>(0)
 
     const hasActivateAction = activateAction !== undefined
-    const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
+    
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -610,20 +612,34 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
-
+    const [selectedGroup, setSelectedGroup] = useState(localStorage.getItem('selectedGroup') || 'default')
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
-
+    const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
+    const actionGroups = (actions || []).reduce((groups, action) => {
+        const group = action.group || 'default';
+        if (!groups[group]) {
+          groups[group] = [];
+        }
+        groups[group].push(action);
+        return groups;
+      }, {})
     useEffect(() => {
+        
         if (!actions) {
             setDisplayedActions([])
             setHiddenActions([])
             return
         }
-        let displayedActions = actions.slice(0, displayedActionsMaxCount)
-        let hiddenActions = actions.slice(displayedActionsMaxCount)
+        
+        const filteredActions = actions.filter(action => {
+            const group = action.group ?? 'default'
+            return group === selectedGroup
+        })
+        let displayedActions = filteredActions.slice(0, displayedActionsMaxCount)
+        let hiddenActions = filteredActions.slice(displayedActionsMaxCount)
         if (!displayedActions.find((action) => action.id === activateAction?.id)) {
-            const activatedAction = actions.find((a) => a.id === activateAction?.id)
+            const activatedAction = filteredActions.find((a) => a.id === activateAction?.id)
             if (activatedAction) {
                 const lastDisplayedAction = displayedActions[displayedActions.length - 1]
                 if (lastDisplayedAction) {
@@ -636,9 +652,21 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         setDisplayedActions(displayedActions)
         setHiddenActions(hiddenActions)
-    }, [actions, activateAction?.id, displayedActionsMaxCount])
+    }, [actions, activateAction?.id, displayedActionsMaxCount,selectedGroup])
 
     const isTranslate = currentTranslateMode === 'translate'
+    
+    useEffect(() => {
+        localStorage.setItem('selectedGroup', selectedGroup);
+    }, [selectedGroup])
+
+    useEffect(() => {
+        const savedAction = localStorage.getItem('savedAction');
+        if (savedAction) {
+            setActivateAction(JSON.parse(savedAction));
+        }
+    }, [])
+
     useEffect(() => {
         if (!isTranslate) {
             setSelectedWord('')
@@ -1384,6 +1412,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }}
                                             onClick={() => {
                                                 setActivateAction(action)
+                                                if (action) {
+                                                    localStorage.setItem('savedAction', JSON.stringify(action));
+                                                  } else {
+                                                    localStorage.removeItem('savedAction');
+                                                  }
                                                 if (action.mode === 'polishing') {
                                                     setTargetLang(sourceLang)
                                                 }
@@ -1938,6 +1971,27 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     </Tooltip>
                 </div>
             )}
+
+<Tooltip content={t('选择使用场景')} placement='bottom'>
+  <Select
+    options={Object.keys(actionGroups).map(key => ({ id: key, label: key }))}
+    value={[{ id: selectedGroup }]}
+    overrides={{
+      Root: {
+        style: {
+          minWidth: '110px',
+          width: '30%',  
+        },
+      },
+    }}
+    onChange={({ value }) => {
+      const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
+      setSelectedGroup(groupId as string)
+    }}
+  />
+</Tooltip>
+
+
             {enableVocabulary && (
                 <Modal
                     isOpen={vocabularyType !== 'hide'}

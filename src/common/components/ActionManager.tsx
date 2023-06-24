@@ -153,7 +153,19 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
     const [showActionForm, setShowActionForm] = useState(false)
     const [updatingAction, setUpdatingAction] = useState<Action>()
     const [deletingAction, setDeletingAction] = useState<Action>()
-
+    const [openGroups, setOpenGroups] = useState<string[]>([]);
+    if (!actions) {
+        // Return a default value or do nothing
+        return null;
+      }
+    const actionGroups = actions.reduce((groups: { [key: string]: Action[] }, action) => {
+        const group = action.group || 'default';
+        if (!groups[group]) {
+            groups[group] = [];
+        }
+        groups[group].push(action);
+        return groups;
+    }, {});
     return (
         <div
             className={styles.root}
@@ -186,10 +198,21 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                 </div>
             </div>
             <div className={styles.actionList}>
+            {Object.keys(actionGroups).map((group) => (
+        <div key={group}>
+            <h3 style={{cursor: 'pointer'}} onClick={() => {
+                if (openGroups.includes(group)) {
+                    setOpenGroups(openGroups.filter(g => g !== group));
+                } else {
+                    setOpenGroups([...openGroups, group]);
+                }
+            }}>{group}</h3>
+            {openGroups.includes(group) && (
                 <List
                     onChange={async ({ oldIndex, newIndex }) => {
+                        const groupActions = actionGroups[group];
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const newActions = arrayMove(actions!, oldIndex, newIndex)
+                        const newActions = arrayMove(groupActions!, oldIndex, newIndex)
                         await actionService.bulkPut(
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             newActions.map((a, idx) => {
@@ -203,7 +226,7 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                             refreshActions()
                         }
                     }}
-                    items={actions?.map((action, idx) => (
+                    items={actionGroups[group]?.map((action, idx) => (
                         <div key={action.id} className={styles.actionItem}>
                             <div className={styles.actionContent}>
                                 <div className={styles.name}>
@@ -312,7 +335,9 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                         </div>
                     ))}
                 />
+            )}
             </div>
+            ))}
             <Modal
                 isOpen={showActionForm}
                 onClose={() => {
@@ -378,5 +403,6 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                 </ModalFooter>
             </Modal>
         </div>
+    </div>
     )
 }

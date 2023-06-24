@@ -17,6 +17,7 @@ export interface Action {
     idx: number
     mode?: TranslateMode
     name: string
+    group?: string
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
