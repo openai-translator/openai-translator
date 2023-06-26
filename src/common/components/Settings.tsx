@@ -546,6 +546,7 @@ const openAIModelOptions: APIModelOption[] = [
     { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
     { label: 'gpt-4-32k-0613', id: 'gpt-4-32k-0613' },
 ]
+
 function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelectorProps) {
     const fetcher = useMemo(() => getUniversalFetch(), [])
     const { t } = useTranslation()
