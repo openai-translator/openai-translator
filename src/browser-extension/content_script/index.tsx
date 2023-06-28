@@ -12,6 +12,7 @@ import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
+import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -101,17 +102,19 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
-            <div>
-                <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <Translator
-                        text={text}
-                        engine={engine}
-                        autoFocus={autoFocus}
-                        showSettings={isUserscript ? true : false}
-                        defaultShowSettings={isUserscript ? true : false}
-                    />
-                </JSS>
-            </div>
+            <GlobalSuspense>
+                <div>
+                    <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
+                        <Translator
+                            text={text}
+                            engine={engine}
+                            autoFocus={autoFocus}
+                            showSettings={isUserscript ? true : false}
+                            defaultShowSettings={isUserscript ? true : false}
+                        />
+                    </JSS>
+                </div>
+            </GlobalSuspense>
         </React.StrictMode>
     )
 }

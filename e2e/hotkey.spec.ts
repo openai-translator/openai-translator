@@ -3,7 +3,7 @@ import { getOptionsPageUrl, selectExampleText } from './common'
 import { expect, test } from './fixtures'
 import { containerID, popupCardID } from '../src/browser-extension/content_script/consts'
 
-test.fixme('hotkey should work', async ({ page, extensionId }) => {
+test('hotkey should work', async ({ page, extensionId }) => {
     await test.step('set hotkey', async () => {
         await page.goto(getOptionsPageUrl(extensionId))
         const input = page.locator('input[name="apiKey"]')
@@ -16,7 +16,7 @@ test.fixme('hotkey should work', async ({ page, extensionId }) => {
         await page.getByText('Save').click()
     })
 
-    const popupCard = await test.step('select example text', async () => {
+    const popupCard = await test.step('show popup card using hotkey', async () => {
         await page.goto(`file:${path.join(__dirname, 'test.html')}`)
         await selectExampleText(page)
 
