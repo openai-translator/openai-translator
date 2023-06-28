@@ -11,6 +11,7 @@ export function useSettings() {
         (newSettings: ISettings) => {
             mutate(newSettings, {
                 optimisticData: newSettings,
+                revalidate: false,
             })
         },
         [mutate]

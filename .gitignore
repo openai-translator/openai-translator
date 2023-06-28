@@ -1,7 +1,6 @@
 npm-debug.log
 node_modules/
 dist/
-!dist/userscript/
 tmp/
 release/
 yarn-error.log
@@ -15,3 +14,6 @@ npm-error.log
 .eslintcache
 .yarn
 .yarnrc.yml
+/test-results/
+/playwright-report/
+/playwright/.cache/

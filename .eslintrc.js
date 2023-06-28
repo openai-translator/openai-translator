@@ -2,7 +2,6 @@ module.exports = {
     env: {
         browser: true,
         es2021: true,
-        jest: true,
         node: true,
     },
     extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
@@ -20,7 +19,6 @@ module.exports = {
         'react/react-in-jsx-scope': 'off',
         'camelcase': 'error',
         'eqeqeq': ['error', 'always'],
-        'spaced-comment': 'error',
         'no-duplicate-imports': 'error',
         'baseui/deprecated-theme-api': 'warn',
         'baseui/deprecated-component-api': 'warn',
@@ -28,6 +26,7 @@ module.exports = {
         'prettier/prettier': 'error',
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
+        'spaced-comment': ['error', 'always', { markers: ['/'] }],
     },
     settings: {
         'import/resolver': {
