@@ -63,6 +63,7 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
+import { getPageX, getPageY, UserEventType } from '../user-event'
 
 const cache = new LRUCache({
     max: 500,
@@ -544,6 +545,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
+    const iconContainerRef = useRef<HTMLDivElement>(null)
+
     const logoTextRef = useRef<HTMLDivElement>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
@@ -840,25 +843,42 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         })()
 
         let closed = true
+        let lastPageX = 0
+        let lastPageY = 0
 
-        const dragMouseDown = (e: MouseEvent) => {
+        const dragMouseDown = (e: UserEventType) => {
             closed = false
             e = e || window.event
             e.preventDefault()
             $popupCard?.addEventListener('mouseup', closeDragElement)
             document.addEventListener('mousemove', elementDrag)
             document.addEventListener('mouseup', closeDragElement)
+
+            lastPageX = getPageX(e)
+            lastPageY = getPageY(e)
+            $popupCard?.addEventListener('touchend', closeDragElement)
+            document.addEventListener('touchmove', elementDrag)
+            document.addEventListener('touchend', closeDragElement)
         }
 
-        const elementDrag = async (e: MouseEvent) => {
+        const elementDrag = async (e: UserEventType) => {
             e.stopPropagation()
             if (closed || !$popupCard) {
                 return
             }
             e = e || window.event
             e.preventDefault()
-            const { movementX, movementY } = e
-            const [l, t] = overflowCheck($popupCard, { x: movementX, y: movementY })
+
+            let movement: MovementXY
+            if (e instanceof MouseEvent) {
+                movement = { x: e.movementX, y: e.movementY }
+            } else {
+                const [pageX, pageY] = [getPageX(e), getPageY(e)]
+                movement = { x: pageX - lastPageX, y: pageY - lastPageY }
+                lastPageX = pageX
+                lastPageY = pageY
+            }
+            const [l, t] = overflowCheck($popupCard, movement)
             $popupCard.style.top = `${t}px`
             $popupCard.style.left = `${l}px`
         }
@@ -903,16 +923,26 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             $popupCard?.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('mousemove', elementDrag)
             document.removeEventListener('mouseup', closeDragElement)
+
+            $popupCard?.removeEventListener('touchend', closeDragElement)
+            document.removeEventListener('touchmove', elementDrag)
+            document.removeEventListener('touchend', closeDragElement)
         }
 
         $header.addEventListener('mousedown', dragMouseDown)
         $header.addEventListener('mouseup', closeDragElement)
         document.addEventListener('scroll', elementScroll)
 
+        const $iconContainer = iconContainerRef.current
+        $iconContainer?.addEventListener('touchstart', dragMouseDown)
+        $iconContainer?.addEventListener('touchend', closeDragElement)
+
         return () => {
             $header.removeEventListener('mousedown', dragMouseDown)
             $header.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('scroll', elementScroll)
+            $iconContainer?.removeEventListener('touchstart', dragMouseDown)
+            $iconContainer?.removeEventListener('touchend', closeDragElement)
             closeDragElement()
         }
     }, [headerRef])
@@ -1292,7 +1322,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cursor: isDesktopApp() ? 'default' : 'move',
                         }}
                     >
-                        <div data-tauri-drag-region className={styles.iconContainer}>
+                        <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
                             <img data-tauri-drag-region className={styles.icon} src={icon} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator

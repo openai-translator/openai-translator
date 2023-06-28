@@ -7,6 +7,12 @@ function attachEventsToContainer($container: HTMLElement) {
     $container.addEventListener('mouseup', (event) => {
         event.stopPropagation()
     })
+    $container.addEventListener('touchstart', (event) => {
+        event.stopPropagation()
+    })
+    $container.addEventListener('touchend', (event) => {
+        event.stopPropagation()
+    })
 }
 
 export async function getContainer(): Promise<HTMLElement> {
