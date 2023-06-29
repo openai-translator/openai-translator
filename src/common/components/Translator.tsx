@@ -1498,7 +1498,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </div>
                                                 {showOCRProcessing && (
                                                     <div>
-                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
+                                                        <img
+                                                            src={
+                                                                isOCRProcessing
+                                                                    ? getAssetUrl(rocket)
+                                                                    : getAssetUrl(partyPopper)
+                                                            }
+                                                            width='20'
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
