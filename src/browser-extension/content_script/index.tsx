@@ -66,7 +66,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
     if (!$popupCard) {
         $popupCard = document.createElement('div')
         $popupCard.id = popupCardID
-        $popupCard.style.position = 'absolute'
+        $popupCard.style.position = 'fixed'
         $popupCard.style.zIndex = zIndex
         $popupCard.style.borderRadius = '4px'
         $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
@@ -81,21 +81,29 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
-    $popupCard.style.width = 'max-content'
+    $popupCard.style.width = '100%'
     $popupCard.style.minHeight = '200px'
     $popupCard.style.opacity = '100'
 
-    autoUpdate(reference, $popupCard, async () => {
-        if (!$popupCard) {
-            return
+    autoUpdate(
+        reference,
+        $popupCard,
+        async () => {
+            if (!$popupCard) {
+                return
+            }
+            const { x, y } = await computePosition(reference, $popupCard, {
+                placement: 'bottom',
+                middleware: [shift({ padding: documentPadding }), flip(), offset(10)],
+                strategy: 'fixed',
+            })
+            $popupCard.style.left = `${x}px`
+            $popupCard.style.top = `${y}px`
+        },
+        {
+            ancestorScroll: false,
         }
-        const { x, y } = await computePosition(reference, $popupCard, {
-            placement: 'bottom',
-            middleware: [shift({ padding: documentPadding }), flip(), offset(10)],
-        })
-        $popupCard.style.left = `${x}px`
-        $popupCard.style.top = `${y}px`
-    })
+    )
 
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

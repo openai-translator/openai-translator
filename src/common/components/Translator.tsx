@@ -16,7 +16,7 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
-import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
+import { queryPopupCardElement } from '../../browser-extension/content_script/utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -579,8 +579,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
 
-    const scrollYRef = useRef<number>(0)
-
     const hasActivateAction = activateAction !== undefined
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
 
@@ -915,22 +913,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return [cardLeft, cardTop]
         }
 
-        const elementScroll = async (e: globalThis.Event) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                scrollYRef.current = window.scrollY
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-            const { scrollY } = window
-            const movementY = scrollY - scrollYRef.current
-            const [l, t] = overflowCheck($popupCard, { x: 0, y: movementY })
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-            scrollYRef.current = scrollY
-        }
-
         const closeDragElement = () => {
             closed = true
             $popupCard?.removeEventListener('mouseup', closeDragElement)
@@ -944,7 +926,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
         $header.addEventListener('mousedown', dragMouseDown)
         $header.addEventListener('mouseup', closeDragElement)
-        document.addEventListener('scroll', elementScroll)
 
         const $iconContainer = iconContainerRef.current
         $iconContainer?.addEventListener('touchstart', dragMouseDown)
@@ -953,7 +934,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             $header.removeEventListener('mousedown', dragMouseDown)
             $header.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('scroll', elementScroll)
             $iconContainer?.removeEventListener('touchstart', dragMouseDown)
             $iconContainer?.removeEventListener('touchend', closeDragElement)
             closeDragElement()
