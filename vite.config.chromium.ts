@@ -21,7 +21,7 @@ export default defineConfig({
             apply: 'serve',
             configureServer(server) {
                 server.httpServer?.once('listening', async () => {
-                    // workaround to wait for the completion of webExtension dev build.
+                    // workaround for waiting until the webExtension dev build is complete.
                     await setTimeout(3000)
                     copyFile('public/cld-min.js', 'dist/cld-min.js')
                 })
