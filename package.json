@@ -47,6 +47,7 @@
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "katex": "^0.16.7",
+    "lodash.debounce": "^4.0.8",
     "lru-cache": "^8.0.0",
     "rc-field-form": "^1.27.4",
     "react": "^18.2.0",
@@ -70,10 +71,12 @@
     "swr": "^2.1.5",
     "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart",
     "tesseract.js": "^4.0.2",
+    "tiktoken": "^1.0.10",
     "underscore": "^1.13.6",
     "url-join-ts": "^1.0.5",
     "use-resize-observer": "^9.1.0",
     "uuid": "^9.0.0",
+    "vite-plugin-wasm": "^3.2.2",
     "web-streams-polyfill": "^3.2.1"
   },
   "devDependencies": {
@@ -83,6 +86,7 @@
     "@types/chrome": "0.0.237",
     "@types/common-tags": "^1.8.1",
     "@types/fs-extra": "^11.0.1",
+    "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",

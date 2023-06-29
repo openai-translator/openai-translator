@@ -64,6 +64,8 @@ import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import { getPageX, getPageY, UserEventType } from '../user-event'
+import { countTokens } from '../token'
+import { useLazyEffect } from '../usehooks'
 
 const cache = new LRUCache({
     max: 500,
@@ -257,6 +259,11 @@ const useStyles = createUseStyles({
         '-webkit-user-select': 'none',
         'user-select': 'none',
     }),
+    'tokenCount': {
+        color: '#999',
+        fontSize: '14px',
+        fontFamily: 'monospace',
+    },
     'actionStr': (props: IThemedStyleProps) => ({
         position: 'absolute',
         display: 'flex',
@@ -318,6 +325,12 @@ const useStyles = createUseStyles({
         paddingTop: '6px',
         paddingBottom: '6px',
     }),
+    'enterHint': {
+        color: '#999',
+        fontSize: '14px',
+        transform: 'scale(0.9)',
+        marginRight: '-16px',
+    },
     'writing': {
         'marginLeft': '3px',
         'width': '10px',
@@ -371,6 +384,9 @@ const useStyles = createUseStyles({
         justifyContent: 'center',
         alignItems: 'center',
         background: 'rgba(0,0,0,0.3)',
+    },
+    'flexPlaceHolder': {
+        marginRight: 'auto',
     },
 })
 
@@ -691,6 +707,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [originalText, setOriginalText] = useState(props.text)
     const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
+    const [tokenCount, setTokenCount] = useState(0)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
@@ -703,6 +720,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setEditableText(detectedOriginalText)
     }, [detectedOriginalText])
+
+    useLazyEffect(
+        () => {
+            setTokenCount(countTokens(editableText, settings?.apiModel))
+        },
+        [editableText],
+        500
+    )
 
     const checkWordCollection = useCallback(async () => {
         try {
@@ -1628,17 +1653,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }
                                             onChange={(e) => setEditableText(e.target.value)}
                                             onKeyPress={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    if (!e.shiftKey) {
-                                                        e.preventDefault()
-                                                        e.stopPropagation()
-                                                        if (!activateAction) {
-                                                            setActivateAction(
-                                                                actions?.find((action) => action.mode === 'translate')
-                                                            )
-                                                        }
-                                                        setOriginalText(editableText)
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    if (!activateAction) {
+                                                        setActivateAction(
+                                                            actions?.find((action) => action.mode === 'translate')
+                                                        )
                                                     }
+                                                    setOriginalText(editableText)
                                                 }
                                             }}
                                         />
@@ -1654,11 +1677,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 overflow: 'hidden',
                                             }}
                                         >
-                                            <div
-                                                style={{
-                                                    marginRight: 'auto',
-                                                }}
-                                            />
+                                            <div className={styles.tokenCount}> {tokenCount} </div>
+                                            <div className={styles.flexPlaceHolder} />
                                             <div
                                                 style={{
                                                     display: 'flex',
@@ -1667,17 +1687,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     gap: 10,
                                                 }}
                                             >
-                                                <div
-                                                    style={{
-                                                        color: '#999',
-                                                        fontSize: '12px',
-                                                        transform: 'scale(0.9)',
-                                                        marginRight: '-20px',
-                                                    }}
-                                                >
-                                                    {
-                                                        'Please press <Enter> to submit. Press <Shift+Enter> to start a new line.'
-                                                    }
+                                                <div className={styles.enterHint}>
+                                                    {'Press <Enter> to submit, <Shift+Enter> for a new line.'}
                                                 </div>
                                                 <Button
                                                     size='mini'

@@ -3,12 +3,14 @@ import webExtension from '@samrum/vite-plugin-web-extension'
 import manifest from './src/browser-extension/manifest.json'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import wasm from 'vite-plugin-wasm'
 
 const isDev = process.env.NODE_ENV === 'development'
 
 export default defineConfig({
     plugins: [
         tsconfigPaths(),
+        wasm(),
         react(),
         webExtension({
             manifest: manifest as chrome.runtime.Manifest,
