@@ -245,7 +245,7 @@ const Vocabulary = (props: IVocabularyProps) => {
         }
     }
 
-    const onGenerageArticle = async () => {
+    const onGenerateArticle = async () => {
         if (!articleType) {
             toast(t('No article type selected'), {
                 duration: 3000,
@@ -371,7 +371,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                             }}
                         />
                         <StatefulTooltip content='Big Bang' placement='bottom' showArrow>
-                            <div className={styles.actionButton} onClick={onGenerageArticle}>
+                            <div className={styles.actionButton} onClick={onGenerateArticle}>
                                 <Button size='mini' kind={'secondary'}>
                                     <FcIdea size={20} />
                                 </Button>
