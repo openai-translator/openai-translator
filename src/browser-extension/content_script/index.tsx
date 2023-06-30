@@ -1,7 +1,16 @@
 import * as utils from '../../common/utils'
 import React from 'react'
 import icon from '../../common/assets/images/icon.png'
-import { documentPadding, popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
+import {
+    documentPadding,
+    popupCardID,
+    popupCardMaxWidth,
+    popupCardMinHeight,
+    popupCardMinWidth,
+    popupCardOffset,
+    popupThumbID,
+    zIndex,
+} from './consts'
 import { Translator } from '../../common/components/Translator'
 import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
@@ -81,8 +90,8 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
-    $popupCard.style.width = 'auto'
-    $popupCard.style.height = 'auto'
+    $popupCard.style.width = 'max-content'
+    $popupCard.style.minHeight = `${popupCardMinHeight}px`
     $popupCard.style.opacity = '100'
 
     async function update() {
@@ -93,12 +102,12 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
             placement: 'bottom',
             middleware: [
                 shift({ padding: documentPadding }),
+                offset(popupCardOffset),
                 flip(),
-                offset(10),
                 size({
                     apply({ availableHeight, elements }) {
                         Object.assign(elements.floating.style, {
-                            maxHeight: `${Math.max(elements.floating.offsetHeight, availableHeight)}px`,
+                            maxHeight: `${availableHeight}px`,
                         })
                     },
                 }),
@@ -218,9 +227,12 @@ async function main() {
                 if (settings.autoTranslate === true) {
                     const x = getClientX(event)
                     const y = getClientY(event)
-                    showPopupCard({ getBoundingClientRect: () => new DOMRect(x, y, 7, 7) }, text)
+                    showPopupCard(
+                        { getBoundingClientRect: () => new DOMRect(x, y, popupCardOffset, popupCardOffset) },
+                        text
+                    )
                 } else if (settings.alwaysShowIcons === true) {
-                    showPopupThumb(text, getPageX(event) + 7, getPageY(event) + 7)
+                    showPopupThumb(text, getPageX(event) + popupCardOffset, getPageY(event) + popupCardOffset)
                 }
             }
         })
@@ -235,7 +247,7 @@ async function main() {
             const text = request.info.selectionText ?? ''
             const x = lastMouseEvent ? getClientX(lastMouseEvent) : 0
             const y = lastMouseEvent ? getClientY(lastMouseEvent) : 0
-            showPopupCard({ getBoundingClientRect: () => new DOMRect(x, y, 7, 7) }, text)
+            showPopupCard({ getBoundingClientRect: () => new DOMRect(x, y, popupCardOffset, popupCardOffset) }, text)
         }
     })
 
