@@ -6976,7 +6976,7 @@ packages:
     dev: false
 
   github.com/tauri-apps/tauri-plugin-autostart/b331e5700ca2a5d340563efab7398c61812c69f7:
-    resolution: {commit: b331e5700ca2a5d340563efab7398c61812c69f7, repo: git+ssh://git@github.com/tauri-apps/tauri-plugin-autostart.git, type: git}
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/b331e5700ca2a5d340563efab7398c61812c69f7}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
