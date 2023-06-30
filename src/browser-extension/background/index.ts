@@ -18,7 +18,7 @@ browser.contextMenus?.create(
 )
 
 browser.contextMenus?.onClicked.addListener(async function (info) {
-    const [tab] = await chrome.tabs.query({ active: true })
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
     tab.id &&
         browser.tabs.sendMessage(tab.id, {
             type: 'open-translator',
