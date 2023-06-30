@@ -62,10 +62,10 @@ export async function queryPopupCardElement(): Promise<HTMLDivElement | null> {
 }
 
 export function calculateMaxXY($popupCard: HTMLElement): number[] {
-    const { innerWidth, innerHeight } = window
+    const { innerWidth, innerHeight, scrollX, scrollY } = window
     const { scrollLeft, scrollTop } = document.documentElement
     const { width, height } = $popupCard.getBoundingClientRect()
-    const maxX = scrollLeft + innerWidth - width - documentPadding
-    const maxY = scrollTop + innerHeight - height - documentPadding
+    const maxX = (scrollX || scrollLeft) + innerWidth - width - documentPadding
+    const maxY = (scrollY || scrollTop) + innerHeight - height - documentPadding
     return [maxX, maxY]
 }
