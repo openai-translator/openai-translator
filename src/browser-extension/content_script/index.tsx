@@ -12,9 +12,9 @@ import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
-import { getPageX, getPageY, UserEventType } from '../../common/user-event'
+import { getClientX, getClientY, getPageX, getPageY, UserEventType } from '../../common/user-event'
 import { GlobalSuspense } from '../../common/components/GlobalSuspense'
-import { computePosition, shift, autoUpdate, flip, offset, ReferenceElement } from '@floating-ui/dom'
+import { computePosition, shift, flip, offset, size, type ReferenceElement } from '@floating-ui/dom'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -81,29 +81,36 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
     }
     $popupCard.style.display = 'block'
-    $popupCard.style.width = '100%'
-    $popupCard.style.minHeight = '200px'
+    $popupCard.style.width = 'auto'
+    $popupCard.style.height = 'auto'
     $popupCard.style.opacity = '100'
 
-    autoUpdate(
-        reference,
-        $popupCard,
-        async () => {
-            if (!$popupCard) {
-                return
-            }
-            const { x, y } = await computePosition(reference, $popupCard, {
-                placement: 'bottom',
-                middleware: [shift({ padding: documentPadding }), flip(), offset(10)],
-                strategy: 'fixed',
-            })
-            $popupCard.style.left = `${x}px`
-            $popupCard.style.top = `${y}px`
-        },
-        {
-            ancestorScroll: false,
+    async function update() {
+        if (!$popupCard) {
+            return
         }
-    )
+        const { x, y } = await computePosition(reference, $popupCard, {
+            placement: 'bottom',
+            middleware: [
+                shift({ padding: documentPadding }),
+                flip(),
+                offset(10),
+                size({
+                    apply({ availableHeight, elements }) {
+                        Object.assign(elements.floating.style, {
+                            maxHeight: `${Math.max(elements.floating.offsetHeight, availableHeight)}px`,
+                        })
+                    },
+                }),
+            ],
+            strategy: 'fixed',
+        })
+        $popupCard.style.left = `${x}px`
+        $popupCard.style.top = `${y}px`
+    }
+
+    const resizeObserver = new ResizeObserver(update)
+    resizeObserver.observe($popupCard)
 
     const engine = new Styletron({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,9 +216,9 @@ async function main() {
                 }
             } else {
                 if (settings.autoTranslate === true) {
-                    const pageX = getPageX(event)
-                    const pageY = getPageY(event)
-                    showPopupCard({ getBoundingClientRect: () => new DOMRect(pageX, pageY, 7, 7) }, text)
+                    const x = getClientX(event)
+                    const y = getClientY(event)
+                    showPopupCard({ getBoundingClientRect: () => new DOMRect(x, y, 7, 7) }, text)
                 } else if (settings.alwaysShowIcons === true) {
                     showPopupThumb(text, getPageX(event) + 7, getPageY(event) + 7)
                 }
@@ -226,9 +233,9 @@ async function main() {
         if (request.type === 'open-translator') {
             if (window !== window.top) return
             const text = request.info.selectionText ?? ''
-            const pageX = lastMouseEvent ? getPageX(lastMouseEvent) : 0
-            const pageY = lastMouseEvent ? getPageY(lastMouseEvent) : 0
-            showPopupCard({ getBoundingClientRect: () => new DOMRect(pageX, pageY, 7, 7) }, text)
+            const x = lastMouseEvent ? getClientX(lastMouseEvent) : 0
+            const y = lastMouseEvent ? getClientY(lastMouseEvent) : 0
+            showPopupCard({ getBoundingClientRect: () => new DOMRect(x, y, 7, 7) }, text)
         }
     })
 
