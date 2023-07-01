@@ -235,5 +235,4 @@ export async function bindHotKey(hotkey_: string | undefined) {
         )
     })
 }
-
 main()

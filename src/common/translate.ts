@@ -8,7 +8,6 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
-
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -427,6 +426,10 @@ export async function translate(query: TranslateQuery) {
         body['stop'] = ['<|im_end|>']
     } else if (settings.provider === 'ChatGPT') {
         let resp: Response | null = null
+        const messageId = 'aaa2' + uuidv4().slice(4)
+        const conversationId = localStorage.getItem('conversationId')
+        const parentmessageId = uuidv4()
+        localStorage.setItem('parentmessageId', parentmessageId)
         resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
         if (resp.status !== 200) {
             query.onError?.('Failed to fetch ChatGPT Web accessToken.')
@@ -435,27 +438,48 @@ export async function translate(query: TranslateQuery) {
         }
         const respJson = await resp?.json()
         apiKey = respJson.accessToken
-        body = {
-            action: 'next',
-            messages: [
-                {
-                    id: uuidv4(),
-                    role: 'user',
-                    content: {
-                        content_type: 'text',
-                        parts: [
-                            codeBlock`
-                        ${rolePrompt}
-                        
-                        ${commandPrompt}:
-                        ${contentPrompt}
-                        `,
-                        ],
+        if (conversationId !== '') {
+            body = {
+                action: 'next',
+                conversation_id: localStorage.getItem('conversationId'),
+                messages: [
+                    {
+                        id: uuidv4(),
+                        author: {
+                            role: 'user',
+                        },
+                        content: {
+                            content_type: 'text',
+                            parts: [`${rolePrompt}\n\n${commandPrompt}:\n${contentPrompt}`],
+                        },
+                        metadata: {},
                     },
-                },
-            ],
-            model: settings.apiModel, // 'text-davinci-002-render-sha'
-            parent_message_id: uuidv4(),
+                ],
+                model: settings.apiModel, // 'text-davinci-002-render-sha'
+                parent_message_id: uuidv4(),
+                timezone_offset_min: -480, // adjust this to the correct timezone
+            }
+        } else {
+            body = {
+                action: 'next',
+                messages: [
+                    {
+                        id: messageId,
+                        author: {
+                            role: 'user',
+                        },
+                        content: {
+                            content_type: 'text',
+                            parts: [`${rolePrompt}\n\n${commandPrompt}:\n${contentPrompt}`],
+                        },
+                        metadata: {},
+                    },
+                ],
+
+                model: settings.apiModel, // 'text-davinci-002-render-sha'
+                parent_message_id: parentmessageId,
+                timezone_offset_min: -480, // adjust this to the correct timezone
+            }
         }
     } else {
         const messages = [
@@ -495,8 +519,9 @@ export async function translate(query: TranslateQuery) {
     }
 
     if (settings.provider === 'ChatGPT') {
-        let conversationId = ''
+        let conversationId = localStorage.getItem('conversationId') || ''
         let length = 0
+        console.log(conversationId)
         await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
             method: 'POST',
             headers,
@@ -509,6 +534,7 @@ export async function translate(query: TranslateQuery) {
                 let resp
                 try {
                     resp = JSON.parse(msg)
+                    console.log( resp)
                     // eslint-disable-next-line no-empty
                 } catch {
                     query.onFinish('stop')
@@ -516,6 +542,7 @@ export async function translate(query: TranslateQuery) {
                 }
                 if (!conversationId) {
                     conversationId = resp.conversation_id
+                    localStorage.setItem('conversationId', conversationId)
                 }
                 const { finish_details: finishDetails } = resp.message
                 if (finishDetails) {
@@ -571,13 +598,13 @@ export async function translate(query: TranslateQuery) {
             },
         })
 
-        if (conversationId) {
+        if (conversationId && settings.chatContext === false) {
             await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
                 method: 'PATCH',
                 headers,
                 body: JSON.stringify({ is_visible: false }),
             })
-        }
+        } 
     } else {
         const url = urlJoin(settings.apiURL, settings.apiURLPath)
         await fetchSSE(url, {

@@ -455,7 +455,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
     const [showActionManager, setShowActionManager] = useState(false)
-
+    const [isContextEnabled, setContextEnabled] = useState(false)
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
@@ -475,6 +475,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [i18n, settings?.i18n])
 
     const [autoFocus, setAutoFocus] = useState(false)
+
+    const handleToggleContext = () => {
+        setContextEnabled(!isContextEnabled)
+    }
 
     useEffect(() => {
         if (highlightRef.current) {

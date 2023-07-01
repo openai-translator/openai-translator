@@ -47,6 +47,7 @@
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "katex": "^0.16.7",
+    "keyv": "^4.5.2",
     "lru-cache": "^8.0.0",
     "rc-field-form": "^1.27.4",
     "react": "^18.2.0",
