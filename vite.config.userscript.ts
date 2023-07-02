@@ -4,14 +4,12 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import monkey, { cdn } from 'vite-plugin-monkey'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { version, license, name } from './package.json'
-import wasm from 'vite-plugin-wasm'
 
 const isDev = process.env.NODE_ENV === 'development'
 
 export default defineConfig({
     plugins: [
         tsconfigPaths(),
-        wasm(),
         react(),
         monkey({
             entry: 'src/browser-extension/content_script/index.tsx',

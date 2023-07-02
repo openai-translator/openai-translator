@@ -1,11 +1,10 @@
-// eslint-disable-next-line camelcase
-import { encoding_for_model, TiktokenModel, Tiktoken } from 'tiktoken'
+import { encodingForModel, TiktokenModel, Tiktoken } from 'js-tiktoken'
 
 class Encoding {
     enc: Tiktoken
 
     constructor(model: TiktokenModel) {
-        this.enc = encoding_for_model(model)
+        this.enc = encodingForModel(model)
     }
 
     count(text: string): number {
