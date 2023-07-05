@@ -33,7 +33,7 @@
         "service_worker": "/src/browser-extension/background/index.ts"
     },
 
-    "permissions": ["storage", "contextMenus"],
+    "permissions": ["storage", "contextMenus","tabs","activeTab"],
 
     "commands": {
         "open-popup": {

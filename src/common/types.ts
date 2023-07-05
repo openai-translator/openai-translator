@@ -48,7 +48,6 @@ export interface ISettings {
     apiURLPath: string
     apiModel: string
     provider: Provider | 'OpenAI'
-    chatContext: boolean
     autoTranslate: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string

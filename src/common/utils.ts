@@ -10,8 +10,8 @@ export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
+
 export const defaultAutoTranslate = false
-export const defaultChatContext = true
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
@@ -29,7 +29,6 @@ const settingKeys: Record<keyof ISettings, number> = {
     apiURLPath: 1,
     apiModel: 1,
     provider: 1,
-    chatContext:1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
@@ -65,9 +64,6 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.provider) {
         settings.provider = defaultProvider
-    }
-    if (settings.chatContext === undefined || settings.chatContext === null) {
-        settings.chatContext = defaultChatContext
     }
     if (settings.autoTranslate === undefined || settings.autoTranslate === null) {
         settings.autoTranslate = defaultAutoTranslate

@@ -13,7 +13,7 @@ import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
-import { translate, TranslateMode } from '../translate'
+import { WebAPI, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
 import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
@@ -455,7 +455,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
     const [showActionManager, setShowActionManager] = useState(false)
-    const [isContextEnabled, setContextEnabled] = useState(false)
+
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
@@ -475,10 +475,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [i18n, settings?.i18n])
 
     const [autoFocus, setAutoFocus] = useState(false)
-
-    const handleToggleContext = () => {
-        setContextEnabled(!isContextEnabled)
-    }
 
     useEffect(() => {
         if (highlightRef.current) {
@@ -724,7 +720,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
-
+    const webAPI = new WebAPI();
     useEffect(() => {
         setOriginalText(props.text)
     }, [props.text, props.uuid])
@@ -1013,7 +1009,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             let isStopped = false
             try {
-                await translate({
+                await webAPI.translate({
                     action,
                     signal,
                     text,
@@ -1042,6 +1038,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cache.set(cachedKey, result)
                             return result
                         })
+                        chrome.runtime.sendMessage({ type: "refreshPage" })
                     },
                     onError: (error) => {
                         setActionStr('Error')
