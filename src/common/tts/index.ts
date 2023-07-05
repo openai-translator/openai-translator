@@ -30,6 +30,7 @@ export const langCode2TTSLang: Record<string, string> = {
     'hr': 'hr-HR',
     'id': 'id-ID',
     'vi': 'vi-VN',
+    'sv': 'sv-SE',
 }
 
 let supportVoices: SpeechSynthesisVoice[] = []

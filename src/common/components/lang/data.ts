@@ -363,4 +363,9 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         name: 'Tiếng Việt',
         phoneticNotation: false,
     },
+    'sv': {
+        nameEn: 'Swedish',
+        name: 'Svenska',
+        phoneticNotation: 'IPA',
+    },
 }

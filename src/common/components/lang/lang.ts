@@ -76,6 +76,7 @@ export type LangCode =
     | 'uk'
     | 'ur'
     | 'vi'
+    | 'sv'
 export type LanguageConfig = Required<OptionalLangConfig>
 export const supportedLanguages = Object.entries(LANG_CONFIGS).map(
     ([code, config]) => [code, config.name] as [LangCode, string]
