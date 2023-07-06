@@ -8,6 +8,7 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
+import { fetchArkoseToken } from './arkose'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -194,11 +195,11 @@ export class QuoteProcessor {
 
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
-class WebAPI {
+export class WebAPI {
     conversationContext?: ConversationContext
 
     resetConversation() {
-        this.conversationContext = undefined;
+        this.conversationContext = undefined
     }
     async translate(query: TranslateQuery) {
         const fetcher = getUniversalFetch()
@@ -441,9 +442,6 @@ class WebAPI {
             body['stop'] = ['<|im_end|>']
         } else if (settings.provider === 'ChatGPT') {
             let resp: Response | null = null
-            const messageId = uuidv4()
-            const parentmessageId = uuidv4()
-            localStorage.setItem('parentmessageId', parentmessageId)
             resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: query.signal })
             if (resp.status !== 200) {
                 query.onError?.('Failed to fetch ChatGPT Web accessToken.')
@@ -452,6 +450,10 @@ class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
+            let arkoseToken: string | undefined
+            if (settings.apiModel.startsWith('gpt-4') ) {
+                arkoseToken = await fetchArkoseToken()
+            }
             body = {
                 action: 'next',
                 messages: [
@@ -470,6 +472,7 @@ class WebAPI {
                 model: settings.apiModel, // 'text-davinci-002-render-sha'
                 conversation_id: this.conversationContext?.conversationId || undefined,
                 parent_message_id: this.conversationContext?.lastMessageId || uuidv4(),
+                arkose_token: arkoseToken,
                 timezone_offset_min: -480, // adjust this to the correct timezone
             }
         } else {
@@ -525,17 +528,14 @@ class WebAPI {
                     let resp
                     try {
                         resp = JSON.parse(msg)
-
-                        // eslint-disable-next-line no-empty
-                    } catch {
-                        query.onFinish('stop')
-                        return
-                    }
-                    if (!conversationId) {
                         this.conversationContext = {
                             conversationId: resp.conversation_id,
                             lastMessageId: resp.message.id,
                         }
+                        // eslint-disable-next-line no-empty
+                    } catch {
+                        query.onFinish('stop')
+                        return
                     }
                     const { finish_details: finishDetails } = resp.message
                     if (finishDetails) {

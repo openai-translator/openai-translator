@@ -32,6 +32,9 @@ dependencies:
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
+  destr:
+    specifier: ^2.0.0
+    version: 2.0.0
   dexie:
     specifier: ^3.2.3
     version: 3.2.3
@@ -137,6 +140,9 @@ dependencies:
   tesseract.js:
     specifier: ^4.0.2
     version: 4.0.2(eslint@8.41.0)
+  ufo:
+    specifier: ^1.1.2
+    version: 1.1.2
   underscore:
     specifier: ^1.13.6
     version: 1.13.6
@@ -3275,6 +3281,10 @@ packages:
   /dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
+    dev: false
+
+  /destr@2.0.0:
+    resolution: {integrity: sha512-FJ9RDpf3GicEBvzI3jxc2XhHzbqD8p4ANw/1kPsFBfTvP1b7Gn/Lg1vO7R9J4IVgoMbyUmFrFGZafJ1hPZpvlg==}
     dev: false
 
   /detect-newline@3.1.0:
@@ -7768,6 +7778,10 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
     dev: true
+
+  /ufo@1.1.2:
+    resolution: {integrity: sha512-TrY6DsjTQQgyS3E3dBaOXf0TpPD8u9FVrVYmKVegJuFw51n/YB9XPt+U6ydzFG5ZIN7+DIjPbNmXoBj9esYhgQ==}
+    dev: false
 
   /unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}

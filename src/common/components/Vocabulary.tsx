@@ -11,7 +11,7 @@ import { AiOutlineCloseCircle } from 'react-icons/ai'
 import { Select } from 'baseui-sd/select'
 import { FcIdea } from 'react-icons/fc'
 import { toast } from 'react-hot-toast'
-import { translate } from '../translate'
+import { WebAPI } from '../translate'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { RxCopy } from 'react-icons/rx'
 import { format } from 'date-fns'
@@ -156,7 +156,7 @@ interface IVocabularyProps {
 const Vocabulary = (props: IVocabularyProps) => {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
-
+    const webAPI = new WebAPI();
     const [words, setWords] = useState<VocabularyItem[]>([])
     const [selectedWord, setSelectedWord] = useState<VocabularyItem>()
     const [isCollectedWord, setIsCollectedWord] = useState(false)
@@ -265,7 +265,7 @@ const Vocabulary = (props: IVocabularyProps) => {
         articleTxt.current = ''
         const str = frequentWordsArr.join(',')
         try {
-            await translate({
+            await webAPI.translate({
                 mode: 'big-bang',
                 signal,
                 text: str,

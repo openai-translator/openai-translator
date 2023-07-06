@@ -687,6 +687,26 @@ function MyCheckbox({ value, onChange, onBlur }: MyCheckboxProps) {
     )
 }
 
+interface ChatContextCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function ChatContextCheckbox({ value, onChange, onBlur }: ChatContextCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={value}
+            onChange={(e) => {
+                onChange?.(e.target.checked)
+                onBlur?.()
+            }}
+        />
+    )
+}
+
+
 interface RestorePreviousPositionCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -958,6 +978,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         apiModel: utils.defaultAPIModel,
         provider: utils.defaultProvider,
         autoTranslate: utils.defaultAutoTranslate,
+        chatContext: utils.defaultChatContext,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
         alwaysShowIcons: !isTauri,
@@ -1190,6 +1211,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     )}
                 >
                     <MyCheckbox onBlur={onBlur} />
+                </FormItem>
+                 <FormItem name='chatContext' label={t('Set Context')}>
+                    <ChatContextCheckbox onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='autoTranslate' label={t('Auto Translate')}>
                     <AutoTranslateCheckbox onBlur={onBlur} />
