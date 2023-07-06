@@ -22,7 +22,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { InnerSettings } from './Settings'
-import { containerID, documentPadding, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
+import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
@@ -559,7 +559,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [settings?.defaultTranslateMode])
 
     const headerRef = useRef<HTMLDivElement>(null)
-    const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
+    const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
     const iconContainerRef = useRef<HTMLDivElement>(null)
 
@@ -573,7 +573,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { width: headerActionButtonsWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerActionButtonsRef })
 
+    const containerRef = useRef<HTMLDivElement>(null)
     const editorContainerRef = useRef<HTMLDivElement>(null)
+    const translatedContainerRef = useRef<HTMLDivElement>(null)
 
     const translatedContentRef = useRef<HTMLDivElement>(null)
 
@@ -819,10 +821,21 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         const calculateTranslatedContentMaxHeight = (): number => {
             const { innerHeight } = window
             const maxHeight = popupCardInnerContainer ? parseInt(popupCardInnerContainer.style.maxHeight) : innerHeight
+
             const editorHeight = editorContainerRef.current?.offsetHeight || 0
             const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
-            const paddingBottom = showSettings ? 0 : 30
-            return maxHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10 - paddingBottom
+            const headerHeight = headerRef.current?.offsetHeight || 0
+            const { paddingTop, paddingBottom } = getComputedStyle(translatedContainerRef.current as HTMLDivElement)
+            const { paddingTop: containerPaddingTop, paddingBottom: containerPaddingBottom } = getComputedStyle(
+                containerRef.current as HTMLDivElement
+            )
+            const paddingVertical =
+                parseInt(paddingTop) +
+                parseInt(paddingBottom) +
+                parseInt(containerPaddingTop) +
+                parseInt(containerPaddingBottom)
+
+            return maxHeight - headerHeight - editorHeight - actionButtonsHeight - paddingVertical
         }
 
         const resizeHandle: ResizeObserverCallback = _.debounce(() => {
@@ -839,7 +852,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             observer.disconnect()
         }
-    }, [headerHeight, showSettings])
+    }, [showSettings])
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
@@ -1183,6 +1196,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             className={clsx(styles.popupCard, {
                 'yetone-dark': themeType === 'dark',
             })}
+            ref={containerRef}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
                 background: theme.colors.backgroundPrimary,
@@ -1690,7 +1704,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         </div>
                         {detectedOriginalText !== '' && (
-                            <div className={styles.popupCardTranslatedContainer} dir={translatedLanguageDirection}>
+                            <div
+                                className={styles.popupCardTranslatedContainer}
+                                ref={translatedContainerRef}
+                                dir={translatedLanguageDirection}
+                            >
                                 {actionStr && (
                                     <div
                                         className={clsx({
