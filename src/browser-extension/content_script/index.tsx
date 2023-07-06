@@ -1,16 +1,7 @@
 import * as utils from '../../common/utils'
 import React from 'react'
 import icon from '../../common/assets/images/icon.png'
-import {
-    documentPadding,
-    popupCardID,
-    popupCardMaxWidth,
-    popupCardMinHeight,
-    popupCardMinWidth,
-    popupCardOffset,
-    popupThumbID,
-    zIndex,
-} from './consts'
+import { popupCardID, popupCardOffset, popupThumbID, zIndex } from './consts'
 import { Translator } from '../../common/components/Translator'
 import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
 import { create } from 'jss'
@@ -23,7 +14,8 @@ import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
 import { getClientX, getClientY, getPageX, getPageY, UserEventType } from '../../common/user-event'
 import { GlobalSuspense } from '../../common/components/GlobalSuspense'
-import { computePosition, shift, flip, offset, size, type ReferenceElement } from '@floating-ui/dom'
+import { type ReferenceElement } from '@floating-ui/dom'
+import InnerContainer from './InnerContainer'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -65,81 +57,38 @@ async function hidePopupCard() {
     removeContainer()
 }
 
+async function createPopupCard() {
+    const $popupCard = document.createElement('div')
+    $popupCard.id = popupCardID
+    const $container = await getContainer()
+    $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
+    return $popupCard
+}
+
 async function showPopupCard(reference: ReferenceElement, text: string, autoFocus: boolean | undefined = false) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
         $popupThumb.style.visibility = 'hidden'
     }
 
-    let $popupCard: HTMLDivElement | null = await queryPopupCardElement()
-    if (!$popupCard) {
-        $popupCard = document.createElement('div')
-        $popupCard.id = popupCardID
-        $popupCard.style.position = 'fixed'
-        $popupCard.style.zIndex = zIndex
-        $popupCard.style.borderRadius = '4px'
-        $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
-        $popupCard.style.minWidth = `${popupCardMinWidth}px`
-        $popupCard.style.maxWidth = `${popupCardMaxWidth}px`
-        $popupCard.style.lineHeight = '1.6'
-        $popupCard.style.fontSize = '13px'
-        $popupCard.style.color = '#333'
-        $popupCard.style.font =
-            '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
-        const $container = await getContainer()
-        $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
-    }
-    $popupCard.style.display = 'block'
-    $popupCard.style.width = 'max-content'
-    $popupCard.style.minHeight = `${popupCardMinHeight}px`
-    $popupCard.style.opacity = '100'
-
-    async function update() {
-        if (!$popupCard) {
-            return
-        }
-        const { x, y } = await computePosition(reference, $popupCard, {
-            placement: 'bottom',
-            middleware: [
-                shift({ padding: documentPadding }),
-                offset(popupCardOffset),
-                flip(),
-                size({
-                    apply({ availableHeight, elements }) {
-                        Object.assign(elements.floating.style, {
-                            maxHeight: `${availableHeight}px`,
-                        })
-                    },
-                }),
-            ],
-            strategy: 'fixed',
-        })
-        $popupCard.style.left = `${x}px`
-        $popupCard.style.top = `${y}px`
-    }
-
-    const resizeObserver = new ResizeObserver(update)
-    resizeObserver.observe($popupCard)
+    const $popupCard = (await queryPopupCardElement()) ?? (await createPopupCard())
 
     const engine = new Styletron({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        container: $popupCard.parentElement as any,
+        container: $popupCard.parentElement ?? undefined,
         prefix: `${PREFIX}-styletron-`,
     })
     const jss = create().setup({
         ...preset(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        insertionPoint: $popupCard.parentElement as any,
+        insertionPoint: $popupCard.parentElement ?? undefined,
     })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const JSS = JssProvider as any
+    const JSS = JssProvider
     const isUserscript = utils.isUserscript()
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
             <GlobalSuspense>
-                <div>
-                    <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
+                <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
+                    <InnerContainer reference={reference}>
                         <Translator
                             text={text}
                             engine={engine}
@@ -147,8 +96,8 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                             showSettings={isUserscript ? true : false}
                             defaultShowSettings={isUserscript ? true : false}
                         />
-                    </JSS>
-                </div>
+                    </InnerContainer>
+                </JSS>
             </GlobalSuspense>
         </React.StrictMode>
     )

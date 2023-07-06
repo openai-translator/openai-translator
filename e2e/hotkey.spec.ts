@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { getOptionsPageUrl, selectExampleText } from './common'
 import { expect, test } from './fixtures'
-import { containerID, popupCardID } from '../src/browser-extension/content_script/consts'
+import { containerID, popupCardID, popupCardInnerContainerId } from '../src/browser-extension/content_script/consts'
 
 test('hotkey should work', async ({ page, extensionId }) => {
     await test.step('set hotkey', async () => {
@@ -29,5 +29,6 @@ test('hotkey should work', async ({ page, extensionId }) => {
         return container.locator(`#${popupCardID}`)
     })
 
-    await expect(popupCard).toBeVisible()
+    await expect(popupCard).toBeAttached()
+    await expect(page.locator(`#${popupCardInnerContainerId}`)).toBeVisible()
 })

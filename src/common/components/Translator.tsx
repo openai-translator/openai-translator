@@ -16,14 +16,13 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
-import { queryPopupCardElement } from '../../browser-extension/content_script/utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { InnerSettings } from './Settings'
-import { documentPadding } from '../../browser-extension/content_script/consts'
+import { containerID, documentPadding, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
@@ -63,7 +62,6 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
-import { getPageX, getPageY, UserEventType } from '../user-event'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 
@@ -167,6 +165,7 @@ const useStyles = createUseStyles({
         '-ms-user-select': 'none',
         '-webkit-user-select': 'none',
         'user-select': 'none',
+        'pointerEvents': 'none',
     },
     'iconText': (props: IThemedStyleProps) => ({
         color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
@@ -468,6 +467,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
     }, [])
+    const [showSettings, setShowSettings] = useState(false)
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
@@ -807,13 +807,22 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
-    // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
+        const popupCardInnerContainer: HTMLDivElement | null | undefined = document
+            .querySelector(`#${containerID}`)
+            ?.shadowRoot?.querySelector(`#${popupCardInnerContainerId}`)
+
+        if (!popupCardInnerContainer) {
+            return
+        }
+
         const calculateTranslatedContentMaxHeight = (): number => {
             const { innerHeight } = window
+            const maxHeight = popupCardInnerContainer ? parseInt(popupCardInnerContainer.style.maxHeight) : innerHeight
             const editorHeight = editorContainerRef.current?.offsetHeight || 0
             const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
-            return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
+            const paddingBottom = showSettings ? 0 : 30
+            return maxHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10 - paddingBottom
         }
 
         const resizeHandle: ResizeObserverCallback = _.debounce(() => {
@@ -826,119 +835,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }, 500)
 
         const observer = new ResizeObserver(resizeHandle)
-        queryPopupCardElement().then(($popupCard) => {
-            if ($popupCard) {
-                observer.observe($popupCard)
-            }
-        })
+        observer.observe(popupCardInnerContainer)
         return () => {
-            queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
+            observer.disconnect()
         }
-    }, [headerHeight])
-
-    useEffect(() => {
-        if (isDesktopApp()) {
-            return
-        }
-        const $header = headerRef.current
-        if (!$header) {
-            return undefined
-        }
-
-        let $popupCard: HTMLDivElement | null = null
-        ;(async () => {
-            $popupCard = await queryPopupCardElement()
-            if (!$popupCard) {
-                return
-            }
-        })()
-
-        let closed = true
-        let lastPageX = 0
-        let lastPageY = 0
-
-        const dragMouseDown = (e: UserEventType) => {
-            closed = false
-            e = e || window.event
-            e.preventDefault()
-            $popupCard?.addEventListener('mouseup', closeDragElement)
-            document.addEventListener('mousemove', elementDrag)
-            document.addEventListener('mouseup', closeDragElement)
-
-            lastPageX = getPageX(e)
-            lastPageY = getPageY(e)
-            $popupCard?.addEventListener('touchend', closeDragElement)
-            document.addEventListener('touchmove', elementDrag)
-            document.addEventListener('touchend', closeDragElement)
-        }
-
-        const elementDrag = async (e: UserEventType) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-
-            let movement: MovementXY
-            if (e instanceof MouseEvent) {
-                movement = { x: e.movementX, y: e.movementY }
-            } else {
-                const [pageX, pageY] = [getPageX(e), getPageY(e)]
-                movement = { x: pageX - lastPageX, y: pageY - lastPageY }
-                lastPageX = pageX
-                lastPageY = pageY
-            }
-            const [l, t] = overflowCheck($popupCard, movement)
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-        }
-
-        const overflowCheck = ($popupCard: HTMLDivElement, movementXY: MovementXY): number[] => {
-            let { offsetTop: cardTop, offsetLeft: cardLeft } = $popupCard
-            const rect = $popupCard.getBoundingClientRect()
-            const { x: movementX, y: movementY } = movementXY
-            if (
-                rect.left + movementX > documentPadding &&
-                rect.right + movementX < document.documentElement.clientWidth - documentPadding
-            ) {
-                cardLeft = $popupCard.offsetLeft + movementX
-            }
-            if (
-                rect.top + movementY > documentPadding &&
-                rect.bottom + movementY < document.documentElement.clientHeight - documentPadding
-            ) {
-                cardTop = $popupCard.offsetTop + movementY
-            }
-            return [cardLeft, cardTop]
-        }
-
-        const closeDragElement = () => {
-            closed = true
-            $popupCard?.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('mousemove', elementDrag)
-            document.removeEventListener('mouseup', closeDragElement)
-
-            $popupCard?.removeEventListener('touchend', closeDragElement)
-            document.removeEventListener('touchmove', elementDrag)
-            document.removeEventListener('touchend', closeDragElement)
-        }
-
-        $header.addEventListener('mousedown', dragMouseDown)
-        $header.addEventListener('mouseup', closeDragElement)
-
-        const $iconContainer = iconContainerRef.current
-        $iconContainer?.addEventListener('touchstart', dragMouseDown)
-        $iconContainer?.addEventListener('touchend', closeDragElement)
-
-        return () => {
-            $header.removeEventListener('mousedown', dragMouseDown)
-            $header.removeEventListener('mouseup', closeDragElement)
-            $iconContainer?.removeEventListener('touchstart', dragMouseDown)
-            $iconContainer?.removeEventListener('touchend', closeDragElement)
-            closeDragElement()
-        }
-    }, [headerRef])
+    }, [headerHeight, showSettings])
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
@@ -1081,7 +982,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [translateText, editableText, detectedOriginalText, selectedWord])
 
-    const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
             return
