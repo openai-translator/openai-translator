@@ -1,6 +1,6 @@
 import { computePosition, shift, flip, size, offset, type ReferenceElement } from '@floating-ui/dom'
-import { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
-import Draggable from 'react-draggable'
+import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import {
     documentPadding,
     dragRegionSelector,
@@ -39,7 +39,9 @@ const useStyles = createUseStyles({
 export default function InnerContainer({ children, reference }: Props) {
     const styles = useStyles()
 
+    const draggedRef = useRef(false)
     const draggableRef = useRef<HTMLDivElement | null>(null)
+    const [position, setPosition] = useState({ x: 0, y: 0 })
 
     const updatePosition = useCallback(async () => {
         if (!draggableRef.current) {
@@ -68,11 +70,22 @@ export default function InnerContainer({ children, reference }: Props) {
         })
     }, [reference])
 
+    function handleOnDrag(event: DraggableEvent, data: DraggableData) {
+        draggedRef.current = true
+        setPosition({ x: data.x, y: data.y })
+    }
+
     useEffect(() => {
         if (!draggableRef.current) {
             return
         }
-        const resizeObserver = new ResizeObserver(updatePosition)
+        const resizeObserver = new ResizeObserver(() => {
+            if (draggedRef.current) {
+                // do nothing if has been dragged
+            } else {
+                updatePosition()
+            }
+        })
         resizeObserver.observe(draggableRef.current)
         return () => {
             resizeObserver.disconnect()
@@ -80,7 +93,13 @@ export default function InnerContainer({ children, reference }: Props) {
     }, [reference, updatePosition])
 
     return (
-        <Draggable nodeRef={draggableRef} handle={dragRegionSelector} bounds='html'>
+        <Draggable
+            nodeRef={draggableRef}
+            handle={dragRegionSelector}
+            bounds='html'
+            position={position}
+            onDrag={handleOnDrag}
+        >
             <div ref={draggableRef} className={styles.container} id={popupCardInnerContainerId}>
                 {children}
             </div>
