@@ -4,6 +4,7 @@ export const popupCardID = '__yetone-openai-translator-popup-card'
 export const containerID = '__yetone-openai-translator'
 export const popupCardMinWidth = 220
 export const popupCardMinHeight = 220
+export const popupCardMinHeightAfterTranslation = 500
 export const popupCardMaxWidth = 660
 export const documentPadding = 10
 export const popupCardOffset = 7
