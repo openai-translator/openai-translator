@@ -8,7 +8,7 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
-
+import { fetchArkoseToken } from './arkose'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -440,6 +440,10 @@ export async function translate(query: TranslateQuery) {
         }
         const respJson = await resp?.json()
         apiKey = respJson.accessToken
+        let arkoseToken: string | undefined
+            if (settings.apiModel.startsWith('gpt-4') ) {
+                arkoseToken = await fetchArkoseToken()
+            }
         body = {
             action: 'next',
             messages: [
@@ -461,6 +465,7 @@ export async function translate(query: TranslateQuery) {
             ],
             model: settings.apiModel, // 'text-davinci-002-render-sha'
             parent_message_id: uuidv4(),
+            arkose_token: arkoseToken,
         }
     } else {
         const messages = [
