@@ -6,7 +6,7 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
-import { AiOutlineTranslation, AiOutlineFileSync } from 'react-icons/ai'
+import { AiOutlineTranslation, AiOutlineFileSync, AiOutlinePlusSquare } from 'react-icons/ai'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineGrade, MdGrade } from 'react-icons/md'
@@ -1284,6 +1284,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const enableVocabulary = !isUserscript()
 
+    const [conversationIds, setConversationIds] = useState([])
+
+      const handleConversationClick = () => {
+        chrome.storage.local.remove('conversationId', function() {
+            console.log('ConversationId is removed');
+          })
+      };
+
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1779,6 +1787,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             </StatefulTooltip>
                                         </>
                                     )}
+                                        <StatefulTooltip
+                                            content={t('add a new conversation')}
+                                            showArrow
+                                            placement='top'
+                                        >
+                                            <div
+                                                className={styles.actionButton}
+                                                onClick={() => handleConversationClick()}
+                                            >
+                                                <AiOutlinePlusSquare size={15} />
+                                            </div>
+                                        </StatefulTooltip>
                                 </>
                                 <div style={{ marginLeft: 'auto' }}></div>
                                 {!!editableText.length && (
