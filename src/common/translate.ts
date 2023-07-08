@@ -20,11 +20,6 @@ export type APIModel =
     | 'gpt-4-32k-0314'
     | string
 
-interface ConversationContext {
-    conversationId: string
-    lastMessageId: string
-}
-
 interface BaseTranslateQuery {
     text: string
     selectedWord: string
@@ -191,6 +186,15 @@ export class QuoteProcessor {
         // console.debug('---- end of process quote end -----')
         return result
     }
+}
+
+function getConversationId() {
+    return new Promise(function (resolve) {
+        chrome.storage.local.get(['conversationId'], function (result) {
+            const conversationId = result.conversationId?.value
+            resolve(conversationId)
+        })
+    })
 }
 
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
@@ -451,7 +455,7 @@ export class WebAPI {
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
             let arkoseToken: string | undefined
-            if (settings.apiModel.startsWith('gpt-4') ) {
+            if (settings.apiModel.startsWith('gpt-4')) {
                 arkoseToken = await fetchArkoseToken()
             }
             body = {
@@ -470,8 +474,8 @@ export class WebAPI {
                     },
                 ],
                 model: settings.apiModel, // 'text-davinci-002-render-sha'
-                conversation_id: this.conversationContext?.conversationId || undefined,
-                parent_message_id: this.conversationContext?.lastMessageId || uuidv4(),
+                conversation_id: (await getConversationId()) || undefined,
+                parent_message_id: localStorage.getItem('lastMessageId') || uuidv4(),
                 arkose_token: arkoseToken,
                 timezone_offset_min: -480, // adjust this to the correct timezone
             }
@@ -513,83 +517,81 @@ export class WebAPI {
         }
 
         if (settings.provider === 'ChatGPT') {
-            let conversationId = this.conversationContext?.conversationId || undefined
-            let length = 0
-            console.log(conversationId)
-            await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(body),
-                signal: query.signal,
-                onStatusCode: (status) => {
-                    query.onStatusCode?.(status)
-                },
-                onMessage: (msg) => {
-                    let resp
-                    try {
-                        resp = JSON.parse(msg)
-                        this.conversationContext = {
-                            conversationId: resp.conversation_id,
-                            lastMessageId: resp.message.id,
+            let conversationId = await getConversationId() || undefined
+                let length = 0
+                await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(body),
+                    signal: query.signal,
+                    onStatusCode: (status) => {
+                        query.onStatusCode?.(status)
+                    },
+                    onMessage: (msg) => {
+                        let resp
+                        try {
+                            resp = JSON.parse(msg)
+                            localStorage.setItem('lastMessageId',resp.message.id)
+                            if (!conversationId) {
+                                chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
+                            }
+                            // eslint-disable-next-line no-empty
+                        } catch {
+                            query.onFinish('stop')
+                            return
                         }
-                        // eslint-disable-next-line no-empty
-                    } catch {
-                        query.onFinish('stop')
-                        return
-                    }
-                    const { finish_details: finishDetails } = resp.message
-                    if (finishDetails) {
-                        query.onFinish(finishDetails.type)
-                        return
-                    }
-
-                    const { content, author } = resp.message
-                    if (author.role === 'assistant') {
-                        const targetTxt = content.parts.join('')
-                        let textDelta = targetTxt.slice(length)
-                        if (quoteProcessor) {
-                            textDelta = quoteProcessor.processText(textDelta)
+                        const { finish_details: finishDetails } = resp.message
+                        if (finishDetails) {
+                            query.onFinish(finishDetails.type)
+                            return
                         }
-                        query.onMessage({ content: textDelta, role: '', isWordMode })
-                        length = targetTxt.length
-                    }
-                },
-                onError: (err) => {
-                    if (err instanceof Error) {
-                        query.onError(err.message)
-                        return
-                    }
-                    if (typeof err === 'string') {
-                        query.onError(err)
-                        return
-                    }
-                    if (typeof err === 'object') {
-                        const { detail } = err
-                        if (detail) {
-                            const { message } = detail
+                        const { content, author } = resp.message
+                        if (author.role === 'assistant') {
+                            const targetTxt = content.parts.join('')
+                            let textDelta = targetTxt.slice(length)
+                            if (quoteProcessor) {
+                                textDelta = quoteProcessor.processText(textDelta)
+                            }
+                            query.onMessage({ content: textDelta, role: '', isWordMode })
+                            length = targetTxt.length
+                        }
+                    },
+                    onError: (err) => {
+                        if (err instanceof Error) {
+                            query.onError(err.message)
+                            return
+                        }
+                        if (typeof err === 'string') {
+                            query.onError(err)
+                            return
+                        }
+                        if (typeof err === 'object') {
+                            const { detail } = err
+                            if (detail) {
+                                const { message } = detail
+                                if (message) {
+                                    query.onError(`ChatGPT Web: ${message}`)
+                                    return
+                                }
+                            }
+                            query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
+                            return
+                        }
+                        const { error } = err
+                        if (error instanceof Error) {
+                            query.onError(error.message)
+                            return
+                        }
+                        if (typeof error === 'object') {
+                            const { message } = error
                             if (message) {
-                                query.onError(`ChatGPT Web: ${message}`)
+                                query.onError(message)
                                 return
                             }
                         }
-                        query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
-                        return
-                    }
-                    const { error } = err
-                    if (error instanceof Error) {
-                        query.onError(error.message)
-                        return
-                    }
-                    if (typeof error === 'object') {
-                        const { message } = error
-                        if (message) {
-                            query.onError(message)
-                            return
-                        }
-                    }
-                    query.onError('Unknown error')
-                },
-            })
+                        query.onError('Unknown error')
+                    },
+                })
 
             if (conversationId && settings.chatContext === false) {
                 await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {

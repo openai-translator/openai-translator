@@ -1788,7 +1788,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         </>
                                     )}
                                         <StatefulTooltip
-                                            content={t('add a new conversation')}
+                                            content={t('Add new conversation')}
                                             showArrow
                                             placement='top'
                                         >
