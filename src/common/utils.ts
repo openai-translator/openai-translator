@@ -30,6 +30,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     apiModel: 1,
     provider: 1,
     autoTranslate: 1,
+    chatContext: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
     alwaysShowIcons: 1,
@@ -67,6 +68,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.autoTranslate === undefined || settings.autoTranslate === null) {
         settings.autoTranslate = defaultAutoTranslate
+    }
+    if (!settings.chatContext === undefined || settings.autoTranslate === null) {
+        settings.chatContext = defaultChatContext
     }
     if (!settings.defaultTranslateMode) {
         settings.defaultTranslateMode = 'translate'

@@ -43,12 +43,14 @@ export interface IThemedStyleProps {
 }
 
 export interface ISettings {
+    [x: string]: any
     apiKeys: string
     apiURL: string
     apiURLPath: string
     apiModel: string
     provider: Provider | 'OpenAI'
     autoTranslate: boolean
+    chatContext: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string
     alwaysShowIcons: boolean

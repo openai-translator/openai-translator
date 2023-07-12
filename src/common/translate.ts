@@ -197,14 +197,19 @@ function getConversationId() {
     })
 }
 
+function getlastMessageId() {
+    return new Promise(function (resolve) {
+        chrome.storage.local.get(['lastMessageId'], function (result) {
+            const lastMessageId = result.lastMessageId?.value
+            resolve(lastMessageId)
+        })
+    })
+}
+
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 
 export class WebAPI {
-    conversationContext?: ConversationContext
 
-    resetConversation() {
-        this.conversationContext = undefined
-    }
     async translate(query: TranslateQuery) {
         const fetcher = getUniversalFetch()
         let rolePrompt = ''
@@ -455,6 +460,7 @@ export class WebAPI {
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
             let arkoseToken: string | undefined
+            console.log(localStorage.getItem('lastMessageId'))
             if (settings.apiModel.startsWith('gpt-4')) {
                 arkoseToken = await fetchArkoseToken()
             }
@@ -475,7 +481,7 @@ export class WebAPI {
                 ],
                 model: settings.apiModel, // 'text-davinci-002-render-sha'
                 conversation_id: (await getConversationId()) || undefined,
-                parent_message_id: localStorage.getItem('lastMessageId') || uuidv4(),
+                parent_message_id: (await getlastMessageId()) || uuidv4(),
                 arkose_token: arkoseToken,
                 timezone_offset_min: -480, // adjust this to the correct timezone
             }
@@ -531,11 +537,11 @@ export class WebAPI {
                         let resp
                         try {
                             resp = JSON.parse(msg)
-                            localStorage.setItem('lastMessageId',resp.message.id)
+                            chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
+                            console.log(resp.message.id)
                             if (!conversationId) {
                                 chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
                             }
-                            // eslint-disable-next-line no-empty
                         } catch {
                             query.onFinish('stop')
                             return
