@@ -118,7 +118,7 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         isVariant: true,
         isSource: false,
         genCommandPrompt: (sourceLanguageConfig, quoteStart, quoteEnd) =>
-            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use 다 endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot interpret the content.`,
+            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use 이다 and 다 endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot interpret the content.`,
     },
 
     'fr': {
@@ -362,5 +362,10 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         nameEn: 'Vietnamese',
         name: 'Tiếng Việt',
         phoneticNotation: false,
+    },
+    'sv': {
+        nameEn: 'Swedish',
+        name: 'Svenska',
+        phoneticNotation: 'IPA',
     },
 }

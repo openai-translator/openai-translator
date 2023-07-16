@@ -182,12 +182,6 @@ const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=
 
 [LICENSE](./LICENSE)
 
-# 群组
-
-| <a target="_blank" href="https://t.me/+QoVo0d840BVlYzY1">加入 Telegram 群组 (中文)</a> | <a target="_blank" href="https://t.me/+E0ev56MAUFFjOGQ1">Join the Telegram Group (English)</a> |
-| ------------- | ------------- |
-| <img height="260" src="https://user-images.githubusercontent.com/1206493/236804161-fe86b7a8-7f29-4ea1-8e1e-e33ea6807234.jpeg" /> | <img height="260" src="https://user-images.githubusercontent.com/1206493/236804890-34557624-69c7-41c3-8731-6c5d720b07fa.jpeg" /> |
-
 # Star 历史
 
 <p align="center">

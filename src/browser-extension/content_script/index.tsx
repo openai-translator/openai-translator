@@ -12,12 +12,14 @@ import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
+import { getPageX, getPageY, UserEventType } from '../../common/user-event'
+import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 
 let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
 
-async function popupThumbClickHandler(event: MouseEvent) {
+async function popupThumbClickHandler(event: UserEventType) {
     event.stopPropagation()
     event.preventDefault()
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
@@ -101,17 +103,19 @@ async function showPopupCard(x: number, y: number, text: string, autoFocus: bool
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
-            <div>
-                <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <Translator
-                        text={text}
-                        engine={engine}
-                        autoFocus={autoFocus}
-                        showSettings={isUserscript ? true : false}
-                        defaultShowSettings={isUserscript ? true : false}
-                    />
-                </JSS>
-            </div>
+            <GlobalSuspense>
+                <div>
+                    <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
+                        <Translator
+                            text={text}
+                            engine={engine}
+                            autoFocus={autoFocus}
+                            showSettings={isUserscript ? true : false}
+                            defaultShowSettings={isUserscript ? true : false}
+                        />
+                    </JSS>
+                </div>
+            </GlobalSuspense>
         </React.StrictMode>
     )
 }
@@ -140,7 +144,11 @@ async function showPopupThumb(text: string, x: number, y: number) {
         $popupThumb.style.height = '20px'
         $popupThumb.style.overflow = 'hidden'
         $popupThumb.addEventListener('click', popupThumbClickHandler)
+        $popupThumb.addEventListener('touchend', popupThumbClickHandler)
         $popupThumb.addEventListener('mousemove', (event) => {
+            event.stopPropagation()
+        })
+        $popupThumb.addEventListener('touchmove', (event) => {
             event.stopPropagation()
         })
         const $img = document.createElement('img')
@@ -162,9 +170,9 @@ async function showPopupThumb(text: string, x: number, y: number) {
 async function main() {
     const browser = await utils.getBrowser()
     let mousedownTarget: EventTarget | null
-    let lastMouseEvent: MouseEvent | undefined
+    let lastMouseEvent: UserEventType | undefined
 
-    document.addEventListener('mouseup', async (event: MouseEvent) => {
+    const mouseUpHandler = async (event: UserEventType) => {
         lastMouseEvent = event
         const settings = await utils.getSettings()
         if (
@@ -182,27 +190,34 @@ async function main() {
                 }
             } else {
                 if (settings.autoTranslate === true) {
-                    showPopupCard(event.pageX + 7, event.pageY + 7, text)
+                    showPopupCard(getPageX(event) + 7, getPageY(event) + 7, text)
                 } else if (settings.alwaysShowIcons === true) {
-                    showPopupThumb(text, event.pageX + 7, event.pageY + 7)
+                    showPopupThumb(text, getPageX(event) + 7, getPageY(event) + 7)
                 }
             }
         })
-    })
+    }
+
+    document.addEventListener('mouseup', mouseUpHandler)
+    document.addEventListener('touchend', mouseUpHandler)
 
     browser.runtime.onMessage.addListener(function (request) {
         if (request.type === 'open-translator') {
             if (window !== window.top) return
             const text = request.info.selectionText ?? ''
-            showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
+            const pageX = lastMouseEvent ? getPageX(lastMouseEvent) : 0
+            const pageY = lastMouseEvent ? getPageY(lastMouseEvent) : 0
+            showPopupCard(pageX, pageY, text)
         }
     })
 
-    document.addEventListener('mousedown', (event: MouseEvent) => {
+    const mouseDownHandler = async (event: UserEventType) => {
         mousedownTarget = event.target
         hidePopupCard()
         hidePopupThumb()
-    })
+    }
+    document.addEventListener('mousedown', mouseDownHandler)
+    document.addEventListener('touchstart', mouseDownHandler)
 
     const settings = await utils.getSettings()
 

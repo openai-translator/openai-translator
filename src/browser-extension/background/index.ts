@@ -5,7 +5,7 @@ import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '.
 import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
 import { actionInternalService } from '../../common/internal-services/action'
 
-browser.contextMenus.create(
+browser.contextMenus?.create(
     {
         id: 'open-translator',
         type: 'normal',
@@ -17,8 +17,8 @@ browser.contextMenus.create(
     }
 )
 
-browser.contextMenus.onClicked.addListener(async function (info) {
-    const [tab] = await chrome.tabs.query({ active: true })
+browser.contextMenus?.onClicked.addListener(async function (info) {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
     tab.id &&
         browser.tabs.sendMessage(tab.id, {
             type: 'open-translator',

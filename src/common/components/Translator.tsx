@@ -63,6 +63,9 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
+import { getPageX, getPageY, UserEventType } from '../user-event'
+import { countTokens } from '../token'
+import { useLazyEffect } from '../usehooks'
 
 const cache = new LRUCache({
     max: 500,
@@ -256,6 +259,11 @@ const useStyles = createUseStyles({
         '-webkit-user-select': 'none',
         'user-select': 'none',
     }),
+    'tokenCount': {
+        color: '#999',
+        fontSize: '14px',
+        fontFamily: 'monospace',
+    },
     'actionStr': (props: IThemedStyleProps) => ({
         position: 'absolute',
         display: 'flex',
@@ -317,6 +325,12 @@ const useStyles = createUseStyles({
         paddingTop: '6px',
         paddingBottom: '6px',
     }),
+    'enterHint': {
+        color: '#999',
+        fontSize: '14px',
+        transform: 'scale(0.9)',
+        marginRight: '-16px',
+    },
     'writing': {
         'marginLeft': '3px',
         'width': '10px',
@@ -370,6 +384,9 @@ const useStyles = createUseStyles({
         justifyContent: 'center',
         alignItems: 'center',
         background: 'rgba(0,0,0,0.3)',
+    },
+    'flexPlaceHolder': {
+        marginRight: 'auto',
     },
 })
 
@@ -544,6 +561,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
+    const iconContainerRef = useRef<HTMLDivElement>(null)
+
     const logoTextRef = useRef<HTMLDivElement>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
@@ -688,6 +707,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [originalText, setOriginalText] = useState(props.text)
     const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
+    const [tokenCount, setTokenCount] = useState(0)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
@@ -700,6 +720,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setEditableText(detectedOriginalText)
     }, [detectedOriginalText])
+
+    useLazyEffect(
+        () => {
+            setTokenCount(countTokens(editableText, settings?.apiModel))
+        },
+        [editableText],
+        500
+    )
 
     const checkWordCollection = useCallback(async () => {
         try {
@@ -840,25 +868,42 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         })()
 
         let closed = true
+        let lastPageX = 0
+        let lastPageY = 0
 
-        const dragMouseDown = (e: MouseEvent) => {
+        const dragMouseDown = (e: UserEventType) => {
             closed = false
             e = e || window.event
             e.preventDefault()
             $popupCard?.addEventListener('mouseup', closeDragElement)
             document.addEventListener('mousemove', elementDrag)
             document.addEventListener('mouseup', closeDragElement)
+
+            lastPageX = getPageX(e)
+            lastPageY = getPageY(e)
+            $popupCard?.addEventListener('touchend', closeDragElement)
+            document.addEventListener('touchmove', elementDrag)
+            document.addEventListener('touchend', closeDragElement)
         }
 
-        const elementDrag = async (e: MouseEvent) => {
+        const elementDrag = async (e: UserEventType) => {
             e.stopPropagation()
             if (closed || !$popupCard) {
                 return
             }
             e = e || window.event
             e.preventDefault()
-            const { movementX, movementY } = e
-            const [l, t] = overflowCheck($popupCard, { x: movementX, y: movementY })
+
+            let movement: MovementXY
+            if (e instanceof MouseEvent) {
+                movement = { x: e.movementX, y: e.movementY }
+            } else {
+                const [pageX, pageY] = [getPageX(e), getPageY(e)]
+                movement = { x: pageX - lastPageX, y: pageY - lastPageY }
+                lastPageX = pageX
+                lastPageY = pageY
+            }
+            const [l, t] = overflowCheck($popupCard, movement)
             $popupCard.style.top = `${t}px`
             $popupCard.style.left = `${l}px`
         }
@@ -903,16 +948,26 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             $popupCard?.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('mousemove', elementDrag)
             document.removeEventListener('mouseup', closeDragElement)
+
+            $popupCard?.removeEventListener('touchend', closeDragElement)
+            document.removeEventListener('touchmove', elementDrag)
+            document.removeEventListener('touchend', closeDragElement)
         }
 
         $header.addEventListener('mousedown', dragMouseDown)
         $header.addEventListener('mouseup', closeDragElement)
         document.addEventListener('scroll', elementScroll)
 
+        const $iconContainer = iconContainerRef.current
+        $iconContainer?.addEventListener('touchstart', dragMouseDown)
+        $iconContainer?.addEventListener('touchend', closeDragElement)
+
         return () => {
             $header.removeEventListener('mousedown', dragMouseDown)
             $header.removeEventListener('mouseup', closeDragElement)
             document.removeEventListener('scroll', elementScroll)
+            $iconContainer?.removeEventListener('touchstart', dragMouseDown)
+            $iconContainer?.removeEventListener('touchend', closeDragElement)
             closeDragElement()
         }
     }, [headerRef])
@@ -1292,7 +1347,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cursor: isDesktopApp() ? 'default' : 'move',
                         }}
                     >
-                        <div data-tauri-drag-region className={styles.iconContainer}>
+                        <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
                             <img data-tauri-drag-region className={styles.icon} src={icon} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
@@ -1598,17 +1653,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }
                                             onChange={(e) => setEditableText(e.target.value)}
                                             onKeyPress={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    if (!e.shiftKey) {
-                                                        e.preventDefault()
-                                                        e.stopPropagation()
-                                                        if (!activateAction) {
-                                                            setActivateAction(
-                                                                actions?.find((action) => action.mode === 'translate')
-                                                            )
-                                                        }
-                                                        setOriginalText(editableText)
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    if (!activateAction) {
+                                                        setActivateAction(
+                                                            actions?.find((action) => action.mode === 'translate')
+                                                        )
                                                     }
+                                                    setOriginalText(editableText)
                                                 }
                                             }}
                                         />
@@ -1624,11 +1677,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 overflow: 'hidden',
                                             }}
                                         >
-                                            <div
-                                                style={{
-                                                    marginRight: 'auto',
-                                                }}
-                                            />
+                                            <div className={styles.tokenCount}> {tokenCount} </div>
+                                            <div className={styles.flexPlaceHolder} />
                                             <div
                                                 style={{
                                                     display: 'flex',
@@ -1637,17 +1687,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     gap: 10,
                                                 }}
                                             >
-                                                <div
-                                                    style={{
-                                                        color: '#999',
-                                                        fontSize: '12px',
-                                                        transform: 'scale(0.9)',
-                                                        marginRight: '-20px',
-                                                    }}
-                                                >
-                                                    {
-                                                        'Please press <Enter> to submit. Press <Shift+Enter> to start a new line.'
-                                                    }
+                                                <div className={styles.enterHint}>
+                                                    {'Press <Enter> to submit, <Shift+Enter> for a new line.'}
                                                 </div>
                                                 <Button
                                                     size='mini'
