@@ -461,6 +461,7 @@ export async function translate(query: TranslateQuery) {
             ],
             model: settings.apiModel, // 'text-davinci-002-render-sha'
             parent_message_id: uuidv4(),
+            history_and_training_disabled: true,
         }
     } else {
         const messages = [
@@ -500,7 +501,6 @@ export async function translate(query: TranslateQuery) {
     }
 
     if (settings.provider === 'ChatGPT') {
-        let conversationId = ''
         let length = 0
         await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
             method: 'POST',
@@ -518,9 +518,6 @@ export async function translate(query: TranslateQuery) {
                 } catch {
                     query.onFinish('stop')
                     return
-                }
-                if (!conversationId) {
-                    conversationId = resp.conversation_id
                 }
                 const { finish_details: finishDetails } = resp.message
                 if (finishDetails) {
@@ -575,14 +572,6 @@ export async function translate(query: TranslateQuery) {
                 query.onError('Unknown error')
             },
         })
-
-        if (conversationId) {
-            await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
-                method: 'PATCH',
-                headers,
-                body: JSON.stringify({ is_visible: false }),
-            })
-        }
     } else {
         const url = urlJoin(settings.apiURL, settings.apiURLPath)
         await fetchSSE(url, {
