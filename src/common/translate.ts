@@ -522,13 +522,13 @@ export async function translate(query: TranslateQuery) {
                 if (!conversationId) {
                     conversationId = resp.conversation_id
                 }
-                const { finish_details: finishDetails } = resp.message
+                const { finish_details: finishDetails } = resp.messages
                 if (finishDetails) {
                     query.onFinish(finishDetails.type)
                     return
                 }
 
-                const { content, author } = resp.message
+                const { content, author } = resp.messages
                 if (author.role === 'assistant') {
                     const targetTxt = content.parts.join('')
                     let textDelta = targetTxt.slice(length)
