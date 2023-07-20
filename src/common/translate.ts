@@ -1,10 +1,9 @@
 /* eslint-disable camelcase */
 import * as utils from '../common/utils'
-import * as lang from './components/lang/lang'
 import { fetchSSE } from './utils'
 import { urlJoin } from 'url-join-ts'
 import { v4 as uuidv4 } from 'uuid'
-import { getLangConfig, LangCode } from './components/lang/lang'
+import { getLangConfig, getLangName, LangCode } from '../common/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
@@ -217,8 +216,8 @@ export async function translate(query: TranslateQuery) {
     } else {
         const sourceLangCode = query.detectFrom
         const targetLangCode = query.detectTo
-        const sourceLangName = lang.getLangName(sourceLangCode)
-        const targetLangName = lang.getLangName(targetLangCode)
+        const sourceLangName = getLangName(sourceLangCode)
+        const targetLangName = getLangName(targetLangCode)
         console.debug('sourceLang', sourceLangName)
         console.debug('targetLang', targetLangName)
         const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0

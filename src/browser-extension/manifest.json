@@ -25,7 +25,7 @@
         {
             "matches": ["<all_urls>"],
             "all_frames": true,
-            "js": ["/public/cld-min.js", "/src/browser-extension/content_script/index.tsx"]
+            "js": ["/src/browser-extension/content_script/index.tsx"]
         }
     ],
 

@@ -1,4 +1,4 @@
-import { LangCode } from './lang'
+import { LangCode } from '.'
 
 export interface Config {
     name: string
@@ -366,6 +366,11 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     'sv': {
         nameEn: 'Swedish',
         name: 'Svenska',
+        phoneticNotation: 'IPA',
+    },
+    'th': {
+        nameEn: 'Thai',
+        name: 'ไทย',
         phoneticNotation: 'IPA',
     },
 }

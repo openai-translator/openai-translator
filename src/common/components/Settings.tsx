@@ -13,7 +13,7 @@ import { Button } from 'baseui-sd/button'
 import { TranslateMode, Provider, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
-import { supportedLanguages } from './lang/lang'
+import { supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
@@ -593,8 +593,8 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                     if (!models) {
                         return
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     setOptions(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         models.map((model: any) => ({
                             label: `${model.title} (${model.tags.join(', ')})`,
                             id: model.slug,
