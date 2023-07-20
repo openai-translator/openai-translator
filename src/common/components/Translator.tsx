@@ -16,14 +16,13 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
-import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
 import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { InnerSettings } from './Settings'
-import { documentPadding } from '../../browser-extension/content_script/consts'
+import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
@@ -63,7 +62,6 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
-import { getPageX, getPageY, UserEventType } from '../user-event'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 
@@ -167,6 +165,7 @@ const useStyles = createUseStyles({
         '-ms-user-select': 'none',
         '-webkit-user-select': 'none',
         'user-select': 'none',
+        'pointerEvents': 'none',
     },
     'iconText': (props: IThemedStyleProps) => ({
         color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
@@ -468,6 +467,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
     }, [])
+    const [showSettings, setShowSettings] = useState(false)
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
@@ -559,7 +559,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [settings?.defaultTranslateMode])
 
     const headerRef = useRef<HTMLDivElement>(null)
-    const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
+    const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
     const iconContainerRef = useRef<HTMLDivElement>(null)
 
@@ -573,13 +573,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { width: headerActionButtonsWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerActionButtonsRef })
 
+    const containerRef = useRef<HTMLDivElement>(null)
     const editorContainerRef = useRef<HTMLDivElement>(null)
+    const translatedContainerRef = useRef<HTMLDivElement>(null)
 
     const translatedContentRef = useRef<HTMLDivElement>(null)
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
-
-    const scrollYRef = useRef<number>(0)
 
     const hasActivateAction = activateAction !== undefined
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
@@ -809,168 +809,50 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
-    // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
-        const calculateTranslatedContentMaxHeight = (): number => {
-            const { innerHeight } = window
-            const editorHeight = editorContainerRef.current?.offsetHeight || 0
-            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
-            return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
+        const popupCardInnerContainer: HTMLDivElement | null | undefined = document
+            .querySelector(`#${containerID}`)
+            ?.shadowRoot?.querySelector(`#${popupCardInnerContainerId}`)
+
+        if (!popupCardInnerContainer) {
+            return
         }
 
-        const resizeHandle: ResizeObserverCallback = _.debounce((entries) => {
-            // Listen for element height changes
-            for (const entry of entries) {
-                const $popupCard = entry.target as HTMLElement
-                const [maxX, maxY] = calculateMaxXY($popupCard)
-                const yList = [maxY, $popupCard.offsetTop].filter((item) => item > documentPadding)
-                $popupCard.style.top = `${Math.min(...yList) || documentPadding}px`
-                const xList = [maxX, $popupCard.offsetLeft].filter((item) => item > documentPadding)
-                $popupCard.style.left = `${Math.min(...xList) || documentPadding}px`
+        const calculateTranslatedContentMaxHeight = (): number => {
+            const { innerHeight } = window
+            const maxHeight = popupCardInnerContainer ? parseInt(popupCardInnerContainer.style.maxHeight) : innerHeight
 
-                const $translatedContent = translatedContentRef.current
-                if ($translatedContent) {
-                    const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
-                    $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
-                }
+            const editorHeight = editorContainerRef.current?.offsetHeight || 0
+            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
+            const headerHeight = headerRef.current?.offsetHeight || 0
+            const { paddingTop, paddingBottom } = getComputedStyle(translatedContainerRef.current as HTMLDivElement)
+            const { paddingTop: containerPaddingTop, paddingBottom: containerPaddingBottom } = getComputedStyle(
+                containerRef.current as HTMLDivElement
+            )
+            const paddingVertical =
+                parseInt(paddingTop) +
+                parseInt(paddingBottom) +
+                parseInt(containerPaddingTop) +
+                parseInt(containerPaddingBottom)
+
+            return maxHeight - headerHeight - editorHeight - actionButtonsHeight - paddingVertical
+        }
+
+        const resizeHandle: ResizeObserverCallback = _.debounce(() => {
+            // Listen for element height changes
+            const $translatedContent = translatedContentRef.current
+            if ($translatedContent) {
+                const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
+                $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
             }
         }, 500)
 
         const observer = new ResizeObserver(resizeHandle)
-        queryPopupCardElement().then(($popupCard) => {
-            if ($popupCard) {
-                const rect = $popupCard.getBoundingClientRect()
-                const x = Math.min(window.innerWidth - 600, rect.x)
-                $popupCard.style.left = x + 'px'
-                observer.observe($popupCard)
-            }
-        })
+        observer.observe(popupCardInnerContainer)
         return () => {
-            queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
+            observer.disconnect()
         }
-    }, [headerHeight])
-
-    useEffect(() => {
-        if (isDesktopApp()) {
-            return
-        }
-        const $header = headerRef.current
-        if (!$header) {
-            return undefined
-        }
-
-        let $popupCard: HTMLDivElement | null = null
-        ;(async () => {
-            $popupCard = await queryPopupCardElement()
-            if (!$popupCard) {
-                return
-            }
-        })()
-
-        let closed = true
-        let lastPageX = 0
-        let lastPageY = 0
-
-        const dragMouseDown = (e: UserEventType) => {
-            closed = false
-            e = e || window.event
-            e.preventDefault()
-            $popupCard?.addEventListener('mouseup', closeDragElement)
-            document.addEventListener('mousemove', elementDrag)
-            document.addEventListener('mouseup', closeDragElement)
-
-            lastPageX = getPageX(e)
-            lastPageY = getPageY(e)
-            $popupCard?.addEventListener('touchend', closeDragElement)
-            document.addEventListener('touchmove', elementDrag)
-            document.addEventListener('touchend', closeDragElement)
-        }
-
-        const elementDrag = async (e: UserEventType) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-
-            let movement: MovementXY
-            if (e instanceof MouseEvent) {
-                movement = { x: e.movementX, y: e.movementY }
-            } else {
-                const [pageX, pageY] = [getPageX(e), getPageY(e)]
-                movement = { x: pageX - lastPageX, y: pageY - lastPageY }
-                lastPageX = pageX
-                lastPageY = pageY
-            }
-            const [l, t] = overflowCheck($popupCard, movement)
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-        }
-
-        const overflowCheck = ($popupCard: HTMLDivElement, movementXY: MovementXY): number[] => {
-            let { offsetTop: cardTop, offsetLeft: cardLeft } = $popupCard
-            const rect = $popupCard.getBoundingClientRect()
-            const { x: movementX, y: movementY } = movementXY
-            if (
-                rect.left + movementX > documentPadding &&
-                rect.right + movementX < document.documentElement.clientWidth - documentPadding
-            ) {
-                cardLeft = $popupCard.offsetLeft + movementX
-            }
-            if (
-                rect.top + movementY > documentPadding &&
-                rect.bottom + movementY < document.documentElement.clientHeight - documentPadding
-            ) {
-                cardTop = $popupCard.offsetTop + movementY
-            }
-            return [cardLeft, cardTop]
-        }
-
-        const elementScroll = async (e: globalThis.Event) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                scrollYRef.current = window.scrollY
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-            const { scrollY } = window
-            const movementY = scrollY - scrollYRef.current
-            const [l, t] = overflowCheck($popupCard, { x: 0, y: movementY })
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-            scrollYRef.current = scrollY
-        }
-
-        const closeDragElement = () => {
-            closed = true
-            $popupCard?.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('mousemove', elementDrag)
-            document.removeEventListener('mouseup', closeDragElement)
-
-            $popupCard?.removeEventListener('touchend', closeDragElement)
-            document.removeEventListener('touchmove', elementDrag)
-            document.removeEventListener('touchend', closeDragElement)
-        }
-
-        $header.addEventListener('mousedown', dragMouseDown)
-        $header.addEventListener('mouseup', closeDragElement)
-        document.addEventListener('scroll', elementScroll)
-
-        const $iconContainer = iconContainerRef.current
-        $iconContainer?.addEventListener('touchstart', dragMouseDown)
-        $iconContainer?.addEventListener('touchend', closeDragElement)
-
-        return () => {
-            $header.removeEventListener('mousedown', dragMouseDown)
-            $header.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('scroll', elementScroll)
-            $iconContainer?.removeEventListener('touchstart', dragMouseDown)
-            $iconContainer?.removeEventListener('touchend', closeDragElement)
-            closeDragElement()
-        }
-    }, [headerRef])
+    }, [showSettings])
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
@@ -1113,7 +995,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [translateText, editableText, detectedOriginalText, selectedWord])
 
-    const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
             return
@@ -1315,6 +1196,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             className={clsx(styles.popupCard, {
                 'yetone-dark': themeType === 'dark',
             })}
+            ref={containerRef}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
                 background: theme.colors.backgroundPrimary,
@@ -1822,7 +1704,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         </div>
                         {detectedOriginalText !== '' && (
-                            <div className={styles.popupCardTranslatedContainer} dir={translatedLanguageDirection}>
+                            <div
+                                className={styles.popupCardTranslatedContainer}
+                                ref={translatedContainerRef}
+                                dir={translatedLanguageDirection}
+                            >
                                 {actionStr && (
                                     <div
                                         className={clsx({
