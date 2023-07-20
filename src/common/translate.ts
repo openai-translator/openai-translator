@@ -520,12 +520,12 @@ export async function translate(query: TranslateQuery) {
                     return
                 }
 
-                if (!resp.message) {
+                if (resp.is_completion) {
+                    query.onFinish('stop')
                     return
                 }
 
-                if (resp.is_completion) {
-                    query.onFinish('stop')
+                if (!resp.message) {
                     return
                 }
 
