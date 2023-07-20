@@ -522,6 +522,11 @@ export async function translate(query: TranslateQuery) {
                 if (!conversationId) {
                     conversationId = resp.conversation_id
                 }
+
+                if (!resp.message) {
+                    return
+                }
+
                 const { finish_details: finishDetails } = resp.message
                 if (finishDetails) {
                     query.onFinish(finishDetails.type)
