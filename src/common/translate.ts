@@ -519,9 +519,13 @@ export async function translate(query: TranslateQuery) {
                     query.onFinish('stop')
                     return
                 }
-                const { finish_details: finishDetails } = resp.message
-                if (finishDetails) {
-                    query.onFinish(finishDetails.type)
+
+                if (resp.is_completion) {
+                    query.onFinish('stop')
+                    return
+                }
+
+                if (!resp.message) {
                     return
                 }
 
