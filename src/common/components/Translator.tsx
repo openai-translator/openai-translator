@@ -292,11 +292,16 @@ const useStyles = createUseStyles({
         },
     },
     'popupCardTranslatedContentContainer': (props: IThemedStyleProps) => ({
-        fontSize: '15px',
-        marginTop: '-14px',
-        display: 'flex',
-        overflowY: 'auto',
-        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        'fontSize': '15px',
+        'marginTop': '-14px',
+        'display': 'flex',
+        'overflowY': 'auto',
+        'color': props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        '& *': {
+            '-ms-user-select': 'text',
+            '-webkit-user-select': 'text',
+            'user-select': 'text',
+        },
     }),
     'errorMessage': {
         display: 'flex',
