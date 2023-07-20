@@ -67,7 +67,7 @@ jobs:
       - name: Change Version
         env:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
-        run: make change-version
+        run: make change-version change-package-version
 
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
@@ -149,7 +149,7 @@ jobs:
       - name: Change Version
         env:
           VERSION: "${{ steps.get_version.outputs.version-without-v }}"
-        run: make change-version
+        run: make change-version change-package-version
 
       - uses: actions/download-artifact@v3
         with:
