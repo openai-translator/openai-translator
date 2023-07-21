@@ -29,10 +29,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             {
                 matches: ['<all_urls>'],
                 all_frames: true,
-                js: [
-                    process.env.NODE_ENV === 'development' ? 'cld-min.js' : 'public/cld-min.js',
-                    'src/browser-extension/content_script/index.tsx',
-                ],
+                js: ['src/browser-extension/content_script/index.tsx'],
             },
         ],
 
