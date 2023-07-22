@@ -63,6 +63,21 @@ async function createPopupCard() {
     $popupCard.id = popupCardID
     const $container = await getContainer()
     $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
+    if ($container.shadowRoot) {
+        const shadowRoot = $container.shadowRoot
+        if (import.meta.hot) {
+            const { addViteStyleTarget } = await import('@samrum/vite-plugin-web-extension/client')
+            await addViteStyleTarget(shadowRoot)
+        } else {
+            const browser = await utils.getBrowser()
+            import.meta.PLUGIN_WEB_EXT_CHUNK_CSS_PATHS.forEach((cssPath) => {
+                const styleEl = document.createElement('link')
+                styleEl.setAttribute('rel', 'stylesheet')
+                styleEl.setAttribute('href', browser.runtime.getURL(cssPath))
+                shadowRoot.appendChild(styleEl)
+            })
+        }
+    }
     return $popupCard
 }
 
