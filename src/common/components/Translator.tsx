@@ -16,6 +16,7 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { LuStars, LuStarOff } from 'react-icons/lu'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -34,7 +35,7 @@ import type { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
-import LRUCache from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { speak } from '../tts'
@@ -717,6 +718,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
+    const [isAutoCollectOn, setIsAutoCollectOn] = useState(false)
 
     useEffect(() => {
         setOriginalText(props.text)
@@ -861,6 +863,37 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
+    const onWordCollection = useCallback(async () => {
+        try {
+            if (isCollectedWord) {
+                const wordInfo = await vocabularyService.getItem(editableText.trim())
+                await vocabularyService.deleteItem(wordInfo?.word ?? '')
+                setIsCollectedWord(false)
+                setCollectedWordTotal((t: number) => t - 1)
+            } else {
+                await vocabularyService.putItem({
+                    word: editableText,
+                    reviewCount: 1,
+                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
+                    updatedAt: new Date().valueOf().toString(),
+                    createdAt: new Date().valueOf().toString(),
+                })
+                setIsCollectedWord(true)
+                setCollectedWordTotal((t: number) => t + 1)
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText])
+
+    const autoCollect = useCallback(() => {
+        isWordMode && isAutoCollectOn && !isCollectedWord && onWordCollection()
+    }, [isWordMode, isAutoCollectOn, isCollectedWord, onWordCollection])
+    const autoCollectRef = useRef(autoCollect)
+    useEffect(() => {
+        autoCollectRef.current = autoCollect
+    }, [autoCollect])
+
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
@@ -907,6 +940,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
+                    autoCollectRef.current()
                 }
             }
             beforeTranslate()
@@ -1116,29 +1150,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setIsOCRProcessing(false)
 
         await (await worker).terminate()
-    }
-
-    const onWordCollection = async () => {
-        try {
-            if (isCollectedWord) {
-                const wordInfo = await vocabularyService.getItem(editableText.trim())
-                await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setIsCollectedWord(false)
-                setCollectedWordTotal((t: number) => t - 1)
-            } else {
-                await vocabularyService.putItem({
-                    word: editableText,
-                    reviewCount: 1,
-                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
-                    updatedAt: new Date().valueOf().toString(),
-                    createdAt: new Date().valueOf().toString(),
-                })
-                setIsCollectedWord(true)
-                setCollectedWordTotal((t: number) => t + 1)
-            }
-        } catch (e) {
-            console.error(e)
-        }
     }
 
     const onCsvExport = async () => {
@@ -1828,13 +1839,34 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         className={styles.actionButton}
                                                         onClick={handleTranslatedSpeakAction}
                                                     >
-                                                        {isSpeakingTranslatedText ? (
-                                                            <SpeakerMotion />
-                                                        ) : (
-                                                            <RxSpeakerLoud size={15} />
-                                                        )}
+                                                        <div
+                                                            onClick={() => forceTranslate()}
+                                                            className={styles.actionButton}
+                                                        >
+                                                            {isSpeakingTranslatedText ? (
+                                                                <SpeakerMotion />
+                                                            ) : (
+                                                                <RxSpeakerLoud size={15} />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </Tooltip>
+                                                {isWordMode && (
+                                                    <Tooltip content={t('Auto collect')} placement='bottom'>
+                                                        <div
+                                                            className={styles.actionButton}
+                                                            onClick={() => {
+                                                                setIsAutoCollectOn((prevState) => !prevState)
+                                                            }}
+                                                        >
+                                                            {isAutoCollectOn ? (
+                                                                <LuStars size={15} />
+                                                            ) : (
+                                                                <LuStarOff size={15} />
+                                                            )}
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
                                                 <Tooltip content={t('Copy to clipboard')} placement='bottom'>
                                                     <div className={styles.actionButton}>
                                                         <CopyButton text={translatedText} styles={styles}></CopyButton>
