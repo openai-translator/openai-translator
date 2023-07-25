@@ -780,9 +780,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
 
         ;(async () => {
-            let sourceLang_ = sourceLang
             if(settings?.autoDetectSourceLanguage) {
-                sourceLang_ = await detectLang(originalText)
+                const sourceLang_ = await detectLang(originalText)
                 setSourceLang(sourceLang_)
                 setTargetLang((targetLang_) => {
                     if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
