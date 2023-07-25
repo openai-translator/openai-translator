@@ -568,7 +568,11 @@ export async function translate(query: TranslateQuery) {
                 if (typeof error === 'object') {
                     const { message } = error
                     if (message) {
-                        query.onError(message)
+                        if (typeof message === 'string') {
+                            query.onError(message)
+                        } else {
+                            query.onError(JSON.stringify(message))
+                        }
                         return
                     }
                 }
@@ -648,7 +652,11 @@ export async function translate(query: TranslateQuery) {
                 if (typeof error === 'object') {
                     const { message } = error
                     if (message) {
-                        query.onError(message)
+                        if (typeof message === 'string') {
+                            query.onError(message)
+                        } else {
+                            query.onError(JSON.stringify(message))
+                        }
                         return
                     }
                 }
