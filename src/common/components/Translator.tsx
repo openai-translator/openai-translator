@@ -754,12 +754,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [editableText])
 
     useEffect(() => {
-        if (isWordMode && !isLoading) {
-            checkWordCollection()
-        }
-    }, [isWordMode, isLoading, checkWordCollection])
-
-    useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
     }, [translatedText])
     const [isSpeakingTranslatedText, setIsSpeakingTranslatedText] = useState(false)
@@ -866,11 +860,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const onWordCollection = useCallback(async () => {
         try {
             if (isCollectedWord) {
+                setIsCollectedWord(false)
                 const wordInfo = await vocabularyService.getItem(editableText.trim())
                 await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setIsCollectedWord(false)
                 setCollectedWordTotal((t: number) => t - 1)
             } else {
+                setIsCollectedWord(true)
                 await vocabularyService.putItem({
                     word: editableText,
                     reviewCount: 1,
@@ -878,17 +873,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     updatedAt: new Date().valueOf().toString(),
                     createdAt: new Date().valueOf().toString(),
                 })
-                setIsCollectedWord(true)
                 setCollectedWordTotal((t: number) => t + 1)
             }
         } catch (e) {
             console.error(e)
         }
-    }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText])
+        checkWordCollection()
+    }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText, checkWordCollection])
 
-    const autoCollect = useCallback(() => {
+    const autoCollect = useCallback(async () => {
+        await checkWordCollection()
         isWordMode && isAutoCollectOn && !isCollectedWord && onWordCollection()
-    }, [isWordMode, isAutoCollectOn, isCollectedWord, onWordCollection])
+    }, [isWordMode, isAutoCollectOn, isCollectedWord, onWordCollection, checkWordCollection])
     const autoCollectRef = useRef(autoCollect)
     useEffect(() => {
         autoCollectRef.current = autoCollect
@@ -1157,7 +1153,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             const words = await vocabularyService.listItems()
             await exportToCsv<VocabularyItem>(`openai-translator-collection-${new Date().valueOf()}`, words)
             if (isDesktopApp()) {
-                toast(t('csv file saved on Desktop'), {
+                toast(t('CSV file saved on Desktop'), {
                     duration: 5000,
                     icon: '👏',
                 })

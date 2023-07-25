@@ -1110,7 +1110,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
-                <FormItem name='provider' label={t('Default Service Provider')} required>
+                <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
                 {values.provider !== 'ChatGPT' && (
@@ -1209,15 +1209,15 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                     <RestorePreviousPositionCheckbox onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
+                <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                     <SelectInputElementsCheckbox onBlur={onBlur} />
                 </FormItem>
                 {isTauri && (
-                    <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                    <FormItem name='runAtStartup' label={t('Run at startup')}>
                         <RunAtStartupCheckbox onBlur={onBlur} />
                     </FormItem>
                 )}
-                <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
+                <FormItem name='defaultTargetLanguage' label={t('Default target language')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>
