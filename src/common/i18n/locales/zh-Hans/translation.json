@@ -91,6 +91,7 @@
   "Create sth": "创建 {{0}}",
   "Delete sth": "删除 {{0}}",
   "Are you sure to delete sth?": "确定要删除 {{0}} 吗？",
+  "Press <Enter> to submit, <Shift+Enter> for a new line.": "按回车提交，按Shift+回车换行",
   "Ok": "确定",
   "Cancel": "取消",
   "Submit": "提交",

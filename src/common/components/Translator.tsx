@@ -333,7 +333,7 @@ const useStyles = createUseStyles({
         color: '#999',
         fontSize: '14px',
         transform: 'scale(0.9)',
-        marginRight: '-16px',
+        marginRight: '-10px',
     },
     'writing': {
         'marginLeft': '3px',
@@ -1575,7 +1575,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }}
                                             >
                                                 <div className={styles.enterHint}>
-                                                    {'Press <Enter> to submit, <Shift+Enter> for a new line.'}
+                                                    {t('Press <Enter> to submit, <Shift+Enter> for a new line.')}
                                                 </div>
                                                 <Button
                                                     size='mini'
