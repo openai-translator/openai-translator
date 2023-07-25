@@ -12,6 +12,7 @@ export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/se
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 
 export const defaultAutoTranslate = false
+export const defaultAutoDetectSourceLanguage = true
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
@@ -30,6 +31,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     apiModel: 1,
     provider: 1,
     autoTranslate: 1,
+    autoDetectSourceLanguage: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
     alwaysShowIcons: 1,
@@ -67,6 +69,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.autoTranslate === undefined || settings.autoTranslate === null) {
         settings.autoTranslate = defaultAutoTranslate
+    }
+    if (settings.autoDetectSourceLanguage === undefined || settings.autoDetectSourceLanguage === null) {
+        settings.autoDetectSourceLanguage = defaultAutoDetectSourceLanguage
     }
     if (!settings.defaultTranslateMode) {
         settings.defaultTranslateMode = 'translate'

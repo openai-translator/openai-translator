@@ -780,24 +780,33 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
 
         ;(async () => {
-            const sourceLang_ = await detectLang(originalText)
-            setSourceLang(sourceLang_)
-            setTargetLang((targetLang_) => {
-                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
-                    return (
-                        (sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
-                            ? 'en'
-                            : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
-                    )
-                }
-                if (!targetLang_) {
-                    if (settings?.defaultTargetLanguage) {
-                        return settings.defaultTargetLanguage as LangCode
+            let sourceLang_ = sourceLang
+            if(settings?.autoDetectSourceLanguage) {
+                sourceLang_ = await detectLang(originalText)
+                setSourceLang(sourceLang_)
+                setTargetLang((targetLang_) => {
+                    if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
+                        return (
+                            (sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
+                                ? 'en'
+                                : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
+                        )
                     }
-                    return sourceLang_
+                    if (!targetLang_) {
+                        if (settings?.defaultTargetLanguage) {
+                            return settings.defaultTargetLanguage as LangCode
+                        }
+                        return sourceLang_
+                    }
+                    return targetLang_
+                })
+            }
+            else {
+                if (!targetLang){
+                    setTargetLang(settings?.defaultTargetLanguage as LangCode)
                 }
-                return targetLang_
-            })
+            }
+            
             setDetectedOriginalText(originalText)
         })()
     }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, props.uuid])

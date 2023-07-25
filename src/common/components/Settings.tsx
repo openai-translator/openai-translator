@@ -680,6 +680,25 @@ function AutoTranslateCheckbox({ value, onChange, onBlur }: AutoTranslateCheckbo
     )
 }
 
+interface AutoDetectSourceLanguageCheckboxProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function AutoDetectSourceLanguageCheckbox({ value, onChange, onBlur }: AutoDetectSourceLanguageCheckboxProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={value}
+            onChange={(e) => {
+                onChange?.(e.target.checked)
+                onBlur?.()
+            }}
+        />
+    )
+}
+
 interface MyCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -970,6 +989,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         apiModel: utils.defaultAPIModel,
         provider: utils.defaultProvider,
         autoTranslate: utils.defaultAutoTranslate,
+        autoDetectSourceLanguage: utils.defaultAutoDetectSourceLanguage,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
         alwaysShowIcons: !isTauri,
@@ -1205,6 +1225,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='autoTranslate' label={t('Auto Translate')}>
                     <AutoTranslateCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='autoDetectSourceLanguage' label={t('Auto Detect Source Language')}>
+                    <AutoDetectSourceLanguageCheckbox onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                     <RestorePreviousPositionCheckbox onBlur={onBlur} />
