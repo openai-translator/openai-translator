@@ -201,8 +201,12 @@ export async function detectLang(text: string): Promise<LangCode> {
             langWeights.de += 1
         }
     }
+    if (langWeights.zh > 0 && langWeights.zh === langWeights.ja) {
+        // fix pure Chinese text
+        langWeights.zh += 1
+    }
     if (langWeights.en > 0 && langWeights.en === langWeights.es && langWeights.en === langWeights.fr && langWeights.en === langWeights.de) {
-        // fix pure english text
+        // fix pure English text
         langWeights.en += 1
     }
     let langWeightResult = Object.entries(langWeights).sort((a, b) => b[1] - a[1])[0]
