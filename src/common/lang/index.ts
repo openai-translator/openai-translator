@@ -138,7 +138,7 @@ export async function detectLang(text: string): Promise<LangCode> {
     if (text.length > 200) {
         text = text.slice(0, 200)
     }
-    let langWeights = {
+    const langWeights = {
         en: 0,
         zh: 0,
         ko: 0,
@@ -149,9 +149,11 @@ export async function detectLang(text: string): Promise<LangCode> {
         ru: 0,
         es: 0,
         fr: 0,
-        de: 0        
-    };
-    for (let char of text.split('')) {
+        de: 0,
+    }
+    const VietnameseCharsRegEx =
+        /[\u0103\u00E2\u00EA\u00F4\u01A1\u01B0\u1EA1\u1EB9\u1EC7\u1ED3\u1EDD\u1EF3\u1EA3\u1EBB\u1EC9\u1ED5\u1EDF\u1EF5\u1EA7\u1EBF\u1EC5\u1ED1\u1EDB\u1EF1\u1EA5\u1EBD\u1EC3\u1ECF\u1ED9\u1EE3\u1EF7\u1EA9\u1EC1\u1ED7\u1EE1\u1EF9\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF]/
+    for (const char of text.split('')) {
         if (/[\u4e00-\u9fa5]/.test(char)) {
             // Detect Chinese
             langWeights.zh += 1
@@ -161,7 +163,7 @@ export async function detectLang(text: string): Promise<LangCode> {
             // Detect Korean
             langWeights.ko += 1
         }
-        if (/[\u0103\u00E2\u00EA\u00F4\u01A1\u01B0\u1EA1\u1EB9\u1EC7\u1ED3\u1EDD\u1EF3\u1EA3\u1EBB\u1EC9\u1ED5\u1EDF\u1EF5\u1EA7\u1EBF\u1EC5\u1ED1\u1EDB\u1EF1\u1EA5\u1EBD\u1EC3\u1ECF\u1ED9\u1EE3\u1EF7\u1EA9\u1EC1\u1ED7\u1EE1\u1EF9\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF]/.test(char)) {
+        if (VietnameseCharsRegEx.test(char)) {
             // Detect Vietnamese
             langWeights.vi += 1
         }
@@ -193,7 +195,7 @@ export async function detectLang(text: string): Promise<LangCode> {
             // Detect German
             langWeights.de += 1
         }
-        if(/[a-zA-Z]/.test(char)) {
+        if (/[a-zA-Z]/.test(char)) {
             // Detect English
             langWeights.en += 1
             langWeights.es += 1
@@ -205,18 +207,21 @@ export async function detectLang(text: string): Promise<LangCode> {
         // fix pure Chinese text
         langWeights.zh += 1
     }
-    if (langWeights.en > 0 && langWeights.en === langWeights.es && langWeights.en === langWeights.fr && langWeights.en === langWeights.de) {
+    if (
+        langWeights.en > 0 &&
+        langWeights.en === langWeights.es &&
+        langWeights.en === langWeights.fr &&
+        langWeights.en === langWeights.de
+    ) {
         // fix pure English text
         langWeights.en += 1
     }
-    let langWeightResult = Object.entries(langWeights).sort((a, b) => b[1] - a[1])[0]
+    const langWeightResult = Object.entries(langWeights).sort((a, b) => b[1] - a[1])[0]
     if (langWeightResult[1] === 0) {
         return 'en'
-    }
-    else if (langWeightResult[0] === 'zh') {
+    } else if (langWeightResult[0] === 'zh') {
         return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
-    }
-    else {
+    } else {
         return langWeightResult[0] as LangCode
     }
 }
