@@ -780,7 +780,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
 
         ;(async () => {
-            if(settings?.autoDetectSourceLanguage) {
+            if (settings?.autoDetectSourceLanguage) {
                 const sourceLang_ = await detectLang(originalText)
                 setSourceLang(sourceLang_)
                 setTargetLang((targetLang_) => {
@@ -799,13 +799,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     }
                     return targetLang_
                 })
-            }
-            else {
-                if (!targetLang){
+            } else {
+                if (!targetLang) {
                     setTargetLang(settings?.defaultTargetLanguage as LangCode)
                 }
             }
-            
             setDetectedOriginalText(originalText)
         })()
     }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, props.uuid])
