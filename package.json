@@ -8,7 +8,7 @@
     "dev-tauri-renderer": "vite -c vite.config.tauri.ts",
     "build-tauri": "npm run build-tauri-renderer && tauri build",
     "dev-tauri": "tauri dev",
-    "dev-chromium": "NODE_ENV=development vite build -c vite.config.chromium.ts --watch",
+    "dev-chromium": "vite -c vite.config.chromium.ts",
     "dev-firefox": "NODE_ENV=development vite build -c vite.config.firefox.ts --watch",
     "build-browser-extension": "tsc && make build-browser-extension",
     "build-userscript": "make build-userscript",
@@ -82,6 +82,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.34.3",
+    "@rollup/plugin-typescript": "^11.1.2",
     "@samrum/vite-plugin-web-extension": "^5.0.0",
     "@tauri-apps/cli": "^1.3.1",
     "@types/chrome": "0.0.237",

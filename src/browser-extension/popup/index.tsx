@@ -1,3 +1,4 @@
+import '../enable-dev-hmr'
 import { createRoot } from 'react-dom/client'
 import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'

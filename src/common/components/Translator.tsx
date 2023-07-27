@@ -20,7 +20,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
+import { defaultAPIURL, exportToCsv, getAssetUrl, isDesktopApp, isTauri, isUserscript } from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -1235,7 +1235,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         }}
                     >
                         <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={icon} />
+                            <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
                             </div>
@@ -1498,7 +1498,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </div>
                                                 {showOCRProcessing && (
                                                     <div>
-                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
+                                                        <img
+                                                            src={
+                                                                isOCRProcessing
+                                                                    ? getAssetUrl(rocket)
+                                                                    : getAssetUrl(partyPopper)
+                                                            }
+                                                            width='20'
+                                                        />
                                                     </div>
                                                 )}
                                             </div>

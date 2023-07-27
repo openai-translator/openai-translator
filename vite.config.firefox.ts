@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import webExtension from '@samrum/vite-plugin-web-extension'
-import manifest from './src/browser-extension/manifest.firefox.json'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { getManifest } from './src/browser-extension/manifest'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -11,7 +11,7 @@ export default defineConfig({
         tsconfigPaths(),
         react(),
         webExtension({
-            manifest: manifest as chrome.runtime.Manifest,
+            manifest: getManifest('firefox'),
             useDynamicUrlWebAccessibleResources: false,
         }),
     ],

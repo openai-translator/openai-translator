@@ -1075,13 +1075,13 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     alignItems: 'center',
                     padding: '15px 25px',
                     color: '#333',
-                    background: `url(${beams}) no-repeat center center`,
+                    background: `url(${utils.getAssetUrl(beams)}) no-repeat center center`,
                     gap: 10,
                     boxSizing: 'border-box',
                 }}
                 data-tauri-drag-region
             >
-                <img width='22' src={icon} alt='logo' />
+                <img width='22' src={utils.getAssetUrl(icon)} alt='logo' />
                 <h2>
                     OpenAI Translator
                     {AppConfig?.version ? (
