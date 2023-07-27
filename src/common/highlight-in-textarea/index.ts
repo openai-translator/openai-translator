@@ -39,6 +39,7 @@ export class HighlightInTextarea {
 
         this.highlights = document.createElement('div')
         this.highlights.classList.add(this.ID + '-highlights', this.ID + '-content')
+        this.highlights.style.fontSize = window.getComputedStyle(this.el, null).getPropertyValue('font-size')
 
         this.backdrop = document.createElement('div')
         this.backdrop.classList.add(this.ID + '-backdrop')
