@@ -51,7 +51,9 @@ def create_new_tag():
         seen.add(line)
     args = ['git', 'tag', '-a', 'v' + new_version] + flatten([['-m', line] for line in release_notes])
     # Create a new tag for the current release.
-    return subprocess.check_output(args)
+    subprocess.check_output(args)
+    # Push the new tag to the repository.
+    subprocess.check_output(['git', 'push', 'origin', 'v' + new_version])
 
 def flatten(l):
     return reduce(lambda x, y: x + y, l)
