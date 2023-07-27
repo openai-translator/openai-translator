@@ -195,6 +195,8 @@ export async function detectLang(text: string): Promise<LangCode> {
             // Detect German
             langWeights.de += 1
         }
+    }
+    for (const char of text.split(' ')) {
         if (/[a-zA-Z]/.test(char)) {
             // Detect English
             langWeights.en += 1
