@@ -1516,14 +1516,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
-                                                        fontSize: '15px',
+                                                        fontSize: '15px !important',
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                     },
                                                 },
                                                 Input: {
                                                     style: {
-                                                        fontSize: '15px',
+                                                        fontSize: '15px !important',
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
