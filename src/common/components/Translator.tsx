@@ -27,7 +27,6 @@ import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import { FcIdea } from 'react-icons/fc'
-import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
 import type { Event } from '@tauri-apps/api/event'
@@ -64,6 +63,7 @@ import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
+import LogoWithText from './LogoWithText'
 
 const cache = new LRUCache({
     max: 500,
@@ -146,33 +146,11 @@ const useStyles = createUseStyles({
                   'alignItems': 'center',
                   'padding': '8px 16px',
                   'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                  'minWidth': '580px',
+                  'minWidth': '612px',
                   '-ms-user-select': 'none',
                   '-webkit-user-select': 'none',
                   'user-select': 'none',
               },
-    'iconContainer': {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        flexShrink: 0,
-        marginRight: 'auto',
-    },
-    'icon': {
-        'display': 'block',
-        'width': '16px',
-        'height': '16px',
-        '-ms-user-select': 'none',
-        '-webkit-user-select': 'none',
-        'user-select': 'none',
-        'pointerEvents': 'none',
-    },
-    'iconText': (props: IThemedStyleProps) => ({
-        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
-        fontSize: '12px',
-        fontWeight: 600,
-        cursor: 'unset',
-    }),
     'paragraph': {
         'margin': '0.5em 0',
         '-ms-user-select': 'text',
@@ -209,7 +187,7 @@ const useStyles = createUseStyles({
         'flexShrink': 0,
         'flexDirection': 'row',
         'alignItems': 'center',
-        'padding': '5px 10px',
+        'padding': props.showLogo ? '5px 10px' : '5px 10px 5px 0px',
         'gap': '10px',
         '@media screen and (max-width: 460px)': {
             padding: props.isDesktopApp ? '5px 0' : undefined,
@@ -443,6 +421,7 @@ export interface IInnerTranslatorProps {
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
     editorRows?: number
+    showLogo?: boolean
     onSettingsSave?: (oldSettings: ISettings) => void
 }
 
@@ -473,6 +452,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setupAnalysis()
     }, [])
     const [showSettings, setShowSettings] = useState(false)
+
+    const { showLogo = true } = props
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
@@ -566,8 +547,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
-    const iconContainerRef = useRef<HTMLDivElement>(null)
-
     const logoTextRef = useRef<HTMLDivElement>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
@@ -596,15 +575,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 return
             }
             const logoTextElem = logoTextRef.current
-            if (!logoTextElem) {
-                return
-            }
             const activateActionElem = headerElem.querySelector('.__yetone-activate-action')
             if (hasActivateAction && !activateActionElem) {
                 return
             }
             const paddingWidth = 32
-            const logoWidth = 131
+            const logoWidth = showLogo ? 131 : 0
             const iconWidth = 32
             const iconWithTextWidth = activateActionElem ? activateActionElem.clientWidth : 105
             const iconGap = 5
@@ -618,10 +594,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     (iconGap + iconWidth)
             )
             count = hasActivateAction ? count + 1 : count
-            if (count <= 0) {
-                logoTextElem.style.display = 'none'
-            } else {
-                logoTextElem.style.display = 'flex'
+            if (logoTextElem) {
+                if (count <= 0) {
+                    logoTextElem.style.display = 'none'
+                } else {
+                    logoTextElem.style.display = 'flex'
+                }
             }
             setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
         }
@@ -631,7 +609,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             clearTimeout(timer)
         }
-    }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
+    }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth, showLogo])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
 
@@ -706,7 +684,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { theme, themeType } = useTheme()
 
-    const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
+    const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp(), showLogo })
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
@@ -1231,15 +1209,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         className={styles.popupCardHeaderContainer}
                         data-tauri-drag-region
                         style={{
-                            cursor: isDesktopApp() ? 'default' : 'move',
+                            cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                         }}
                     >
-                        <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
-                            <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
-                                OpenAI Translator
-                            </div>
-                        </div>
+                        {showLogo && <LogoWithText />}
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
                             <div className={styles.from}>
                                 <Select
@@ -1352,56 +1325,82 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 )
                             })}
                         </div>
-                        <div className={styles.popupCardHeaderMoreActionsContainer}>
-                            <StatefulPopover
-                                autoFocus={false}
-                                triggerType='hover'
-                                showArrow
-                                placement='bottom'
-                                content={
-                                    <StatefulMenu
-                                        initialState={{
-                                            highlightedIndex: hiddenActions.findIndex(
-                                                (action) => action.id === activateAction?.id
-                                            ),
-                                        }}
-                                        onItemSelect={async ({ item }) => {
-                                            const actionID = item.id
-                                            if (actionID === '__manager__') {
-                                                if (isTauri()) {
-                                                    const { invoke } = await import('@tauri-apps/api')
-                                                    if (!navigator.userAgent.includes('Windows')) {
-                                                        await invoke('show_action_manager_window')
-                                                    } else {
-                                                        const { LogicalSize, WebviewWindow } = await import(
-                                                            '@tauri-apps/api/window'
-                                                        )
-                                                        const windowLabel = 'action_manager'
-                                                        let window = WebviewWindow.getByLabel(windowLabel)
-                                                        if (!window) {
-                                                            window = new WebviewWindow(windowLabel, {
-                                                                url: 'src/tauri/action_manager.html',
-                                                                decorations: false,
-                                                                visible: true,
-                                                                focus: true,
-                                                            })
+                        {props.showSettings && (
+                            <div className={styles.popupCardHeaderMoreActionsContainer}>
+                                <StatefulPopover
+                                    autoFocus={false}
+                                    triggerType='hover'
+                                    showArrow
+                                    placement='bottom'
+                                    content={
+                                        <StatefulMenu
+                                            initialState={{
+                                                highlightedIndex: hiddenActions.findIndex(
+                                                    (action) => action.id === activateAction?.id
+                                                ),
+                                            }}
+                                            onItemSelect={async ({ item }) => {
+                                                const actionID = item.id
+                                                if (actionID === '__manager__') {
+                                                    if (isTauri()) {
+                                                        const { invoke } = await import('@tauri-apps/api')
+                                                        if (!navigator.userAgent.includes('Windows')) {
+                                                            await invoke('show_action_manager_window')
+                                                        } else {
+                                                            const { LogicalSize, WebviewWindow } = await import(
+                                                                '@tauri-apps/api/window'
+                                                            )
+                                                            const windowLabel = 'action_manager'
+                                                            let window = WebviewWindow.getByLabel(windowLabel)
+                                                            if (!window) {
+                                                                window = new WebviewWindow(windowLabel, {
+                                                                    url: 'src/tauri/action_manager.html',
+                                                                    decorations: false,
+                                                                    visible: true,
+                                                                    focus: true,
+                                                                })
+                                                            }
+                                                            await window.setDecorations(false)
+                                                            await window.setSize(new LogicalSize(600, 770))
+                                                            await window.center()
+                                                            await window.show()
                                                         }
-                                                        await window.setDecorations(false)
-                                                        await window.setSize(new LogicalSize(600, 770))
-                                                        await window.center()
-                                                        await window.show()
+                                                    } else {
+                                                        setShowActionManager(true)
                                                     }
-                                                } else {
-                                                    setShowActionManager(true)
+                                                    return
                                                 }
-                                                return
-                                            }
-                                            setActivateAction(actions?.find((a) => a.id === (actionID as number)))
-                                        }}
-                                        items={[
-                                            ...hiddenActions.map((action) => {
-                                                return {
-                                                    id: action.id,
+                                                setActivateAction(actions?.find((a) => a.id === (actionID as number)))
+                                            }}
+                                            items={[
+                                                ...hiddenActions.map((action) => {
+                                                    return {
+                                                        id: action.id,
+                                                        label: (
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'row',
+                                                                    alignItems: 'center',
+                                                                    gap: 6,
+                                                                }}
+                                                            >
+                                                                {action.icon
+                                                                    ? React.createElement(
+                                                                          (mdIcons as Record<string, IconType>)[
+                                                                              action.icon
+                                                                          ],
+                                                                          { size: 15 }
+                                                                      )
+                                                                    : undefined}
+                                                                {action.mode ? t(action.name) : action.name}
+                                                            </div>
+                                                        ),
+                                                    }
+                                                }),
+                                                { divider: true },
+                                                {
+                                                    id: '__manager__',
                                                     label: (
                                                         <div
                                                             style={{
@@ -1409,48 +1408,24 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 flexDirection: 'row',
                                                                 alignItems: 'center',
                                                                 gap: 6,
+                                                                fontWeight: 500,
                                                             }}
                                                         >
-                                                            {action.icon
-                                                                ? React.createElement(
-                                                                      (mdIcons as Record<string, IconType>)[
-                                                                          action.icon
-                                                                      ],
-                                                                      { size: 15 }
-                                                                  )
-                                                                : undefined}
-                                                            {action.mode ? t(action.name) : action.name}
+                                                            <GiPlatform />
+                                                            {t('Action Manager')}
                                                         </div>
                                                     ),
-                                                }
-                                            }),
-                                            { divider: true },
-                                            {
-                                                id: '__manager__',
-                                                label: (
-                                                    <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'row',
-                                                            alignItems: 'center',
-                                                            gap: 6,
-                                                            fontWeight: 500,
-                                                        }}
-                                                    >
-                                                        <GiPlatform />
-                                                        {t('Action Manager')}
-                                                    </div>
-                                                ),
-                                            },
-                                        ]}
-                                    />
-                                }
-                            >
-                                <div className={styles.popupCardHeaderMoreActionsBtn}>
-                                    <GrMoreVertical />
-                                </div>
-                            </StatefulPopover>
-                        </div>
+                                                },
+                                            ]}
+                                        />
+                                    }
+                                >
+                                    <div className={styles.popupCardHeaderMoreActionsBtn}>
+                                        <GrMoreVertical />
+                                    </div>
+                                </StatefulPopover>
+                            </div>
+                        )}
                     </div>
                     <div className={styles.popupCardContentContainer}>
                         {settings?.apiURL === defaultAPIURL && (

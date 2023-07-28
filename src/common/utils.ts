@@ -43,6 +43,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     selectInputElementsText: 1,
     disableCollectingStatistics: 1,
     allowUsingClipboardWhenSelectedTextNotAvailable: 1,
+    pinned: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

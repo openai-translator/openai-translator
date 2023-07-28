@@ -40,6 +40,7 @@ export interface IThemedStyleProps {
     theme: Theme
     themeType: BaseThemeType
     isDesktopApp?: boolean
+    showLogo?: boolean
 }
 
 export interface ISettings {
@@ -70,4 +71,5 @@ export interface ISettings {
     runAtStartup?: boolean
     disableCollectingStatistics?: boolean
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
+    pinned?: boolean
 }
