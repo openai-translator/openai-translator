@@ -61,7 +61,11 @@ export default function TitleBar({ pinned = false, onClose, engine }: TitleBarPr
                     <LogoWithText />
                     <div className={styles.actionsContainer}>
                         <Tooltip content={isPinned ? t('Unpin') : t('Pin')} placement='bottom'>
-                            <div className={styles.actionIconContainer} onClick={handleTogglePin}>
+                            <div
+                                className={styles.actionIconContainer}
+                                onClick={handleTogglePin}
+                                data-testid='titlebar-pin-btn'
+                            >
                                 {isPinned ? (
                                     <RxDrawingPinFilled size={13} className={styles.pinIcon} />
                                 ) : (
@@ -70,7 +74,11 @@ export default function TitleBar({ pinned = false, onClose, engine }: TitleBarPr
                             </div>
                         </Tooltip>
                         <Tooltip content={t('Close')} placement='bottom'>
-                            <div className={styles.actionIconContainer} onClick={onClose}>
+                            <div
+                                className={styles.actionIconContainer}
+                                onClick={onClose}
+                                data-testid='titlebar-close-btn'
+                            >
                                 <RxCross2 size={18} />
                             </div>
                         </Tooltip>
