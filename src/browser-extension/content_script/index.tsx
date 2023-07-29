@@ -38,6 +38,14 @@ async function removeContainer() {
     $container.remove()
 }
 
+async function hidePopupThumb() {
+    const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
+    if (!$popupThumb) {
+        return
+    }
+    $popupThumb.style.visibility = 'hidden'
+}
+
 async function hidePopupCard() {
     const $popupCard: HTMLDivElement | null = await queryPopupCardElement()
     if (!$popupCard) {
@@ -216,6 +224,7 @@ async function main() {
     const mouseDownHandler = async (event: UserEventType) => {
         mousedownTarget = event.target
         const settings = await utils.getSettings()
+        hidePopupThumb()
         if (!settings.pinned) {
             hidePopupCard()
         }
