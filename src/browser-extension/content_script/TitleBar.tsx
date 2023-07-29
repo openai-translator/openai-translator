@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import { createUseStyles } from 'react-jss'
+import { useTranslation } from 'react-i18next'
+import { BaseProvider } from 'baseui-sd'
+import { Provider as StyletronProvider } from 'styletron-react'
+import { Client as Styletron } from 'styletron-engine-atomic'
 import { IThemedStyleProps } from '../../common/types'
 import { useTheme } from '../../common/hooks/useTheme'
 import { RxCross2, RxDrawingPin, RxDrawingPinFilled } from 'react-icons/rx'
 import LogoWithText from '../../common/components/LogoWithText'
 import { setSettings } from '../../common/utils'
-import { useState } from 'react'
+import { Tooltip } from '../../common/components/Tooltip'
 
 const useStyles = createUseStyles({
     container: ({ theme }: IThemedStyleProps) => ({
@@ -31,11 +36,14 @@ const useStyles = createUseStyles({
 
 type TitleBarProps = {
     pinned?: boolean
+    engine: Styletron
     onClose: () => void
 }
 
-export default function TitleBar({ pinned = false, onClose }: TitleBarProps) {
+export default function TitleBar({ pinned = false, onClose, engine }: TitleBarProps) {
     const { theme, themeType } = useTheme()
+    const { t } = useTranslation()
+
     const styles = useStyles({ theme, themeType })
     const [isPinned, setIsPinned] = useState(pinned)
 
@@ -47,20 +55,28 @@ export default function TitleBar({ pinned = false, onClose }: TitleBarProps) {
     }
 
     return (
-        <div data-tauri-drag-region className={styles.container}>
-            <LogoWithText />
-            <div className={styles.actionsContainer}>
-                <div className={styles.actionIconContainer} onClick={handleTogglePin}>
-                    {isPinned ? (
-                        <RxDrawingPinFilled size={13} className={styles.pinIcon} />
-                    ) : (
-                        <RxDrawingPin size={13} className={styles.pinIcon} />
-                    )}
+        <StyletronProvider value={engine}>
+            <BaseProvider theme={theme}>
+                <div data-tauri-drag-region className={styles.container}>
+                    <LogoWithText />
+                    <div className={styles.actionsContainer}>
+                        <Tooltip content={isPinned ? t('Unpin') : t('Pin')} placement='bottom'>
+                            <div className={styles.actionIconContainer} onClick={handleTogglePin}>
+                                {isPinned ? (
+                                    <RxDrawingPinFilled size={13} className={styles.pinIcon} />
+                                ) : (
+                                    <RxDrawingPin size={13} className={styles.pinIcon} />
+                                )}
+                            </div>
+                        </Tooltip>
+                        <Tooltip content={t('Close')} placement='bottom'>
+                            <div className={styles.actionIconContainer} onClick={onClose}>
+                                <RxCross2 size={18} />
+                            </div>
+                        </Tooltip>
+                    </div>
                 </div>
-                <div className={styles.actionIconContainer} onClick={onClose}>
-                    <RxCross2 size={18} />
-                </div>
-            </div>
-        </div>
+            </BaseProvider>
+        </StyletronProvider>
     )
 }
