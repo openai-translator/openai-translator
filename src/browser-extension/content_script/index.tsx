@@ -100,7 +100,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
             <GlobalSuspense>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
                     <InnerContainer reference={reference}>
-                        <TitleBar pinned={settings.pinned} />
+                        <TitleBar pinned={settings.pinned} onClose={hidePopupCard} />
                         <Translator
                             text={text}
                             engine={engine}

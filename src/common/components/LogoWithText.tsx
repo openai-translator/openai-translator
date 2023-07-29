@@ -26,6 +26,7 @@ const useStyles = createUseStyles({
         fontSize: '12px',
         fontWeight: 600,
         cursor: 'unset',
+        userSelect: 'none',
     }),
 })
 export default function Logo() {

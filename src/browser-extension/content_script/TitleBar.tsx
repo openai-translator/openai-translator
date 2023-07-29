@@ -1,7 +1,7 @@
 import { createUseStyles } from 'react-jss'
 import { IThemedStyleProps } from '../../common/types'
 import { useTheme } from '../../common/hooks/useTheme'
-import { RxDrawingPin, RxDrawingPinFilled } from 'react-icons/rx'
+import { RxCross2, RxDrawingPin, RxDrawingPinFilled } from 'react-icons/rx'
 import LogoWithText from '../../common/components/LogoWithText'
 import { setSettings } from '../../common/utils'
 import { useState } from 'react'
@@ -31,9 +31,10 @@ const useStyles = createUseStyles({
 
 type TitleBarProps = {
     pinned?: boolean
+    onClose: () => void
 }
 
-export default function TitleBar({ pinned = false }: TitleBarProps) {
+export default function TitleBar({ pinned = false, onClose }: TitleBarProps) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType })
     const [isPinned, setIsPinned] = useState(pinned)
@@ -51,10 +52,13 @@ export default function TitleBar({ pinned = false }: TitleBarProps) {
             <div className={styles.actionsContainer}>
                 <div className={styles.actionIconContainer} onClick={handleTogglePin}>
                     {isPinned ? (
-                        <RxDrawingPinFilled size={15} className={styles.pinIcon} />
+                        <RxDrawingPinFilled size={13} className={styles.pinIcon} />
                     ) : (
-                        <RxDrawingPin size={15} className={styles.pinIcon} />
+                        <RxDrawingPin size={13} className={styles.pinIcon} />
                     )}
+                </div>
+                <div className={styles.actionIconContainer} onClick={onClose}>
+                    <RxCross2 size={18} />
                 </div>
             </div>
         </div>
