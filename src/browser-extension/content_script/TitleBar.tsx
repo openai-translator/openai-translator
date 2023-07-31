@@ -60,7 +60,7 @@ export default function TitleBar({ pinned = false, onClose, engine }: TitleBarPr
                 <div data-tauri-drag-region className={styles.container}>
                     <LogoWithText />
                     <div className={styles.actionsContainer}>
-                        <Tooltip content={isPinned ? t('Unpin') : t('Pin')} placement='bottom'>
+                        <Tooltip content={isPinned ? t('Unpin') : t('Pin')} placement='bottom' onMouseEnterDelay={1000}>
                             <div
                                 className={styles.actionIconContainer}
                                 onClick={handleTogglePin}
@@ -73,13 +73,13 @@ export default function TitleBar({ pinned = false, onClose, engine }: TitleBarPr
                                 )}
                             </div>
                         </Tooltip>
-                        <Tooltip content={t('Close')} placement='bottom'>
+                        <Tooltip content={t('Close')} placement='bottom' onMouseEnterDelay={1000}>
                             <div
                                 className={styles.actionIconContainer}
                                 onClick={onClose}
                                 data-testid='titlebar-close-btn'
                             >
-                                <RxCross2 size={18} />
+                                <RxCross2 size={16} />
                             </div>
                         </Tooltip>
                     </div>
