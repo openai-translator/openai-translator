@@ -883,9 +883,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         checkWordCollection()
     }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText, checkWordCollection])
 
-    useEffect(() =>
+    useEffect(() => {
         settings?.apiKeys && setSettings({ autoCollect: isAutoCollectOn })
-        , [isAutoCollectOn])
+    }, [isAutoCollectOn])
 
     const autoCollect = useCallback(async () => {
         await checkWordCollection()

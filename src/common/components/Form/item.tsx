@@ -16,7 +16,6 @@ export const FormItem = ({ label: label_, required, style, children, ...restProp
     }
     return (
         <div className={styles.formItem} style={style}>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading  */}
             <Field {...restProps}>
                 {(control, meta, form) => {
                     const childNode =

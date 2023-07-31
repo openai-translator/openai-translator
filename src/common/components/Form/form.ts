@@ -58,18 +58,18 @@ interface BasicFormItemProps<S extends {} = Store> extends OmittedRcFieldProps {
 type Deps<S> = Array<NamePath<S>>
 type FormItemPropsDeps<S extends {} = Store> =
     | {
-          deps?: Deps<S>
-          children?: ReactElement
-          validators?: Array<Validator | null>
-      }
+        deps?: Deps<S>
+        children?: ReactElement
+        validators?: Array<Validator | null>
+    }
     | {
-          deps: Deps<S>
-          validators: (value: S) => Array<Validator | null>
-      }
+        deps: Deps<S>
+        validators: (value: S) => Array<Validator | null>
+    }
     | {
-          deps: Deps<S>
-          children: (value: S) => ReactElement
-      }
+        deps: Deps<S>
+        children: (value: S) => ReactElement
+    }
 
 export type FormItemProps<S extends {} = Store> = BasicFormItemProps<S> & FormItemPropsDeps<S>
 
@@ -147,10 +147,10 @@ export function createForm<S extends {} = Store>({
         const rules: Rule[] =
             typeof validators === 'function'
                 ? [
-                      ({ getFieldsValue }) => ({
-                          validator: composeValidator(validators(getFieldsValue(deps) as any)),
-                      }),
-                  ]
+                    ({ getFieldsValue }) => ({
+                        validator: composeValidator(validators(getFieldsValue(deps) as any)),
+                    }),
+                ]
                 : [{ validator: composeValidator(validators) }]
 
         // eslint-disable-next-line react/destructuring-assignment
@@ -175,14 +175,23 @@ export function createForm<S extends {} = Store>({
                     typeof children === 'function'
                         ? children(getFieldsValue(deps))
                         : React.cloneElement(children as React.ReactElement, {
-                              ...control,
-                          })
+                            ...control,
+                        })
 
                 if (noStyle) {
                     return childNode
                 }
 
                 const error = errors && errors[0]
+
+                const labelText = React.createElement('div', {
+                    style: {
+                        flexShrink: 0,
+                        padding: "0.25em 0",
+                        fontSize: "1.2em",
+                        fontWeight: "600",
+                    }
+                }, label)
 
                 // eslint-disable-next-line react/no-children-prop
                 return React.createElement(
@@ -192,10 +201,10 @@ export function createForm<S extends {} = Store>({
                         // eslint-disable-next-line react/prop-types
                         label: props.required
                             ? React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } }, [
-                                  React.createElement('div', {}, '*'),
-                                  React.createElement('div', { style: { flexShrink: 0 } }, label),
-                              ])
-                            : label,
+                                React.createElement('div', {}, '*'),
+                                labelText,
+                            ])
+                            : labelText,
                         caption,
                         children: childNode,
                     },
