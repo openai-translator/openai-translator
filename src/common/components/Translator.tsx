@@ -21,7 +21,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, getAssetUrl, isDesktopApp, isTauri, isUserscript, setSettings } from '../utils'
+import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript, setSettings } from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -97,61 +97,61 @@ const useStyles = createUseStyles({
     'footer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
-                color: props.theme.colors.contentSecondary,
-                position: 'fixed',
-                width: '100%',
-                height: '42px',
-                cursor: 'pointer',
-                left: '0',
-                bottom: '0',
-                paddingLeft: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                backdropFilter: 'blur(10px)',
-            }
+                  color: props.theme.colors.contentSecondary,
+                  position: 'fixed',
+                  width: '100%',
+                  height: '42px',
+                  cursor: 'pointer',
+                  left: '0',
+                  bottom: '0',
+                  paddingLeft: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(10px)',
+              }
             : {
-                color: props.theme.colors.contentSecondary,
-                position: 'absolute',
-                cursor: 'pointer',
-                bottom: '16px',
-                left: '16px',
-                lineHeight: '1',
-            },
+                  color: props.theme.colors.contentSecondary,
+                  position: 'absolute',
+                  cursor: 'pointer',
+                  bottom: '16px',
+                  left: '16px',
+                  lineHeight: '1',
+              },
     'popupCardHeaderContainer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
-                'position': 'fixed',
-                'backdropFilter': 'blur(10px)',
-                'zIndex': 1,
-                'left': 0,
-                'top': 0,
-                'width': '100%',
-                'boxSizing': 'border-box',
-                'padding': '30px 16px 8px',
-                'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                'display': 'flex',
-                'flexDirection': 'row',
-                'flexFlow': 'row nowrap',
-                'cursor': 'move',
-                'alignItems': 'center',
-                'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                '-ms-user-select': 'none',
-                '-webkit-user-select': 'none',
-                'user-select': 'none',
-            }
+                  'position': 'fixed',
+                  'backdropFilter': 'blur(10px)',
+                  'zIndex': 1,
+                  'left': 0,
+                  'top': 0,
+                  'width': '100%',
+                  'boxSizing': 'border-box',
+                  'padding': '30px 16px 8px',
+                  'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'flexFlow': 'row nowrap',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              }
             : {
-                'display': 'flex',
-                'flexDirection': 'row',
-                'cursor': 'move',
-                'alignItems': 'center',
-                'padding': '8px 16px',
-                'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                'minWidth': '580px',
-                '-ms-user-select': 'none',
-                '-webkit-user-select': 'none',
-                'user-select': 'none',
-            },
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'padding': '8px 16px',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  'minWidth': '580px',
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              },
     'iconContainer': {
         display: 'flex',
         alignItems: 'center',
@@ -493,7 +493,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (settings?.i18n !== (i18n as any).language) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ; (i18n as any).changeLanguage(settings?.i18n)
+            ;(i18n as any).changeLanguage(settings?.i18n)
         }
     }, [i18n, settings?.i18n])
 
@@ -616,7 +616,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     languagesSelectorWidth -
                     10 -
                     iconWithTextWidth * (hasActivateAction ? 1 : 0)) /
-                (iconGap + iconWidth)
+                    (iconGap + iconWidth)
             )
             count = hasActivateAction ? count + 1 : count
             if (count <= 0) {
@@ -777,7 +777,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
 
-        ; (async () => {
+        ;(async () => {
             const sourceLang_ = await detectLang(originalText)
             setSourceLang(sourceLang_)
             setTargetLang((targetLang_) => {
@@ -884,7 +884,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText, checkWordCollection])
 
     useEffect(() => {
-        settings?.apiKeys && setSettings({ autoCollect: isAutoCollectOn })
+        setSettings({ autoCollect: isAutoCollectOn })
     }, [isAutoCollectOn])
 
     const autoCollect = useCallback(async () => {
@@ -909,9 +909,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             const actionStrItem = currentTranslateMode
                 ? actionStrItems[currentTranslateMode]
                 : {
-                    beforeStr: 'Processing...',
-                    afterStr: 'Processed',
-                }
+                      beforeStr: 'Processing...',
+                      afterStr: 'Processed',
+                  }
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
                 if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
@@ -946,9 +946,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${action.rolePrompt
-                }:${action.commandPrompt}:${action.outputRenderingFormat
-                }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
+            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
+                action.rolePrompt
+            }:${action.commandPrompt}:${
+                action.outputRenderingFormat
+            }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -1067,7 +1069,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (!isTauri()) {
             return
         }
-        ; (async () => {
+        ;(async () => {
             const { listen } = await import('@tauri-apps/api/event')
             const { fs } = await import('@tauri-apps/api')
             listen('tauri://file-drop', async (e: Event<string>) => {
@@ -1246,7 +1248,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         }}
                     >
                         <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
+                            <img data-tauri-drag-region className={styles.icon} src={icon} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                                 OpenAI Translator
                             </div>
@@ -1424,11 +1426,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         >
                                                             {action.icon
                                                                 ? React.createElement(
-                                                                    (mdIcons as Record<string, IconType>)[
-                                                                    action.icon
-                                                                    ],
-                                                                    { size: 15 }
-                                                                )
+                                                                      (mdIcons as Record<string, IconType>)[
+                                                                          action.icon
+                                                                      ],
+                                                                      { size: 15 }
+                                                                  )
                                                                 : undefined}
                                                             {action.mode ? t(action.name) : action.name}
                                                         </div>
@@ -1509,14 +1511,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </div>
                                                 {showOCRProcessing && (
                                                     <div>
-                                                        <img
-                                                            src={
-                                                                isOCRProcessing
-                                                                    ? getAssetUrl(rocket)
-                                                                    : getAssetUrl(partyPopper)
-                                                            }
-                                                            width='20'
-                                                        />
+                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
                                                     </div>
                                                 )}
                                             </div>
@@ -1527,14 +1522,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
-                                                        fontSize: '15px !important',
+                                                        fontSize: '15px',
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                     },
                                                 },
                                                 Input: {
                                                     style: {
-                                                        fontSize: '15px !important',
+                                                        fontSize: '15px',
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
@@ -1770,7 +1765,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         >
                                             <div>
                                                 {currentTranslateMode === 'explain-code' ||
-                                                    activateAction?.outputRenderingFormat === 'markdown' ? (
+                                                activateAction?.outputRenderingFormat === 'markdown' ? (
                                                     <>
                                                         <Markdown>{translatedText}</Markdown>
                                                         {isLoading && <span className={styles.caret} />}

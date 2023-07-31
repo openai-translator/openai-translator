@@ -164,10 +164,10 @@ function ThemeTypeSelector({ value, onChange, onBlur }: IThemeTypeSelectorProps)
             value={
                 value
                     ? [
-                        {
-                            id: value,
-                        },
-                    ]
+                          {
+                              id: value,
+                          },
+                      ]
                     : []
             }
             onChange={(params) => {
@@ -220,9 +220,9 @@ const ttsProviderOptions: {
     label: string
     id: TTSProvider
 }[] = [
-        { label: 'Edge TTS', id: 'EdgeTTS' },
-        { label: 'System Default', id: 'WebSpeech' },
-    ]
+    { label: 'Edge TTS', id: 'EdgeTTS' },
+    { label: 'System Default', id: 'WebSpeech' },
+]
 
 function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) {
     const { t } = useTranslation()
@@ -235,7 +235,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     const [supportVoices, setSupportVoices] = useState<SpeechSynthesisVoice[]>([])
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             switch (value?.provider ?? 'WebSpeech') {
                 case 'EdgeTTS':
                     setSupportVoices(await getEdgeVoices())
@@ -511,17 +511,17 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
             value={
                 value
                     ? [
-                        {
-                            id: value,
-                            label: options.find((option) => option.id === value)?.label || 'en',
-                        },
-                    ]
+                          {
+                              id: value,
+                              label: options.find((option) => option.id === value)?.label || 'en',
+                          },
+                      ]
                     : undefined
             }
             onChange={(params) => {
                 onChange?.(params.value[0].id as string)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ; (i18n as any).changeLanguage(params.value[0].id as string)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ;(i18n as any).changeLanguage(params.value[0].id as string)
             }}
             options={options}
         />
@@ -570,7 +570,7 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         } else if (provider === 'ChatGPT') {
             setIsLoading(true)
             try {
-                ; (async () => {
+                ;(async () => {
                     const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
                     if (sessionResp.status !== 200) {
                         setIsChatGPTNotLogin(true)
@@ -628,10 +628,10 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                 value={
                     value
                         ? [
-                            {
-                                id: value,
-                            },
-                        ]
+                              {
+                                  id: value,
+                              },
+                          ]
                         : undefined
                 }
                 onChange={(params) => {
@@ -664,7 +664,7 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     )
 }
 
@@ -902,20 +902,20 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
 function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
     const options = utils.isDesktopApp()
         ? ([
-            { label: 'OpenAI', id: 'OpenAI' },
-            { label: 'Azure', id: 'Azure' },
-        ] as {
-            label: string
-            id: Provider
-        }[])
+              { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'Azure', id: 'Azure' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
         : ([
-            { label: 'OpenAI', id: 'OpenAI' },
-            { label: 'ChatGPT (Web)', id: 'ChatGPT' },
-            { label: 'Azure', id: 'Azure' },
-        ] as {
-            label: string
-            id: Provider
-        }[])
+              { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'ChatGPT (Web)', id: 'ChatGPT' },
+              { label: 'Azure', id: 'Azure' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
 
     return (
         <Select
@@ -998,7 +998,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     useEffect(() => {
         if (settings) {
-            ; (async () => {
+            ;(async () => {
                 if (isTauri) {
                     const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
                     settings.runAtStartup = await autostartIsEnabled()
