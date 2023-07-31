@@ -1,3 +1,4 @@
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { createUseStyles } from 'react-jss'
 import { IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
@@ -29,16 +30,45 @@ const useStyles = createUseStyles({
         userSelect: 'none',
     }),
 })
-export default function Logo() {
+
+export type LogoWithTextRef = {
+    hideText: () => void
+    showText: () => void
+}
+
+const LogoWithText = forwardRef<LogoWithTextRef, unknown>(function LogoWithText(_props, ref) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType })
+
+    const logoTextRef = useRef<HTMLDivElement>(null)
+
+    useImperativeHandle(
+        ref,
+        () => {
+            return {
+                hideText() {
+                    if (logoTextRef.current) {
+                        logoTextRef.current.style.display = 'none'
+                    }
+                },
+                showText() {
+                    if (logoTextRef.current) {
+                        logoTextRef.current.style.display = 'flex'
+                    }
+                },
+            }
+        },
+        []
+    )
 
     return (
         <div data-tauri-drag-region className={styles.iconContainer}>
             <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
-            <div data-tauri-drag-region className={styles.iconText}>
+            <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
                 OpenAI Translator
             </div>
         </div>
     )
-}
+})
+
+export default LogoWithText

@@ -63,7 +63,7 @@ import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
-import LogoWithText from './LogoWithText'
+import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 
 const cache = new LRUCache({
     max: 500,
@@ -547,7 +547,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
-    const logoTextRef = useRef<HTMLDivElement>(null)
+    const logoWithTextRef = useRef<LogoWithTextRef>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
 
@@ -574,7 +574,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             if (!headerElem) {
                 return
             }
-            const logoTextElem = logoTextRef.current
+            const logoWithTextElem = logoWithTextRef.current
             const activateActionElem = headerElem.querySelector('.__yetone-activate-action')
             if (hasActivateAction && !activateActionElem) {
                 return
@@ -594,12 +594,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     (iconGap + iconWidth)
             )
             count = hasActivateAction ? count + 1 : count
-            if (logoTextElem) {
-                if (count <= 0) {
-                    logoTextElem.style.display = 'none'
-                } else {
-                    logoTextElem.style.display = 'flex'
-                }
+            if (count <= 0) {
+                logoWithTextElem?.hideText()
+            } else {
+                logoWithTextElem?.showText()
             }
             setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
         }
@@ -1212,7 +1210,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                         }}
                     >
-                        {showLogo && <LogoWithText />}
+                        {showLogo && <LogoWithText ref={logoWithTextRef} />}
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
                             <div className={styles.from}>
                                 <Select
