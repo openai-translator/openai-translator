@@ -135,61 +135,96 @@ export async function baiduDetectLang(text: string): Promise<LangCode> {
 }
 
 export async function detectLang(text: string): Promise<LangCode> {
-    // Detect Traditional Chinese
-    if (/[\u4e00-\u9fa5]/.test(text) && /[\u4e00-\u9ccc]/.test(text)) {
-        return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
+    if (text.length > 200) {
+        text = text.slice(0, 200)
     }
-    // Detect Simplified Chinese
-    else if (/[\u4e00-\u9fa5]/.test(text)) {
-        return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
+    const langWeights = {
+        en: 0,
+        zh: 0,
+        ko: 0,
+        vi: 0,
+        th: 0,
+        hmn: 0,
+        ja: 0,
+        ru: 0,
+        es: 0,
+        fr: 0,
+        de: 0,
     }
-    // Detect Korean
-    else if (/[\uAC00-\uD7A3]/.test(text)) {
-        return 'ko'
+    const VietnameseCharsRegEx =
+        /[\u0103\u00E2\u00EA\u00F4\u01A1\u01B0\u1EA1\u1EB9\u1EC7\u1ED3\u1EDD\u1EF3\u1EA3\u1EBB\u1EC9\u1ED5\u1EDF\u1EF5\u1EA7\u1EBF\u1EC5\u1ED1\u1EDB\u1EF1\u1EA5\u1EBD\u1EC3\u1ECF\u1ED9\u1EE3\u1EF7\u1EA9\u1EC1\u1ED7\u1EE1\u1EF9\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF]/
+    for (const char of text.split('')) {
+        if (/[\u4e00-\u9fa5]/.test(char)) {
+            // Detect Chinese
+            langWeights.zh += 1
+            langWeights.ja += 1
+        }
+        if (/[\uAC00-\uD7A3]/.test(char)) {
+            // Detect Korean
+            langWeights.ko += 1
+        }
+        if (VietnameseCharsRegEx.test(char)) {
+            // Detect Vietnamese
+            langWeights.vi += 1
+        }
+        if (/[\u0E01-\u0E5B]/.test(char)) {
+            // Detect Thai
+            langWeights.th += 1
+        }
+        if (/[\u16F0-\u16F9]/.test(char)) {
+            // Detect Hmong
+            langWeights.hmn += 1
+        }
+        if (/[\u3040-\u30ff]/.test(char)) {
+            // Detect Japanese
+            langWeights.ja += 1
+        }
+        if (/[\u0400-\u04FF]/.test(char)) {
+            // Detect Russian
+            langWeights.ru += 1
+        }
+        if (/[áéíóúüñ]/.test(char)) {
+            // Detect Spanish
+            langWeights.es += 1
+        }
+        if (/[àâçéèêëîïôûùüÿœæ]/.test(char)) {
+            // Detect French
+            langWeights.fr += 1
+        }
+        if (/[äöüß]/.test(char)) {
+            // Detect German
+            langWeights.de += 1
+        }
     }
-    // Detect Vietnamese
-    else if (
-        /[\u0103\u00E2\u00EA\u00F4\u01A1\u01B0\u1EA1\u1EB9\u1EC7\u1ED3\u1EDD\u1EF3\u1EA3\u1EBB\u1EC9\u1ED5\u1EDF\u1EF5\u1EA7\u1EBF\u1EC5\u1ED1\u1EDB\u1EF1\u1EA5\u1EBD\u1EC3\u1ECF\u1ED9\u1EE3\u1EF7\u1EA9\u1EC1\u1ED7\u1EE1\u1EF9\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF]/.test(
-            text
-        )
+    for (const char of text.split(' ')) {
+        if (/[a-zA-Z]/.test(char)) {
+            // Detect English
+            langWeights.en += 1
+            langWeights.es += 1
+            langWeights.fr += 1
+            langWeights.de += 1
+        }
+    }
+    if (langWeights.zh > 0 && langWeights.zh === langWeights.ja) {
+        // fix pure Chinese text
+        langWeights.zh += 1
+    }
+    if (
+        langWeights.en > 0 &&
+        langWeights.en === langWeights.es &&
+        langWeights.en === langWeights.fr &&
+        langWeights.en === langWeights.de
     ) {
-        return 'vi'
+        // fix pure English text
+        langWeights.en += 1
     }
-    // Detect Thai
-    else if (/[\u0E01-\u0E5B]/.test(text)) {
-        return 'th'
-    }
-    // Detect Hmong
-    else if (/[\u16F0-\u16F9]/.test(text)) {
-        return 'hmn'
-    }
-    // Detect Japanese
-    else if (/[\u3040-\u30ff]/.test(text)) {
-        return 'ja'
-    }
-    // Detect Russian
-    else if (/[\u0400-\u04FF]/.test(text)) {
-        return 'ru'
-    }
-    // Detect Spanish
-    else if (/[áéíóúüñ]/.test(text)) {
-        return 'es'
-    }
-    // Detect French
-    else if (/[àâçéèêëîïôûùüÿœæ]/.test(text)) {
-        return 'fr'
-    }
-    // Detect German
-    else if (/[äöüß]/.test(text)) {
-        return 'de'
-    }
-    // If none match, we assume it's English
-    else if (/[a-zA-Z]/.test(text)) {
+    const langWeightResult = Object.entries(langWeights).sort((a, b) => b[1] - a[1])[0]
+    if (langWeightResult[1] === 0) {
         return 'en'
-    }
-    // If none match, we return 'en'
-    else {
-        return 'en'
+    } else if (langWeightResult[0] === 'zh') {
+        return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
+    } else {
+        return langWeightResult[0] as LangCode
     }
 }
 

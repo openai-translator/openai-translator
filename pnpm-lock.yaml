@@ -7207,9 +7207,8 @@ packages:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
-
-  github.com/tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/0e474395d4990587ad5c1db25ed23220fe11764f}
+  github.com/tauri-apps/tauri-plugin-autostart/5f6b99fda5afc1e38976307b1cbede15a572c57d:
+    resolution: {commit: 5f6b99fda5afc1e38976307b1cbede15a572c57d, repo: git+ssh://git@github.com/tauri-apps/tauri-plugin-autostart.git, type: git}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
