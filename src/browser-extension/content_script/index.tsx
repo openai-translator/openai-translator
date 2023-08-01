@@ -17,6 +17,7 @@ import { getClientX, getClientY, getPageX, getPageY, UserEventType } from '../..
 import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
+import TitleBar from './TitleBar'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -42,7 +43,7 @@ async function hidePopupThumb() {
     if (!$popupThumb) {
         return
     }
-    removeContainer()
+    $popupThumb.style.visibility = 'hidden'
 }
 
 async function hidePopupCard() {
@@ -89,6 +90,9 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
 
     const $popupCard = (await queryPopupCardElement()) ?? (await createPopupCard())
 
+    const settings = await utils.getSettings()
+    const isUserscript = utils.isUserscript()
+
     const engine = new Styletron({
         container: $popupCard.parentElement ?? undefined,
         prefix: `${PREFIX}-styletron-`,
@@ -98,19 +102,20 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         insertionPoint: $popupCard.parentElement ?? undefined,
     })
     const JSS = JssProvider
-    const isUserscript = utils.isUserscript()
     root = createRoot($popupCard)
     root.render(
         <React.StrictMode>
             <GlobalSuspense>
                 <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
                     <InnerContainer reference={reference}>
+                        <TitleBar pinned={settings.pinned} onClose={hidePopupCard} engine={engine} />
                         <Translator
                             text={text}
                             engine={engine}
                             autoFocus={autoFocus}
                             showSettings={isUserscript ? true : false}
                             defaultShowSettings={isUserscript ? true : false}
+                            showLogo={false}
                         />
                     </InnerContainer>
                 </JSS>
@@ -218,8 +223,11 @@ async function main() {
 
     const mouseDownHandler = async (event: UserEventType) => {
         mousedownTarget = event.target
-        hidePopupCard()
+        const settings = await utils.getSettings()
         hidePopupThumb()
+        if (!settings.pinned) {
+            hidePopupCard()
+        }
     }
     document.addEventListener('mousedown', mouseDownHandler)
     document.addEventListener('touchstart', mouseDownHandler)
