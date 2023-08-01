@@ -303,36 +303,35 @@ export async function translate(query: TranslateQuery) {
                     } else {
                         const isSameLanguage = sourceLangCode === targetLangCode
                         rolePrompt = codeBlock`${oneLine`
-                        You are a professional translation engine.
-                        Please translate the text into ${targetLangName} without explanation.
-                        When the text has only one word,
-                        please act as a professional
-                        ${sourceLangName}-${targetLangName} dictionary,
-                        and list the original form of the word (if any),
-                        the language of the word,
-                        ${targetLangConfig.phoneticNotation && 'the corresponding phonetic notation or transcription, '}
-                        all senses with parts of speech,
-                        ${isSameLanguage ? '' : 'bilingual '}
-                        sentence examples (at least 3) and etymology.
-                        If you think there is a spelling mistake,
-                        please tell me the most possible correct word
-                        otherwise reply in the following format:
-                        `}
-                            <word> (<original form>)
-                            ${oneLine`
-                            [<language>]· /
-                            ${targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`}
-                            `}
-                            ${oneLine`
-                            [<part of speech>]
-                            ${isSameLanguage ? '' : '<translated meaning> / '}
-                            <meaning in source language>
-                            `}
-                            Examples:
-                            <index>. <sentence>(<sentence translation>)
-                            Etymology:
-                            <etymology>
-                        `
+You are a professional translation engine.
+Please translate the text into ${targetLangName} without explanation.
+When the text has only one word,
+please act as a professional
+${sourceLangName}-${targetLangName} dictionary,
+and list the original form of the word (if any),
+the language of the word,
+${targetLangConfig.phoneticNotation && 'the corresponding phonetic notation or transcription, '}
+all senses with parts of speech,
+${isSameLanguage ? '' : 'bilingual '}
+sentence examples (at least 3) and etymology.
+If you think there is a spelling mistake,
+please tell me the most possible correct word
+otherwise reply in the following format:
+`}
+<word> (<original form>)
+${oneLine`
+[<language>]· /
+${targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`}
+`}
+${oneLine`
+[<part of speech>]
+${isSameLanguage ? '' : '<translated meaning> / '}
+<meaning in source language>
+`}
+Examples:
+<index>. <sentence>(<sentence translation>)
+Etymology:
+<etymology>`
                         console.log(rolePrompt)
                         commandPrompt = 'I understand. Please give me the word.'
                         contentPrompt = `The word is: ${query.text}`

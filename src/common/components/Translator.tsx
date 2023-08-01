@@ -835,29 +835,35 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
-    const onWordCollection = useCallback(async () => {
-        try {
-            if (isCollectedWord) {
-                setIsCollectedWord(false)
-                const wordInfo = await vocabularyService.getItem(editableText.trim())
-                await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setCollectedWordTotal((t: number) => t - 1)
-            } else {
-                setIsCollectedWord(true)
-                await vocabularyService.putItem({
-                    word: editableText,
-                    reviewCount: 1,
-                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
-                    updatedAt: new Date().valueOf().toString(),
-                    createdAt: new Date().valueOf().toString(),
-                })
-                setCollectedWordTotal((t: number) => t + 1)
+    /**
+     * Add or remove word from collection.
+     * @param remove - Remove word from collection if true, otherwise add it to collection.
+     */
+    const onWordCollection = useCallback(
+        async (remove: boolean) => {
+            try {
+                if (remove) {
+                    const wordInfo = await vocabularyService.getItem(editableText.trim())
+                    await vocabularyService.deleteItem(wordInfo?.word ?? '')
+                    setCollectedWordTotal((t: number) => t - 1)
+                    setIsCollectedWord(false)
+                } else {
+                    await vocabularyService.putItem({
+                        word: editableText,
+                        reviewCount: 1,
+                        description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
+                        updatedAt: new Date().valueOf().toString(),
+                        createdAt: new Date().valueOf().toString(),
+                    })
+                    setCollectedWordTotal((t: number) => t + 1)
+                    setIsCollectedWord(true)
+                }
+            } catch (e) {
+                console.error(e)
             }
-        } catch (e) {
-            console.error(e)
-        }
-        checkWordCollection()
-    }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText, checkWordCollection])
+        },
+        [editableText, setCollectedWordTotal, translatedText]
+    )
 
     useEffect(() => {
         setSettings({ autoCollect: isAutoCollectOn })
@@ -865,8 +871,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const autoCollect = useCallback(async () => {
         await checkWordCollection()
-        isWordMode && isAutoCollectOn && !isCollectedWord && onWordCollection()
-    }, [isWordMode, isAutoCollectOn, isCollectedWord, onWordCollection, checkWordCollection])
+        if (isWordMode && isAutoCollectOn) {
+            onWordCollection(false)
+            console.info(`Auto collecting word: ${editableText}`)
+        }
+    }, [isWordMode, isAutoCollectOn, editableText, onWordCollection, checkWordCollection])
     const autoCollectRef = useRef(autoCollect)
     useEffect(() => {
         autoCollectRef.current = autoCollect
@@ -1758,7 +1767,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 ) : (
                                                     translatedLines.map((line, i) => {
                                                         return (
-                                                            <p className={styles.paragraph} key={`p-${i}`}>
+                                                            <div className={styles.paragraph} key={`p-${i}`}>
                                                                 {isWordMode && i === 0 ? (
                                                                     <div
                                                                         style={{
@@ -1780,7 +1789,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                             >
                                                                                 <div
                                                                                     className={styles.actionButton}
-                                                                                    onClick={onWordCollection}
+                                                                                    onClick={() =>
+                                                                                        onWordCollection(
+                                                                                            isCollectedWord
+                                                                                        )
+                                                                                    }
                                                                                 >
                                                                                     {isCollectedWord ? (
                                                                                         <MdGrade size={15} />
@@ -1797,7 +1810,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 {isLoading && i === translatedLines.length - 1 && (
                                                                     <span className={styles.caret} />
                                                                 )}
-                                                            </p>
+                                                            </div>
                                                         )
                                                     })
                                                 )}
