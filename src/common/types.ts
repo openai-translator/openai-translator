@@ -72,4 +72,5 @@ export interface ISettings {
     disableCollectingStatistics?: boolean
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
     pinned?: boolean
+    autoCollect?: boolean
 }

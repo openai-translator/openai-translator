@@ -370,7 +370,7 @@ export async function translate(query: TranslateQuery) {
                 commandPrompt = oneLine`
                 Please summarize this text in the most concise language
                 and must use ${targetLangName} language!
-                Only summarize the text between 
+                Only summarize the text between
                 ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.
                 `
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
@@ -450,7 +450,7 @@ export async function translate(query: TranslateQuery) {
                         parts: [
                             codeBlock`
                         ${rolePrompt}
-                        
+
                         ${commandPrompt}:
                         ${contentPrompt}
                         `,
@@ -499,6 +499,7 @@ export async function translate(query: TranslateQuery) {
             break
     }
 
+    let finished = false // finished can be called twice because event.data is 1. "finish_reason":"stop"; 2. [DONE]
     if (settings.provider === 'ChatGPT') {
         let length = 0
         await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
@@ -510,17 +511,20 @@ export async function translate(query: TranslateQuery) {
                 query.onStatusCode?.(status)
             },
             onMessage: (msg) => {
+                if (finished) return
                 let resp
                 try {
                     resp = JSON.parse(msg)
                     // eslint-disable-next-line no-empty
                 } catch {
                     query.onFinish('stop')
+                    finished = true
                     return
                 }
 
                 if (resp.is_completion) {
                     query.onFinish('stop')
+                    finished = true
                     return
                 }
 
@@ -587,12 +591,14 @@ export async function translate(query: TranslateQuery) {
             body: JSON.stringify(body),
             signal: query.signal,
             onMessage: (msg) => {
+                if (finished) return
                 let resp
                 try {
                     resp = JSON.parse(msg)
                     // eslint-disable-next-line no-empty
                 } catch {
                     query.onFinish('stop')
+                    finished = true
                     return
                 }
 
@@ -603,6 +609,7 @@ export async function translate(query: TranslateQuery) {
                 const { finish_reason: finishReason } = choices[0]
                 if (finishReason) {
                     query.onFinish(finishReason)
+                    finished = true
                     return
                 }
 

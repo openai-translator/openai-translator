@@ -44,6 +44,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     disableCollectingStatistics: 1,
     allowUsingClipboardWhenSelectedTextNotAvailable: 1,
     pinned: 1,
+    autoCollect: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

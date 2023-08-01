@@ -51,6 +51,13 @@ interface ILanguageSelectorProps {
     onBlur?: () => void
 }
 
+const linkStyle = {
+    color: 'inherit',
+    opacity: 0.8,
+    cursor: 'pointer',
+    outline: 'none',
+}
+
 function LanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
     return (
         <Select
@@ -651,7 +658,7 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                 {isChatGPTNotLogin && (
                     <div>
                         <span>{t('Please login to ChatGPT Web')}: </span>
-                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer' style={linkStyle}>
                             Login
                         </a>
                     </div>
@@ -1089,12 +1096,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                             href='https://github.com/yetone/openai-translator/releases'
                             target='_blank'
                             rel='noreferrer'
-                            style={{
-                                fontSize: '0.65em',
-                                marginLeft: '5px',
-                                color: 'unset',
-                                textDecoration: 'none',
-                            }}
+                            style={linkStyle}
                         >
                             {AppConfig.version}
                         </a>
@@ -1110,7 +1112,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
-                <FormItem name='provider' label={t('Default Service Provider')} required>
+                <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
                 {values.provider !== 'ChatGPT' && (
@@ -1126,6 +1128,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                                         target='_blank'
                                         href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
                                         rel='noreferrer'
+                                        style={linkStyle}
                                     >
                                         {t('Azure OpenAI Service page')}
                                     </a>
@@ -1134,6 +1137,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                                         target='_blank'
                                         href='https://platform.openai.com/account/api-keys'
                                         rel='noreferrer'
+                                        style={linkStyle}
                                     >
                                         {t('OpenAI page')}
                                     </a>
@@ -1182,6 +1186,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                                     href='https://github.com/openai-translator/openai-translator/blob/main/CLIP-EXTENSIONS.md'
                                     target='_blank'
                                     rel='noreferrer'
+                                    style={linkStyle}
                                 >
                                     {t('Clip Extension')}
                                 </a>
@@ -1209,15 +1214,15 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                     <RestorePreviousPositionCheckbox onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
+                <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                     <SelectInputElementsCheckbox onBlur={onBlur} />
                 </FormItem>
                 {isTauri && (
-                    <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                    <FormItem name='runAtStartup' label={t('Run at startup')}>
                         <RunAtStartupCheckbox onBlur={onBlur} />
                     </FormItem>
                 )}
-                <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
+                <FormItem name='defaultTargetLanguage' label={t('Default target language')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>
