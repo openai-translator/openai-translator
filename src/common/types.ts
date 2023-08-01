@@ -70,4 +70,5 @@ export interface ISettings {
     runAtStartup?: boolean
     disableCollectingStatistics?: boolean
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
+    autoCollect?: boolean
 }

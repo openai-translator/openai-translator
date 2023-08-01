@@ -16,11 +16,12 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { LuStars, LuStarOff } from 'react-icons/lu'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, getAssetUrl, isDesktopApp, isTauri, isUserscript } from '../utils'
+import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, getAssetUrl, isUserscript, setSettings } from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -34,7 +35,7 @@ import type { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
-import LRUCache from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { speak } from '../tts'
@@ -717,6 +718,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
+    const [isAutoCollectOn, setIsAutoCollectOn] = useState(
+        settings?.autoCollect === undefined ? false : settings.autoCollect
+    )
 
     useEffect(() => {
         setOriginalText(props.text)
@@ -750,12 +754,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             console.error(e)
         }
     }, [editableText])
-
-    useEffect(() => {
-        if (isWordMode && !isLoading) {
-            checkWordCollection()
-        }
-    }, [isWordMode, isLoading, checkWordCollection])
 
     useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
@@ -861,6 +859,43 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [isNotLogin, setIsNotLogin] = useState(false)
 
+    const onWordCollection = useCallback(async () => {
+        try {
+            if (isCollectedWord) {
+                setIsCollectedWord(false)
+                const wordInfo = await vocabularyService.getItem(editableText.trim())
+                await vocabularyService.deleteItem(wordInfo?.word ?? '')
+                setCollectedWordTotal((t: number) => t - 1)
+            } else {
+                setIsCollectedWord(true)
+                await vocabularyService.putItem({
+                    word: editableText,
+                    reviewCount: 1,
+                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
+                    updatedAt: new Date().valueOf().toString(),
+                    createdAt: new Date().valueOf().toString(),
+                })
+                setCollectedWordTotal((t: number) => t + 1)
+            }
+        } catch (e) {
+            console.error(e)
+        }
+        checkWordCollection()
+    }, [editableText, isCollectedWord, setCollectedWordTotal, translatedText, checkWordCollection])
+
+    useEffect(() => {
+        setSettings({ autoCollect: isAutoCollectOn })
+    }, [isAutoCollectOn])
+
+    const autoCollect = useCallback(async () => {
+        await checkWordCollection()
+        isWordMode && isAutoCollectOn && !isCollectedWord && onWordCollection()
+    }, [isWordMode, isAutoCollectOn, isCollectedWord, onWordCollection, checkWordCollection])
+    const autoCollectRef = useRef(autoCollect)
+    useEffect(() => {
+        autoCollectRef.current = autoCollect
+    }, [autoCollect])
+
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
@@ -907,6 +942,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
+                    autoCollectRef.current()
                 }
             }
             beforeTranslate()
@@ -1118,35 +1154,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         await (await worker).terminate()
     }
 
-    const onWordCollection = async () => {
-        try {
-            if (isCollectedWord) {
-                const wordInfo = await vocabularyService.getItem(editableText.trim())
-                await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setIsCollectedWord(false)
-                setCollectedWordTotal((t: number) => t - 1)
-            } else {
-                await vocabularyService.putItem({
-                    word: editableText,
-                    reviewCount: 1,
-                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
-                    updatedAt: new Date().valueOf().toString(),
-                    createdAt: new Date().valueOf().toString(),
-                })
-                setIsCollectedWord(true)
-                setCollectedWordTotal((t: number) => t + 1)
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     const onCsvExport = async () => {
         try {
             const words = await vocabularyService.listItems()
             await exportToCsv<VocabularyItem>(`openai-translator-collection-${new Date().valueOf()}`, words)
             if (isDesktopApp()) {
-                toast(t('csv file saved on Desktop'), {
+                toast(t('CSV file saved on Desktop'), {
                     duration: 5000,
                     icon: '👏',
                 })
@@ -1505,7 +1518,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                     : getAssetUrl(partyPopper)
                                                             }
                                                             width='20'
-                                                        />
+                                                        />{' '}
                                                     </div>
                                                 )}
                                             </div>
@@ -1835,13 +1848,34 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         className={styles.actionButton}
                                                         onClick={handleTranslatedSpeakAction}
                                                     >
-                                                        {isSpeakingTranslatedText ? (
-                                                            <SpeakerMotion />
-                                                        ) : (
-                                                            <RxSpeakerLoud size={15} />
-                                                        )}
+                                                        <div
+                                                            onClick={() => forceTranslate()}
+                                                            className={styles.actionButton}
+                                                        >
+                                                            {isSpeakingTranslatedText ? (
+                                                                <SpeakerMotion />
+                                                            ) : (
+                                                                <RxSpeakerLoud size={15} />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </Tooltip>
+                                                {isWordMode && (
+                                                    <Tooltip content={t('Auto collect')} placement='bottom'>
+                                                        <div
+                                                            className={styles.actionButton}
+                                                            onClick={() => {
+                                                                setIsAutoCollectOn((prevState) => !prevState)
+                                                            }}
+                                                        >
+                                                            {isAutoCollectOn ? (
+                                                                <LuStars size={15} />
+                                                            ) : (
+                                                                <LuStarOff size={15} />
+                                                            )}
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
                                                 <Tooltip content={t('Copy to clipboard')} placement='bottom'>
                                                     <div className={styles.actionButton}>
                                                         <CopyButton text={translatedText} styles={styles}></CopyButton>
