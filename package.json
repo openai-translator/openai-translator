@@ -78,7 +78,8 @@
     "url-join-ts": "^1.0.5",
     "use-resize-observer": "^9.1.0",
     "uuid": "^9.0.0",
-    "web-streams-polyfill": "^3.2.1"
+    "web-streams-polyfill": "^3.2.1",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.34.3",

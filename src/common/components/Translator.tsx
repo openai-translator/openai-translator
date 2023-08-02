@@ -65,6 +65,7 @@ import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
+import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
 
 const cache = new LRUCache({
     max: 500,
@@ -685,10 +686,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp(), showLogo })
     const [isLoading, setIsLoading] = useState(false)
-    const [editableText, setEditableText] = useState(props.text)
+    const { editableText, originalText, detectedOriginalText } = useTranslatorStore()
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
-    const [originalText, setOriginalText] = useState(props.text)
-    const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
     const [tokenCount, setTokenCount] = useState(0)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
