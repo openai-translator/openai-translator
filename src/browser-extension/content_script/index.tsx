@@ -18,7 +18,7 @@ import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
 import TitleBar from './TitleBar'
-import { setEditableText, setOriginalText } from '../../common/store'
+import { setOriginalText } from '../../common/store'
 
 let root: Root | null = null
 const generateId = createGenerateId()
