@@ -92,7 +92,6 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
     const settings = await utils.getSettings()
     let $popupCard = await queryPopupCardElement()
     if ($popupCard && settings.pinned) {
-        setEditableText(text)
         setOriginalText(text)
         return
     } else {
