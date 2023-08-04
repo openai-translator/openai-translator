@@ -18,6 +18,7 @@ import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
 import TitleBar from './TitleBar'
+import { setOriginalText } from '../../common/store'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -88,11 +89,16 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $popupThumb.style.visibility = 'hidden'
     }
 
-    const $popupCard = (await queryPopupCardElement()) ?? (await createPopupCard())
-
     const settings = await utils.getSettings()
-    const isUserscript = utils.isUserscript()
+    let $popupCard = await queryPopupCardElement()
+    if ($popupCard && settings.pinned) {
+        setOriginalText(text)
+        return
+    } else {
+        $popupCard = await createPopupCard()
+    }
 
+    const isUserscript = utils.isUserscript()
     const engine = new Styletron({
         container: $popupCard.parentElement ?? undefined,
         prefix: `${PREFIX}-styletron-`,
