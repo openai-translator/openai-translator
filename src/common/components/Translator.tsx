@@ -1833,16 +1833,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         className={styles.actionButton}
                                                         onClick={handleTranslatedSpeakAction}
                                                     >
-                                                        <div
-                                                            onClick={() => forceTranslate()}
-                                                            className={styles.actionButton}
-                                                        >
-                                                            {isSpeakingTranslatedText ? (
-                                                                <SpeakerMotion />
-                                                            ) : (
-                                                                <RxSpeakerLoud size={15} />
-                                                            )}
-                                                        </div>
+                                                        {isSpeakingTranslatedText ? (
+                                                            <SpeakerMotion />
+                                                        ) : (
+                                                            <RxSpeakerLoud size={15} />
+                                                        )}
                                                     </div>
                                                 </Tooltip>
                                                 {isWordMode && (
