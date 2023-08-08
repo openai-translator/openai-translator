@@ -72,7 +72,7 @@ async function createPopupCard() {
             await addViteStyleTarget(shadowRoot)
         } else {
             const browser = await utils.getBrowser()
-            import.meta.PLUGIN_WEB_EXT_CHUNK_CSS_PATHS.forEach((cssPath) => {
+            import.meta.PLUGIN_WEB_EXT_CHUNK_CSS_PATHS?.forEach((cssPath) => {
                 const styleEl = document.createElement('link')
                 styleEl.setAttribute('rel', 'stylesheet')
                 styleEl.setAttribute('href', browser.runtime.getURL(cssPath))

@@ -1067,6 +1067,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 paddingBottom: isDesktopApp ? '32px' : undefined,
                 background: theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
+                maxHeight: utils.isUserscript() ? 'calc(100vh - 32px)' : undefined,
+                overflow: utils.isUserscript() ? 'auto' : undefined,
             }}
             data-testid='settings-container'
         >
