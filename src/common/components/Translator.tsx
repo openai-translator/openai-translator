@@ -1540,6 +1540,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     : Math.min(Math.max(editableText.split('\n').length, 3), 12)
                                             }
                                             onChange={(e) => setEditableText(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                e.stopPropagation()
+                                            }}
                                             onKeyPress={(e) => {
                                                 if (e.key === 'Enter' && !e.shiftKey) {
                                                     e.preventDefault()
