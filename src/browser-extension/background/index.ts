@@ -80,7 +80,12 @@ async function fetchWithStream(
             })
         }
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            const { message, name } = error
+            port.postMessage({
+                error: { message, name },
+            })
+        }
     } finally {
         port.disconnect()
         reader.releaseLock()
