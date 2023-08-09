@@ -1745,7 +1745,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                           translateControllerRef.current?.signal.reason === 'stop' ? (
                                             <span key={'3'}>⏹️</span>
                                         ) : (
-                                            <span key={'3'}>👍</span>
+                                            <span key={'4'}>👍</span>
                                         )}
                                     </div>
                                 )}
