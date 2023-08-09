@@ -1743,7 +1743,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             <span key={'2'}>😢</span>
                                         ) : translateControllerRef.current?.signal.aborted &&
                                           translateControllerRef.current?.signal.reason === 'stop' ? (
-                                            <span key={'4'}>⏹️</span>
+                                            <span key={'3'}>⏹️</span>
                                         ) : (
                                             <span key={'3'}>👍</span>
                                         )}
