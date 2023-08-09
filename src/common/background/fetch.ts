@@ -58,7 +58,7 @@ export async function backgroundFetch(input: string, options: RequestInit) {
                             const e = new Error()
                             e.message = error.message
                             e.name = error.name
-                            reject(e)
+                            controller.error(e)
                             return
                         }
                         controller.enqueue(textEncoder.encode(data))
@@ -78,7 +78,11 @@ export async function backgroundFetch(input: string, options: RequestInit) {
 
                     port.onDisconnect.addListener(() => {
                         signal?.removeEventListener('abort', handleAbort)
-                        controller.close()
+                        try {
+                            controller.close()
+                        } catch (e) {
+                            // may throw if controller is errored
+                        }
                     })
 
                     port.postMessage(message)
