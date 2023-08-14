@@ -50,7 +50,7 @@
     "jss-preset-default": "^10.10.0",
     "katex": "^0.16.8",
     "lodash.debounce": "^4.0.8",
-    "lru-cache": "^10.0.0",
+    "lru-cache": "^10.0.1",
     "rc-field-form": "^1.36.0",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
