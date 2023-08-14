@@ -41,7 +41,7 @@
     "electron-store": "^8.1.0",
     "eventsource-parser": "^1.0.0",
     "hotkeys-js": "^3.10.1",
-    "i18next": "^23.4.1",
+    "i18next": "^23.4.4",
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.1",
     "iso-639-1": "^2.1.15",
