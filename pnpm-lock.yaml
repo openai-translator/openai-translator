@@ -272,8 +272,8 @@ devDependencies:
     specifier: ^4.6.0
     version: 4.6.0(eslint@8.46.0)
   fs-extra:
-    specifier: ^11.1.0
-    version: 11.1.0
+    specifier: ^11.1.1
+    version: 11.1.1
   jsdom:
     specifier: ^22.1.0
     version: 22.1.0
@@ -3643,15 +3643,6 @@ packages:
   /fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
     engines: {node: '>=12'}
-    dependencies:
-      graceful-fs: 4.2.11
-      jsonfile: 6.1.0
-      universalify: 2.0.0
-    dev: true
-
-  /fs-extra@11.1.0:
-    resolution: {integrity: sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==}
-    engines: {node: '>=14.14'}
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.1.0
