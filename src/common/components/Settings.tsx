@@ -23,7 +23,7 @@ import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../../package.json'
 import { useSettings } from '../hooks/useSettings'
-import { langCode2TTSLang } from '../tts'
+import { defaultTTSProvider, langCode2TTSLang } from '../tts'
 import { RiDeleteBin5Line } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
@@ -236,7 +236,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
 
     useEffect(() => {
         ;(async () => {
-            switch (value?.provider ?? 'WebSpeech') {
+            switch (value?.provider ?? defaultTTSProvider) {
                 case 'EdgeTTS':
                     setSupportVoices(await getEdgeVoices())
                     break
@@ -244,7 +244,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                     setSupportVoices(speechSynthesis.getVoices())
                     break
                 default:
-                    setSupportVoices(speechSynthesis.getVoices())
+                    setSupportVoices(await getEdgeVoices())
                     break
             }
         })()
@@ -276,7 +276,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
         (lang: string) => {
             const ttsLang = langCode2TTSLang[lang]
             return supportVoices
-                .filter((v) => v.lang === ttsLang)
+                .filter((v) => v.lang.split('-')[0] === lang || v.lang === ttsLang)
                 .map((sv) => ({ id: sv.voiceURI, label: sv.name, lang: sv.lang }))
         },
         [supportVoices]
