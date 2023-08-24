@@ -125,7 +125,7 @@
     "vite-plugin-dynamic-import": "^1.4.1",
     "vite-plugin-monkey": "^3.2.2",
     "vite-tsconfig-paths": "^4.2.0",
-    "vitest": "^0.34.1",
+    "vitest": "^0.34.2",
     "webextension-polyfill": "^0.10.0"
   },
   "build": {
