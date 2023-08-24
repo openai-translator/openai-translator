@@ -77,7 +77,7 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     },
     'lzh': {
         nameEn: 'Classical Chinese',
-        name: '文言',
+        name: '古文',
         phoneticNotation: 'Pinyin',
     },
     'jdbhw': {
