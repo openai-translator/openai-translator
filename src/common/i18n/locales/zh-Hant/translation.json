@@ -99,5 +99,7 @@
   "represents the target language": "表示目標語言",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "表示原始文本，通常不需要在提示中使用，因為它會自動注入",
   "Output rendering format": "輸出渲染格式",
-  "disable collecting statistics": "停用收集統計資料"
+  "disable collecting statistics": "停用收集統計資料",
+  "Buy me a coffee": "請我喝杯咖啡",
+  "If you find this tool helpful, you can buy me a cup of coffee.": "如果您覺得這個工具有幫助，可以請我喝杯咖啡。"
 }

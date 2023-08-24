@@ -34,6 +34,7 @@ import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
+import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1060,6 +1061,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
 
+    const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false)
+
     return (
         <div
             style={{
@@ -1091,7 +1094,14 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 data-tauri-drag-region
             >
                 <img width='22' src={utils.getAssetUrl(icon)} alt='logo' />
-                <h2>
+                <h2
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
+                    }}
+                >
                     OpenAI Translator
                     {AppConfig?.version ? (
                         <a
@@ -1104,6 +1114,23 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         </a>
                     ) : null}
                 </h2>
+                <div
+                    style={{
+                        flexGrow: 1,
+                    }}
+                />
+                <div>
+                    <Button
+                        kind='secondary'
+                        size='mini'
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setShowBuyMeACoffee(true)
+                        }}
+                    >
+                        {'❤️  ' + t('Buy me a coffee')}
+                    </Button>
+                </div>
             </nav>
             <Form
                 form={form}
@@ -1270,6 +1297,48 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </div>
                 <Toaster />
             </Form>
+            <Modal
+                isOpen={showBuyMeACoffee}
+                onClose={() => setShowBuyMeACoffee(false)}
+                closeable
+                size='auto'
+                autoFocus
+                animate
+            >
+                <ModalHeader
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    {'❤️  ' + t('Buy me a coffee')}
+                </ModalHeader>
+                <ModalBody>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 10,
+                        }}
+                    >
+                        <div>{t('If you find this tool helpful, you can buy me a cup of coffee.')}</div>
+                        <div>
+                            <img
+                                width='330'
+                                src='https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png'
+                            />
+                        </div>
+                        <div>
+                            <img
+                                width='330'
+                                src='https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png'
+                            />
+                        </div>
+                    </div>
+                </ModalBody>
+            </Modal>
         </div>
     )
 }

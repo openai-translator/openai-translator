@@ -98,5 +98,7 @@
   "represents the target language": "แสดงภาษาปลายทาง",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "แสดงข้อความต้นฉบับซึ่งมักจะไม่จำเป็นต้องอยู่ใน prompt เนื่องจากถูกฉีกอัตโนมัติ",
   "Output rendering format": "รูปแบบการแสดงผล",
-  "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
+  "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม",
+  "Buy me a coffee": "ช่วยฉันซื้อกาแฟ",
+  "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

@@ -99,5 +99,7 @@
   "represents the target language": "represents the target language",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "represents the original text, which is usually not needed inside the prompt because it is automatically injected",
   "Output rendering format": "Output rendering format",
-  "disable collecting statistics": "Disable collecting statistics"
+  "disable collecting statistics": "Disable collecting statistics",
+  "Buy me a coffee": "Buy me a coffee",
+  "If you find this tool helpful, you can buy me a cup of coffee.": "If you find this tool helpful, you can buy me a cup of coffee."
 }
