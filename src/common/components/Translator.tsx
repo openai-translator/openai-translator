@@ -699,6 +699,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     useEffect(() => {
         setOriginalText(props.text)
+        setSelectedWord('')
+        setHighlightWords([])
     }, [props.text, props.uuid])
 
     useEffect(() => {
