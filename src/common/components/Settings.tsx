@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'underscore'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
+import wechat from '../assets/images/wechat.png'
+import alipay from '../assets/images/alipay.png'
 import toast, { Toaster } from 'react-hot-toast'
 import * as utils from '../utils'
 import { Client as Styletron } from 'styletron-engine-atomic'
@@ -1325,16 +1327,10 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     >
                         <div>{t('If you find this tool helpful, you can buy me a cup of coffee.')}</div>
                         <div>
-                            <img
-                                width='330'
-                                src='https://user-images.githubusercontent.com/1206493/220753437-90e4039c-d95f-4b6a-9a08-b3d6de13211f.png'
-                            />
+                            <img width='330' src={wechat} />
                         </div>
                         <div>
-                            <img
-                                width='330'
-                                src='https://user-images.githubusercontent.com/1206493/220756036-d9ac4512-0375-4a32-8c2e-8697021058a2.png'
-                            />
+                            <img width='330' src={alipay} />
                         </div>
                     </div>
                 </ModalBody>
