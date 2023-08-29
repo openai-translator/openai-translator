@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast/headless'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -66,6 +66,7 @@ import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
+import Toaster from './Toaster'
 
 const cache = new LRUCache({
     max: 500,
