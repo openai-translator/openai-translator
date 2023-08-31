@@ -957,7 +957,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         setIsNotLogin(statusCode === 401 || statusCode === 403)
                     },
                     onMessage: (message) => {
-                        if (message.role) {
+                        if (!message.content) {
                             return
                         }
                         setIsWordMode(message.isWordMode)

@@ -271,7 +271,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                 text: str,
                 articlePrompt: prompt || '',
                 onMessage: (message) => {
-                    if (message.role) {
+                    if (!message.content) {
                         return
                     }
                     setArticle((e) => {
