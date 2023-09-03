@@ -9,7 +9,7 @@ export interface Config {
     direction?: 'ltr' | 'rtl' // direction of the language, default `ltr`
     rolePrompt?: string // prompt for the role of the translator, default `''`
     genAssistantPrompts?: () => string[] // generate prompts for the assistant, default `() => []`
-    genCommandPrompt?: (sourceLanguageConfig: Required<Config>, quoteStart: string, quoteEnd: string) => string
+    genCommandPrompt?: (sourceLanguageConfig: Required<Config>) => string
     phoneticNotation?: string | false // string for the name of the transcription / transliteration system, `false` if not applicable, default 'transcription'
     /*
      `phoneticNotation` is not applicable for languages that have no phonetic transcription, only
@@ -118,8 +118,8 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         phoneticNotation: 'Revised Romanization',
         isVariant: true,
         isSource: false,
-        genCommandPrompt: (sourceLanguageConfig, quoteStart, quoteEnd) =>
-            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use 이다 and 다 endings. Never use formal or honorific endings. Return translated text only. Only translate the text between ${quoteStart} and ${quoteEnd}. You can only translate and cannot interpret the content.`,
+        genCommandPrompt: (sourceLanguageConfig) =>
+            `Translate from ${sourceLanguageConfig.nameEn} to Korean banmal. Please use 이다 and 다 endings. Never use formal or honorific endings. Return translated text only.`,
     },
 
     'fr': {

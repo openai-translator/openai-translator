@@ -238,22 +238,19 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
         isTarget: true,
         isVariant: false,
         direction: 'ltr',
-        rolePrompt: oneLine`
-            You are a professional translation engine,
-            translate directly without explanation.`,
+        rolePrompt: 'You are a translator, translate directly without explanation.',
         genAssistantPrompts: () => {
-            return [
-                oneLine`
-                Please translate the text into a colloquial,
-                professional, elegant and fluent content,
-                without the style of machine translation.`,
-            ]
+            return []
+            // return [
+            //     oneLine`
+            //     Please translate the text into a colloquial,
+            //     professional, elegant and fluent content,
+            //     without the style of machine translation.`,
+            // ]
         },
-        genCommandPrompt: (sourceLanguageConfig: LanguageConfig, quoteStart: string, quoteEnd: string) =>
+        genCommandPrompt: (sourceLanguageConfig: LanguageConfig) =>
             oneLine`
-            Translate the following text from ${sourceLanguageConfig.name} to ${config.name}.
-            Return translated text only.
-            Only translate the text between ${quoteStart} and ${quoteEnd}.`,
+            Translate the following text from ${sourceLanguageConfig.name} to ${config.name} without the style of machine translation.`,
     }
     return { ...DEFAULT_CONFIG, ...config }
 }
