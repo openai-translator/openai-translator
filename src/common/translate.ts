@@ -199,7 +199,7 @@ export async function translate(query: TranslateQuery) {
     let rolePrompt = ''
     let commandPrompt = ''
     let contentPrompt = query.text
-    const assistantPrompts: string[] = []
+    let assistantPrompts: string[] = []
     let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
     let isWordMode = false
@@ -251,6 +251,7 @@ export async function translate(query: TranslateQuery) {
                 break
             case 'translate':
                 quoteProcessor = new QuoteProcessor()
+                assistantPrompts = targetLangConfig.genAssistantPrompts()
                 commandPrompt = targetLangConfig.genCommandPrompt(
                     sourceLangConfig,
                     quoteProcessor.quoteStart,
@@ -359,10 +360,12 @@ Etymology:
                 }
                 break
             case 'polishing':
-                rolePrompt =
-                    'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
+                rolePrompt = 'You are an expert translator, translate directly without explanation.'
                 quoteProcessor = new QuoteProcessor()
-                commandPrompt = `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                assistantPrompts = [
+                    'Please revise the following sentences to make them more clear, concise, and coherent.',
+                ]
+                commandPrompt = `Please polish the following text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'summarize':

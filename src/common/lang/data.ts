@@ -8,6 +8,7 @@ export interface Config {
     isTarget?: boolean // whether the language can be translated to, default `true`
     direction?: 'ltr' | 'rtl' // direction of the language, default `ltr`
     rolePrompt?: string // prompt for the role of the translator, default `''`
+    genAssistantPrompts?: () => string[] // generate prompts for the assistant, default `() => []`
     genCommandPrompt?: (sourceLanguageConfig: Required<Config>, quoteStart: string, quoteEnd: string) => string
     phoneticNotation?: string | false // string for the name of the transcription / transliteration system, `false` if not applicable, default 'transcription'
     /*
