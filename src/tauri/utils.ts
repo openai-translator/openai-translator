@@ -23,3 +23,14 @@ export async function bindOCRHotkey(oldOCRHotKey?: string) {
         invoke('ocr')
     })
 }
+
+export async function bindWritingHotkey(oldWritingHotKey?: string) {
+    if (oldWritingHotKey && (await isRegistered(oldWritingHotKey))) {
+        await unregister(oldWritingHotKey)
+    }
+    const settings = await getSettings()
+    if (!settings.writingHotkey) return
+    await register(settings.writingHotkey, () => {
+        invoke('writing')
+    })
+}

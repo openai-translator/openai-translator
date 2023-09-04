@@ -26,7 +26,8 @@ export type APIModel =
 
 interface BaseTranslateQuery {
     text: string
-    selectedWord: string
+    writing?: boolean
+    selectedWord?: string
     detectFrom: LangCode
     detectTo: LangCode
     mode?: Exclude<TranslateMode, 'big-bang'>
@@ -252,7 +253,7 @@ export async function translate(query: TranslateQuery) {
                 assistantPrompts = targetLangConfig.genAssistantPrompts()
                 commandPrompt = targetLangConfig.genCommandPrompt(sourceLangConfig)
                 contentPrompt = query.text
-                if (query.text.length < 5 && toChinese) {
+                if (!query.writing && query.text.length < 5 && toChinese) {
                     // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                     rolePrompt = codeBlock`
                     ${oneLineTrim`
@@ -269,7 +270,7 @@ export async function translate(query: TranslateQuery) {
                     `
                     commandPrompt = ''
                 }
-                if (isAWord(sourceLangCode, query.text.trim())) {
+                if (!query.writing && isAWord(sourceLangCode, query.text.trim())) {
                     isWordMode = true
                     if (toChinese) {
                         // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
@@ -335,7 +336,7 @@ Etymology:
                         contentPrompt = `The word is: ${query.text}`
                     }
                 }
-                if (query.selectedWord) {
+                if (!query.writing && query.selectedWord) {
                     rolePrompt = oneLine`
                     You are an expert in the semantic syntax of the ${sourceLangName} language
                     and you are teaching me the ${sourceLangName} language.

@@ -7,6 +7,7 @@ mod config;
 mod hotkey;
 mod lang;
 mod ocr;
+mod writing;
 mod tray;
 mod utils;
 mod windows;
@@ -23,6 +24,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
+use crate::writing::{writing, write_to_input};
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
     show_main_window_with_selected_text, MAIN_WIN_NAME,
@@ -33,7 +35,7 @@ use once_cell::sync::OnceCell;
 use tauri::api::notification::Notification;
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use tauri::{Manager, PhysicalPosition, PhysicalSize};
-use tiny_http::{Header, Response as HttpResponse, Server};
+use tiny_http::{Response as HttpResponse, Server};
 use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
@@ -336,6 +338,8 @@ fn main() {
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,
+            writing,
+            write_to_input,
             detect_lang,
         ])
         .system_tray(tray::menu())

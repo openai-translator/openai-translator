@@ -1271,6 +1271,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
                     <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
                 </FormItem>
+                <FormItem name='writingHotkey' label={t('Writing Hotkey')}>
+                    <HotkeyRecorder onBlur={onBlur} testId='writing-hotkey-recorder' />
+                </FormItem>
                 <FormItem
                     style={{
                         display: isDesktopApp ? 'block' : 'none',

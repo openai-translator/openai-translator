@@ -55,6 +55,7 @@ export interface ISettings {
     alwaysShowIcons: boolean
     hotkey?: string
     ocrHotkey?: string
+    writingHotkey?: string
     themeType?: ThemeType
     i18n?: string
     tts?: {

@@ -22,6 +22,7 @@
   "i18n": "言語",
   "Hotkey": "ホットキー",
   "OCR Hotkey": "OCRホットキー",
+  "Writing Hotkey": "書き込みホットキー",
   "Please press the hotkey you want to set.": "設定したいホットキーを押してください。",
   "Click above to set hotkeys.": "ホットキーを設定するには上をクリックしてください。",
   "Save": "保存",
