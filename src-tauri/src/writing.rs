@@ -56,6 +56,27 @@ pub fn select_all() {
     enigo.key_up(Key::Control);
 }
 
+pub fn double_backspace_click() {
+    use enigo::*;
+    let mut enigo = Enigo::new();
+    enigo.key_click(Key::Backspace);
+    enigo.key_click(Key::Backspace);
+}
+
+pub fn double_left_click() {
+    use enigo::*;
+    let mut enigo = Enigo::new();
+    enigo.key_click(Key::LeftArrow);
+    enigo.key_click(Key::LeftArrow);
+}
+
+pub fn double_right_click() {
+    use enigo::*;
+    let mut enigo = Enigo::new();
+    enigo.key_click(Key::RightArrow);
+    enigo.key_click(Key::RightArrow);
+}
+
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn paste() {
@@ -180,28 +201,23 @@ pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
 
 #[tauri::command]
 pub fn writing() {
+    use arboard::Clipboard;
     let content = get_input_text().unwrap_or_default();
+    let old_text = Clipboard::new().unwrap().get_text();
+    let old_image = Clipboard::new().unwrap().get_image();
+    {
+        let mut old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock();
+        *old_clipboard_content = (old_text.ok(), old_image.ok());
+    }
+    do_write_to_input("Translating, please wait... ✍️".to_string());
+    select_all();
     crate::utils::writing_text(content);
 }
 
 static START_WRITING: Mutex<bool> = Mutex::new(false);
 static OLD_CLIPBOARD_CONTENT: Mutex<(Option<String>, Option<ImageData<'static>>)> = Mutex::new((None, None));
 
-#[tauri::command]
-pub fn write_to_input(text: String) {
-    // println!("write_to_input: {}", text);
-    {
-        let mut start_writing = START_WRITING.lock();
-        if !*start_writing {
-            let old_text = Clipboard::new().unwrap().get_text();
-            let old_image = Clipboard::new().unwrap().get_image();
-            {
-                let mut old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock();
-                *old_clipboard_content = (old_text.ok(), old_image.ok());
-            }
-        }
-        *start_writing = true;
-    }
+fn do_write_to_input(text: String) {
     use arboard::Clipboard;
     use std::{thread, time::Duration};
     let mut write_clipboard = Clipboard::new().unwrap();
@@ -212,10 +228,43 @@ pub fn write_to_input(text: String) {
 }
 
 #[tauri::command]
+pub fn write_to_input(text: String) {
+    // println!("write_to_input: {}", text);
+    use std::{thread, time::Duration};
+    let mut new_text = text.clone();
+    let mut start_writing = START_WRITING.lock();
+    let is_first_writing = !*start_writing;
+    if is_first_writing {
+        new_text = text.clone() + " ✍️";
+    }
+    *start_writing = true;
+    do_write_to_input(new_text);
+    if is_first_writing {
+        thread::sleep(Duration::from_millis(50));
+        double_left_click();
+    }
+}
+
+#[tauri::command]
 pub fn finish_writing() {
     use arboard::Clipboard;
+    use std::{thread, time::Duration};
+
     let mut start_writing = START_WRITING.lock();
     *start_writing = false;
+
+    double_right_click();
+    thread::sleep(Duration::from_millis(50));
+
+    double_backspace_click();
+    thread::sleep(Duration::from_millis(50));
+
+    do_write_to_input(" ✅".to_string());
+    thread::sleep(Duration::from_millis(300));
+
+    double_backspace_click();
+    thread::sleep(Duration::from_millis(50));
+
     let old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock().clone();
     let (old_text, old_image) = old_clipboard_content;
     let mut write_clipboard = Clipboard::new().unwrap();
