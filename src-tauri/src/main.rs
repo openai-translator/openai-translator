@@ -24,7 +24,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
-use crate::writing::{writing, write_to_input};
+use crate::writing::{writing, write_to_input, finish_writing};
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
     show_main_window_with_selected_text, MAIN_WIN_NAME,
@@ -340,6 +340,7 @@ fn main() {
             ocr,
             writing,
             write_to_input,
+            finish_writing,
             detect_lang,
         ])
         .system_tray(tray::menu())

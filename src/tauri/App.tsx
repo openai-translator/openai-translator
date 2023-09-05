@@ -86,8 +86,12 @@ export function App() {
                                 text: message.content,
                             })
                         },
-                        onFinish: () => {},
-                        onError: () => {},
+                        onFinish: () => {
+                            invoke('finish_writing')
+                        },
+                        onError: () => {
+                            invoke('finish_writing')
+                        },
                     })
                 }
             })

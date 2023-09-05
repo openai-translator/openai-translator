@@ -1,3 +1,4 @@
+use arboard::ImageData;
 use parking_lot::Mutex;
 
 #[allow(dead_code)]
@@ -183,8 +184,24 @@ pub fn writing() {
     crate::utils::writing_text(content);
 }
 
+static START_WRITING: Mutex<bool> = Mutex::new(false);
+static OLD_CLIPBOARD_CONTENT: Mutex<(Option<String>, Option<ImageData<'static>>)> = Mutex::new((None, None));
+
 #[tauri::command]
 pub fn write_to_input(text: String) {
+    // println!("write_to_input: {}", text);
+    {
+        let mut start_writing = START_WRITING.lock();
+        if !*start_writing {
+            let old_text = Clipboard::new().unwrap().get_text();
+            let old_image = Clipboard::new().unwrap().get_image();
+            {
+                let mut old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock();
+                *old_clipboard_content = (old_text.ok(), old_image.ok());
+            }
+        }
+        *start_writing = true;
+    }
     use arboard::Clipboard;
     use std::{thread, time::Duration};
     let mut write_clipboard = Clipboard::new().unwrap();
@@ -192,4 +209,28 @@ pub fn write_to_input(text: String) {
     write_clipboard.set_text(text).unwrap();
     thread::sleep(Duration::from_millis(50));
     paste();
+}
+
+#[tauri::command]
+pub fn finish_writing() {
+    use arboard::Clipboard;
+    let mut start_writing = START_WRITING.lock();
+    *start_writing = false;
+    let old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock().clone();
+    let (old_text, old_image) = old_clipboard_content;
+    let mut write_clipboard = Clipboard::new().unwrap();
+    match old_text {
+        Some(text) => {
+            write_clipboard.set_text(text.clone()).unwrap();
+        }
+        None => {
+            write_clipboard.clear().unwrap();
+        }
+    }
+    match old_image {
+        Some(image) => {
+            write_clipboard.set_image(image.clone()).unwrap();
+        }
+        None => {}
+    }
 }
