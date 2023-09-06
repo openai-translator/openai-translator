@@ -77,18 +77,6 @@ pub fn double_right_click() {
     enigo.key_click(Key::RightArrow);
 }
 
-pub fn home_click() {
-    use enigo::*;
-    let mut enigo = Enigo::new();
-    enigo.key_click(Key::Home);
-}
-
-pub fn end_click() {
-    use enigo::*;
-    let mut enigo = Enigo::new();
-    enigo.key_click(Key::End);
-}
-
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn paste() {
@@ -221,7 +209,7 @@ pub fn writing() {
         let mut old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock();
         *old_clipboard_content = (old_text.ok(), old_image.ok());
     }
-    do_write_to_input("✍️ Translating, please wait...".to_string());
+    do_write_to_input("Translating, please wait... ✍️".to_string());
     select_all();
     crate::utils::writing_text(content);
 }
@@ -242,14 +230,19 @@ fn do_write_to_input(text: String) {
 #[tauri::command]
 pub fn write_to_input(text: String) {
     // println!("write_to_input: {}", text);
+    use std::{thread, time::Duration};
     let mut new_text = text.clone();
     let mut start_writing = START_WRITING.lock();
     let is_first_writing = !*start_writing;
     if is_first_writing {
-        new_text = format!("✍️ {}", text);
+        new_text = text.clone() + " ✍️";
     }
     *start_writing = true;
     do_write_to_input(new_text);
+    if is_first_writing {
+        thread::sleep(Duration::from_millis(50));
+        double_left_click();
+    }
 }
 
 #[tauri::command]
@@ -260,21 +253,17 @@ pub fn finish_writing() {
     let mut start_writing = START_WRITING.lock();
     *start_writing = false;
 
-    home_click();
-
     double_right_click();
     thread::sleep(Duration::from_millis(50));
 
     double_backspace_click();
     thread::sleep(Duration::from_millis(50));
 
-    do_write_to_input("✅ ".to_string());
+    do_write_to_input(" ✅".to_string());
     thread::sleep(Duration::from_millis(300));
 
     double_backspace_click();
     thread::sleep(Duration::from_millis(50));
-
-    end_click();
 
     let old_clipboard_content = OLD_CLIPBOARD_CONTENT.lock().clone();
     let (old_text, old_image) = old_clipboard_content;
