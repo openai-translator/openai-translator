@@ -22,6 +22,7 @@
   "i18n": "语言",
   "Hotkey": "快捷键",
   "OCR Hotkey": "OCR 快捷键",
+  "Writing Hotkey": "写作快捷键",
   "Please press the hotkey you want to set.": "请按您要设置的快捷键。",
   "Click above to set hotkeys.": "点击上面设置快捷键。",
   "Save": "保存",
@@ -101,5 +102,7 @@
   "Output rendering format": "输出渲染格式",
   "disable collecting statistics": "禁用统计",
   "Buy me a coffee": "请我喝杯咖啡",
+  "Writing target language": "写作目标语言",
+  "Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.": "在任何应用程序的输入框中按下此快捷键，输入框中已输入的文本将自动翻译为写作目标语言。",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }

@@ -988,6 +988,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         restorePreviousPosition: false,
         selectInputElementsText: utils.defaultSelectInputElementsText,
         runAtStartup: false,
+        writingTargetLanguage: utils.defaultWritingTargetLanguage,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
@@ -1270,6 +1271,27 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
                     <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='writingTargetLanguage'
+                    label={t('Writing target language')}
+                >
+                    <LanguageSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='writingHotkey'
+                    label={t('Writing Hotkey')}
+                    caption={t(
+                        'Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.'
+                    )}
+                >
+                    <HotkeyRecorder onBlur={onBlur} testId='writing-hotkey-recorder' />
                 </FormItem>
                 <FormItem
                     style={{

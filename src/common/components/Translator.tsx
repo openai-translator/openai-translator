@@ -419,6 +419,7 @@ export interface MovementXY {
 export interface IInnerTranslatorProps {
     uuid?: string
     text: string
+    writing?: boolean
     autoFocus?: boolean
     showSettings?: boolean
     defaultShowSettings?: boolean
@@ -884,7 +885,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [autoCollect])
 
     const translateText = useCallback(
-        async (text: string, selectedWord: string, signal: AbortSignal) => {
+        async (text: string, selectedWord: string, writing: boolean, signal: AbortSignal) => {
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
                 return
             }
@@ -1018,11 +1019,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         translateControllerRef.current = new AbortController()
         const { signal } = translateControllerRef.current
-        translateText(detectedOriginalText, selectedWord, signal)
+        translateText(detectedOriginalText, selectedWord, props.writing ?? false, signal)
         return () => {
             translateControllerRef.current?.abort()
         }
-    }, [translateText, editableText, detectedOriginalText, selectedWord])
+    }, [translateText, editableText, detectedOriginalText, selectedWord, props.writing])
 
     useEffect(() => {
         if (!props.defaultShowSettings) {

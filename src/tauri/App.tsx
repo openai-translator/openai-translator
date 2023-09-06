@@ -4,11 +4,14 @@ import { Client as Styletron } from 'styletron-engine-atomic'
 import { appWindow } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
-import { bindHotkey, bindOCRHotkey } from './utils'
+import { bindHotkey, bindOCRHotkey, bindWritingHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
 import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../common/constants'
+import { translate } from '../common/translate'
+import { detectLang, intoLangCode } from '../common/lang'
+import { useSettings } from '../common/hooks/useSettings'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -49,6 +52,59 @@ export function App() {
         return unlisten
     }, [])
 
+    const { settings } = useSettings()
+
+    useEffect(() => {
+        if (!settings?.writingTargetLanguage) {
+            return
+        }
+        let unlisten: () => void | undefined
+        ;(async () => {
+            unlisten = await listen('writing-text', async (event: Event<string>) => {
+                const inputText = event.payload
+                const { signal } = new AbortController()
+                if (inputText) {
+                    const sourceLang = await detectLang(inputText)
+                    let detectTo = intoLangCode(settings.writingTargetLanguage)
+                    if (sourceLang === detectTo) {
+                        detectTo = 'en'
+                    }
+                    await translate({
+                        writing: true,
+                        action: {
+                            idx: 0,
+                            name: 'writing',
+                            mode: 'translate',
+                            updatedAt: Date.now() + '',
+                            createdAt: Date.now() + '',
+                        },
+                        signal,
+                        text: inputText,
+                        detectFrom: sourceLang,
+                        detectTo,
+                        onMessage: (message) => {
+                            if (!message.content) {
+                                return
+                            }
+                            invoke('write_to_input', {
+                                text: message.content,
+                            })
+                        },
+                        onFinish: () => {
+                            invoke('finish_writing')
+                        },
+                        onError: () => {
+                            invoke('finish_writing')
+                        },
+                    })
+                }
+            })
+        })()
+        return () => {
+            unlisten?.()
+        }
+    }, [settings?.writingTargetLanguage])
+
     useEffect(() => {
         let unlisten
         ;(async () => {
@@ -63,6 +119,7 @@ export function App() {
     useEffect(() => {
         bindHotkey()
         bindOCRHotkey()
+        bindWritingHotkey()
     }, [])
 
     useEffect(() => {
@@ -170,6 +227,7 @@ export function App() {
                     invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)
+                    bindWritingHotkey(oldSettings.writingHotkey)
                 }}
             />
         </div>

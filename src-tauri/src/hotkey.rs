@@ -29,6 +29,19 @@ pub fn do_bind_hotkey() -> Result<(), Box<dyn std::error::Error>> {
                 ocr();
             })?;
     }
+    if let Some(writing_hotkey) = config.writing_hotkey {
+        if !handle
+            .global_shortcut_manager()
+            .is_registered(&writing_hotkey)?
+        {
+            handle.global_shortcut_manager().unregister(&writing_hotkey)?;
+        }
+        handle
+            .global_shortcut_manager()
+            .register(writing_hotkey.as_str(), || {
+                println!("writing_hotkey");
+            })?;
+    }
     Ok(())
 }
 

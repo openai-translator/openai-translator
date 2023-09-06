@@ -13,6 +13,7 @@ export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
+export const defaultWritingTargetLanguage = 'zh-Hans'
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
@@ -35,6 +36,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     alwaysShowIcons: 1,
     hotkey: 1,
     ocrHotkey: 1,
+    writingTargetLanguage: 1,
+    writingHotkey: 1,
     themeType: 1,
     i18n: 1,
     tts: 1,
@@ -75,6 +78,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.defaultTargetLanguage) {
         settings.defaultTargetLanguage = defaultTargetLanguage
+    }
+    if (!settings.writingTargetLanguage) {
+        settings.writingTargetLanguage = defaultWritingTargetLanguage
     }
     if (settings.alwaysShowIcons === undefined || settings.alwaysShowIcons === null) {
         settings.alwaysShowIcons = !isTauri()

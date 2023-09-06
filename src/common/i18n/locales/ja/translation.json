@@ -22,6 +22,7 @@
   "i18n": "言語",
   "Hotkey": "ホットキー",
   "OCR Hotkey": "OCRホットキー",
+  "Writing Hotkey": "書き込みホットキー",
   "Please press the hotkey you want to set.": "設定したいホットキーを押してください。",
   "Click above to set hotkeys.": "ホットキーを設定するには上をクリックしてください。",
   "Save": "保存",
@@ -101,5 +102,7 @@
   "Output rendering format": "出力レンダリング形式",
   "disable collecting statistics": "統計情報の収集を無効にする",
   "Buy me a coffee": "コーヒーを買ってください",
+  "Writing target language": "ターゲット言語を書く",
+  "Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.": "このショートカットキーを任意のアプリケーションの入力ボックスで押すと、入力ボックスにすでに入力されているテキストが自動的にターゲット言語に翻訳されます。",
   "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

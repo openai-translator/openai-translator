@@ -22,6 +22,7 @@
   "i18n": "語言",
   "Hotkey": "快捷鍵",
   "OCR Hotkey": "OCR 快捷鍵",
+  "Writing Hotkey": "寫作快捷鍵",
   "Please press the hotkey you want to set.": "請按下您想要設定的快捷鍵。",
   "Click above to set hotkeys.": "點選上方設定快捷鍵。",
   "Save": "儲存",
@@ -101,5 +102,7 @@
   "Output rendering format": "輸出渲染格式",
   "disable collecting statistics": "停用收集統計資料",
   "Buy me a coffee": "請我喝杯咖啡",
+  "Writing target language": "創作目標語言",
+  "Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.": "在任何應用程式的輸入框中按下此快捷鍵，輸入框中已輸入的文字將自動翻譯為創作目標語言。",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您覺得這個工具有幫助，可以請我喝杯咖啡。"
 }
