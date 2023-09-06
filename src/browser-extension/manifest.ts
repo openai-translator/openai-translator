@@ -18,6 +18,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
 
         options_ui: {
             page: 'src/browser-extension/options/index.html',
+            open_in_tab: true,
         },
 
         action: {
