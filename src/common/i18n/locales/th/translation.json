@@ -101,5 +101,7 @@
   "Output rendering format": "รูปแบบการแสดงผล",
   "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม",
   "Buy me a coffee": "ช่วยฉันซื้อกาแฟ",
+  "Writing target language": "เขียนภาษาปลายทาง",
+  "Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.": "กดปุ่มลัดนี้ในกล่องข้อความของแอปพลิเคชันใด ๆ และข้อความที่ป้อนลงในกล่องข้อความจะถูกแปลอัตโนมัติเป็นภาษาปลายทางที่เขียน",
   "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

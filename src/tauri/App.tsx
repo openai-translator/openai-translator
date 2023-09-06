@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../common/constants'
 import { translate } from '../common/translate'
 import { detectLang, intoLangCode } from '../common/lang'
-import { getSettings } from '../common/utils'
+import { useSettings } from '../common/hooks/useSettings'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -52,16 +52,20 @@ export function App() {
         return unlisten
     }, [])
 
+    const { settings } = useSettings()
+
     useEffect(() => {
-        let unlisten
+        if (!settings?.writingTargetLanguage) {
+            return
+        }
+        let unlisten: () => void | undefined
         ;(async () => {
-            const settings = await getSettings()
             unlisten = await listen('writing-text', async (event: Event<string>) => {
                 const inputText = event.payload
                 const { signal } = new AbortController()
                 if (inputText) {
                     const sourceLang = await detectLang(inputText)
-                    let detectTo = intoLangCode(settings.defaultTargetLanguage)
+                    let detectTo = intoLangCode(settings.writingTargetLanguage)
                     if (sourceLang === detectTo) {
                         detectTo = 'en'
                     }
@@ -96,8 +100,10 @@ export function App() {
                 }
             })
         })()
-        return unlisten
-    }, [])
+        return () => {
+            unlisten?.()
+        }
+    }, [settings?.writingTargetLanguage])
 
     useEffect(() => {
         let unlisten
