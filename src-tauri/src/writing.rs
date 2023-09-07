@@ -38,7 +38,9 @@ pub fn select_all() {
     }
 
     enigo.key_down(Key::Meta);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('a'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Meta);
 }
 
