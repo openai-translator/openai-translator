@@ -43,7 +43,7 @@ def create_new_tag():
     for line in release_note.split('\n'):
         line = line.strip().strip('"')
         t_, _, _ = line.partition(':')
-        if t_.lower() not in ('fix', 'feat', 'docs', 'refactor'):
+        if t_.lower() not in ('fix', 'feat', 'docs', 'refactor', 'optimize'):
             continue
         if line in seen:
             continue
@@ -56,6 +56,8 @@ def create_new_tag():
     subprocess.check_output(['git', 'push', 'origin', 'v' + new_version])
 
 def flatten(l):
+    if not l:
+        return l
     return reduce(lambda x, y: x + y, l)
 
 def main():
