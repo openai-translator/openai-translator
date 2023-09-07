@@ -1297,6 +1297,16 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     style={{
                         display: isDesktopApp ? 'block' : 'none',
                     }}
+                    name='writingNewlineHotkey'
+                    label={t('Writing line break shortcut')}
+                    caption={t('When writing, which key should be pressed when encountering a line break?')}
+                >
+                    <HotkeyRecorder onBlur={onBlur} testId='writing-newline-hotkey-recorder' />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
                     name='disableCollectingStatistics'
                     label={t('disable collecting statistics')}
                 >
