@@ -142,13 +142,15 @@ pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
 
     write_clipboard.set_text(not_selected_placeholder)?;
 
+    thread::sleep(Duration::from_millis(50));
+
     select_all();
 
-    thread::sleep(Duration::from_millis(10));
+    thread::sleep(Duration::from_millis(50));
 
     crate::utils::copy();
 
-    thread::sleep(Duration::from_millis(10));
+    thread::sleep(Duration::from_millis(100));
 
     let new_text = Clipboard::new()?.get_text();
 
