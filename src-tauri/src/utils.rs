@@ -1,33 +1,23 @@
 use tauri::Manager;
 use parking_lot::Mutex;
+use enigo::*;
 
 use crate::APP_HANDLE;
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn copy() {
-    use enigo::*;
+pub fn up_control_keys() {
     let mut enigo = Enigo::new();
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
     enigo.key_up(Key::Space);
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('c'));
-    enigo.key_up(Key::Control);
+    enigo.key_up(Key::Tab);
 }
-
-static COPY_PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn copy() {
-    // use std::{thread, time::Duration};
-
-    use enigo::*;
-
-    let _guard = COPY_PASTE.lock();
-
+pub fn up_control_keys() {
     let mut enigo = Enigo::new();
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Meta);
@@ -36,23 +26,55 @@ pub fn copy() {
     enigo.key_up(Key::Space);
     enigo.key_up(Key::Tab);
     enigo.key_up(Key::Option);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "linux")]
+pub fn up_control_keys() {
+    let mut enigo = Enigo::new();
+    enigo.key_up(Key::Control);
+    enigo.key_up(Key::Alt);
+    enigo.key_up(Key::Shift);
+    enigo.key_up(Key::Space);
+    enigo.key_up(Key::Tab);
+}
+
+static COPY_PASTE: Mutex<()> = Mutex::new(());
+
+#[allow(dead_code)]
+#[cfg(target_os = "windows")]
+pub fn copy() {
+    let _guard = COPY_PASTE.lock();
+
+    up_control_keys();
+
+    let mut enigo = Enigo::new();
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('c'));
+    enigo.key_up(Key::Control);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "macos")]
+pub fn copy() {
+    let _guard = COPY_PASTE.lock();
+
+    up_control_keys();
+
+    let mut enigo = Enigo::new();
     enigo.key_down(Key::Meta);
     enigo.key_click(Key::Layout('c'));
-    // enigo.key_down(Key::Layout('c'));
-    // thread::sleep(Duration::from_millis(300));
-    // enigo.key_up(Key::Layout('c'));
     enigo.key_up(Key::Meta);
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn copy() {
-    use enigo::*;
+    let _guard = COPY_PASTE.lock();
+
+    up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('c'));
     enigo.key_up(Key::Control);

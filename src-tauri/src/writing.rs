@@ -1,38 +1,42 @@
 use parking_lot::Mutex;
 use std::{thread, time::Duration};
-use enigo::{Enigo, KeyboardControllable};
+use enigo::*;
+
+static SELECT_ALL: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn select_all() {
-    use enigo::*;
+    let _guard = SELECT_ALL.lock();
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
     enigo.key_up(Key::Control);
 }
 
-static SELECT_ALL: Mutex<()> = Mutex::new(());
-
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn select_all() {
-    use enigo::*;
-
     let _guard = SELECT_ALL.lock();
 
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Meta);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
-    enigo.key_up(Key::Option);
+
+    if let Ok(config) = crate::config::get_config() {
+        if let Some(writing_hotkey) = config.writing_hotkey {
+            for key in writing_hotkey.split("+") {
+                let key = key.trim();
+                if key.len() == 1 {
+                    enigo.key_up(Key::Layout(key.chars().next().unwrap()));
+                }
+            }
+        }
+    }
+
     enigo.key_down(Key::Meta);
     enigo.key_click(Key::Layout('a'));
     enigo.key_up(Key::Meta);
@@ -41,12 +45,11 @@ pub fn select_all() {
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn select_all() {
-    use enigo::*;
+    let _guard = SELECT_ALL.lock();
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
     enigo.key_up(Key::Control);
@@ -56,7 +59,9 @@ static INPUT_LOCK: Mutex<()> = Mutex::new(());
 
 pub fn double_backspace_click() {
     let _guard = INPUT_LOCK.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
     enigo.key_click(Key::Backspace);
     enigo.key_click(Key::Backspace);
@@ -64,55 +69,49 @@ pub fn double_backspace_click() {
 
 pub fn double_left_click() {
     let _guard = INPUT_LOCK.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    thread::sleep(Duration::from_millis(100));
     enigo.key_click(Key::LeftArrow);
-    thread::sleep(Duration::from_millis(100));
     enigo.key_click(Key::LeftArrow);
-    thread::sleep(Duration::from_millis(100));
 }
 
 pub fn double_right_click() {
     let _guard = INPUT_LOCK.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
     enigo.key_click(Key::RightArrow);
     enigo.key_click(Key::RightArrow);
 }
+
+static PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn paste() {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
 }
-
-static PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn paste() {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Meta);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
-    enigo.key_up(Key::Option);
     enigo.key_down(Key::Meta);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Meta);
@@ -123,12 +122,10 @@ pub fn paste() {
 pub fn paste() {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
-    use enigo::*;
+
+    crate::utils::up_control_keys();
+
     let mut enigo = Enigo::new();
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
@@ -203,7 +200,7 @@ pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
 #[tauri::command]
 pub fn writing() {
     let content = get_input_text().unwrap_or_default();
-    do_write_to_input("Translating, please wait... ✍️".to_string(), false);
+    do_write_to_input("OpenAI Translator is translating, please wait... ✍️".to_string(), false);
     crate::utils::writing_text(content);
 }
 
