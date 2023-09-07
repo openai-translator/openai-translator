@@ -38,6 +38,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ocrHotkey: 1,
     writingTargetLanguage: 1,
     writingHotkey: 1,
+    writingNewlineHotkey: 1,
     themeType: 1,
     i18n: 1,
     tts: 1,

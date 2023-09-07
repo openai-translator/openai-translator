@@ -9,6 +9,7 @@ pub struct Config {
     pub hotkey: Option<String>,
     pub ocr_hotkey: Option<String>,
     pub writing_hotkey: Option<String>,
+    pub writing_newline_hotkey: Option<String>,
     pub restore_previous_position: Option<bool>,
     pub always_show_icons: Option<bool>,
     pub allow_using_clipboard_when_selected_text_not_available: Option<bool>,
