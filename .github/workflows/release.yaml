@@ -15,7 +15,7 @@ jobs:
       release_body: "${{ steps.tag.outputs.message }}"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version
         id: get_version
@@ -45,7 +45,7 @@ jobs:
       packages: write
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version
         id: get_version
@@ -105,7 +105,7 @@ jobs:
 
     runs-on: ${{ matrix.config.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version
         id: get_version
@@ -189,7 +189,7 @@ jobs:
     needs: create-release
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version
         id: get_version
@@ -231,7 +231,7 @@ jobs:
     needs: create-release
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v2
         with:
