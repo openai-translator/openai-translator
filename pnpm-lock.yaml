@@ -293,8 +293,8 @@ devDependencies:
     specifier: ^1.4.1
     version: 1.4.1
   vite-plugin-monkey:
-    specifier: ^3.2.2
-    version: 3.2.2(vite@4.3.9)
+    specifier: ^3.5.0
+    version: 3.5.0(vite@4.3.9)
   vite-tsconfig-paths:
     specifier: ^4.2.0
     version: 4.2.0(typescript@5.1.6)(vite@4.3.9)
@@ -4102,8 +4102,8 @@ packages:
       void-elements: 3.1.0
     dev: false
 
-  /htmlparser2@8.0.2:
-    resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
+  /htmlparser2@9.0.0:
+    resolution: {integrity: sha512-uxbSI98wmFT/G4P2zXx4OVx04qWUmyFPrD2/CNepa2Zo3GPNaCaaxElDgwUrwYWkK1nr9fft0Ya8dws8coDLLQ==}
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
@@ -6546,8 +6546,8 @@ packages:
       tslib: 2.5.2
     dev: true
 
-  /systemjs@6.14.1:
-    resolution: {integrity: sha512-8ftwWd+XnQtZ/aGbatrN4QFNGrKJzmbtixW+ODpci7pyoTajg4sonPP8aFLESAcuVxaC1FyDESt+SpfFCH9rZQ==}
+  /systemjs@6.14.2:
+    resolution: {integrity: sha512-1TlOwvKWdXxAY9vba+huLu99zrQURDWA8pUTYsRIYDZYQbGyK+pyEP4h4dlySsqo7ozyJBmYD20F+iUHhAltEg==}
     dev: true
 
   /tapable@2.2.1:
@@ -6979,8 +6979,8 @@ packages:
       fast-glob: 3.2.12
     dev: true
 
-  /vite-plugin-monkey@3.2.2(vite@4.3.9):
-    resolution: {integrity: sha512-h4pcTAVelBG3AYyMMAZu8tKLVo6Oeycul5MHkNOuvSusMq7Cm08q/VMG7eDZlFw1/Vww2Z6O242F1rGCQ1iHAQ==}
+  /vite-plugin-monkey@3.5.0(vite@4.3.9):
+    resolution: {integrity: sha512-NS3qiLvnzyRPsbfanbnzMGk33rCmN1iGs2RkGykl7H5aCwZhpb7nyUSOy3CD8haP8rqTQ9BS23BLprV5MRIy/Q==}
     engines: {node: ^14.18 || >= 16, pnpm: '>=6'}
     peerDependencies:
       vite: '>=3.0.0'
@@ -6991,12 +6991,12 @@ packages:
       acorn-walk: 8.2.0
       cross-spawn: 7.0.3
       detect-port: 1.5.1
-      htmlparser2: 8.0.2
-      magic-string: 0.30.0
+      htmlparser2: 9.0.0
+      magic-string: 0.30.2
       mrmime: 1.0.1
-      open: 8.4.2
+      open: 9.1.0
       picocolors: 1.0.0
-      systemjs: 6.14.1
+      systemjs: 6.14.2
       vite: 4.3.9(@types/node@20.5.9)
     transitivePeerDependencies:
       - supports-color
