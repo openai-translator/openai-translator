@@ -91,7 +91,8 @@ pub fn get_input_text(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::E
 pub fn writing() {
     let mut enigo = Enigo::new();
     let content = get_input_text(&mut enigo).unwrap_or_default();
-    do_write_to_input(&mut enigo, "OpenAI Translator is translating, please wait... ✍️".to_string(), false);
+    do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
+    select_all(&mut enigo);
     crate::utils::writing_text(content);
 }
 
@@ -154,11 +155,6 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
 pub fn write_to_input(text: String) {
     let mut start_writing = START_WRITING.lock();
     let mut enigo = Enigo::new();
-    let is_first_writing = !*start_writing;
-    if is_first_writing {
-        select_all(&mut enigo);
-        thread::sleep(Duration::from_millis(50));
-    }
     *start_writing = true;
     do_write_to_input(&mut enigo, text, true);
 }
