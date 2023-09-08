@@ -56,15 +56,14 @@ pub fn copy(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY.lock();
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/copy.applescript")
+        .expect("failed to resolve copy.applescript");
 
-    up_control_keys(enigo);
-
-    enigo.key_down(Key::Meta);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('c'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Meta);
+    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
 }
 
 #[allow(dead_code)]
@@ -219,7 +218,7 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
         .unwrap()
         .path_resolver()
         .resolve_resource("resources/get-selected-text-by-ax.applescript")
-        .expect("failed to resolve ocr binary resource");
+        .expect("failed to resolve get-selected-text-by-ax.applescript");
 
     match std::process::Command::new("osascript")
         .arg(apple_script)
@@ -255,7 +254,7 @@ pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<
         .unwrap()
         .path_resolver()
         .resolve_resource("resources/get-selected-text.applescript")
-        .expect("failed to resolve ocr binary resource");
+        .expect("failed to resolve get-selected-text.applescript");
 
     match std::process::Command::new("osascript")
         .arg(apple_script)
