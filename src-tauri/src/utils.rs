@@ -37,12 +37,12 @@ pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Tab);
 }
 
-static COPY_PASTE: Mutex<()> = Mutex::new(());
+static COPY: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
+    let _guard = COPY.lock();
 
     up_control_keys(enigo);
 
@@ -56,7 +56,7 @@ pub fn copy(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
+    let _guard = COPY.lock();
 
     up_control_keys(enigo);
 
@@ -70,7 +70,7 @@ pub fn copy(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
+    let _guard = COPY.lock();
 
     up_control_keys(enigo);
 
@@ -78,6 +78,44 @@ pub fn copy(enigo: &mut Enigo) {
     thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
     thread::sleep(Duration::from_millis(50));
+    enigo.key_up(Key::Control);
+}
+
+static PASTE: Mutex<()> = Mutex::new(());
+
+#[allow(dead_code)]
+#[cfg(target_os = "windows")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('v'));
+    enigo.key_up(Key::Control);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "macos")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Meta);
+    enigo.key_click(Key::Layout('v'));
+    enigo.key_up(Key::Meta);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "linux")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
 }
 
