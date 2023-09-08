@@ -19,26 +19,16 @@ pub fn select_all(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn select_all(enigo: &mut Enigo) {
-    let _guard = SELECT_ALL.lock();
+    use crate::APP_HANDLE;
 
-    crate::utils::up_control_keys(enigo);
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/select-all.applescript")
+        .expect("failed to resolve select-all.applescript");
 
-    if let Ok(config) = crate::config::get_config() {
-        if let Some(writing_hotkey) = config.writing_hotkey {
-            for key in writing_hotkey.split("+") {
-                let key = key.trim();
-                if key.len() == 1 {
-                    enigo.key_up(Key::Layout(key.chars().next().unwrap()));
-                }
-            }
-        }
-    }
-
-    enigo.key_down(Key::Meta);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('a'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Meta);
+    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
 }
 
 #[allow(dead_code)]
