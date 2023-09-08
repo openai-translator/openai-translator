@@ -835,7 +835,7 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
     useEffect(() => {
         let keys_ = Array.from(keys)
         if (keys_ && keys_.length > 0) {
-            keys_ = keys_.filter((k) => k.toLowerCase() !== 'meta')
+            keys_ = keys_.map((k) => (k.toLowerCase() === 'meta' ? 'CommandOrControl' : k))
             setHotKeys(keys_)
             onChange?.(keys_.join('+'))
         }
