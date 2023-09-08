@@ -5,6 +5,7 @@ use crate::APP_HANDLE;
 use mouse_position::mouse_position::Mouse;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
+use enigo::*;
 use window_shadows::set_shadow;
 
 pub const MAIN_WIN_NAME: &str = "main";
@@ -47,9 +48,10 @@ pub fn get_main_window_always_on_top() -> bool {
 #[tauri::command]
 pub fn show_main_window_with_selected_text() {
     let mut window = show_main_window(false, false);
+    let mut enigo = Enigo::new();
     let selected_text;
     if cfg!(target_os = "macos") {
-        selected_text = match utils::get_selected_text_by_clipboard() {
+        selected_text = match utils::get_selected_text_by_clipboard(&mut enigo) {
             Ok(text) => text,
             Err(e) => {
                 eprintln!("Error getting selected text: {}", e);

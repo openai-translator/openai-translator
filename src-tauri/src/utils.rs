@@ -1,13 +1,13 @@
 use tauri::Manager;
 use parking_lot::Mutex;
 use enigo::*;
+use std::{thread, time::Duration};
 
 use crate::APP_HANDLE;
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
@@ -17,8 +17,7 @@ pub fn up_control_keys() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Meta);
     enigo.key_up(Key::Alt);
@@ -30,8 +29,7 @@ pub fn up_control_keys() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
@@ -39,55 +37,96 @@ pub fn up_control_keys() {
     enigo.key_up(Key::Tab);
 }
 
-static COPY_PASTE: Mutex<()> = Mutex::new(());
+static COPY: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn copy() {
-    let _guard = COPY_PASTE.lock();
+pub fn copy(enigo: &mut Enigo) {
+    let _guard = COPY.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Control);
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn copy() {
-    let _guard = COPY_PASTE.lock();
+pub fn copy(enigo: &mut Enigo) {
+    let _guard = COPY.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Meta);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Meta);
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn copy() {
-    let _guard = COPY_PASTE.lock();
+pub fn copy(enigo: &mut Enigo) {
+    let _guard = COPY.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
+    enigo.key_up(Key::Control);
+}
+
+static PASTE: Mutex<()> = Mutex::new(());
+
+#[allow(dead_code)]
+#[cfg(target_os = "windows")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('v'));
+    enigo.key_up(Key::Control);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "macos")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Meta);
+    enigo.key_click(Key::Layout('v'));
+    enigo.key_up(Key::Meta);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "linux")]
+pub fn paste(enigo: &mut Enigo) {
+    let __guard = PASTE.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
 }
 
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    get_selected_text_by_clipboard()
+    let mut enigo = Enigo::new();
+    get_selected_text_by_clipboard(&mut enigo)
 }
 
-pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
-    use std::{thread, time::Duration};
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
 
@@ -99,7 +138,7 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
 
     thread::sleep(Duration::from_millis(50));
 
-    copy();
+    copy(enigo);
 
     thread::sleep(Duration::from_millis(100));
 
