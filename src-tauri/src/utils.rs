@@ -1,6 +1,7 @@
 use tauri::Manager;
 use parking_lot::Mutex;
 use enigo::*;
+use std::{thread, time::Duration};
 
 use crate::APP_HANDLE;
 
@@ -50,7 +51,9 @@ pub fn copy() {
 
     let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Control);
 }
 
@@ -63,7 +66,9 @@ pub fn copy() {
 
     let mut enigo = Enigo::new();
     enigo.key_down(Key::Meta);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Meta);
 }
 
@@ -76,7 +81,9 @@ pub fn copy() {
 
     let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
+    thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
+    thread::sleep(Duration::from_millis(50));
     enigo.key_up(Key::Control);
 }
 
@@ -87,7 +94,6 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
 
 pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
-    use std::{thread, time::Duration};
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
 
