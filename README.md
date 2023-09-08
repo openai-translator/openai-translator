@@ -85,19 +85,6 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 ## Windows
 
-### Install via [winget](https://github.com/microsoft/winget-cli)
-
-```sh
-winget install yetone.OpenAITranslator
-```
-
-### Install via [Scoop](https://scoop.sh)
-
-```powershell
-scoop bucket add extras
-scoop install openai-translator
-```
-
 ### Install Manually
 
 1. Download the installation package ending in `.msi` from the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page.
