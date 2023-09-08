@@ -82,9 +82,16 @@ pub fn double_right_click(enigo: &mut Enigo) {
     enigo.key_click(Key::RightArrow);
 }
 
+#[cfg(target_os = "macos")]
 pub fn get_input_text(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
     select_all(enigo);
-    return crate::utils::get_selected_text();
+    return crate::utils::get_selected_text_by_clipboard_using_applescript();
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn get_input_text(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
+    select_all(enigo);
+    return crate::utils::get_selected_text_by_clipboard(enigo);
 }
 
 #[tauri::command]
