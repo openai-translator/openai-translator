@@ -356,10 +356,7 @@ Etymology:
                 break
             case 'polishing':
                 rolePrompt = 'You are an expert translator, translate directly without explanation.'
-                assistantPrompts = [
-                    'Please revise the following sentences to make them more clear, concise, and coherent.',
-                ]
-                commandPrompt = `Please polish the following text in ${sourceLangName}.`
+                commandPrompt = `Please edit the following sentences in ${sourceLangName} to improve clarity, conciseness, and coherence, making them match the expression of native speakers.`
                 contentPrompt = query.text
                 break
             case 'summarize':
