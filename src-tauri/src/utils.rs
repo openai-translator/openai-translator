@@ -7,8 +7,7 @@ use crate::APP_HANDLE;
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
@@ -18,8 +17,7 @@ pub fn up_control_keys() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Meta);
     enigo.key_up(Key::Alt);
@@ -31,8 +29,7 @@ pub fn up_control_keys() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn up_control_keys() {
-    let mut enigo = Enigo::new();
+pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
     enigo.key_up(Key::Alt);
     enigo.key_up(Key::Shift);
@@ -44,12 +41,11 @@ static COPY_PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn copy() {
+pub fn copy(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
@@ -59,12 +55,11 @@ pub fn copy() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn copy() {
+pub fn copy(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Meta);
     thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
@@ -74,12 +69,11 @@ pub fn copy() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn copy() {
+pub fn copy(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
-    up_control_keys();
+    up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     thread::sleep(Duration::from_millis(50));
     enigo.key_click(Key::Layout('c'));
@@ -89,10 +83,11 @@ pub fn copy() {
 
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    get_selected_text_by_clipboard()
+    let mut enigo = Enigo::new();
+    get_selected_text_by_clipboard(&mut enigo)
 }
 
-pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
@@ -105,7 +100,7 @@ pub fn get_selected_text_by_clipboard() -> Result<String, Box<dyn std::error::Er
 
     thread::sleep(Duration::from_millis(50));
 
-    copy();
+    copy(enigo);
 
     thread::sleep(Duration::from_millis(100));
 

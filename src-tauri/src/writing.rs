@@ -6,12 +6,11 @@ static SELECT_ALL: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn select_all() {
+pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
     enigo.key_up(Key::Control);
@@ -19,12 +18,10 @@ pub fn select_all() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn select_all() {
+pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys();
-
-    let mut enigo = Enigo::new();
+    crate::utils::up_control_keys(enigo);
 
     if let Ok(config) = crate::config::get_config() {
         if let Some(writing_hotkey) = config.writing_hotkey {
@@ -46,12 +43,11 @@ pub fn select_all() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn select_all() {
+pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
     enigo.key_up(Key::Control);
@@ -59,32 +55,29 @@ pub fn select_all() {
 
 static INPUT_LOCK: Mutex<()> = Mutex::new(());
 
-pub fn double_backspace_click() {
+pub fn double_backspace_click(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_click(Key::Backspace);
     enigo.key_click(Key::Backspace);
 }
 
-pub fn double_left_click() {
+pub fn double_left_click(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_click(Key::LeftArrow);
     enigo.key_click(Key::LeftArrow);
 }
 
-pub fn double_right_click() {
+pub fn double_right_click(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_click(Key::RightArrow);
     enigo.key_click(Key::RightArrow);
 }
@@ -93,13 +86,12 @@ static PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
-pub fn paste() {
+pub fn paste(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
@@ -107,13 +99,12 @@ pub fn paste() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn paste() {
+pub fn paste(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Meta);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Meta);
@@ -121,19 +112,18 @@ pub fn paste() {
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
-pub fn paste() {
+pub fn paste(enigo: &mut Enigo) {
     let _guard = INPUT_LOCK.lock();
     let __guard = PASTE.lock();
 
-    crate::utils::up_control_keys();
+    crate::utils::up_control_keys(enigo);
 
-    let mut enigo = Enigo::new();
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
 }
 
-pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_input_text(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
@@ -146,11 +136,11 @@ pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
 
     thread::sleep(Duration::from_millis(50));
 
-    select_all();
+    select_all(enigo);
 
     thread::sleep(Duration::from_millis(50));
 
-    crate::utils::copy();
+    crate::utils::copy(enigo);
 
     thread::sleep(Duration::from_millis(100));
 
@@ -201,16 +191,16 @@ pub fn get_input_text() -> Result<String, Box<dyn std::error::Error>> {
 
 #[tauri::command]
 pub fn writing() {
-    let content = get_input_text().unwrap_or_default();
-    do_write_to_input("OpenAI Translator is translating, please wait... ✍️".to_string(), false);
+    let mut enigo = Enigo::new();
+    let content = get_input_text(&mut enigo).unwrap_or_default();
+    do_write_to_input(&mut enigo, "OpenAI Translator is translating, please wait... ✍️".to_string(), false);
     crate::utils::writing_text(content);
 }
 
 static START_WRITING: Mutex<bool> = Mutex::new(false);
 
-fn do_write_to_input(text: String, animation: bool) {
+fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
     let _guard = INPUT_LOCK.lock();
-    let mut enigo = Enigo::new();
     if animation {
         for c in text.chars() {
             let char = c.to_string();
@@ -265,23 +255,25 @@ fn do_write_to_input(text: String, animation: bool) {
 #[tauri::command]
 pub fn write_to_input(text: String) {
     let mut start_writing = START_WRITING.lock();
+    let mut enigo = Enigo::new();
     let is_first_writing = !*start_writing;
     if is_first_writing {
-        select_all();
+        select_all(&mut enigo);
         thread::sleep(Duration::from_millis(50));
     }
     *start_writing = true;
-    do_write_to_input(text, true);
+    do_write_to_input(&mut enigo, text, true);
 }
 
 #[tauri::command]
 pub fn finish_writing() {
     let mut start_writing = START_WRITING.lock();
+    let mut enigo = Enigo::new();
     *start_writing = false;
 
-    do_write_to_input(" ✅".to_string(), true);
+    do_write_to_input(&mut enigo, " ✅".to_string(), true);
     thread::sleep(Duration::from_millis(300));
 
-    double_backspace_click();
+    double_backspace_click(&mut enigo);
     thread::sleep(Duration::from_millis(50));
 }
