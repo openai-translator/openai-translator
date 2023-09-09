@@ -77,9 +77,26 @@ pub fn get_input_text(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::E
     return crate::utils::get_selected_text_by_clipboard(enigo);
 }
 
+static IS_WRITING: Mutex<bool> = Mutex::new(false);
+static TRANSLATE_SELECTED_TEXT_PLACEHOLDER: &str = "<Translating... ✍️>";
+static TRANSLATE_SELECTED_TEXT: Mutex<bool> = Mutex::new(false);
+
 #[tauri::command]
 pub fn writing() {
+    let mut is_writing = IS_WRITING.lock();
+    if *is_writing {
+        return;
+    }
+    let mut translate_selected_text = TRANSLATE_SELECTED_TEXT.lock();
     let mut enigo = Enigo::new();
+    let selected_text = crate::utils::get_selected_text_by_clipboard(&mut enigo).unwrap_or_default();
+    if !selected_text.is_empty() {
+        *translate_selected_text = true;
+        do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
+        crate::utils::writing_text(selected_text);
+        return;
+    }
+    *translate_selected_text = false;
     let content = get_input_text(&mut enigo).unwrap_or_default();
     do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
     crate::utils::writing_text(content);
@@ -142,12 +159,19 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
 
 #[tauri::command]
 pub fn write_to_input(text: String) {
+    let mut translate_selected_text = TRANSLATE_SELECTED_TEXT.lock();
     let mut start_writing = START_WRITING.lock();
     let mut enigo = Enigo::new();
     let is_first_writing = !*start_writing;
     if is_first_writing {
-        select_all(&mut enigo);
-        thread::sleep(Duration::from_millis(50));
+        if !*translate_selected_text {
+            select_all(&mut enigo);
+            thread::sleep(Duration::from_millis(50));
+        } else {
+            for _ in 0..TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned().chars().count() - 1 {
+                enigo.key_click(Key::Backspace);
+            }
+        }
     }
     *start_writing = true;
     do_write_to_input(&mut enigo, text, true);
@@ -155,6 +179,8 @@ pub fn write_to_input(text: String) {
 
 #[tauri::command]
 pub fn finish_writing() {
+    let mut is_writing = IS_WRITING.lock();
+    *is_writing = false;
     let mut start_writing = START_WRITING.lock();
     let mut enigo = Enigo::new();
     *start_writing = false;
