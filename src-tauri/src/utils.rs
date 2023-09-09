@@ -37,12 +37,12 @@ pub fn up_control_keys(enigo: &mut Enigo) {
     enigo.key_up(Key::Tab);
 }
 
-static COPY: Mutex<()> = Mutex::new(());
+static COPY_PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY.lock();
+    let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
@@ -56,6 +56,8 @@ pub fn copy(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn copy(enigo: &mut Enigo) {
+    let _guard = COPY_PASTE.lock();
+
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
@@ -69,7 +71,7 @@ pub fn copy(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY.lock();
+    let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
@@ -80,12 +82,10 @@ pub fn copy(enigo: &mut Enigo) {
     enigo.key_up(Key::Control);
 }
 
-static PASTE: Mutex<()> = Mutex::new(());
-
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn paste(enigo: &mut Enigo) {
-    let __guard = PASTE.lock();
+    let _guard = COPY_PASTE.lock();
 
     crate::utils::up_control_keys(enigo);
 
@@ -97,19 +97,22 @@ pub fn paste(enigo: &mut Enigo) {
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn paste(enigo: &mut Enigo) {
-    let __guard = PASTE.lock();
+    let _guard = COPY_PASTE.lock();
 
-    crate::utils::up_control_keys(enigo);
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/paste.applescript")
+        .expect("failed to resolve paste.applescript");
 
-    enigo.key_down(Key::Meta);
-    enigo.key_click(Key::Layout('v'));
-    enigo.key_up(Key::Meta);
+    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "linux")]
 pub fn paste(enigo: &mut Enigo) {
-    let __guard = PASTE.lock();
+    let _guard = COPY_PASTE.lock();
 
     crate::utils::up_control_keys(enigo);
 
@@ -121,10 +124,10 @@ pub fn paste(enigo: &mut Enigo) {
 #[cfg(not(target_os = "macos"))]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     let mut enigo = Enigo::new();
-    get_selected_text_by_clipboard(&mut enigo)
+    get_selected_text_by_clipboard(&mut enigo, false)
 }
 
-pub fn get_selected_text_by_clipboard(enigo: &mut Enigo) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard(enigo: &mut Enigo, cancel_select: bool) -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
@@ -138,6 +141,10 @@ pub fn get_selected_text_by_clipboard(enigo: &mut Enigo) -> Result<String, Box<d
     thread::sleep(Duration::from_millis(50));
 
     copy(enigo);
+
+    if cancel_select {
+        paste(enigo);
+    }
 
     thread::sleep(Duration::from_millis(100));
 
