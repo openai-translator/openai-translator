@@ -51,7 +51,7 @@ pub fn show_main_window_with_selected_text() {
     let mut enigo = Enigo::new();
     let selected_text;
     if cfg!(target_os = "macos") {
-        selected_text = match utils::get_selected_text_by_clipboard(&mut enigo) {
+        selected_text = match utils::get_selected_text_by_clipboard(&mut enigo, false) {
             Ok(text) => text,
             Err(e) => {
                 eprintln!("Error getting selected text: {}", e);
