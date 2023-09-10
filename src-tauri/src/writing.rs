@@ -100,7 +100,7 @@ pub fn get_input_text(enigo: &mut Enigo, cancel_select: bool) -> Result<String, 
 }
 
 static IS_WRITING: Mutex<bool> = Mutex::new(false);
-static TRANSLATE_SELECTED_TEXT_PLACEHOLDER: &str = "<Translating... ✍️>";
+static TRANSLATE_SELECTED_TEXT_PLACEHOLDER: &str = "<Translating ✍️>";
 static IS_TRANSLATE_SELECTED_TEXT: Mutex<bool> = Mutex::new(false);
 static IS_INCREMENTAL_TRANSLATE: Mutex<bool> = Mutex::new(false);
 static IS_INCREMENTAL_TRANSLATE_IN_THE_MIDDLE: Mutex<bool> = Mutex::new(false);
@@ -149,31 +149,31 @@ pub fn writing() {
             }
         }).collect::<Vec<_>>();
         if insertions.len() == 1 {
-            let insertion = insertions.iter().next().unwrap();
-            let insertion_idx = changeset.iter().take_while(|change| {
-                match change {
-                    Difference::Same(_) => true,
-                    _ => false,
+            let insertion_content = insertions.iter().next().unwrap();
+            if !insertion_content.is_empty() {
+                let insertion_idx = changeset.iter().take_while(|change| {
+                    match change {
+                        Difference::Same(_) => true,
+                        _ => false,
+                    }
+                }).fold(0, |acc, change| {
+                    match change {
+                        Difference::Same(v) => acc + v.chars().count(),
+                        _ => acc,
+                    }
+                });
+                let left_click_count = content.chars().count() - insertion_idx - insertion_content.chars().count();
+                if left_click_count > 0 {
+                    *is_incremental_translate_in_the_middle = true;
                 }
-            }).fold(0, |acc, change| {
-                match change {
-                    Difference::Same(v) => acc + v.chars().count(),
-                    _ => acc,
-                }
-            });
-            let left_click_count = content.chars().count() - insertion_idx - insertion.chars().count();
-            if left_click_count > 0 {
-                *is_incremental_translate_in_the_middle = true;
+                left_arrow_click(&mut enigo, left_click_count);
+                *is_incremental_translate = true;
+                let insertion_content = insertion_content.replace("\r\n", "\n");
+                backspace_click(&mut enigo, insertion_content.chars().count());
+                do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
+                crate::utils::writing_text(insertion_content.to_owned());
+                return;
             }
-            left_arrow_click(&mut enigo, left_click_count);
-            *is_incremental_translate = true;
-            let new_content = insertion;
-            for _ in 0..new_content.chars().count() {
-                enigo.key_click(Key::Backspace);
-            }
-            do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
-            crate::utils::writing_text(new_content.to_owned());
-            return;
         }
     }
     select_all(&mut enigo);
