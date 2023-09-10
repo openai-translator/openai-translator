@@ -1,98 +1,10 @@
+use debug_print::debug_println;
 use parking_lot::Mutex;
 use std::{thread, time::Duration};
-use text_diff::{diff, Difference};
+use similar::utils::diff_chars;
+use similar::{Algorithm, ChangeTag};
 use enigo::*;
-
-static SELECT_ALL: Mutex<()> = Mutex::new(());
-
-#[allow(dead_code)]
-#[cfg(target_os = "windows")]
-pub fn select_all(enigo: &mut Enigo) {
-    let _guard = SELECT_ALL.lock();
-
-    crate::utils::up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "macos")]
-pub fn select_all(enigo: &mut Enigo) {
-    use crate::APP_HANDLE;
-
-    let apple_script = APP_HANDLE
-        .get()
-        .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/select-all.applescript")
-        .expect("failed to resolve select-all.applescript");
-
-    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn select_all(enigo: &mut Enigo) {
-    let _guard = SELECT_ALL.lock();
-
-    crate::utils::up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
-}
-
-static INPUT_LOCK: Mutex<()> = Mutex::new(());
-
-#[cfg(not(target_os = "macos"))]
-pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
-    let _guard = INPUT_LOCK.lock();
-
-    for _ in 0..n {
-        enigo.key_click(Key::LeftArrow);
-    }
-}
-
-#[cfg(target_os = "macos")]
-pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
-    use crate::APP_HANDLE;
-    let _guard = INPUT_LOCK.lock();
-
-    let apple_script = APP_HANDLE
-        .get()
-        .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/left.applescript")
-        .expect("failed to resolve left.applescript");
-
-    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
-}
-
-#[cfg(not(target_os = "macos"))]
-pub fn backspace_click(enigo: &mut Enigo, n: usize) {
-    let _guard = INPUT_LOCK.lock();
-
-    for _ in 0..n {
-        enigo.key_click(Key::Backspace);
-    }
-}
-
-#[cfg(target_os = "macos")]
-pub fn backspace_click(enigo: &mut Enigo, n: usize) {
-    use crate::APP_HANDLE;
-    let _guard = INPUT_LOCK.lock();
-
-    let apple_script = APP_HANDLE
-        .get()
-        .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/backspace.applescript")
-        .expect("failed to resolve backspace.applescript");
-
-    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
-}
+use crate::utils::{INPUT_LOCK, select_all, left_arrow_click, backspace_click, right_arrow_click};
 
 pub fn get_input_text(enigo: &mut Enigo, cancel_select: bool) -> Result<String, Box<dyn std::error::Error>> {
     select_all(enigo);
@@ -102,9 +14,16 @@ pub fn get_input_text(enigo: &mut Enigo, cancel_select: bool) -> Result<String, 
 static IS_WRITING: Mutex<bool> = Mutex::new(false);
 static TRANSLATE_SELECTED_TEXT_PLACEHOLDER: &str = "<Translating ✍️>";
 static IS_TRANSLATE_SELECTED_TEXT: Mutex<bool> = Mutex::new(false);
-static IS_INCREMENTAL_TRANSLATE: Mutex<bool> = Mutex::new(false);
-static IS_INCREMENTAL_TRANSLATE_IN_THE_MIDDLE: Mutex<bool> = Mutex::new(false);
 static PREVIOUS_TRANSLATED_TEXT: Mutex<String> = Mutex::new(String::new());
+
+#[derive(Clone)]
+struct IncrementalAction {
+    left_arrow_click_count: usize,
+    right_arrow_click_count: usize,
+    insertion_content: String,
+}
+
+static INCREMENTAL_ACTIONS: Mutex<Vec<IncrementalAction>> = Mutex::new(Vec::new());
 
 #[tauri::command]
 pub fn writing() {
@@ -112,10 +31,6 @@ pub fn writing() {
     if *is_writing {
         return;
     }
-    let mut is_incremental_translate = IS_INCREMENTAL_TRANSLATE.lock();
-    *is_incremental_translate = false;
-    let mut is_incremental_translate_in_the_middle = IS_INCREMENTAL_TRANSLATE_IN_THE_MIDDLE.lock();
-    *is_incremental_translate_in_the_middle = false;
     let mut is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
     let mut enigo = Enigo::new();
     let selected_text = crate::utils::get_selected_text_by_clipboard(&mut enigo, false).unwrap_or_default();
@@ -126,60 +41,122 @@ pub fn writing() {
         return;
     }
     *is_translate_selected_text = false;
-    let content = get_input_text(&mut enigo, true).unwrap_or_default();
+    let mut previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
+    let mut content = get_input_text(&mut enigo, true).unwrap_or_default();
     if content.is_empty() {
+        *previous_translated_text = content;
         return;
     }
-    let previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
-    let (_, changeset) = diff(&*previous_translated_text, &content, "");
-    let changes = changeset.iter().filter(|change| {
-        match change {
-            Difference::Add(_) => true,
-            Difference::Rem(_) => true,
+    if content.ends_with("\r\n") {
+        content = content[..content.len() - 2].to_owned();
+    }
+    let content = content.replace("\r\n", "\n");
+    if content.trim().is_empty() {
+        *previous_translated_text = content;
+        return;
+    }
+    debug_println!("content: {:?}", content.chars());
+    debug_println!("previous_translated_text: {:?}", previous_translated_text.chars());
+    let changeset = diff_chars(Algorithm::Myers, &*previous_translated_text, &content);
+    debug_println!("changeset: {:?}", changeset);
+    let modifications_count = changeset.iter().filter(|(change_tag, _)| {
+        match change_tag {
+            ChangeTag::Insert => true,
+            ChangeTag::Delete => true,
             _ => false,
         }
-    }).collect::<Vec<_>>();
-    if !previous_translated_text.is_empty() && changes.len() == 1 {
-        let insertions = changes.iter().map(|change| {
-            match change {
-                Difference::Add(text) => {
-                    text.to_owned()
-                }
-                _ => String::new(),
+    }).count();
+    {
+        let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
+        incremental_actions.clear();
+    }
+    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 {
+        let mut incremental_actions = Vec::new();
+        let mut is_first_insertion = true;
+        let mut prev_insertion_index = 0;
+        for i in 0..changeset.len() {
+            let change = &changeset[i];
+            let insertion_content = match change {
+                (ChangeTag::Insert, content) => content,
+                _ => continue,
+            };
+            if insertion_content.trim().is_empty() {
+                continue;
             }
-        }).collect::<Vec<_>>();
-        if insertions.len() == 1 {
-            let insertion_content = insertions.iter().next().unwrap();
-            if !insertion_content.is_empty() {
-                let insertion_idx = changeset.iter().take_while(|change| {
+            let mut prefix_newline_count = 0;
+            for c in insertion_content.chars() {
+                if c == '\n' {
+                    prefix_newline_count += 1;
+                } else {
+                    break;
+                }
+            }
+            let mut suffix_newline_count = 0;
+            for c in insertion_content.chars().rev() {
+                if c == '\n' {
+                    suffix_newline_count += 1;
+                } else {
+                    break;
+                }
+            }
+            let mut left_arrow_click_count = 0;
+            let mut right_arrow_click_count = 0;
+            if is_first_insertion {
+                is_first_insertion = false;
+                left_arrow_click_count = changeset[i+1..].iter().fold(0, |acc, change| {
                     match change {
-                        Difference::Same(_) => true,
-                        _ => false,
-                    }
-                }).fold(0, |acc, change| {
-                    match change {
-                        Difference::Same(v) => acc + v.chars().count(),
+                        (ChangeTag::Insert, text) => acc + text.chars().count(),
+                        (ChangeTag::Equal, text) => acc + text.chars().count(),
                         _ => acc,
                     }
-                });
-                let left_click_count = content.chars().count() - insertion_idx - insertion_content.chars().count();
-                if left_click_count > 0 {
-                    *is_incremental_translate_in_the_middle = true;
-                }
-                left_arrow_click(&mut enigo, left_click_count);
-                *is_incremental_translate = true;
-                let insertion_content = insertion_content.replace("\r\n", "\n");
-                backspace_click(&mut enigo, insertion_content.chars().count());
-                do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
-                crate::utils::writing_text(insertion_content.to_owned());
-                return;
+                }) + suffix_newline_count;
+            } else {
+                right_arrow_click_count = changeset[prev_insertion_index+1..i].iter().fold(0, |acc, change| {
+                    match change {
+                        (ChangeTag::Insert, text) => acc + text.chars().count(),
+                        (ChangeTag::Equal, text) => acc + text.chars().count(),
+                        _ => acc,
+                    }
+                }) + prefix_newline_count;
             }
+            prev_insertion_index = i;
+            let insertion_content = insertion_content[prefix_newline_count..insertion_content.len()-suffix_newline_count].to_owned();
+            let incremental_action = IncrementalAction {
+                left_arrow_click_count,
+                right_arrow_click_count,
+                insertion_content,
+            };
+            incremental_actions.push(incremental_action);
         }
+        if incremental_actions.is_empty() {
+            *previous_translated_text = content;
+            return;
+        }
+        thread::spawn(move || {
+            let mut global_incremental_actions = INCREMENTAL_ACTIONS.lock();
+            let reversed_incremental_actions = incremental_actions.iter().rev().map(|action| action.to_owned()).collect::<Vec<_>>();
+            let incremental_action = reversed_incremental_actions[reversed_incremental_actions.len()-1].clone();
+            *global_incremental_actions = reversed_incremental_actions;
+            do_incremental_writing(&incremental_action);
+        });
+        return;
     }
     select_all(&mut enigo);
     thread::sleep(Duration::from_millis(30));
     do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
     crate::utils::writing_text(content);
+}
+
+fn do_incremental_writing(incremental_action: &IncrementalAction) {
+    let mut enigo = Enigo::new();
+    if incremental_action.left_arrow_click_count > 0 {
+        left_arrow_click(&mut enigo, incremental_action.left_arrow_click_count);
+    } else if incremental_action.right_arrow_click_count > 0 {
+        right_arrow_click(&mut enigo, incremental_action.right_arrow_click_count + incremental_action.insertion_content.chars().count());
+    }
+    backspace_click(&mut enigo, incremental_action.insertion_content.chars().count());
+    do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
+    crate::utils::writing_text(incremental_action.insertion_content.to_owned());
 }
 
 static IS_START_WRITING: Mutex<bool> = Mutex::new(false);
@@ -240,12 +217,13 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
 #[tauri::command]
 pub fn write_to_input(text: String) {
     let is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
-    let is_incremental_translate = IS_INCREMENTAL_TRANSLATE.lock();
+    let incremental_contents = INCREMENTAL_ACTIONS.lock();
+    let is_incremental_translate = !incremental_contents.is_empty();
     let mut is_start_writing = IS_START_WRITING.lock();
     let mut enigo = Enigo::new();
     let is_first_writing = !*is_start_writing;
     if is_first_writing {
-        if !*is_translate_selected_text && !*is_incremental_translate {
+        if !*is_translate_selected_text && !is_incremental_translate {
             select_all(&mut enigo);
             thread::sleep(Duration::from_millis(50));
         } else {
@@ -264,22 +242,39 @@ pub fn finish_writing() {
     let mut enigo = Enigo::new();
     *is_start_writing = false;
 
-    let is_incremental_translate_in_the_middle = IS_INCREMENTAL_TRANSLATE_IN_THE_MIDDLE.lock();
-    if *is_incremental_translate_in_the_middle {
+    let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
+
+    let is_incremental_translate_in_the_middle = {
+        if incremental_actions.is_empty() {
+            false
+        } else {
+            let incremental_action = &incremental_actions[incremental_actions.len()-1];
+            incremental_action.left_arrow_click_count > 0
+        }
+    };
+    if is_incremental_translate_in_the_middle {
         do_write_to_input(&mut enigo, " ".to_string(), false);
     }
 
-    do_write_to_input(&mut enigo, " ✅".to_string(), true);
-    thread::sleep(Duration::from_millis(300));
+    if incremental_actions.len() > 1 {
+        let mut new_incremental_actions = incremental_actions.clone();
+        new_incremental_actions.pop().unwrap();
+        let incremental_action = new_incremental_actions[new_incremental_actions.len()-1].clone();
+        *incremental_actions = new_incremental_actions;
+        do_incremental_writing(&incremental_action);
+    } else {
+        incremental_actions.clear();
 
-    backspace_click(&mut enigo, 2);
-    thread::sleep(Duration::from_millis(50));
+        do_write_to_input(&mut enigo, " ✅".to_string(), true);
+        thread::sleep(Duration::from_millis(300));
 
-    let input_text = get_input_text(&mut enigo, true).unwrap_or_default();
-    if input_text.is_empty() {
-        return;
+        backspace_click(&mut enigo, 2);
+        thread::sleep(Duration::from_millis(50));
+
+        let input_text = get_input_text(&mut enigo, true).unwrap_or_default();
+        let input_text = input_text.replace("\r\n", "\n");
+
+        let mut previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
+        *previous_translated_text = input_text;
     }
-
-    let mut previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
-    *previous_translated_text = input_text;
 }

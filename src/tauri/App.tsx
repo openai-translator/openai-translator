@@ -65,10 +65,7 @@ export function App() {
                 const { signal } = new AbortController()
                 if (inputText) {
                     const sourceLang = await detectLang(inputText)
-                    let detectTo = intoLangCode(settings.writingTargetLanguage)
-                    if (sourceLang === detectTo) {
-                        detectTo = 'en'
-                    }
+                    const detectTo = intoLangCode(settings.writingTargetLanguage)
                     await translate({
                         writing: true,
                         action: {

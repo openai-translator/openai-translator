@@ -5,6 +5,118 @@ use std::{thread, time::Duration};
 
 use crate::APP_HANDLE;
 
+static SELECT_ALL: Mutex<()> = Mutex::new(());
+
+#[allow(dead_code)]
+#[cfg(target_os = "windows")]
+pub fn select_all(enigo: &mut Enigo) {
+    let _guard = SELECT_ALL.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('a'));
+    enigo.key_up(Key::Control);
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "macos")]
+pub fn select_all(enigo: &mut Enigo) {
+    let _guard = SELECT_ALL.lock();
+
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/select-all.applescript")
+        .expect("failed to resolve select-all.applescript");
+
+    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+}
+
+#[allow(dead_code)]
+#[cfg(target_os = "linux")]
+pub fn select_all(enigo: &mut Enigo) {
+    let _guard = SELECT_ALL.lock();
+
+    crate::utils::up_control_keys(enigo);
+
+    enigo.key_down(Key::Control);
+    enigo.key_click(Key::Layout('a'));
+    enigo.key_up(Key::Control);
+}
+
+pub static INPUT_LOCK: Mutex<()> = Mutex::new(());
+
+#[cfg(not(target_os = "macos"))]
+pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    for _ in 0..n {
+        enigo.key_click(Key::LeftArrow);
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/left.applescript")
+        .expect("failed to resolve left.applescript");
+
+    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    for _ in 0..n {
+        enigo.key_click(Key::RightArrow);
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/right.applescript")
+        .expect("failed to resolve right.applescript");
+
+    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn backspace_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    for _ in 0..n {
+        enigo.key_click(Key::Backspace);
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn backspace_click(enigo: &mut Enigo, n: usize) {
+    let _guard = INPUT_LOCK.lock();
+
+    let apple_script = APP_HANDLE
+        .get()
+        .unwrap()
+        .path_resolver()
+        .resolve_resource("resources/backspace.applescript")
+        .expect("failed to resolve backspace.applescript");
+
+    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+}
+
 #[allow(dead_code)]
 #[cfg(target_os = "windows")]
 pub fn up_control_keys(enigo: &mut Enigo) {
@@ -143,7 +255,7 @@ pub fn get_selected_text_by_clipboard(enigo: &mut Enigo, cancel_select: bool) ->
     copy(enigo);
 
     if cancel_select {
-        paste(enigo);
+        right_arrow_click(enigo, 1);
     }
 
     thread::sleep(Duration::from_millis(100));
