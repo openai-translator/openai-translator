@@ -33,7 +33,7 @@
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
     "baseui-sd": "^12.2.4",
-    "clsx": "^1.2.1",
+    "clsx": "^2.0.0",
     "common-tags": "^1.8.2",
     "date-fns": "^2.29.3",
     "dexie": "^3.2.3",
