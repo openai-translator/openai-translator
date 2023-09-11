@@ -43,7 +43,6 @@ import { useSettings } from '../hooks/useSettings'
 import Vocabulary from './Vocabulary'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
 import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
-import { setupAnalysis } from '../analysis'
 import { vocabularyService } from '../services/vocabulary'
 import { Action, VocabularyItem } from '../internal-services/db'
 import { CopyButton } from './CopyButton'
@@ -452,9 +451,6 @@ export function Translator(props: ITranslatorProps) {
 }
 
 function InnerTranslator(props: IInnerTranslatorProps) {
-    useEffect(() => {
-        setupAnalysis()
-    }, [])
     const [showSettings, setShowSettings] = useState(false)
 
     const { showLogo = true } = props

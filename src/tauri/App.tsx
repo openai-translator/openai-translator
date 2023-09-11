@@ -12,6 +12,7 @@ import { PREFIX } from '../common/constants'
 import { translate } from '../common/translate'
 import { detectLang, intoLangCode } from '../common/lang'
 import { useSettings } from '../common/hooks/useSettings'
+import { setupAnalysis } from '../common/analysis'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -29,6 +30,9 @@ export function App() {
     const [isPinned, setPinned] = useState(false)
 
     useMemoWindow({ size: true, position: false })
+    useEffect(() => {
+        setupAnalysis()
+    }, [])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
