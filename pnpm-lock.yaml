@@ -57,8 +57,8 @@ dependencies:
     specifier: ^7.1.0
     version: 7.1.0
   i18next-http-backend:
-    specifier: ^2.2.1
-    version: 2.2.1
+    specifier: ^2.2.2
+    version: 2.2.2
   iso-639-1:
     specifier: ^3.0.1
     version: 3.0.1
@@ -145,7 +145,7 @@ dependencies:
     version: 2.2.0(react@18.2.0)
   tauri-plugin-autostart-api:
     specifier: github:tauri-apps/tauri-plugin-autostart
-    version: git@github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f
+    version: git/github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f
   tesseract.js:
     specifier: ^4.0.2
     version: 4.0.2(eslint@8.46.0)
@@ -4164,8 +4164,8 @@ packages:
       '@babel/runtime': 7.22.6
     dev: false
 
-  /i18next-http-backend@2.2.1:
-    resolution: {integrity: sha512-ZXIdn/8NJIBJ0X4hzXfc3STYxKrCKh1fYjji9HPyIpEJfvTvy8/ZlTl8RuTizzCPj2ZcWrfaecyOMKs6bQ7u5A==}
+  /i18next-http-backend@2.2.2:
+    resolution: {integrity: sha512-mJu4ZqzDtBiU3O4GV9AbK5ekEqoDMdMnCl3pkdXmb5b8yoIH//u8FsmIe6C5qXb3teZu+j6VMi20tjUgzeABiw==}
     dependencies:
       cross-fetch: 3.1.6
     transitivePeerDependencies:
@@ -7390,7 +7390,7 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  git@github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f:
+  git/github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f:
     resolution: {commit: 0e474395d4990587ad5c1db25ed23220fe11764f, repo: git@github.com:tauri-apps/tauri-plugin-autostart.git, type: git}
     name: tauri-plugin-autostart-api
     version: 0.0.0
