@@ -66,11 +66,12 @@ pub fn writing() {
             _ => false,
         }
     }).count();
+    let first_change_tag = changeset.first().map(|(change_tag, _)| change_tag);
     {
         let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
         incremental_actions.clear();
     }
-    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 {
+    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 && !(modifications_count > 2 && first_change_tag != Some(&ChangeTag::Equal)) {
         let mut incremental_actions = Vec::new();
         let mut is_first_insertion = true;
         let mut prev_insertion_index = 0;
