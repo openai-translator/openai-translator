@@ -66,6 +66,9 @@
       ],
       "identifier": "xyz.yetone.apps.openai-translator",
       "longDescription": "",
+      "appimage": {
+        "bundleMediaFramework": true
+      },
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
