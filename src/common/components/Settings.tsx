@@ -1135,6 +1135,32 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     </Button>
                 </div>
             </nav>
+            {!isDesktopApp && (
+                <div
+                    style={{
+                        padding: '20px 25px 0px 25px',
+                        color: theme.colors.contentPrimary,
+                    }}
+                >
+                    {t(
+                        'It is recommended to download the desktop application of OpenAI Translator to enjoy the wonderful experience of word translation in all software!'
+                    )}{' '}
+                    <a
+                        target='_blank'
+                        href={
+                            values?.i18n?.toLowerCase().includes('zh')
+                                ? 'https://github.com/openai-translator/openai-translator/blob/main/README-CN.md#%E5%AE%89%E8%A3%85'
+                                : 'https://github.com/openai-translator/openai-translator#installation'
+                        }
+                        rel='noreferrer'
+                        style={{
+                            color: theme.colors.linkText,
+                        }}
+                    >
+                        {t('Download Link')}
+                    </a>
+                </div>
+            )}
             <Form
                 form={form}
                 style={{
