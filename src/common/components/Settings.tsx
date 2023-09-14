@@ -1144,6 +1144,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
+                <FormItem name='i18n' label={t('i18n')}>
+                    <Ii18nSelector onBlur={onBlur} />
+                </FormItem>
                 <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
@@ -1259,9 +1262,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>
                     <ThemeTypeSelector onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='i18n' label={t('i18n')}>
-                    <Ii18nSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='tts' label={t('TTS')}>
                     <TTSVoicesSettings onBlur={onBlur} />
