@@ -69,7 +69,12 @@ export function App() {
                 const { signal } = new AbortController()
                 if (inputText) {
                     const sourceLang = await detectLang(inputText)
-                    const detectTo = intoLangCode(settings.writingTargetLanguage)
+                    const targetLang = intoLangCode(settings.writingTargetLanguage)
+                    if (sourceLang === targetLang) {
+                        invoke('write_to_input', { text: inputText })
+                        invoke('finish_writing')
+                        return
+                    }
                     await translate({
                         writing: true,
                         action: {
@@ -82,7 +87,7 @@ export function App() {
                         signal,
                         text: inputText,
                         detectFrom: sourceLang,
-                        detectTo,
+                        detectTo: targetLang,
                         onMessage: (message) => {
                             if (!message.content) {
                                 return
