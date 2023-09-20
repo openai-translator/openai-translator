@@ -8,7 +8,7 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
-import { fetchArkoseToken } from './arkose'
+import { getArkoseToken } from './arkose'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -462,7 +462,7 @@ export class WebAPI {
             let arkoseToken: string | undefined
             console.log(localStorage.getItem('lastMessageId'))
             if (settings.apiModel.startsWith('gpt-4')) {
-                arkoseToken = await fetchArkoseToken()
+                arkoseToken = await getArkoseToken()
             }
             body = {
                 action: 'next',
