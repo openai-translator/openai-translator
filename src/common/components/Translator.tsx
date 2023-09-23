@@ -28,6 +28,7 @@ import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import { FcIdea } from 'react-icons/fc'
+import { addNewNote } from '../anki/anki-connect';
 import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
@@ -1962,6 +1963,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         <CopyButton text={translatedText} styles={styles}></CopyButton>
                                                     </div>
                                                 </Tooltip>
+                                                <Tooltip content={t('Add to Anki')} placement='bottom'>
+                                                        <div
+                                                            onClick={() => addNewNote(selectedGroup + ":" + activateAction?.name,originalText, translatedText )}
+                                                            className={styles.actionButton}
+                                                        >
+                                                            <AiOutlinePlusSquare size={15} />
+                                                        </div>
+                                                    </Tooltip>
                                             </div>
                                         )}
                                     </div>
