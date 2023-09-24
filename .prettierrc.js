@@ -8,4 +8,5 @@ module.exports = {
     quoteProps: 'consistent',
     bracketSpacing: true,
     printWidth: 120,
+    endOfLine: 'auto',
 }
