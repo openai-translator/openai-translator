@@ -46,11 +46,13 @@
     },
 
     "host_permissions": [
+        "http://127.0.0.1:8765/",
         "https://*.openai.com/",
         "https://*.openai.azure.com/",
         "https://*.ingest.sentry.io/",
         "*://speech.platform.bing.com/",
         "https://*.googletagmanager.com/",
-        "https://*.google-analytics.com/"
+        "https://*.google-analytics.com/",
+        "<all_urls>"
     ]
 }

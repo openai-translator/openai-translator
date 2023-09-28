@@ -460,7 +460,6 @@ export class WebAPI {
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
             let arkoseToken: string | undefined
-            console.log(localStorage.getItem('lastMessageId'))
             if (settings.apiModel.startsWith('gpt-4')) {
                 arkoseToken = await getArkoseToken()
             }
@@ -538,7 +537,6 @@ export class WebAPI {
                         try {
                             resp = JSON.parse(msg)
                             chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
-                            console.log(resp.message.id)
                             if (!conversationId) {
                                 chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
                             }

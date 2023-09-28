@@ -22,6 +22,7 @@
 /**
  * This class controls communication with Anki via the AnkiConnect plugin.
  */
+
 function isObject(value) {
     return value !== null && typeof value === 'object'
 }
@@ -427,6 +428,7 @@ class AnkiConnect {
 const anki = new AnkiConnect()
 anki.server = 'http://127.0.0.1:8765'
 anki.enabled = true
+anki.apiKey = '1999'
 anki.isConnected().then((connected) => {
     if (connected) {
         console.log('Connected to Anki!')
@@ -465,4 +467,9 @@ export async function addNewNote(deckName, front, back) {
             }
         }
     }
+}
+
+export function setankiApiKey(value){
+    anki.apiKey = value
+    console.log(value)
 }

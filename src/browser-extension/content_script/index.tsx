@@ -12,7 +12,7 @@ import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
-
+import { addNewNote } from '../../common/anki/anki-connect'
 let root: Root | null = null
 const generateId = createGenerateId()
 const hidePopupThumbTimer: number | null = null
@@ -236,3 +236,27 @@ export async function bindHotKey(hotkey_: string | undefined) {
     })
 }
 main()
+export function sendNewNote(deckName: string, front: string, back: string) {
+    chrome.runtime.sendMessage(
+        {
+            action: 'addNewNote',
+            payload: {
+                deckName: deckName,
+                front: front,
+                back: back,
+            },
+        },
+        (response: any) => {
+            if (chrome.runtime.lastError) {
+                console.error('Runtime error:', chrome.runtime.lastError);
+                return;
+            }
+            if (response && response.error) {
+                console.error('An error occurred:', response.error);
+            } else if (response) {
+                console.log('Note added:', response);
+            }
+        }
+    )
+    console.log(deckName)
+}

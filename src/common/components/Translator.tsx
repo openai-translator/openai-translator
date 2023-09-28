@@ -613,12 +613,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
-    const [selectedGroup, setSelectedGroup] = useState(localStorage.getItem('selectedGroup') || 'default')
+    const [selectedGroup, setSelectedGroup] = useState(localStorage.getItem('selectedGroup') || 'English Learning')
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
     const actionGroups = (actions || []).reduce((groups, action) => {
-        const group = action.group || 'default';
+        const group = action.group || 'English Learning';
         if (!groups[group]) {
           groups[group] = [];
         }
@@ -634,7 +634,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         
         const filteredActions = actions.filter(action => {
-            const group = action.group ?? 'default'
+            const group = action.group ?? 'English Learning'
             return group === selectedGroup
         })
         let displayedActions = filteredActions.slice(0, displayedActionsMaxCount)

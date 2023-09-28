@@ -34,7 +34,6 @@ import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
-
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
         ...acc,
@@ -202,6 +201,7 @@ const useTTSSettingsStyles = createUseStyles({
         paddingLeft: '16px',
     }),
 })
+
 
 interface TTSVoicesSettingsProps {
     value?: ISettings['tts']
@@ -706,7 +706,6 @@ function ChatContextCheckbox({ value, onChange, onBlur }: ChatContextCheckboxPro
     )
 }
 
-
 interface RestorePreviousPositionCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -1059,6 +1058,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         }
     }, [prevValues, values])
 
+      
+
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
 
@@ -1212,7 +1213,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 >
                     <MyCheckbox onBlur={onBlur} />
                 </FormItem>
-                 <FormItem name='chatContext' label={t('Set Context')}>
+                <FormItem name='chatContext' label={t('Set Context')}>
                     <ChatContextCheckbox onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='autoTranslate' label={t('Auto Translate')}>
