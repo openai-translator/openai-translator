@@ -439,12 +439,14 @@ anki.isConnected().then((connected) => {
 })
 
 export async function addNewNote(deckName, front, back) {
+    let formattedBack = back.replace(/\n/g, '<br>')
+    formattedBack = formattedBack.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     const note = {
         deckName: deckName,
         modelName: '问答题',
         fields: {
             正面: front,
-            背面: back,
+            背面: formattedBack,
         },
         options: {
             allowDuplicate: false,
