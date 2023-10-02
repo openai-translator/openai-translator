@@ -34,7 +34,7 @@ export class LocalDB extends Dexie {
         super('openai-translator')
         this.version(4).stores({
             vocabulary: 'word, reviewCount, description, updatedAt, createdAt',
-            action: '++id, idx, mode, name, icon, rolePrompt, commandPrompt, outputRenderingFormat, updatedAt, createdAt',
+            action: 'id, idx, mode, name, group, icon, rolePrompt, commandPrompt, outputRenderingFormat, updatedAt, createdAt',
         })
     }
 }

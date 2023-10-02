@@ -10,13 +10,13 @@ import { format } from 'date-fns'
 import { Button } from 'baseui-sd/button'
 import { List, arrayMove } from 'baseui-sd/dnd-list'
 import { RiDeleteBinLine } from 'react-icons/ri'
-import { createElement, useReducer, useState } from 'react'
+import { createElement, useReducer, useRef, useState } from 'react'
 import * as mdIcons from 'react-icons/md'
 import { Action } from '../internal-services/db'
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-sd/modal'
 import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
-import { isDesktopApp } from '../utils'
+import { isDesktopApp, exportToCsv, csvToActions } from '../utils'
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md'
 
 const useStyles = createUseStyles({
@@ -153,19 +153,47 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
     const [showActionForm, setShowActionForm] = useState(false)
     const [updatingAction, setUpdatingAction] = useState<Action>()
     const [deletingAction, setDeletingAction] = useState<Action>()
-    const [openGroups, setOpenGroups] = useState<string[]>([]);
+    const [openGroups, setOpenGroups] = useState<string[]>([])
+    const fileInputRef = useRef<HTMLInputElement>(null)
     if (!actions) {
         // Return a default value or do nothing
-        return null;
-      }
+        return null
+    }
     const actionGroups = actions.reduce((groups: { [key: string]: Action[] }, action) => {
-        const group = action.group || 'default';
+        const group = action.group || 'default'
         if (!groups[group]) {
-            groups[group] = [];
+            groups[group] = []
         }
-        groups[group].push(action);
-        return groups;
-    }, {});
+        groups[group].push(action)
+        return groups
+    }, {})
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            if (event.target.files) {
+                const file = event.target.files[0]
+                if (file) {
+                    const importActions = await csvToActions(file)
+                    await actionService.bulkPut(importActions)
+                    refreshActions()
+                }
+            }
+        } catch (error) {
+            console.error('Error handling file change:', error)
+            // Optionally, show an error message to the user
+        }
+    }
+
+    const onCsvExportActions = async (group: string) => {
+        try {
+            const filteredActions = actions.filter((action) => {
+                return action.group === group
+            })
+            await exportToCsv<Action>(group + `-${new Date().valueOf()}`, filteredActions)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     return (
         <div
             className={styles.root}
@@ -195,214 +223,247 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                     >
                         {t('Create')}
                     </Button>
+                    <Button
+                        size='mini'
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (fileInputRef.current) {
+                                fileInputRef.current.click()
+                            }
+                        }}
+                    >
+                        {t('Import')}
+                    </Button>
                 </div>
             </div>
+            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
             <div className={styles.actionList}>
-            {Object.keys(actionGroups).map((group) => (
-        <div key={group}>
-            <h3 style={{cursor: 'pointer'}} onClick={() => {
-                if (openGroups.includes(group)) {
-                    setOpenGroups(openGroups.filter(g => g !== group));
-                } else {
-                    setOpenGroups([...openGroups, group]);
-                }
-            }}>{group}</h3>
-            {openGroups.includes(group) && (
-                <List
-                    onChange={async ({ oldIndex, newIndex }) => {
-                        const groupActions = actionGroups[group];
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        const newActions = arrayMove(groupActions!, oldIndex, newIndex)
-                        await actionService.bulkPut(
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            newActions.map((a, idx) => {
-                                return {
-                                    ...a,
-                                    idx,
-                                }
-                            })
-                        )
-                        if (!isDesktopApp()) {
-                            refreshActions()
-                        }
-                    }}
-                    items={actionGroups[group]?.map((action, idx) => (
-                        <div key={action.id} className={styles.actionItem}>
-                            <div className={styles.actionContent}>
-                                <div className={styles.name}>
-                                    {action.icon &&
-                                        createElement((mdIcons as Record<string, IconType>)[action.icon], { size: 16 })}
-                                    {action.mode ? t(action.name) : action.name}
-                                    {action.mode && (
-                                        <div
-                                            style={{
-                                                display: 'inline-block',
-                                                fontSize: '12px',
-                                                background: theme.colors.backgroundTertiary,
-                                                padding: '1px 4px',
-                                                borderRadius: '2px',
-                                            }}
-                                        >
-                                            {t('built-in')}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className={styles.prompts}>
-                                    <div>{action.rolePrompt}</div>
-                                    <div>{action.commandPrompt}</div>
-                                </div>
-                                <div className={styles.metadata}>
-                                    <div>
-                                        {t('Created At')} {format(+action?.createdAt, 'yyyy-MM-dd HH:mm:ss')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={styles.actionOperation}>
-                                {!draggable && (
-                                    <>
-                                        <Button
-                                            size='mini'
-                                            disabled={idx === 0}
-                                            onClick={async (e) => {
-                                                e.preventDefault()
-                                                e.stopPropagation()
-                                                const newActions = arrayMove(actions, idx, idx - 1)
-                                                await actionService.bulkPut(
-                                                    newActions.map((a, idx) => {
-                                                        return {
-                                                            ...a,
-                                                            idx,
-                                                        }
-                                                    })
-                                                )
-                                                if (!isDesktopApp()) {
-                                                    refreshActions()
-                                                }
-                                            }}
-                                        >
-                                            <MdArrowUpward size={12} />
-                                        </Button>
-                                        <Button
-                                            size='mini'
-                                            disabled={idx === actions.length - 1}
-                                            onClick={async (e) => {
-                                                e.preventDefault()
-                                                e.stopPropagation()
-                                                const newActions = arrayMove(actions, idx, idx + 1)
-                                                await actionService.bulkPut(
-                                                    newActions.map((a, idx) => {
-                                                        return {
-                                                            ...a,
-                                                            idx,
-                                                        }
-                                                    })
-                                                )
-                                                if (!isDesktopApp()) {
-                                                    refreshActions()
-                                                }
-                                            }}
-                                        >
-                                            <MdArrowDownward size={12} />
-                                        </Button>
-                                    </>
-                                )}
-                                <Button
-                                    size='mini'
-                                    startEnhancer={<FiEdit size={12} />}
-                                    disabled={!!action.mode}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        setUpdatingAction(action)
-                                        setShowActionForm(true)
-                                    }}
-                                >
-                                    {t('Update')}
-                                </Button>
-                                <Button
-                                    size='mini'
-                                    startEnhancer={<RiDeleteBinLine size={12} />}
-                                    disabled={!!action.mode}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        setDeletingAction(action)
-                                    }}
-                                >
-                                    {t('Delete')}
-                                </Button>
-                            </div>
+                {Object.keys(actionGroups).map((group) => (
+                    <div key={group}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                    if (openGroups.includes(group)) {
+                                        setOpenGroups(openGroups.filter((g) => g !== group))
+                                    } else {
+                                        setOpenGroups([...openGroups, group])
+                                    }
+                                }}
+                            >
+                                {group}
+                            </h3>
+                            <Button
+                                size='mini'
+                                onClick={() => {
+                                    onCsvExportActions(group)
+                                }}
+                            >
+                                {t('Export')}
+                            </Button>
                         </div>
-                    ))}
-                />
-            )}
+                        {openGroups.includes(group) && (
+                            <List
+                                onChange={async ({ oldIndex, newIndex }) => {
+                                    const groupActions = actionGroups[group]
+                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                    const newActions = arrayMove(groupActions!, oldIndex, newIndex)
+                                    await actionService.bulkPut(
+                                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                        newActions.map((a, idx) => {
+                                            return {
+                                                ...a,
+                                                idx,
+                                            }
+                                        })
+                                    )
+                                    if (!isDesktopApp()) {
+                                        refreshActions()
+                                    }
+                                }}
+                                items={actionGroups[group]?.map((action, idx) => (
+                                    <div key={action.id} className={styles.actionItem}>
+                                        <div className={styles.actionContent}>
+                                            <div className={styles.name}>
+                                                {action.icon &&
+                                                    createElement((mdIcons as Record<string, IconType>)[action.icon], {
+                                                        size: 16,
+                                                    })}
+                                                {action.mode ? t(action.name) : action.name}
+                                                {action.mode && (
+                                                    <div
+                                                        style={{
+                                                            display: 'inline-block',
+                                                            fontSize: '12px',
+                                                            background: theme.colors.backgroundTertiary,
+                                                            padding: '1px 4px',
+                                                            borderRadius: '2px',
+                                                        }}
+                                                    >
+                                                        {t('built-in')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className={styles.prompts}>
+                                                <div>{action.rolePrompt}</div>
+                                                <div>{action.commandPrompt}</div>
+                                            </div>
+                                            <div className={styles.metadata}>
+                                                <div>
+                                                    {t('Created At')}{' '}
+                                                    {format(+action?.createdAt, 'yyyy-MM-dd HH:mm:ss')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={styles.actionOperation}>
+                                            {!draggable && (
+                                                <>
+                                                    <Button
+                                                        size='mini'
+                                                        disabled={idx === 0}
+                                                        onClick={async (e) => {
+                                                            e.preventDefault()
+                                                            e.stopPropagation()
+                                                            const newActions = arrayMove(actions, idx, idx - 1)
+                                                            await actionService.bulkPut(
+                                                                newActions.map((a, idx) => {
+                                                                    return {
+                                                                        ...a,
+                                                                        idx,
+                                                                    }
+                                                                })
+                                                            )
+                                                            if (!isDesktopApp()) {
+                                                                refreshActions()
+                                                            }
+                                                        }}
+                                                    >
+                                                        <MdArrowUpward size={12} />
+                                                    </Button>
+                                                    <Button
+                                                        size='mini'
+                                                        disabled={idx === actions.length - 1}
+                                                        onClick={async (e) => {
+                                                            e.preventDefault()
+                                                            e.stopPropagation()
+                                                            const newActions = arrayMove(actions, idx, idx + 1)
+                                                            await actionService.bulkPut(
+                                                                newActions.map((a, idx) => {
+                                                                    return {
+                                                                        ...a,
+                                                                        idx,
+                                                                    }
+                                                                })
+                                                            )
+                                                            if (!isDesktopApp()) {
+                                                                refreshActions()
+                                                            }
+                                                        }}
+                                                    >
+                                                        <MdArrowDownward size={12} />
+                                                    </Button>
+                                                </>
+                                            )}
+                                            <Button
+                                                size='mini'
+                                                startEnhancer={<FiEdit size={12} />}
+                                                disabled={!!action.mode}
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    setUpdatingAction(action)
+                                                    setShowActionForm(true)
+                                                }}
+                                            >
+                                                {t('Update')}
+                                            </Button>
+                                            <Button
+                                                size='mini'
+                                                startEnhancer={<RiDeleteBinLine size={12} />}
+                                                disabled={!!action.mode}
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    setDeletingAction(action)
+                                                }}
+                                            >
+                                                {t('Delete')}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            />
+                        )}
+                    </div>
+                ))}
+                <Modal
+                    isOpen={showActionForm}
+                    onClose={() => {
+                        setShowActionForm(false)
+                        setUpdatingAction(undefined)
+                    }}
+                    closeable
+                    size='default'
+                    autoFocus
+                    animate
+                    role='dialog'
+                >
+                    <ModalHeader>
+                        {updatingAction ? t('Update sth', [t('Action')]) : t('Create sth', [t('Action')])}
+                    </ModalHeader>
+                    <ModalBody>
+                        <ActionForm
+                            action={updatingAction}
+                            onSubmit={() => {
+                                setShowActionForm(false)
+                                if (!isDesktopApp()) {
+                                    refreshActions()
+                                }
+                            }}
+                        />
+                    </ModalBody>
+                </Modal>
+                <Modal
+                    isOpen={!!deletingAction}
+                    onClose={() => {
+                        setDeletingAction(undefined)
+                    }}
+                    closeable
+                    size='default'
+                    autoFocus
+                    animate
+                    role='dialog'
+                >
+                    <ModalHeader>{t('Delete sth', [t('Action')])}</ModalHeader>
+                    <ModalBody>
+                        {t('Are you sure to delete sth?', [`${t('Action')} ${deletingAction?.name}`])}
+                    </ModalBody>
+                    <ModalFooter>
+                        <ModalButton
+                            size='compact'
+                            kind='tertiary'
+                            onClick={() => {
+                                setDeletingAction(undefined)
+                            }}
+                        >
+                            {t('Cancel')}
+                        </ModalButton>
+                        <ModalButton
+                            size='compact'
+                            onClick={async () => {
+                                await actionService.delete(deletingAction?.id as number)
+                                if (!isDesktopApp()) {
+                                    refreshActions()
+                                }
+                                setDeletingAction(undefined)
+                            }}
+                        >
+                            {t('Ok')}
+                        </ModalButton>
+                    </ModalFooter>
+                </Modal>
             </div>
-            ))}
-            <Modal
-                isOpen={showActionForm}
-                onClose={() => {
-                    setShowActionForm(false)
-                    setUpdatingAction(undefined)
-                }}
-                closeable
-                size='default'
-                autoFocus
-                animate
-                role='dialog'
-            >
-                <ModalHeader>
-                    {updatingAction ? t('Update sth', [t('Action')]) : t('Create sth', [t('Action')])}
-                </ModalHeader>
-                <ModalBody>
-                    <ActionForm
-                        action={updatingAction}
-                        onSubmit={() => {
-                            setShowActionForm(false)
-                            if (!isDesktopApp()) {
-                                refreshActions()
-                            }
-                        }}
-                    />
-                </ModalBody>
-            </Modal>
-            <Modal
-                isOpen={!!deletingAction}
-                onClose={() => {
-                    setDeletingAction(undefined)
-                }}
-                closeable
-                size='default'
-                autoFocus
-                animate
-                role='dialog'
-            >
-                <ModalHeader>{t('Delete sth', [t('Action')])}</ModalHeader>
-                <ModalBody>{t('Are you sure to delete sth?', [`${t('Action')} ${deletingAction?.name}`])}</ModalBody>
-                <ModalFooter>
-                    <ModalButton
-                        size='compact'
-                        kind='tertiary'
-                        onClick={() => {
-                            setDeletingAction(undefined)
-                        }}
-                    >
-                        {t('Cancel')}
-                    </ModalButton>
-                    <ModalButton
-                        size='compact'
-                        onClick={async () => {
-                            await actionService.delete(deletingAction?.id as number)
-                            if (!isDesktopApp()) {
-                                refreshActions()
-                            }
-                            setDeletingAction(undefined)
-                        }}
-                    >
-                        {t('Ok')}
-                    </ModalButton>
-                </ModalFooter>
-            </Modal>
         </div>
-    </div>
     )
 }

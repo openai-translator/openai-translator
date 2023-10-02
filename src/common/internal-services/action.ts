@@ -32,6 +32,8 @@ export interface IActionInternalService {
     delete(id: number): Promise<void>
     list(): Promise<Action[]>
     count(): Promise<number>
+    exportActions(filename: string, filteredActions: Action[]): Promise<void>
+    importActions(file: File): Promise<void>
 }
 
 class ActionInternalService implements IActionInternalService {
@@ -95,6 +97,10 @@ class ActionInternalService implements IActionInternalService {
         return await this.db.action.get(id)
     }
 
+    async getByGroup(group: string): Promise<Action | undefined> {
+        return await this.db.action.get(group)
+    }
+
     async getByMode(mode: string): Promise<Action | undefined> {
         return await this.db.action.where('mode').equals(mode).first()
     }
@@ -142,6 +148,70 @@ class ActionInternalService implements IActionInternalService {
 
     async count(): Promise<number> {
         return await this.db.action.count()
+    }
+
+    async exportActions(filename: string, filteredActions: Action[]): Promise<void> {
+        try {
+            // 将数据对象转换为JSON字符串
+            const jsonString = JSON.stringify(filteredActions, null, 2)
+
+            // 创建一个新的<a>元素
+            const link = document.createElement('a')
+
+            // 检查浏览器是否支持下载属性
+            if (link.download !== undefined) {
+                // 将JSON字符串编码到data URL中
+                const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString)
+
+                // 设置<a>元素的href属性和download属性
+                link.setAttribute('href', dataUrl)
+                link.setAttribute('download', filename)
+
+                // 将<a>元素添加到文档中
+                document.body.appendChild(link)
+
+                // 模拟点击<a>元素以触发下载
+                link.click()
+
+                // 从文档中删除<a>元素
+                document.body.removeChild(link)
+            } else {
+                // 如果浏览器不支持下载属性，可能需要使用其他方法来触发下载
+                console.error('Browser does not support the download attribute')
+            }
+        } catch (error) {
+            console.error('Error exporting data to file:', error)
+        }
+    }
+
+    async importActions(file: File): Promise<void> {
+        try {
+            // Read and parse file content
+            const fileContent = await file.text()
+            const parsedData = JSON.parse(fileContent)
+
+            // Simple validation to check if parsedData is an array of actions
+            if (!Array.isArray(parsedData)) {
+                throw new Error('Invalid file format: Expected an array of actions')
+            }
+            for (const action of parsedData) {
+                if (typeof action.name !== 'string' || typeof action.idx !== 'number') {
+                    throw new Error('Invalid action format: Missing required properties')
+                }
+            }
+
+            // Prepare actions for import
+            const actions = parsedData.map((action) => ({
+                ...action,
+                id: undefined, // Remove id to allow the database to assign new ids
+            }))
+
+            // Import actions into the database
+            await this.bulkPut(actions)
+        } catch (error) {
+            console.error('Error importing actions:', error)
+            // Optionally, show an error message to the user
+        }
     }
 }
 

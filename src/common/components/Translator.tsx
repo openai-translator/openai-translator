@@ -2020,8 +2020,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }}
   />
 </Tooltip>
-
-
             {enableVocabulary && (
                 <Modal
                     isOpen={vocabularyType !== 'hide'}

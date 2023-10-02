@@ -1000,10 +1000,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
     useEffect(() => {
         if (settings) {
             ;(async () => {
-                if (isTauri) {
-                    const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
-                    settings.runAtStartup = await autostartIsEnabled()
-                }
                 setValues(settings)
                 setPrevValues(settings)
             })()
@@ -1021,23 +1017,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             }
             setLoading(true)
             const oldSettings = await utils.getSettings()
-            if (isTauri) {
-                try {
-                    const {
-                        enable: autostartEnable,
-                        disable: autostartDisable,
-                        isEnabled: autostartIsEnabled,
-                    } = await import('tauri-plugin-autostart-api')
-                    if (data.runAtStartup) {
-                        await autostartEnable()
-                    } else {
-                        await autostartDisable()
-                    }
-                    data.runAtStartup = await autostartIsEnabled()
-                } catch (e) {
-                    console.log('err', e)
-                }
-            }
             await utils.setSettings(data)
 
             toast(t('Saved'), {
@@ -1089,7 +1068,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     gap: 10,
                     boxSizing: 'border-box',
                 }}
-                data-tauri-drag-region
             >
                 <img width='22' src={icon} alt='logo' />
                 <h2>

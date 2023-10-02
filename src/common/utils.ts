@@ -2,6 +2,8 @@
 import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
+import csvtojson from 'csvtojson';
+import { Action } from './internal-services/db'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -155,7 +157,7 @@ export const isUsingOpenAIOfficial = async () => {
 }
 
 // js to csv
-export async function exportToCsv<T extends Record<string, string | number>>(filename: string, rows: T[]) {
+export async function exportToCsv<T extends Action>(filename: string, rows: T[]) {
     if (!rows.length) return
     filename += '.csv'
     const columns = Object.keys(rows[0])
@@ -164,14 +166,16 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
         csvFile += key + ','
     }
     csvFile += '\r\n'
+
     const processRow = function (row: T) {
         let s = ''
         for (const key of columns) {
-            if (key === 'updatedAt') {
-                s += '\t' + `${row[key]}` + ','
-            } else {
-                s += '"' + `${row[key]}` + '"' + ','
+            let value = `${row[key]}`
+            if (key === 'rolePrompt' || key === 'commandPrompt') {
+                // 替换换行符和双引号
+                value = value.replace(/\n/g, ' ').replace(/"/g, '""')
             }
+            s += '"' + value + '"' + ','
         }
         return s + '\r\n'
     }
@@ -192,11 +196,47 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
         if (link.download !== undefined) {
             link.setAttribute('href', 'data:text/csv;charset=utf-8,ufeff' + encodeURIComponent(csvFile))
             link.setAttribute('download', filename)
-            // link.style.visibility = 'hidden'
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
         }
+    }
+}
+
+
+
+export async function csvToActions(file: File): Promise<Action[]> {
+    try {
+        // 读取文件内容
+        const fileContent = await file.text()
+        // 清理数据
+        const cleanContent = fileContent.replace(/^\ufeff/, '')
+        // 使用csvtojson库解析CSV数据
+        const parsedData = await csvtojson().fromString(cleanContent)
+        // 简单验证以检查parsedData是否为动作数组
+        if (!Array.isArray(parsedData)) {
+            throw new Error('Invalid file format: Expected an array of actions');
+        }
+
+        // 准备要导入的动作
+        const actions = parsedData.map((action) => ({
+            id: action.id,  // 使用 id 作为 id 字段的值
+            idx: action.ufeffidx,  // 使用 ufeffidx 作为 idx 字段的值
+            name: action.name,
+            icon: action.icon,
+            rolePrompt: action.rolePrompt,
+            commandPrompt: action.commandPrompt,
+            group: action.group,
+            createdAt: action.createdAt,
+            updatedAt: action.updatedAt,
+        }))
+        // 将动作导入数据库
+        console.log('test actions' + JSON.stringify(actions))
+        return actions
+    } catch (error) {
+        console.error('Error importing actions:', error);
+        // 可选地，向用户显示错误消息
+        return []
     }
 }
 

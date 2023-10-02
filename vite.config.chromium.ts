@@ -20,8 +20,12 @@ export default defineConfig({
         sourcemap: isDev,
         target: 'chrome105',
         rollupOptions: {
+            external: ['file-saver'],
             output: {
                 dir: 'dist/browser-extension/chromium',
+                globals: {
+                    'file-saver': 'FileSaver'
+                }
             },
         },
     },

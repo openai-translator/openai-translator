@@ -27,6 +27,13 @@ class BackgroundActionService implements IActionInternalService {
     count(): Promise<number> {
         return callMethod('actionService', 'count', [])
     }
+    exportActions(filename: string, filteredActions: Action[]): Promise<void> {
+        return callMethod('actionService', 'exportActions', [filename, filteredActions])
+    }
+
+    importActions(file: File): Promise<void> {
+        return callMethod('actionService', 'importActions', [file])
+    }
 }
 
 export const backgroundActionService = new BackgroundActionService()
