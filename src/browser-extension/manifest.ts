@@ -66,6 +66,11 @@ export function getManifest(browser: 'firefox' | 'chromium') {
                 id: 'openaitranslator@gmail.com',
             },
         }
+        manifest.background = {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            scripts: ['src/browser-extension/background/index.ts'],
+        }
     }
     return manifest
 }
