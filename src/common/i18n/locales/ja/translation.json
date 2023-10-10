@@ -16,6 +16,7 @@
   "Default translate mode": "デフォルトの翻訳モード",
   "Auto Translate": "自動翻訳",
   "Word selection in input": "テキスト入力エレメント内で選択可能",
+  "Read the selected words in input": "入力ボックスで選択された単語を読み上げる",
   "Always show icons": "常にアイコンを表示",
   "Default target language": "デフォルトのターゲット言語",
   "Theme": "テーマ",

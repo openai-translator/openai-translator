@@ -16,6 +16,7 @@
   "Default translate mode": "Default translate mode",
   "Auto Translate": "Auto Translate",
   "Word selection in input": "Enable word selection for lookup in the input field",
+  "Read the selected words in input": "Read word selection from the input field automatically",
   "Always show icons": "Always show icons",
   "Default target language": "Default target language",
   "Theme": "Theme",

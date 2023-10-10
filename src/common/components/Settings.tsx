@@ -745,6 +745,30 @@ function SelectInputElementsCheckbox({ value, onChange, onBlur }: SelectInputEle
         />
     )
 }
+
+interface ReadSelectedWordsFromInputElementsProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function ReadSelectedWordsFromInputElementsCheckbox({
+    value,
+    onChange,
+    onBlur,
+}: ReadSelectedWordsFromInputElementsProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={value}
+            onChange={(e) => {
+                onChange?.(e.target.checked)
+                onBlur?.()
+            }}
+        />
+    )
+}
+
 interface RunAtStartupCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -987,6 +1011,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
         selectInputElementsText: utils.defaultSelectInputElementsText,
+        readSelectedWordsFromInputElementsText: utils.defaultReadSelectedWordsFromInputElementsText,
         runAtStartup: false,
         writingTargetLanguage: utils.defaultWritingTargetLanguage,
     })
@@ -1277,6 +1302,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                     <SelectInputElementsCheckbox onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='readSelectedWordsFromInputElementsText' label={t('Read the selected words in input')}>
+                    <ReadSelectedWordsFromInputElementsCheckbox onBlur={onBlur} />
                 </FormItem>
                 {isTauri && (
                     <FormItem name='runAtStartup' label={t('Run at startup')}>
