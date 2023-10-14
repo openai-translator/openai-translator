@@ -9,7 +9,6 @@ import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation, AiOutlineFileSync, AiOutlinePlusSquare } from 'react-icons/ai'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
-import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
@@ -21,14 +20,13 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
+import { defaultAPIURL, isDesktopApp, isTauri } from '../utils'
 import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
-import { FcIdea } from 'react-icons/fc'
-import { addNewNote } from '../anki/anki-connect';
+import { addNewNote, isConnected } from '../anki/anki-connect'
 import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
@@ -42,12 +40,9 @@ import { useTheme } from '../hooks/useTheme'
 import { speak } from '../tts'
 import { Tooltip } from './Tooltip'
 import { useSettings } from '../hooks/useSettings'
-import Vocabulary from './Vocabulary'
-import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
 import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 import { setupAnalysis } from '../analysis'
-import { vocabularyService } from '../services/vocabulary'
-import { Action, VocabularyItem } from '../internal-services/db'
+import { Action } from '../internal-services/db'
 import { CopyButton } from './CopyButton'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
@@ -361,17 +356,6 @@ const useStyles = createUseStyles({
     'OCRStatusBar': (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentSecondary,
     }),
-    'vocabulary': {
-        position: 'fixed',
-        width: '100%',
-        height: '100%',
-        top: 0,
-        left: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'rgba(0,0,0,0.3)',
-    },
 })
 
 interface IActionStrItem {
@@ -462,7 +446,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const editorRef = useRef<HTMLTextAreaElement>(null)
     const isCompositing = useRef(false)
     const [selectedWord, setSelectedWord] = useState('')
-    const [vocabularyType, setVocabularyType] = useState<'hide' | 'vocabulary' | 'article'>('hide')
     const highlightRef = useRef<HighlightInTextarea | null>(null)
     const [showWordbookButtons, setShowWordbookButtons] = useState(false)
     const { t, i18n } = useTranslation()
@@ -521,9 +504,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [selectedWord, highlightWords])
 
     const [activateAction, setActivateAction] = useState<Action | undefined>(() => {
-        const savedAction = localStorage.getItem('savedAction');
-        return savedAction ? JSON.parse(savedAction) : undefined;
-      })
+        const savedAction = localStorage.getItem('savedAction')
+        return savedAction ? JSON.parse(savedAction) : undefined
+    })
     const currentTranslateMode = useMemo(() => {
         if (!activateAction) {
             return undefined
@@ -562,11 +545,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const translatedContentRef = useRef<HTMLDivElement>(null)
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
-  
+
     const scrollYRef = useRef<number>(0)
 
     const hasActivateAction = activateAction !== undefined
-    
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -618,22 +600,21 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
     const actionGroups = (actions || []).reduce((groups, action) => {
-        const group = action.group || 'English Learning';
+        const group = action.group || 'English Learning'
         if (!groups[group]) {
-          groups[group] = [];
+            groups[group] = []
         }
-        groups[group].push(action);
-        return groups;
-      }, {})
+        groups[group].push(action)
+        return groups
+    }, {})
     useEffect(() => {
-        
         if (!actions) {
             setDisplayedActions([])
             setHiddenActions([])
             return
         }
-        
-        const filteredActions = actions.filter(action => {
+
+        const filteredActions = actions.filter((action) => {
             const group = action.group ?? 'English Learning'
             return group === selectedGroup
         })
@@ -653,18 +634,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         setDisplayedActions(displayedActions)
         setHiddenActions(hiddenActions)
-    }, [actions, activateAction?.id, displayedActionsMaxCount,selectedGroup])
+    }, [actions, activateAction?.id, displayedActionsMaxCount, selectedGroup])
 
     const isTranslate = currentTranslateMode === 'translate'
-    
+
     useEffect(() => {
-        localStorage.setItem('selectedGroup', selectedGroup);
+        localStorage.setItem('selectedGroup', selectedGroup)
     }, [selectedGroup])
 
     useEffect(() => {
-        const savedAction = localStorage.getItem('savedAction');
+        const savedAction = localStorage.getItem('savedAction')
         if (savedAction) {
-            setActivateAction(JSON.parse(savedAction));
+            setActivateAction(JSON.parse(savedAction))
         }
     }, [])
 
@@ -720,8 +701,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
-    const [isCollectedWord, setIsCollectedWord] = useState(false)
-    const webAPI = new WebAPI();
+    const webAPI = new WebAPI()
     useEffect(() => {
         setOriginalText(props.text)
     }, [props.text, props.uuid])
@@ -729,29 +709,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setEditableText(detectedOriginalText)
     }, [detectedOriginalText])
-
-    const checkWordCollection = useCallback(async () => {
-        try {
-            const item = await vocabularyService.getItem(editableText.trim())
-            if (item) {
-                await vocabularyService.putItem({
-                    ...item,
-                    reviewCount: item.reviewCount + 1,
-                })
-                setIsCollectedWord(true)
-            } else {
-                setIsCollectedWord(false)
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }, [editableText])
-
-    useEffect(() => {
-        if (isWordMode && !isLoading) {
-            checkWordCollection()
-        }
-    }, [isWordMode, isLoading, checkWordCollection])
 
     useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
@@ -808,7 +765,23 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [sourceLang])
 
-    const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
+
+    const addToAnki = async (deckname: string, front: string, back: any) => {
+        const connected = await isConnected()
+    
+        if (connected) {
+            try {
+                await addNewNote(deckname, front, back)
+                setActionStr('Note added successfully!')
+            } catch (error) {
+                console.error('Error adding note:', error)
+                setErrorMessage( `Error: ${error}`)
+            }
+        } else {
+            console.log('Not connected')
+            setErrorMessage('Not connected to Anki!')
+        }
+    }
 
     // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
@@ -1039,7 +1012,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cache.set(cachedKey, result)
                             return result
                         })
-                        chrome.runtime.sendMessage({ type: "refreshPage" })
+                        chrome.runtime.sendMessage({ type: 'refreshPage' })
                     },
                     onError: (error) => {
                         setActionStr('Error')
@@ -1207,44 +1180,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         await (await worker).terminate()
     }
 
-    const onWordCollection = async () => {
-        try {
-            if (isCollectedWord) {
-                const wordInfo = await vocabularyService.getItem(editableText.trim())
-                await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setIsCollectedWord(false)
-                setCollectedWordTotal((t: number) => t - 1)
-            } else {
-                await vocabularyService.putItem({
-                    word: editableText,
-                    reviewCount: 1,
-                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
-                    updatedAt: new Date().valueOf().toString(),
-                    createdAt: new Date().valueOf().toString(),
-                })
-                setIsCollectedWord(true)
-                setCollectedWordTotal((t: number) => t + 1)
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    const onCsvExport = async () => {
-        try {
-            const words = await vocabularyService.listItems()
-            await exportToCsv<VocabularyItem>(`openai-translator-collection-${new Date().valueOf()}`, words)
-            if (isDesktopApp()) {
-                toast(t('csv file saved on Desktop'), {
-                    duration: 5000,
-                    icon: '👏',
-                })
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     const editableStopSpeakRef = useRef<() => void>(() => null)
     const translatedStopSpeakRef = useRef<() => void>(() => null)
     useEffect(() => {
@@ -1283,15 +1218,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         translatedStopSpeakRef.current = stopSpeak
     }
 
-    const enableVocabulary = !isUserscript()
-
     const [conversationIds, setConversationIds] = useState([])
 
-      const handleConversationClick = () => {
-        chrome.storage.local.remove('conversationId', function() {
-            console.log('ConversationId is removed');
-          })
-      };
+    const handleConversationClick = () => {
+        chrome.storage.local.remove('conversationId', function () {
+            setActionStr('ConversationId added successfully!')
+        })
+    }
 
     return (
         <div
@@ -1299,7 +1232,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 'yetone-dark': themeType === 'dark',
             })}
             style={{
-                minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
+                minHeight:  '600px',
                 background: theme.colors.backgroundPrimary,
                 paddingBottom: showSettings ? '0px' : '30px',
             }}
@@ -1333,7 +1266,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         <div data-tauri-drag-region className={styles.iconContainer}>
                             <img data-tauri-drag-region className={styles.icon} src={icon} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
-                                OpenAI Translator
+                                GPT Tutor
                             </div>
                         </div>
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
@@ -1423,10 +1356,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             onClick={() => {
                                                 setActivateAction(action)
                                                 if (action) {
-                                                    localStorage.setItem('savedAction', JSON.stringify(action));
-                                                  } else {
-                                                    localStorage.removeItem('savedAction');
-                                                  }
+                                                    localStorage.setItem('savedAction', JSON.stringify(action))
+                                                } else {
+                                                    localStorage.removeItem('savedAction')
+                                                }
                                                 if (action.mode === 'polishing') {
                                                     setTargetLang(sourceLang)
                                                 }
@@ -1741,65 +1674,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             </Dropzone>
                                         </div>
                                     </Tooltip>
-                                    {enableVocabulary && (
-                                        <StatefulTooltip
-                                            content={
-                                                <Trans
-                                                    i18nKey='words are collected'
-                                                    values={{
-                                                        collectTotal: collectedWordTotal,
-                                                    }}
-                                                />
-                                            }
-                                            showArrow
-                                            placement='top'
-                                        >
-                                            <div
-                                                className={styles.actionButton}
-                                                onClick={() => setShowWordbookButtons((e) => !e)}
-                                            >
-                                                <AiOutlineFileSync size={15} />
-                                            </div>
-                                        </StatefulTooltip>
-                                    )}
-                                    {showWordbookButtons && (
-                                        <>
-                                            <StatefulTooltip content={t('Collection Review')} showArrow placement='top'>
-                                                <div className={styles.actionButton}>
-                                                    <MdGrade
-                                                        size={15}
-                                                        onClick={() => setVocabularyType('vocabulary')}
-                                                    />
-                                                </div>
-                                            </StatefulTooltip>
-                                            <StatefulTooltip
-                                                content={t('Export your collection as a csv file')}
-                                                showArrow
-                                                placement='top'
-                                            >
-                                                <div className={styles.actionButton} onClick={onCsvExport}>
-                                                    <TbCsv size={15} />
-                                                </div>
-                                            </StatefulTooltip>
-                                            <StatefulTooltip content='Big Bang' showArrow placement='top'>
-                                                <div className={styles.actionButton}>
-                                                    <FcIdea size={15} onClick={() => setVocabularyType('article')} />
-                                                </div>
-                                            </StatefulTooltip>
-                                        </>
-                                    )}
-                                        <StatefulTooltip
-                                            content={t('Add new conversation')}
-                                            showArrow
-                                            placement='top'
-                                        >
-                                            <div
-                                                className={styles.actionButton}
-                                                onClick={() => handleConversationClick()}
-                                            >
-                                                <AiOutlinePlusSquare size={15} />
-                                            </div>
-                                        </StatefulTooltip>
+                                    <StatefulTooltip content={t('Add new conversation')} showArrow placement='top'>
+                                        <div className={styles.actionButton} onClick={() => handleConversationClick()}>
+                                            <AiOutlinePlusSquare size={15} />
+                                        </div>
+                                    </StatefulTooltip>
                                 </>
                                 <div style={{ marginLeft: 'auto' }}></div>
                                 {!!editableText.length && (
@@ -1888,6 +1767,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 ) : (
                                                     translatedLines.map((line, i) => {
                                                         return (
+                                                            
                                                             <p className={styles.paragraph} key={`p-${i}`}>
                                                                 {isWordMode && i === 0 ? (
                                                                     <div
@@ -1898,28 +1778,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                         }}
                                                                     >
                                                                         {line}
-                                                                        {!isLoading && (
-                                                                            <StatefulTooltip
-                                                                                content={
-                                                                                    isCollectedWord
-                                                                                        ? t('Remove from collection')
-                                                                                        : t('Add to collection')
-                                                                                }
-                                                                                showArrow
-                                                                                placement='right'
-                                                                            >
-                                                                                <div
-                                                                                    className={styles.actionButton}
-                                                                                    onClick={onWordCollection}
-                                                                                >
-                                                                                    {isCollectedWord ? (
-                                                                                        <MdGrade size={15} />
-                                                                                    ) : (
-                                                                                        <MdOutlineGrade size={15} />
-                                                                                    )}
-                                                                                </div>
-                                                                            </StatefulTooltip>
-                                                                        )}
                                                                     </div>
                                                                 ) : (
                                                                     line
@@ -1964,13 +1822,19 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     </div>
                                                 </Tooltip>
                                                 <Tooltip content={t('Add to Anki')} placement='bottom'>
-                                                        <div
-                                                            onClick={() => addNewNote(selectedGroup + ":" + activateAction?.name,originalText, translatedText )}
-                                                            className={styles.actionButton}
-                                                        >
-                                                            <AiOutlinePlusSquare size={15} />
-                                                        </div>
-                                                    </Tooltip>
+                                                    <div
+                                                        onClick={() =>
+                                                            addToAnki(
+                                                                selectedGroup + ':' + activateAction?.name,
+                                                                originalText,
+                                                                translatedText
+                                                            )
+                                                        }
+                                                        className={styles.actionButton}
+                                                    >
+                                                        <AiOutlinePlusSquare size={15} />
+                                                    </div>
+                                                </Tooltip>
                                             </div>
                                         )}
                                     </div>
@@ -2002,55 +1866,24 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 </div>
             )}
 
-<Tooltip content={t('选择使用场景')} placement='bottom'>
-  <Select
-    options={Object.keys(actionGroups).map(key => ({ id: key, label: key }))}
-    value={[{ id: selectedGroup }]}
-    overrides={{
-      Root: {
-        style: {
-          minWidth: '110px',
-          width: '30%',  
-        },
-      },
-    }}
-    onChange={({ value }) => {
-      const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
-      setSelectedGroup(groupId as string)
-    }}
-  />
-</Tooltip>
-            {enableVocabulary && (
-                <Modal
-                    isOpen={vocabularyType !== 'hide'}
-                    onClose={() => setVocabularyType('hide')}
-                    closeable
+            <Tooltip content={t('选择使用场景')} placement='bottom'>
+                <Select
+                    options={Object.keys(actionGroups).map((key) => ({ id: key, label: key }))}
+                    value={[{ id: selectedGroup }]}
                     overrides={{
-                        Close: {
+                        Root: {
                             style: {
-                                display: 'none',
+                                minWidth: '110px',
+                                width: '30%',
                             },
                         },
                     }}
-                    size='auto'
-                    autoFocus
-                    animate
-                    role='dialog'
-                >
-                    <Vocabulary
-                        onCancel={() => setVocabularyType('hide')}
-                        onInsert={(content, highlightWords) => {
-                            setEditableText(content)
-                            setOriginalText(content)
-                            setHighlightWords(highlightWords)
-                            setSelectedWord('')
-                            setActivateAction(actions?.find((action) => action.mode === 'translate'))
-                            setVocabularyType('hide')
-                        }}
-                        type={vocabularyType as 'vocabulary' | 'article'}
-                    />
-                </Modal>
-            )}
+                    onChange={({ value }) => {
+                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
+                        setSelectedGroup(groupId as string)
+                    }}
+                />
+            </Tooltip>
             <Modal
                 isOpen={!isDesktopApp() && showActionManager}
                 onClose={() => {

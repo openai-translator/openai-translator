@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
 
-    "name": "OpenAI Translator",
-    "description": "OpenAI-Translator is a Chrome extension that uses the ChatGPT API for translation.",
+    "name": "GPT Tutor",
+    "description": "GPT Tutor is a fork of OpenAI Translator, a Chrome extension that utilizes the ChatGPT API for language learning and other functions.",
     "version": "0.1.0",
 
     "icons": {
@@ -53,6 +53,13 @@
         "*://speech.platform.bing.com/",
         "https://*.googletagmanager.com/",
         "https://*.google-analytics.com/",
-        "<all_urls>"
+        "https://tcr9i.chat.openai.com/v2/1.5.2/enforcement.64b3a4e29686f93d52816249ecbf9857.html#35536E1E-65B4-4D96-9D97-6ADB7EFF8147/",
+        "https://tcr9i.chat.openai./"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js"],
+            "matches": ["<all_urls>"]
+        }
     ]
 }

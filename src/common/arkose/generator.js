@@ -1,18 +1,25 @@
 import Browser from 'webextension-polyfill'
 
-
 class ArkoseTokenGenerator {
     constructor() {
         this.enforcement = undefined
+        /**
+         * @type {{ resolve: (value: any) => void; reject: (reason?: any) => void; }[]}
+         */
         this.pendingPromises = []
-        window.useArkoseSetupEnforcement = this.useArkoseSetupEnforcement.bind(this)
+        this.scriptLoaded = false
+        window.useUniqueArkoseSetupEnforcement = this.useArkoseSetupEnforcement.bind(this)
         this.injectScript()
     }
 
+    /**
+     * @param {{ setConfig: (arg0: { onCompleted: (r: any) => void; onReady: () => void; onError: (r: any) => void; onFailed: (r: any) => void; }) => void; }} enforcement
+     */
     useArkoseSetupEnforcement(enforcement) {
         this.enforcement = enforcement
+        console.log(this.enforcement)
         enforcement.setConfig({
-            onCompleted: (r) => {
+            onCompleted: (/** @type {{ token: any; }} */ r) => {
                 console.debug('enforcement.onCompleted', r)
                 this.pendingPromises.forEach((promise) => {
                     promise.resolve(r.token)
@@ -22,10 +29,13 @@ class ArkoseTokenGenerator {
             onReady: () => {
                 console.debug('enforcement.onReady')
             },
-            onError: (r) => {
+            onError: (/** @type {{ message: any; }} */ r) => {
                 console.debug('enforcement.onError', r)
+                this.pendingPromises.forEach((promise) => {
+                    promise.reject(new Error(`Error in enforcement: ${r.message}`))
+                })
             },
-            onFailed: (r) => {
+            onFailed: (/** @type {any} */ r) => {
                 console.debug('enforcement.onFailed', r)
                 this.pendingPromises.forEach((promise) => {
                     promise.reject(new Error('Failed to generate arkose token'))
@@ -37,22 +47,48 @@ class ArkoseTokenGenerator {
     injectScript() {
         const script = document.createElement('script')
         script.src = Browser.runtime.getURL('/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js')
-        console.log('脚本调用')
         script.async = true
         script.defer = true
-        script.setAttribute('data-callback', 'useArkoseSetupEnforcement')
+        script.setAttribute('data-callback', 'useUniqueArkoseSetupEnforcement')
+        script.onload = () => {
+            this.scriptLoaded = true
+            console.log('Arkose API script loaded')
+        }
+        script.onerror = () => {
+            console.error('Failed to load Arkose API script')
+        }
         document.body.appendChild(script)
     }
 
-    async generate() {
-        if (!this.enforcement) {
-            return
+    /**
+     * @param {{ (): void; (): void; }} callback
+     */
+    ensureScriptLoaded(callback) {
+        if (this.scriptLoaded) {
+            callback()
+        } else {
+            const checkScriptLoaded = setInterval(() => {
+                if (this.scriptLoaded) {
+                    clearInterval(checkScriptLoaded)
+                    callback()
+                }
+            }, 100)
         }
+    }
+
+    async generate() {
         return new Promise((resolve, reject) => {
-            this.pendingPromises = [{ resolve, reject }] // store only one promise for now.
-            this.enforcement.run()
+            this.ensureScriptLoaded(() => {
+                if (!this.enforcement) {
+                    
+                  return undefined
+                }
+                this.pendingPromises.push({ resolve, reject }) // Allow multiple promises to be stored.
+                this.enforcement.run()
+            })
         })
     }
 }
-console.log('脚本成功调用')
+
+
 export const arkoseTokenGenerator = new ArkoseTokenGenerator()

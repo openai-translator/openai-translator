@@ -34,6 +34,9 @@ import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
+import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
+import wechat from '../assets/images/wechat.png'
+import alipay from '../assets/images/alipay.png'
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
         ...acc,
@@ -1041,7 +1044,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
-
+    const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false)
     return (
         <div
             style={{
@@ -1071,7 +1074,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             >
                 <img width='22' src={icon} alt='logo' />
                 <h2>
-                    OpenAI Translator
+                    GPT Tutor
                     {AppConfig?.version ? (
                         <a
                             href='https://github.com/yetone/openai-translator/releases'
@@ -1088,6 +1091,23 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         </a>
                     ) : null}
                 </h2>
+                <div
+                    style={{
+                        flexGrow: 1,
+                    }}
+                />
+                <div>
+                    <Button
+                        kind='secondary'
+                        size='mini'
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setShowBuyMeACoffee(true)
+                        }}
+                    >
+                        {'❤️  ' + t('Buy me a coffee')}
+                    </Button>
+                </div>
             </nav>
             <Form
                 form={form}
@@ -1254,6 +1274,42 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </div>
                 <Toaster />
             </Form>
+            <Modal
+                isOpen={showBuyMeACoffee}
+                onClose={() => setShowBuyMeACoffee(false)}
+                closeable
+                size='auto'
+                autoFocus
+                animate
+            >
+                <ModalHeader
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    {'❤️  ' + t('Buy me a coffee')}
+                </ModalHeader>
+                <ModalBody>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 10,
+                        }}
+                    >
+                        <div>{t('If you find this tool helpful, you can buy me a cup of coffee.')}</div>
+                        <div>
+                            <img width='330' src={wechat} />
+                        </div>
+                        <div>
+                            <img width='330' src={alipay} />
+                        </div>
+                    </div>
+                </ModalBody>
+            </Modal>
         </div>
     )
 }

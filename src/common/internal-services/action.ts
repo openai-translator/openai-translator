@@ -1,4 +1,3 @@
-import { builtinActionModes } from '../constants'
 import { TranslateMode } from '../translate'
 import { Action, ActionOutputRenderingFormat, getLocalDB } from './db'
 
@@ -123,24 +122,6 @@ class ActionInternalService implements IActionInternalService {
 
     async list(): Promise<Action[]> {
         return this.db.transaction('rw', this.db.action, async () => {
-            let count = await this.db.action.count()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const actions = await (this.db.action.orderBy('idx') as any).desc().toArray()
-            builtinActionModes.forEach(async (m) => {
-                const now = new Date().valueOf().toString()
-                const action = actions.find((a: Action) => a.mode === m.mode)
-                if (action) {
-                    return
-                }
-                await this.db.action.add({
-                    idx: count++,
-                    name: m.name,
-                    mode: m.mode,
-                    icon: m.icon,
-                    createdAt: now,
-                    updatedAt: now,
-                })
-            })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return await (this.db.action.orderBy('idx') as any).toArray()
         })
@@ -214,5 +195,6 @@ class ActionInternalService implements IActionInternalService {
         }
     }
 }
+
 
 export const actionInternalService = new ActionInternalService()

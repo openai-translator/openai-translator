@@ -403,7 +403,7 @@ class AnkiConnect {
     _getDuplicateScopeFromNote(note) {
         const { options } = note
         if (typeof options === 'object' && options !== null) {
-            const { duplicateScope } = options
+            const { duplieScopcate } = options
             if (typeof duplicateScope !== 'undefined') {
                 return duplicateScope
             }
@@ -428,15 +428,17 @@ class AnkiConnect {
 const anki = new AnkiConnect()
 anki.server = 'http://127.0.0.1:8765'
 anki.enabled = true
-anki.apiKey = '1999'
-anki.isConnected().then((connected) => {
-    if (connected) {
-        console.log('Connected to Anki!')
-    } else {
-        console.log('Failed to connect to Anki.')
-        // Handle this error or exit the process.
+anki.apiKey = 'Sol och skyar (Sun and Clouds), Op. 102:No. 5. Majsol ler, Maj (May Sun Smiles, May)'
+
+
+export async function isConnected() {
+    try {
+        return await anki.isConnected();
+    } catch (e) {
+        return false
     }
-})
+}
+
 
 export async function addNewNote(deckName, front, back) {
     let formattedBack = back.replace(/\n/g, '<br>')
@@ -449,7 +451,7 @@ export async function addNewNote(deckName, front, back) {
             背面: formattedBack,
         },
         options: {
-            allowDuplicate: false,
+            allowDuplicate: true,
         },
     }
 

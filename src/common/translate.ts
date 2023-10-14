@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
-import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
+import { oneLine } from 'common-tags'
 import { getArkoseToken } from './arkose'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -49,6 +49,38 @@ export interface TranslateResult {
     from?: string
     to?: string
     error?: string
+}
+
+interface FetcherOptions {
+    method: string
+    headers: Record<string, string>
+    body: string
+}
+
+async function updateTitleAndCheckId(
+    conversationId: string | undefined,
+    fetcher: (url: string, options: FetcherOptions) => Promise<Response>,
+    headers: Record<string, string>
+): Promise<void> {
+    const lastConversationId: string | null = localStorage.getItem('lastConversationId')
+    // Check if conversationId has changed
+    if (lastConversationId !== conversationId) {
+        localStorage.setItem('lastConversationId', conversationId || '') // Update lastConversationId
+        await updateTitleAndCheckId(conversationId, fetcher, headers) // Recursively call to reset the title
+        return
+    }
+    if (conversationId) {
+        const savedAction: string | null = localStorage.getItem('savedAction')
+        const currentDate = new Date()
+        const formattedDate = `${currentDate.getMonth() + 1}月${currentDate.getDate()}日`
+        const newTitle = `${savedAction}-${formattedDate}`
+
+        await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify({ title: newTitle }),
+        })
+    }
 }
 
 export const isAWord = (langCode: string, text: string) => {
@@ -207,9 +239,7 @@ function getlastMessageId() {
 }
 
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
-
 export class WebAPI {
-
     async translate(query: TranslateQuery) {
         const fetcher = getUniversalFetch()
         let rolePrompt = ''
@@ -218,7 +248,7 @@ export class WebAPI {
         const assistantPrompts: string[] = []
         let quoteProcessor: QuoteProcessor | undefined
         const settings = await utils.getSettings()
-        let isWordMode = false
+        const isWordMode = false
 
         if (query.mode === 'big-bang') {
             rolePrompt = oneLine`
@@ -234,9 +264,9 @@ export class WebAPI {
             const targetLangCode = query.detectTo
             const sourceLangName = lang.getLangName(sourceLangCode)
             const targetLangName = lang.getLangName(targetLangCode)
+            const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
             console.debug('sourceLang', sourceLangName)
             console.debug('targetLang', targetLangName)
-            const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
             const targetLangConfig = getLangConfig(targetLangCode)
             const sourceLangConfig = getLangConfig(sourceLangCode)
             console.log('Source language is', sourceLangConfig)
@@ -264,155 +294,6 @@ export class WebAPI {
                     if (query.action.outputRenderingFormat) {
                         commandPrompt += `. Format: ${query.action.outputRenderingFormat}`
                     }
-                    break
-                case 'translate':
-                    quoteProcessor = new QuoteProcessor()
-                    commandPrompt = targetLangConfig.genCommandPrompt(
-                        sourceLangConfig,
-                        quoteProcessor.quoteStart,
-                        quoteProcessor.quoteEnd
-                    )
-                    contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-                    if (query.text.length < 5 && toChinese) {
-                        // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
-                        rolePrompt = codeBlock`
-                    ${oneLineTrim`
-                    你是一个翻译引擎，
-                    请将给到的文本翻译成${targetLangName}。
-                    请列出3种（如果有）最常用翻译结果：单词或短语，
-                    并列出对应的适用语境（用中文阐述）、音标或转写、词性、双语示例。
-                    按照下面格式用中文阐述：`}
-                        ${oneLineTrim`
-                        <序号><单词或短语> · /<${targetLangConfig.phoneticNotation}>/
-                        `}
-                        [<词性缩写>] <适用语境（用中文阐述）>
-                        例句：<例句>(例句翻译)
-                    `
-                        commandPrompt = ''
-                    }
-                    if (isAWord(sourceLangCode, query.text.trim())) {
-                        isWordMode = true
-                        if (toChinese) {
-                            // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
-                            rolePrompt = codeBlock`
-                        ${oneLineTrim`
-                        你是一个翻译引擎，请翻译给出的文本，只需要翻译不需要解释。
-                        当且仅当文本只有一个单词时，
-                        请给出单词原始形态（如果有）、
-                        单词的语种、
-                        ${targetLangConfig.phoneticNotation && '对应的音标或转写、'}
-                        所有含义（含词性）、
-                        双语示例，至少三条例句。
-                        如果你认为单词拼写错误，请提示我最可能的正确拼写，
-                        否则请严格按照下面格式给到翻译结果：
-                        `}
-                            <单词>
-                            [<语种>]· / ${targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`}
-                            [<词性缩写>] <中文含义>]
-                            例句：
-                            <序号><例句>(例句翻译)
-                            词源：
-                            <词源>
-                        `
-                            commandPrompt = '好的，我明白了，请给我这个单词。'
-                            contentPrompt = `单词是：${query.text}`
-                        } else {
-                            const isSameLanguage = sourceLangCode === targetLangCode
-                            rolePrompt = codeBlock`${oneLine`
-                        You are a professional translation engine.
-                        Please translate the text into ${targetLangName} without explanation.
-                        When the text has only one word,
-                        please act as a professional
-                        ${sourceLangName}-${targetLangName} dictionary,
-                        and list the original form of the word (if any),
-                        the language of the word,
-                        ${targetLangConfig.phoneticNotation && 'the corresponding phonetic notation or transcription, '}
-                        all senses with parts of speech,
-                        ${isSameLanguage ? '' : 'bilingual '}
-                        sentence examples (at least 3) and etymology.
-                        If you think there is a spelling mistake,
-                        please tell me the most possible correct word
-                        otherwise reply in the following format:
-                        `}
-                            <word> (<original form>)
-                            ${oneLine`
-                            [<language>]· /
-                            ${targetLangConfig.phoneticNotation && `<${targetLangConfig.phoneticNotation}>`}
-                            `}
-                            ${oneLine`
-                            [<part of speech>]
-                            ${isSameLanguage ? '' : '<translated meaning> / '}
-                            <meaning in source language>
-                            `}
-                            Examples:
-                            <index>. <sentence>(<sentence translation>)
-                            Etymology:
-                            <etymology>
-                        `
-                            console.log(rolePrompt)
-                            commandPrompt = 'I understand. Please give me the word.'
-                            contentPrompt = `The word is: ${query.text}`
-                        }
-                    }
-                    if (query.selectedWord) {
-                        rolePrompt = oneLine`
-                    You are an expert in the semantic syntax of the ${sourceLangName} language
-                    and you are teaching me the ${sourceLangName} language.
-                    I give you a sentence in ${sourceLangName} and a word in that sentence.
-                    Please help me explain in ${targetLangName} language
-                    what the word means in the sentence
-                    and what the sentence itself means,
-                    and if the word is part of an idiom in the sentence,
-                    explain the idiom in the sentence
-                    and give a few examples in ${sourceLangName} with the same meaning
-                    and explain the examples in ${targetLangName} language,
-                    and must in ${targetLangName} language.
-                    If you understand, say yes, and then we will begin.`
-                        commandPrompt = 'Yes, I understand. Please give me the sentence and the word.'
-                        contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
-                    }
-                    break
-                case 'polishing':
-                    rolePrompt =
-                        'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
-                    quoteProcessor = new QuoteProcessor()
-                    commandPrompt = `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
-                    contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-                    break
-                case 'summarize':
-                    rolePrompt =
-                        "You are a professional text summarizer, you can only summarize the text, don't interpret it."
-                    quoteProcessor = new QuoteProcessor()
-                    commandPrompt = oneLine`
-                Please summarize this text in the most concise language
-                and must use ${targetLangName} language!
-                Only summarize the text between 
-                ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.
-                `
-                    contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-                    break
-                case 'analyze':
-                    rolePrompt = 'You are a professional translation engine and grammar analyzer.'
-                    quoteProcessor = new QuoteProcessor()
-                    commandPrompt = oneLine`
-                Please translate this text to ${targetLangName}
-                and explain the grammar in the original text using ${targetLangName}.
-                Only analyze the text between ${quoteProcessor.quoteStart}
-                and ${quoteProcessor.quoteEnd}.`
-                    contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-                    break
-                case 'explain-code':
-                    rolePrompt =
-                        'You are a code explanation engine that can only explain code but not interpret or translate it. Also, please report bugs and errors (if any).'
-                    commandPrompt = oneLine`
-                explain the provided code,
-                regex or script in the most concise language
-                and must use ${targetLangName} language!
-                You may use Markdown.
-                If the content is not code,
-                return an error message.
-                If the code has obvious errors, point them out.`
-                    contentPrompt = '```\n' + query.text + '\n```'
                     break
             }
         }
@@ -459,7 +340,8 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
-            let arkoseToken: string | undefined
+            let arkoseToken: string | null = null
+            // 优先通过存储在本地存储中的token，无法获取时调用函数生成。
             if (settings.apiModel.startsWith('gpt-4')) {
                 arkoseToken = await getArkoseToken()
             }
@@ -522,80 +404,81 @@ export class WebAPI {
         }
 
         if (settings.provider === 'ChatGPT') {
-            let conversationId = await getConversationId() || undefined
-                let length = 0
-                await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(body),
-                    signal: query.signal,
-                    onStatusCode: (status) => {
-                        query.onStatusCode?.(status)
-                    },
-                    onMessage: (msg) => {
-                        let resp
-                        try {
-                            resp = JSON.parse(msg)
-                            chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
-                            if (!conversationId) {
-                                chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
-                            }
-                        } catch {
-                            query.onFinish('stop')
-                            return
+            const conversationId = JSON.stringify(await getConversationId()) || undefined
+            let length = 0
+            await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+                signal: query.signal,
+                onStatusCode: (status) => {
+                    query.onStatusCode?.(status)
+                },
+                onMessage: (msg) => {
+                    let resp
+                    try {
+                        resp = JSON.parse(msg)
+                        chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
+                        if (!conversationId) {
+                            chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
                         }
-                        const { finish_details: finishDetails } = resp.message
-                        if (finishDetails) {
-                            query.onFinish(finishDetails.type)
-                            return
+                    } catch {
+                        query.onFinish('stop')
+                        return
+                    }
+                    const { finish_details: finishDetails } = resp.message
+                    if (finishDetails) {
+                        query.onFinish(finishDetails.type)
+                        return
+                    }
+                    const { content, author } = resp.message
+                    if (author.role === 'assistant') {
+                        const targetTxt = content.parts.join('')
+                        let textDelta = targetTxt.slice(length)
+                        if (quoteProcessor) {
+                            textDelta = quoteProcessor.processText(textDelta)
                         }
-                        const { content, author } = resp.message
-                        if (author.role === 'assistant') {
-                            const targetTxt = content.parts.join('')
-                            let textDelta = targetTxt.slice(length)
-                            if (quoteProcessor) {
-                                textDelta = quoteProcessor.processText(textDelta)
-                            }
-                            query.onMessage({ content: textDelta, role: '', isWordMode })
-                            length = targetTxt.length
-                        }
-                    },
-                    onError: (err) => {
-                        if (err instanceof Error) {
-                            query.onError(err.message)
-                            return
-                        }
-                        if (typeof err === 'string') {
-                            query.onError(err)
-                            return
-                        }
-                        if (typeof err === 'object') {
-                            const { detail } = err
-                            if (detail) {
-                                const { message } = detail
-                                if (message) {
-                                    query.onError(`ChatGPT Web: ${message}`)
-                                    return
-                                }
-                            }
-                            query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
-                            return
-                        }
-                        const { error } = err
-                        if (error instanceof Error) {
-                            query.onError(error.message)
-                            return
-                        }
-                        if (typeof error === 'object') {
-                            const { message } = error
+                        query.onMessage({ content: textDelta, role: '', isWordMode })
+                        length = targetTxt.length
+                    }
+                },
+                onError: (err) => {
+                    if (err instanceof Error) {
+                        query.onError(err.message)
+                        return
+                    }
+                    if (typeof err === 'string') {
+                        query.onError(err)
+                        return
+                    }
+                    if (typeof err === 'object') {
+                        const { detail } = err
+                        if (detail) {
+                            const { message } = detail
                             if (message) {
-                                query.onError(message)
+                                query.onError(`ChatGPT Web: ${message}`)
                                 return
                             }
                         }
-                        query.onError('Unknown error')
-                    },
-                })
+                        query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
+                        return
+                    }
+                    const { error } = err
+                    if (error instanceof Error) {
+                        query.onError(error.message)
+                        return
+                    }
+                    if (typeof error === 'object') {
+                        const { message } = error
+                        if (message) {
+                            query.onError(message)
+                            return
+                        }
+                    }
+                    query.onError('Unknown error')
+                },
+            })
+            //  set title
 
             if (conversationId && settings.chatContext === false) {
                 await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
@@ -614,6 +497,9 @@ export class WebAPI {
                 onMessage: (msg) => {
                     let resp
                     try {
+                        if (settings.apiModel.startsWith('gpt-4')) {
+                            localStorage.removeItem('arkosetoken')            
+                        }
                         resp = JSON.parse(msg)
                         // eslint-disable-next-line no-empty
                     } catch {
