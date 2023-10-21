@@ -21,7 +21,6 @@ class ArkoseTokenGenerator {
             onCompleted: (/** @type {{ token: any; }} */ r) => {
                 console.debug('enforcement.onCompleted', r)
                 this.pendingPromises.forEach((promise) => {
-                    localStorage.setItem('arkosetoken',r.token)
                     promise.resolve(r.token)
                 })
             },
@@ -46,13 +45,21 @@ class ArkoseTokenGenerator {
     }
 
     injectScript() {
-        // Create and append the script
-        const script = document.createElement('script');
-        script.src = Browser.runtime.getURL('/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js');
-        script.async = true;
-        script.defer = true;
-        script.setAttribute('data-callback', 'useUniqueArkoseSetupEnforcement');
-        document.body.appendChild(script);
+        if (window.location.href.startsWith('https://chat.openai.com/')) {
+            return 
+        }
+        const script = document.createElement('script')
+        script.src = Browser.runtime.getURL('/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js')
+        script.async = true
+        script.defer = true
+        script.setAttribute('data-callback', 'useUniqueArkoseSetupEnforcement')
+        script.onload = () => {
+            this.scriptLoaded = true
+        }
+        script.onerror = () => {
+            console.error('Failed to load Arkose API script')
+        }
+        document.body.appendChild(script)
     }
     
 
@@ -2530,7 +2537,7 @@ var arkoseLabsClientApid975905a;
                 try {
                     e.parentNode.removeChild(e)
                 } catch (e) {}
-            })), Mt()
+            })), Mt(),window[zt]($t)
         }() : Mt()
     }(), arkoseLabsClientApid975905a = r
 }();
