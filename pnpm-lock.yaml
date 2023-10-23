@@ -36,11 +36,11 @@ dependencies:
     specifier: ^2.29.3
     version: 2.29.3
   dexie:
-    specifier: ^3.2.3
-    version: 3.2.3
+    specifier: ^3.2.4
+    version: 3.2.4
   dexie-react-hooks:
     specifier: ^1.1.3
-    version: 1.1.3(@types/react@18.2.18)(dexie@3.2.3)(react@18.2.0)
+    version: 1.1.3(@types/react@18.2.18)(dexie@3.2.4)(react@18.2.0)
   electron-store:
     specifier: ^8.1.0
     version: 8.1.0
@@ -3009,7 +3009,7 @@ packages:
       - supports-color
     dev: true
 
-  /dexie-react-hooks@1.1.3(@types/react@18.2.18)(dexie@3.2.3)(react@18.2.0):
+  /dexie-react-hooks@1.1.3(@types/react@18.2.18)(dexie@3.2.4)(react@18.2.0):
     resolution: {integrity: sha512-bXXE1gfYtfuVYTNiOlyam+YVaO8KaqacgRuxFuP37YtpS6o/jxT6KOl5h+hhqY36s0UavlHWbL+HWJFMcQumIg==}
     peerDependencies:
       '@types/react': '>=16'
@@ -3017,12 +3017,12 @@ packages:
       react: '>=16'
     dependencies:
       '@types/react': 18.2.18
-      dexie: 3.2.3
+      dexie: 3.2.4
       react: 18.2.0
     dev: false
 
-  /dexie@3.2.3:
-    resolution: {integrity: sha512-iHayBd4UYryDCVUNa3PMsJMEnd8yjyh5p7a+RFeC8i8n476BC9wMhVvqiImq5zJZJf5Tuer+s4SSj+AA3x+ZbQ==}
+  /dexie@3.2.4:
+    resolution: {integrity: sha512-VKoTQRSv7+RnffpOJ3Dh6ozknBqzWw/F3iqMdsZg958R0AS8AnY9x9d1lbwENr0gzeGJHXKcGhAMRaqys6SxqA==}
     engines: {node: '>=6.0'}
     dev: false
 
