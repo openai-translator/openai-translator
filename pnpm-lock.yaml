@@ -144,8 +144,8 @@ dependencies:
     specifier: ^2.2.0
     version: 2.2.0(react@18.2.0)
   tauri-plugin-autostart-api:
-    specifier: github:tauri-apps/tauri-plugin-autostart
-    version: git/github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f
+    specifier: github:tauri-apps/tauri-plugin-autostart#v1
+    version: github.com/tauri-apps/tauri-plugin-autostart/072ebc2914c19eb7022c90add7ea328d437d5eb2
   tesseract.js:
     specifier: ^4.0.2
     version: 4.0.2(eslint@8.46.0)
@@ -1367,8 +1367,8 @@ packages:
     engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
-  /@tauri-apps/api@1.4.0:
-    resolution: {integrity: sha512-Jd6HPoTM1PZSFIzq7FB8VmMu3qSSyo/3lSwLpoapW+lQ41CL5Dow2KryLg+gyazA/58DRWI9vu/XpEeHK4uMdw==}
+  /@tauri-apps/api@1.5.1:
+    resolution: {integrity: sha512-6unsZDOdlXTmauU3NhWhn+Cx0rODV+rvNvTdvolE5Kls5ybA6cqndQENDt1+FS0tF7ozCP66jwWoH6a5h90BrA==}
     engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
@@ -7390,10 +7390,10 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  git/github.com+tauri-apps/tauri-plugin-autostart/0e474395d4990587ad5c1db25ed23220fe11764f:
-    resolution: {commit: 0e474395d4990587ad5c1db25ed23220fe11764f, repo: git@github.com:tauri-apps/tauri-plugin-autostart.git, type: git}
+  github.com/tauri-apps/tauri-plugin-autostart/072ebc2914c19eb7022c90add7ea328d437d5eb2:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/072ebc2914c19eb7022c90add7ea328d437d5eb2}
     name: tauri-plugin-autostart-api
     version: 0.0.0
     dependencies:
-      '@tauri-apps/api': 1.4.0
+      '@tauri-apps/api': 1.5.1
     dev: false

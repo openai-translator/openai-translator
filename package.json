@@ -72,7 +72,7 @@
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",
     "swr": "^2.2.0",
-    "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart",
+    "tauri-plugin-autostart-api": "github:tauri-apps/tauri-plugin-autostart#v1",
     "tesseract.js": "^4.0.2",
     "underscore": "^1.13.6",
     "url-join-ts": "^1.0.5",
