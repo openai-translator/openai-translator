@@ -15,6 +15,9 @@ static IS_WRITING: Mutex<bool> = Mutex::new(false);
 static TRANSLATE_SELECTED_TEXT_PLACEHOLDER: &str = "<Translating ✍️>";
 static IS_TRANSLATE_SELECTED_TEXT: Mutex<bool> = Mutex::new(false);
 static PREVIOUS_TRANSLATED_TEXT: Mutex<String> = Mutex::new(String::new());
+static ALL_TRANSLATED_FINGERPRINT: &str = "‌";
+static ALL_TRANSLATED_FINGERPRINT_COUNT: Mutex<usize> = Mutex::new(1);
+static NEED_TO_ADD_FINGERPRINT: Mutex<bool> = Mutex::new(false);
 
 #[derive(Clone)]
 struct IncrementalAction {
@@ -30,6 +33,10 @@ pub fn writing() {
     let is_writing = IS_WRITING.lock();
     if *is_writing {
         return;
+    }
+    {
+        let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
+        incremental_actions.clear();
     }
     let mut is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
     let mut enigo = Enigo::new();
@@ -50,7 +57,7 @@ pub fn writing() {
     if content.ends_with("\r\n") {
         content = content[..content.len() - 2].to_owned();
     }
-    let content = content.replace("\r\n", "\n");
+    let mut content = content.replace("\r\n", "\n");
     if content.trim().is_empty() {
         *previous_translated_text = content;
         return;
@@ -66,11 +73,43 @@ pub fn writing() {
             _ => false,
         }
     }).count();
-    {
-        let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
-        incremental_actions.clear();
+    let translated_fingerprint_count = ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
+    let mut is_all_translated_before = content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1));
+    let mut need_to_add_fingerprint = NEED_TO_ADD_FINGERPRINT.lock();
+    *need_to_add_fingerprint = false;
+
+    if !is_all_translated_before {
+        match changeset.iter().next().clone() {
+            Some(change) => {
+                match change {
+                    (ChangeTag::Delete, text) => {
+                        if *text == ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count) {
+                            *need_to_add_fingerprint = true;
+                            is_all_translated_before = true;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            None => {}
+        }
+        if !is_all_translated_before && changeset.len() >= 2 {
+            let first_change = changeset.iter().next().unwrap();
+            let second_change = changeset.iter().nth(1).unwrap();
+            match (first_change, second_change) {
+                ((ChangeTag::Insert, _), (ChangeTag::Equal, text)) => {
+                    if text.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !text.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1)) {
+                        *need_to_add_fingerprint = true;
+                        is_all_translated_before = true;
+                    }
+                }
+                _ => {}
+            }
+        }
     }
-    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 {
+
+    debug_println!("is_all_translated_before: {:?}", is_all_translated_before);
+    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 && is_all_translated_before {
         let mut incremental_actions = Vec::new();
         let mut is_first_insertion = true;
         let mut prev_insertion_index = 0;
@@ -144,6 +183,10 @@ pub fn writing() {
     select_all(&mut enigo);
     thread::sleep(Duration::from_millis(30));
     do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
+
+    if content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1)) {
+        content = content[*translated_fingerprint_count..].to_owned();
+    }
     crate::utils::writing_text(content);
 }
 
@@ -221,17 +264,30 @@ pub fn write_to_input(text: String) {
     let is_incremental_translate = !incremental_contents.is_empty();
     let mut is_start_writing = IS_START_WRITING.lock();
     let mut enigo = Enigo::new();
+    let mut new_text = text.clone();
     let is_first_writing = !*is_start_writing;
+    let mut need_to_add_fingerprint = false;
     if is_first_writing {
         if !*is_translate_selected_text && !is_incremental_translate {
             select_all(&mut enigo);
             thread::sleep(Duration::from_millis(50));
+            need_to_add_fingerprint = true;
         } else {
             backspace_click(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned().chars().count() - 1);
         }
     }
+    let mut global_need_to_add_fingerprint = NEED_TO_ADD_FINGERPRINT.lock();
+    if need_to_add_fingerprint || *global_need_to_add_fingerprint {
+        *global_need_to_add_fingerprint = false;
+        let mut translated_fingerprint_count = ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
+        *translated_fingerprint_count += 1;
+        if *translated_fingerprint_count > 7 {
+            *translated_fingerprint_count = 1;
+        }
+        new_text = format!("{}{}", ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count), text);
+    }
     *is_start_writing = true;
-    do_write_to_input(&mut enigo, text, true);
+    do_write_to_input(&mut enigo, new_text, true);
 }
 
 #[tauri::command]
@@ -273,6 +329,12 @@ pub fn finish_writing() {
 
         let input_text = get_input_text(&mut enigo, true).unwrap_or_default();
         let input_text = input_text.replace("\r\n", "\n");
+
+        let fingerprint_count = input_text.chars().take_while(|c| *c == ALL_TRANSLATED_FINGERPRINT.chars().next().unwrap()).count();
+        if fingerprint_count > 0 {
+            let mut global_all_translated_fingerprint_count = ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
+            *global_all_translated_fingerprint_count = fingerprint_count;
+        }
 
         let mut previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
         *previous_translated_text = input_text;

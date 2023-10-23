@@ -337,19 +337,25 @@ Etymology:
                     }
                 }
                 if (!query.writing && query.selectedWord) {
-                    rolePrompt = oneLine`
-                    You are an expert in the semantic syntax of the ${sourceLangName} language
-                    and you are teaching me the ${sourceLangName} language.
-                    I give you a sentence in ${sourceLangName} and a word in that sentence.
-                    Please help me explain in ${targetLangName} language
-                    what the word means in the sentence
-                    and what the sentence itself means,
-                    and if the word is part of an idiom in the sentence,
-                    explain the idiom in the sentence
-                    and give a few examples in ${sourceLangName} with the same meaning
-                    and explain the examples in ${targetLangName} language,
-                    and must in ${targetLangName} language.
-                    If you understand, say yes, and then we will begin.`
+                    rolePrompt = codeBlock`
+${oneLine`
+You are an expert in the semantic syntax of the ${sourceLangName} language,
+and you are teaching me the ${sourceLangName} language.
+I will give you a sentence in ${sourceLangName} and a word from that sentence.
+${
+    sourceLangConfig.phoneticNotation &&
+    'Firstly, provide the corresponding phonetic notation or transcription of the word in ' + sourceLangName + '.'
+}
+Then, help me explain in ${targetLangName} what the word means in the sentence, what the sentence itself means,
+and whether the word is part of an idiom in the sentence. If it is, explain the idiom in the sentence.
+Provide 3 to 5 examples in ${sourceLangName} with the same meaning, and explain these examples in ${targetLangName}.
+The answer should follow the format below:
+`}
+
+${oneLine`<word> · /${sourceLangConfig.phoneticNotation && `<${sourceLangConfig.phoneticNotation}>`}/ `}
+${oneLine`<the remaining part>`}
+
+If you understand, say "yes", and then we will begin.`
                     commandPrompt = 'Yes, I understand. Please give me the sentence and the word.'
                     contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
                 }

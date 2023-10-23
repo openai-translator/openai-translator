@@ -745,6 +745,30 @@ function SelectInputElementsCheckbox({ value, onChange, onBlur }: SelectInputEle
         />
     )
 }
+
+interface ReadSelectedWordsFromInputElementsProps {
+    value?: boolean
+    onChange?: (value: boolean) => void
+    onBlur?: () => void
+}
+
+function ReadSelectedWordsFromInputElementsCheckbox({
+    value,
+    onChange,
+    onBlur,
+}: ReadSelectedWordsFromInputElementsProps) {
+    return (
+        <Checkbox
+            checkmarkType='toggle_round'
+            checked={value}
+            onChange={(e) => {
+                onChange?.(e.target.checked)
+                onBlur?.()
+            }}
+        />
+    )
+}
+
 interface RunAtStartupCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -987,6 +1011,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
         selectInputElementsText: utils.defaultSelectInputElementsText,
+        readSelectedWordsFromInputElementsText: utils.defaultReadSelectedWordsFromInputElementsText,
         runAtStartup: false,
         writingTargetLanguage: utils.defaultWritingTargetLanguage,
     })
@@ -1135,6 +1160,32 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     </Button>
                 </div>
             </nav>
+            {!isDesktopApp && (
+                <div
+                    style={{
+                        padding: '20px 25px 0px 25px',
+                        color: theme.colors.contentPrimary,
+                    }}
+                >
+                    {t(
+                        'It is recommended to download the desktop application of OpenAI Translator to enjoy the wonderful experience of word translation in all software!'
+                    )}{' '}
+                    <a
+                        target='_blank'
+                        href={
+                            values?.i18n?.toLowerCase().includes('zh')
+                                ? 'https://github.com/openai-translator/openai-translator/blob/main/README-CN.md#%E5%AE%89%E8%A3%85'
+                                : 'https://github.com/openai-translator/openai-translator#installation'
+                        }
+                        rel='noreferrer'
+                        style={{
+                            color: theme.colors.linkText,
+                        }}
+                    >
+                        {t('Download Link')}
+                    </a>
+                </div>
+            )}
             <Form
                 form={form}
                 style={{
@@ -1144,6 +1195,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
+                <FormItem name='i18n' label={t('i18n')}>
+                    <Ii18nSelector onBlur={onBlur} />
+                </FormItem>
                 <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
@@ -1249,6 +1303,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                     <SelectInputElementsCheckbox onBlur={onBlur} />
                 </FormItem>
+                <FormItem name='readSelectedWordsFromInputElementsText' label={t('Read the selected words in input')}>
+                    <ReadSelectedWordsFromInputElementsCheckbox onBlur={onBlur} />
+                </FormItem>
                 {isTauri && (
                     <FormItem name='runAtStartup' label={t('Run at startup')}>
                         <RunAtStartupCheckbox onBlur={onBlur} />
@@ -1259,9 +1316,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>
                     <ThemeTypeSelector onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='i18n' label={t('i18n')}>
-                    <Ii18nSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='tts' label={t('TTS')}>
                     <TTSVoicesSettings onBlur={onBlur} />

@@ -13,8 +13,9 @@ export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
-export const defaultWritingTargetLanguage = 'zh-Hans'
+export const defaultWritingTargetLanguage = 'en'
 export const defaultSelectInputElementsText = true
+export const defaultReadSelectedWordsFromInputElementsText = false
 export const defaulti18n = 'en'
 
 export async function getApiKey(): Promise<string> {
@@ -45,6 +46,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     restorePreviousPosition: 1,
     runAtStartup: 1,
     selectInputElementsText: 1,
+    readSelectedWordsFromInputElementsText: 1,
     disableCollectingStatistics: 1,
     allowUsingClipboardWhenSelectedTextNotAvailable: 1,
     pinned: 1,
@@ -94,6 +96,12 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.selectInputElementsText === undefined || settings.selectInputElementsText === null) {
         settings.selectInputElementsText = defaultSelectInputElementsText
+    }
+    if (
+        settings.readSelectedWordsFromInputElementsText === undefined ||
+        settings.readSelectedWordsFromInputElementsText === null
+    ) {
+        settings.readSelectedWordsFromInputElementsText = defaultReadSelectedWordsFromInputElementsText
     }
     if (!settings.themeType) {
         settings.themeType = 'followTheSystem'

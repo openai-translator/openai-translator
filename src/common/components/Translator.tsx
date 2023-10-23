@@ -734,6 +734,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setTranslatedLines(translatedText.split('\n'))
     }, [translatedText])
     const [isSpeakingTranslatedText, setIsSpeakingTranslatedText] = useState(false)
+    const isSpeakingSelectedWordsFromInputElements = useRef(false)
     const [errorMessage, setErrorMessage] = useState('')
     const startLoading = useCallback(() => {
         setIsLoading(true)
@@ -1156,10 +1157,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const editableStopSpeakRef = useRef<() => void>(() => null)
     const translatedStopSpeakRef = useRef<() => void>(() => null)
+    const selectedWordsFromInputElementsStopSpeakRef = useRef<() => void>(() => null)
     useEffect(() => {
         return () => {
             editableStopSpeakRef.current()
             translatedStopSpeakRef.current()
+            selectedWordsFromInputElementsStopSpeakRef.current()
         }
     }, [])
     const handleEditSpeakAction = async () => {
@@ -1191,6 +1194,32 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         })
         translatedStopSpeakRef.current = stopSpeak
     }
+
+    const handleReadSelectedWordsFromInputElementsAction = useCallback(async () => {
+        if (isSpeakingSelectedWordsFromInputElements.current) {
+            selectedWordsFromInputElementsStopSpeakRef.current()
+            isSpeakingSelectedWordsFromInputElements.current = false
+            return
+        }
+        isSpeakingSelectedWordsFromInputElements.current = true
+        const { stopSpeak } = await speak({
+            text: selectedWord,
+            lang: sourceLang,
+            onFinish: () => {
+                isSpeakingSelectedWordsFromInputElements.current = false
+            },
+        })
+        selectedWordsFromInputElementsStopSpeakRef.current = stopSpeak
+    }, [selectedWord, sourceLang])
+
+    useEffect(() => {
+        if (selectedWord === '' || settings?.readSelectedWordsFromInputElementsText === false) {
+            return
+        }
+        handleReadSelectedWordsFromInputElementsAction()
+            .then()
+            .catch((reason) => console.error('read selected words error: ', reason))
+    }, [selectedWord, handleReadSelectedWordsFromInputElementsAction, settings?.readSelectedWordsFromInputElementsText])
 
     const enableVocabulary = !isUserscript()
 
