@@ -50,6 +50,9 @@ dependencies:
   eventsource-parser:
     specifier: ^1.0.0
     version: 1.0.0
+  extpay:
+    specifier: ^3.0.7
+    version: 3.0.7
   hotkeys-js:
     specifier: ^3.10.1
     version: 3.10.1
@@ -4031,6 +4034,12 @@ packages:
 
   /extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
+    dev: false
+
+  /extpay@3.0.7:
+    resolution: {integrity: sha512-hvmB9qbduefUEY78k7vvYqgCQZ9mE3Tk42ppBNbffDgztdATVPDbHz/MrRozOEzUcio5Y5b63MY1oVvACW5bgA==}
+    dependencies:
+      webextension-polyfill: 0.7.0
     dev: false
 
   /extract-zip@2.0.1:
@@ -8140,6 +8149,10 @@ packages:
   /webextension-polyfill@0.10.0:
     resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
     dev: true
+
+  /webextension-polyfill@0.7.0:
+    resolution: {integrity: sha512-su48BkMLxqzTTvPSE1eWxKToPS2Tv5DLGxKexLEVpwFd6Po6N8hhSLIvG6acPAg7qERoEaDL+Y5HQJeJeml5Aw==}
+    dev: false
 
   /webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}

@@ -342,9 +342,7 @@ export class WebAPI {
             apiKey = respJson.accessToken
             let arkoseToken: string | null = null
             // 优先通过存储在本地存储中的token，无法获取时调用函数生成。
-            if (settings.apiModel.startsWith('gpt-4')) {
-                arkoseToken = await getArkoseToken()
-            }
+            arkoseToken = await getArkoseToken()
             body = {
                 action: 'next',
                 messages: [

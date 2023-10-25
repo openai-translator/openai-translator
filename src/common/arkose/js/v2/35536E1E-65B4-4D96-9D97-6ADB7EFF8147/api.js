@@ -1,7 +1,11 @@
 import Browser from 'webextension-polyfill'
 /* eslint-disable */
+const openaiRegex = /^https?:\/\/([a-z0-9]+[.])*chat[.]openai[.]com\//
 class ArkoseTokenGenerator {
     constructor() {
+        if (openaiRegex.test(window.location.href)) {
+            return;
+        }
         this.enforcement = undefined
         /**
          * @type {{ resolve: (value: any) => void; reject: (reason?: any) => void; }[]}
@@ -101,6 +105,9 @@ export const arkoseTokenGenerator = new ArkoseTokenGenerator()
 
 var arkoseLabsClientApid975905a;
 ! function() {
+    if (openaiRegex.test(window.location.href)) {
+        return;
+    }
     var e = {
             6857: function(e, t) {
                 "use strict";
