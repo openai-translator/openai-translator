@@ -7,6 +7,7 @@ import { getLangConfig, getLangName, LangCode } from '../common/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
+import { getArkoseToken } from './arkose'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -437,7 +438,9 @@ If you understand, say "yes", and then we will begin.`
             return
         }
         const respJson = await resp?.json()
-        apiKey = respJson.accessToken
+        apiKey = respJson.
+        let arkoseToken: string | null = null
+            arkoseToken = await getArkoseToken()
         body = {
             action: 'next',
             messages: [
@@ -458,6 +461,7 @@ If you understand, say "yes", and then we will begin.`
             ],
             model: settings.apiModel, // 'text-davinci-002-render-sha'
             parent_message_id: uuidv4(),
+            arkose_token: arkoseToken,
             history_and_training_disabled: true,
         }
     } else {
