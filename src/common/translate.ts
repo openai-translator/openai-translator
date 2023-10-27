@@ -438,9 +438,8 @@ If you understand, say "yes", and then we will begin.`
             return
         }
         const respJson = await resp?.json()
-        apiKey = respJson.
-        let arkoseToken: string | null = null
-            arkoseToken = await getArkoseToken()
+        apiKey = respJson.accessToken
+        const arkoseToken = await getArkoseToken()
         body = {
             action: 'next',
             messages: [
