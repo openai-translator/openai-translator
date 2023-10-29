@@ -340,9 +340,7 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
-            let arkoseToken: string | null = null
-            // 优先通过存储在本地存储中的token，无法获取时调用函数生成。
-            arkoseToken = await getArkoseToken()
+            const arkoseToken = await getArkoseToken()
             body = {
                 action: 'next',
                 messages: [
@@ -495,9 +493,6 @@ export class WebAPI {
                 onMessage: (msg) => {
                     let resp
                     try {
-                        if (settings.apiModel.startsWith('gpt-4')) {
-                            localStorage.removeItem('arkosetoken')            
-                        }
                         resp = JSON.parse(msg)
                         // eslint-disable-next-line no-empty
                     } catch {
