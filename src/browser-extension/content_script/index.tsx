@@ -13,7 +13,7 @@ import { createRoot, Root } from 'react-dom/client'
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
 import { PREFIX } from '../../common/constants'
-import { getClientX, getClientY, getPageX, getPageY, UserEventType } from '../../common/user-event'
+import { getCaretNodeType, getClientX, getClientY, getPageX, getPageY, UserEventType } from '../../common/user-event'
 import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
@@ -207,7 +207,7 @@ async function main() {
                         { getBoundingClientRect: () => new DOMRect(x, y, popupCardOffset, popupCardOffset) },
                         text
                     )
-                } else if (settings.alwaysShowIcons === true) {
+                } else if (settings.alwaysShowIcons === true && getCaretNodeType(event) === Node.TEXT_NODE) {
                     showPopupThumb(text, getPageX(event) + popupCardOffset, getPageY(event) + popupCardOffset)
                 }
             }

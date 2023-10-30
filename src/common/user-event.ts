@@ -15,3 +15,22 @@ export const getClientX = (event: UserEventType) => {
 export const getClientY = (event: UserEventType) => {
     return event instanceof MouseEvent ? event.clientY : event.changedTouches[0].clientY
 }
+
+export function getCaretNodeType(event: UserEventType) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (document.caretPositionFromPoint) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const range = document?.caretPositionFromPoint(getClientX(event), getClientY(event))
+        if (!range) return null
+        return range.offsetNode.nodeType
+    } else if (document.caretRangeFromPoint) {
+        const range = document.caretRangeFromPoint(getClientX(event), getClientY(event))
+
+        if (!range) return null
+        return range.startContainer.nodeType
+    } else {
+        return null
+    }
+}
