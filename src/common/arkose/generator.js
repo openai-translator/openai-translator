@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Browser from 'webextension-polyfill'
 
 class ArkoseTokenGenerator {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Browser from 'webextension-polyfill'
 /* eslint-disable */
 const openaiRegex = /^https?:\/\/([a-z0-9]+[.])*chat[.]openai[.]com\//
