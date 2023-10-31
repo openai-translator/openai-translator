@@ -27,7 +27,7 @@ declare class ArkoseTokenGenerator {
             onFailed: (r: any) => void;
         }) => void;
     }): void;
-    injectScript(): void;
+    injectScript(): Promise<void>;
     /**
      * @param {{ (): void; (): void; }} callback
      */

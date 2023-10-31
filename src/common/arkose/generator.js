@@ -1,5 +1,4 @@
-// @ts-nocheck
-import Browser from 'webextension-polyfill'
+import * as utils from '../../common/utils'
 
 class ArkoseTokenGenerator {
     constructor() {
@@ -45,9 +44,10 @@ class ArkoseTokenGenerator {
         })
     }
 
-    injectScript() {
+    async injectScript() {
+        const browser = await utils.getBrowser()
         const script = document.createElement('script')
-        script.src = Browser.runtime.getURL('/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js')
+        script.src = browser.runtime.getURL('/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js')
         script.async = true
         script.defer = true
         script.setAttribute('data-callback', 'useUniqueArkoseSetupEnforcement')
@@ -81,8 +81,7 @@ class ArkoseTokenGenerator {
         return new Promise((resolve, reject) => {
             this.ensureScriptLoaded(() => {
                 if (!this.enforcement) {
-                    
-                  return undefined
+                    return undefined
                 }
                 this.pendingPromises.push({ resolve, reject }) // Allow multiple promises to be stored.
                 this.enforcement.run()
@@ -90,6 +89,5 @@ class ArkoseTokenGenerator {
         })
     }
 }
-
 
 export const arkoseTokenGenerator = new ArkoseTokenGenerator()
