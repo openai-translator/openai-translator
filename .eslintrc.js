@@ -14,6 +14,7 @@ module.exports = {
         sourceType: 'module',
     },
     root: true,
+    ignorePatterns: ["src/common/arkose/**/*.d.ts"],
     plugins: ['react', 'react-hooks', '@typescript-eslint', 'prettier', 'baseui'],
     rules: {
         'react/react-in-jsx-scope': 'off',
