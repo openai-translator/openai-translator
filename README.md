@@ -99,10 +99,4 @@ const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=
 
 [LICENSE](./LICENSE)
 
-# Star History
 
-<p align="center">
-  <a target="_blank" href="https://star-history.com/#yetone/openai-translator&Date">
-    <img src="https://api.star-history.com/svg?repos=yetone/openai-translator&type=Date" />
-  </a>
-</p>
