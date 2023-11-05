@@ -7,7 +7,7 @@ import { getLangConfig, getLangName, LangCode } from '../common/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
-import { getArkoseToken } from './arkose'
+import { getArkoseToken } from '../../public/index'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
