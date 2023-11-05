@@ -6,7 +6,7 @@
     <br> English | <a href="README-CN.md">中文</a>
 </p>
 <p align="center">
-    <em>The translator that does more than just translation - powered by OpenAI.</em>
+    <em>GPT Tutor is a branch of OpenAI Translator, and I've made some modifications to it. I've added new features, such as categorizing prompts through grouping, one-click addition of responses to Anki, and removed unnecessary content. Additionally, I've fixed the functionality for using ChatGPT Web. GPT-Tutor is now more than just a translation tool; it has become a practical tool for assisting language learning.</em>
 </p>
 
 <p align="center">
@@ -41,22 +41,6 @@
   </a>
 </p>
 
-# Why Yet another Translator
-
-I have developed a [Bob](https://bobtranslate.com/) [plugin](https://github.com/yetone/bob-plugin-openai-translator) that utilizes ChatGPT API to provide global word translation on macOS. However, since not all users have access to macOS to benefit from the plugin, I have created this project!
-
-# More than just a browser extension
-
-What began as a Chrome extension has now evolved into a multi-platform desktop app that I am currently developing.
-
-<p align="center">
-  <img width="560" src="https://user-images.githubusercontent.com/1206493/223899374-ff386436-63b8-4618-afdd-fed2e6b48d56.png" />
-</p>
-
-# More than just translation
-
-What began as a translation tool has now evolved to include surprisingly effective word polishing and summarization capabilities, ~~accidentally~~.
-
 # How to use
 
 <p align="center">
@@ -83,70 +67,6 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 # Installation
 
-## Windows
-
-### Install via [winget](https://github.com/microsoft/winget-cli)
-
-```sh
-winget install yetone.OpenAITranslator
-```
-
-### Install via [Scoop](https://scoop.sh)
-
-```powershell
-scoop bucket add extras
-scoop install openai-translator
-```
-
-### Install Manually
-
-1. Download the installation package ending in `.msi` from the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page.
-2. Double click the downloaded file to install it.
-3. If prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation.
-4. Ready to use!
-
-## MacOS
-
-### Install Manually
-
-1. Go to the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page and download the corresponding chip's `.dmg` installation package. Note: Use aarch64 version for Apple Silicon machines and run `xattr` command below.
-2. Double click the downloaded file to install it.
-3. Ready to use!
-
-### Troubleshooting
-
--   "OpenAI Translator" can’t be opened because the developer cannot be verified.
- 
-    <p align="center">
-      <img width="300" src="https://user-images.githubusercontent.com/1206493/223916804-45ce3f34-6a4a-4baf-a0c1-4ab5c54c521f.png" />
-    </p>
- 
-    -   Click the `Cancel` button, then go to the `Settings` -> `Privacy and Security` page, click the `Still Open` button, and then click the `Open` button in the pop-up window. After that, there will be no more pop-up warnings when opening `OpenAI Translator`. 🎉
-        <p align="center">
-          <img width="500" src="https://user-images.githubusercontent.com/1206493/223916970-9c99f15e-cf61-4770-b92d-4a78f980bb26.png" /> <img width="200" src="https://user-images.githubusercontent.com/1206493/223917449-ed1ac19f-c43d-4b13-9888-79ba46ceb862.png" />
-        </p>
- 
-    -   If you cannot find the above options in `Privacy & Security`, or get error prompts such as broken files with Apple Silicon machines. Open `Terminal.app` and enter the following command (you may need to enter a password halfway through), then restart `OpenAI Translator`:
-
-        ```sh
-        sudo xattr -d com.apple.quarantine /Applications/OpenAI\ Translator.app
-        ```
-
--   If you encounter a permission prompt every time you open it, or if you cannot perform a shortcut translation, please go to `Settings` -> `Privacy & Security` -> `Supporting Features` to remove OpenAI Translator, and then re-add OpenAI Translator.
-
-    <p align="center">
-      <img width="500" src="https://user-images.githubusercontent.com/1206493/224536148-eec559bf-4d99-48c1-bbd3-2cc105aff084.png" />
-      <img width="600" src="https://user-images.githubusercontent.com/1206493/224536277-4200f58e-8dc0-4c01-a27a-a30d7d8dc69e.gif" />
-    </p>
-
-## Installing Desktop Clip Extensions
-
-For details, see [Desktop Clip Extension](./CLIP-EXTENSIONS.md)
-
-  <p align="center">
-    <img width="600" src="https://user-images.githubusercontent.com/1206493/240355949-8f41d98d-f097-4ce4-a533-af60e1757ca1.gif" />
-  </p>
- 
 ## Browser Extension
 
 1. Visit your Browser Extension Store to install this plugin:
@@ -160,7 +80,7 @@ For details, see [Desktop Clip Extension](./CLIP-EXTENSIONS.md)
      </a>
    </p>
 
-2. Click on the OpenAI Translator icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
+2. Click on the GPT Tutor icon in the browser plugin list, and enter the obtained API KEY into the configuration interface that pops up from this plugin.
  
    <p align="center">
      <img width="600" src="https://user-images.githubusercontent.com/1206493/222958165-159719b4-28a5-44a4-b700-567786df7f03.png" />
