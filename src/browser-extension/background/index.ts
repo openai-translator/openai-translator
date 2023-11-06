@@ -140,32 +140,3 @@ browser.commands.onCommand.addListener(async (command) => {
     }
 })
 
-chrome.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
-    console.log('Message received. Request:', request)
-    if (request.action === 'addNewNote') {
-        console.log('action received')
-        fetch('http://127.0.0.1:8765', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(request.payload),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                console.log('Received data:', data)
-                sendResponse(data)
-            })
-            .catch((error) => {
-                console.error('Fetch error:', error)
-                sendResponse({ error: error.message })
-            })
-        return true // 必须返回true
-    }
-})
-
