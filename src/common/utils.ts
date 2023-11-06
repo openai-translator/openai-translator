@@ -218,21 +218,12 @@ export async function csvToActions(file: File): Promise<Action[]> {
             throw new Error('Invalid file format: Expected an array of actions');
         }
 
-        // 准备要导入的动作
-        const actions = parsedData.map((action) => ({
-            id: action.id,  // 使用 id 作为 id 字段的值
-            idx: action.ufeffidx,  // 使用 ufeffidx 作为 idx 字段的值
-            name: action.name,
-            icon: action.icon,
-            rolePrompt: action.rolePrompt,
-            commandPrompt: action.commandPrompt,
-            group: action.group,
-            createdAt: action.createdAt,
-            updatedAt: action.updatedAt,
-        }))
-        // 将动作导入数据库
-        console.log('test actions' + JSON.stringify(actions))
-        return actions
+        return parsedData.map(action => ({
+            ...action,
+            // 如果有需要特殊处理的字段，可以在此处进行映射
+            id: action.id || action.ufeffid, 
+            idx: action.idx || action.ufeffidx,
+        }));
     } catch (error) {
         console.error('Error importing actions:', error);
         // 可选地，向用户显示错误消息
