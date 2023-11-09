@@ -70,11 +70,6 @@ export function App() {
                 if (inputText) {
                     const sourceLang = await detectLang(inputText)
                     const targetLang = intoLangCode(settings.writingTargetLanguage)
-                    if (sourceLang === targetLang) {
-                        invoke('write_to_input', { text: inputText })
-                        invoke('finish_writing')
-                        return
-                    }
                     await translate({
                         writing: true,
                         action: {
