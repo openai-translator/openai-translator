@@ -544,6 +544,7 @@ interface APIModelOption {
 }
 
 const openAIModelOptions: APIModelOption[] = [
+    { label: 'gpt-3.5-turbo-1106', id: 'gpt-3.5-turbo-1106' },
     { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
     { label: 'gpt-3.5-turbo-0613', id: 'gpt-3.5-turbo-0613' },
     { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
