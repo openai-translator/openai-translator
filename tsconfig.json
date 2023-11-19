@@ -5,7 +5,7 @@
         "allowJs": false,
         "useDefineForClassFields": true,
         "module": "ESNext",
-        "target": "es2015",
+        "target": "es2017",
         "skipLibCheck": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
