@@ -438,8 +438,8 @@ If you understand, say "yes", and then we will begin.`
         }
         const respJson = await resp?.json()
         apiKey = respJson.accessToken
-        const { getArkoseToken } = await import('../../public/')
-        const arkoseToken = await getArkoseToken()
+        const { arkoseTokenGenerator } = await import('../common/internal-services/arkoseTokenGenerator')
+        const arkoseToken = await arkoseTokenGenerator.generate()
         body = {
             action: 'next',
             messages: [
