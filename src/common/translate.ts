@@ -7,7 +7,6 @@ import { getLangConfig, getLangName, LangCode } from '../common/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
-import { getArkoseToken } from '../../public/index'
 
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
@@ -439,6 +438,7 @@ If you understand, say "yes", and then we will begin.`
         }
         const respJson = await resp?.json()
         apiKey = respJson.accessToken
+        const { getArkoseToken } = await import('../../public/')
         const arkoseToken = await getArkoseToken()
         body = {
             action: 'next',
