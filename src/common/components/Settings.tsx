@@ -931,6 +931,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
         ? ([
               { label: 'OpenAI', id: 'OpenAI' },
               { label: 'Azure', id: 'Azure' },
+              { label: 'MiniMax', id: 'MiniMax' },
           ] as {
               label: string
               id: Provider
@@ -939,6 +940,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               { label: 'OpenAI', id: 'OpenAI' },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
+              { label: 'MiniMax', id: 'MiniMax' },
           ] as {
               label: string
               id: Provider
@@ -1003,6 +1005,13 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         apiURLPath: utils.defaultAPIURLPath,
         apiModel: utils.defaultAPIModel,
         provider: utils.defaultProvider,
+        chatgptModel: utils.defaultChatGPTModel,
+        azureAPIKeys: '',
+        azureAPIURL: utils.defaultAPIURL,
+        azureAPIURLPath: utils.defaultAPIURLPath,
+        azureAPIModel: utils.defaultAPIModel,
+        miniMaxGroupID: '',
+        miniMaxAPIKey: '',
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
@@ -1201,33 +1210,26 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
-                {values.provider !== 'ChatGPT' && (
+                <div
+                    style={{
+                        display: values.provider === 'OpenAI' ? 'block' : 'none',
+                    }}
+                >
                     <FormItem
-                        required
+                        required={values.provider === 'OpenAI'}
                         name='apiKeys'
                         label={t('API Key')}
                         caption={
                             <div>
                                 {t('Go to the')}{' '}
-                                {values.provider === 'Azure' ? (
-                                    <a
-                                        target='_blank'
-                                        href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
-                                        rel='noreferrer'
-                                        style={linkStyle}
-                                    >
-                                        {t('Azure OpenAI Service page')}
-                                    </a>
-                                ) : (
-                                    <a
-                                        target='_blank'
-                                        href='https://platform.openai.com/account/api-keys'
-                                        rel='noreferrer'
-                                        style={linkStyle}
-                                    >
-                                        {t('OpenAI page')}
-                                    </a>
-                                )}{' '}
+                                <a
+                                    target='_blank'
+                                    href='https://platform.openai.com/account/api-keys'
+                                    rel='noreferrer'
+                                    style={linkStyle}
+                                >
+                                    {t('OpenAI page')}
+                                </a>{' '}
                                 {t(
                                     'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
                                 )}
@@ -1236,22 +1238,111 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     >
                         <Input autoFocus type='password' size='compact' name='apiKey' onBlur={onBlur} />
                     </FormItem>
-                )}
-                {values.provider !== 'Azure' && (
-                    <FormItem name='apiModel' label={t('API Model')} required>
-                        <APIModelSelector provider={values.provider} onBlur={onBlur} />
+                    <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
+                        <APIModelSelector provider='OpenAI' onBlur={onBlur} />
                     </FormItem>
-                )}
-                {values.provider !== 'ChatGPT' && (
-                    <>
-                        <FormItem required name='apiURL' label={t('API URL')}>
-                            <Input size='compact' onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                            <Input size='compact' />
-                        </FormItem>
-                    </>
-                )}
+                    <FormItem name='apiURL' label={t('API URL')} required={values.provider === 'OpenAI'}>
+                        <Input size='compact' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem name='apiURLPath' label={t('API URL Path')} required={values.provider === 'OpenAI'}>
+                        <Input size='compact' />
+                    </FormItem>
+                </div>
+                <div
+                    style={{
+                        display: values.provider === 'Azure' ? 'block' : 'none',
+                    }}
+                >
+                    <FormItem
+                        required={values.provider === 'Azure'}
+                        name='azureAPIKeys'
+                        label={t('API Key')}
+                        caption={
+                            <div>
+                                {t('Go to the')}{' '}
+                                <a
+                                    target='_blank'
+                                    href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
+                                    rel='noreferrer'
+                                    style={linkStyle}
+                                >
+                                    {t('Azure OpenAI Service page')}
+                                </a>{' '}
+                                {t(
+                                    'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                )}
+                            </div>
+                        }
+                    >
+                        <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem name='azureAPIModel' label={t('API Model')} required={values.provider === 'Azure'}>
+                        <APIModelSelector provider='OpenAI' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem name='azureAPIURL' label={t('API URL')} required={values.provider === 'Azure'}>
+                        <Input size='compact' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem name='azureAPIURLPath' label={t('API URL Path')} required={values.provider === 'Azure'}>
+                        <Input size='compact' />
+                    </FormItem>
+                </div>
+                <div
+                    style={{
+                        display: values.provider === 'ChatGPT' ? 'block' : 'none',
+                    }}
+                >
+                    <FormItem name='chatgptModel' label={t('API Model')} required={values.provider === 'ChatGPT'}>
+                        <APIModelSelector provider='ChatGPT' onBlur={onBlur} />
+                    </FormItem>
+                </div>
+                <div
+                    style={{
+                        display: values.provider === 'MiniMax' ? 'block' : 'none',
+                    }}
+                >
+                    <FormItem
+                        required={values.provider === 'MiniMax'}
+                        name='miniMaxGroupID'
+                        label='MiniMax Group ID'
+                        caption={
+                            <div>
+                                {t('Go to the')}{' '}
+                                <a
+                                    target='_blank'
+                                    href='https://api.minimax.chat/user-center/basic-information'
+                                    rel='noreferrer'
+                                    style={linkStyle}
+                                >
+                                    {t('MiniMax page')}
+                                </a>{' '}
+                                {t('to get your Group ID.')}
+                            </div>
+                        }
+                    >
+                        <Input size='compact' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem
+                        required={values.provider === 'MiniMax'}
+                        name='miniMaxAPIKey'
+                        label='MiniMax API Key'
+                        caption={
+                            <div>
+                                {t('Go to the')}{' '}
+                                <a
+                                    target='_blank'
+                                    href='https://api.minimax.chat/user-center/basic-information/interface-key'
+                                    rel='noreferrer'
+                                    style={linkStyle}
+                                >
+                                    {t('MiniMax page')}
+                                </a>{' '}
+                                {t('to get your API Key.')}
+                            </div>
+                        }
+                    >
+                        <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                    </FormItem>
+                </div>
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>
                     <TranslateModeSelector onBlur={onBlur} />
                 </FormItem>

@@ -57,6 +57,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             '*://speech.platform.bing.com/',
             'https://*.googletagmanager.com/',
             'https://*.google-analytics.com/',
+            'https://*.minimax.chat/',
         ],
     }
 

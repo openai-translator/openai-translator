@@ -48,7 +48,14 @@ export interface ISettings {
     apiURL: string
     apiURLPath: string
     apiModel: string
-    provider: Provider | 'OpenAI'
+    provider: Provider
+    chatgptModel: string
+    azureAPIKeys: string
+    azureAPIURL: string
+    azureAPIURLPath: string
+    azureAPIModel: string
+    miniMaxGroupID: string
+    miniMaxAPIKey: string
     autoTranslate: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string
