@@ -61,11 +61,13 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
-import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
 import Toaster from './Toaster'
+
+// use dynamic import to reduce bundle size
+const { countTokens } = await import('../token')
 
 const cache = new LRUCache({
     max: 500,
