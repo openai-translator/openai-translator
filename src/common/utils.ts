@@ -10,6 +10,7 @@ export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
+export const defaultChatGPTModel = 'text-davinci-002-render-sha'
 
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
@@ -24,6 +25,12 @@ export async function getApiKey(): Promise<string> {
     return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
 }
 
+export async function getAzureApiKey(): Promise<string> {
+    const settings = await getSettings()
+    const apiKeys = (settings.azureAPIKeys ?? '').split(',').map((s) => s.trim())
+    return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
+}
+
 // In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
 const settingKeys: Record<keyof ISettings, number> = {
     apiKeys: 1,
@@ -31,6 +38,13 @@ const settingKeys: Record<keyof ISettings, number> = {
     apiURLPath: 1,
     apiModel: 1,
     provider: 1,
+    chatgptModel: 1,
+    azureAPIKeys: 1,
+    azureAPIURL: 1,
+    azureAPIURLPath: 1,
+    azureAPIModel: 1,
+    miniMaxGroupID: 1,
+    miniMaxAPIKey: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
@@ -105,6 +119,25 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.themeType) {
         settings.themeType = 'followTheSystem'
+    }
+    if (settings.provider === 'Azure') {
+        if (!settings.azureAPIKeys) {
+            settings.azureAPIKeys = settings.apiKeys
+        }
+        if (!settings.azureAPIURL) {
+            settings.azureAPIURL = settings.apiURL
+        }
+        if (!settings.azureAPIURLPath) {
+            settings.azureAPIURLPath = settings.apiURLPath
+        }
+        if (!settings.azureAPIModel) {
+            settings.azureAPIModel = settings.apiModel
+        }
+    }
+    if (settings.provider === 'ChatGPT') {
+        if (!settings.chatgptModel) {
+            settings.chatgptModel = settings.apiModel
+        }
     }
     return settings
 }
