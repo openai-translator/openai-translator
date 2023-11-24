@@ -45,6 +45,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     azureAPIModel: 1,
     miniMaxGroupID: 1,
     miniMaxAPIKey: 1,
+    moonshotAPIKey: 1,
+    moonshotAPIModel: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,

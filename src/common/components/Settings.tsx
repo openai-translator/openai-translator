@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
 import _ from 'underscore'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
@@ -21,7 +21,7 @@ import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
 import { ISettings, IThemedStyleProps, ThemeType } from '../types'
 import { useTheme } from '../hooks/useTheme'
-import { IoCloseCircle } from 'react-icons/io5'
+import { IoCloseCircle, IoRefreshSharp } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../../package.json'
 import { useSettings } from '../hooks/useSettings'
@@ -549,6 +549,8 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
     const [options, setOptions] = useState<APIModelOption[]>([])
     const [errMsg, setErrMsg] = useState<string>()
     const [isChatGPTNotLogin, setIsChatGPTNotLogin] = useState(false)
+    const [refreshFlag, refresh] = useReducer((x: number) => x + 1, 0)
+
     useEffect(() => {
         setIsChatGPTNotLogin(false)
         setErrMsg('')
@@ -568,34 +570,57 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
             })()
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
+            if (provider === 'ChatGPT' && JSON.stringify(e).includes('not login')) {
+                setIsChatGPTNotLogin(true)
+            }
             setErrMsg(JSON.stringify(e))
         } finally {
             setIsLoading(false)
         }
-    }, [provider])
+    }, [provider, refreshFlag])
 
     return (
         <div>
-            <Select
-                isLoading={isLoading}
-                size='compact'
-                onBlur={onBlur}
-                searchable={false}
-                clearable={false}
-                value={
-                    value
-                        ? [
-                              {
-                                  id: value,
-                              },
-                          ]
-                        : undefined
-                }
-                onChange={(params) => {
-                    onChange?.(params.value[0].id as APIModel)
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
                 }}
-                options={options}
-            />
+            >
+                <Select
+                    isLoading={isLoading}
+                    size='compact'
+                    onBlur={onBlur}
+                    searchable={false}
+                    clearable={false}
+                    value={
+                        value
+                            ? [
+                                  {
+                                      id: value,
+                                  },
+                              ]
+                            : undefined
+                    }
+                    onChange={(params) => {
+                        onChange?.(params.value[0].id as APIModel)
+                    }}
+                    options={options}
+                />
+                <Button
+                    size='compact'
+                    kind='secondary'
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        refresh()
+                    }}
+                >
+                    <IoRefreshSharp size={16} />
+                </Button>
+            </div>
             <div
                 style={{
                     display: 'flex',
@@ -886,6 +911,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               { label: 'OpenAI', id: 'OpenAI' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
+              { label: 'Moonshot', id: 'Moonshot' },
           ] as {
               label: string
               id: Provider
@@ -895,6 +921,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
+              { label: 'Moonshot', id: 'Moonshot' },
           ] as {
               label: string
               id: Provider
@@ -966,6 +993,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         azureAPIModel: utils.defaultAPIModel,
         miniMaxGroupID: '',
         miniMaxAPIKey: '',
+        moonshotAPIKey: '',
+        moonshotAPIModel: '',
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
@@ -1295,6 +1324,31 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         }
                     >
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                    </FormItem>
+                </div>
+                <div
+                    style={{
+                        display: values.provider === 'Moonshot' ? 'block' : 'none',
+                    }}
+                >
+                    <FormItem
+                        required={values.provider === 'Moonshot'}
+                        name='moonshotAPIKey'
+                        label='Moonshot API Key'
+                        caption={
+                            <div>
+                                {t('Go to the')}{' '}
+                                <a target='_blank' href='https://www.moonshot.cn/' rel='noreferrer' style={linkStyle}>
+                                    Moonshot Page
+                                </a>{' '}
+                                {t('to get your API Key.')}
+                            </div>
+                        }
+                    >
+                        <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                    </FormItem>
+                    <FormItem name='moonshotAPIModel' label={t('API Model')} required={values.provider === 'Moonshot'}>
+                        <APIModelSelector provider='Moonshot' onBlur={onBlur} key={values.moonshotAPIKey} />
                     </FormItem>
                 </div>
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>
