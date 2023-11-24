@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import _ from 'underscore'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
@@ -12,7 +12,7 @@ import { BaseProvider } from 'baseui-sd'
 import { Input } from 'baseui-sd/input'
 import { createForm } from './Form'
 import { Button } from 'baseui-sd/button'
-import { TranslateMode, Provider, APIModel } from '../translate'
+import { TranslateMode, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { supportedLanguages } from '../lang'
@@ -32,11 +32,11 @@ import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { useThemeType } from '../hooks/useThemeType'
 import { Slider } from 'baseui-sd/slider'
-import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
 import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
+import { Provider, getEngine } from '../engines'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -109,8 +109,8 @@ interface AutoTranslateCheckboxProps {
 }
 
 interface IProviderSelectorProps {
-    value?: Provider | 'OpenAI'
-    onChange?: (value: Provider | 'OpenAI') => void
+    value?: Provider
+    onChange?: (value: Provider) => void
 }
 
 function TranslateModeSelector({ value, onChange, onBlur }: ITranslateModeSelectorProps) {
@@ -543,24 +543,7 @@ interface APIModelOption {
     id: string
 }
 
-const openAIModelOptions: APIModelOption[] = [
-    { label: 'gpt-3.5-turbo-1106', id: 'gpt-3.5-turbo-1106' },
-    { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
-    { label: 'gpt-3.5-turbo-0613', id: 'gpt-3.5-turbo-0613' },
-    { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
-    { label: 'gpt-3.5-turbo-16k', id: 'gpt-3.5-turbo-16k' },
-    { label: 'gpt-3.5-turbo-16k-0613', id: 'gpt-3.5-turbo-16k-0613' },
-    { label: 'gpt-4', id: 'gpt-4' },
-    { label: 'gpt-4-1106-preview (recommended)', id: 'gpt-4-1106-preview' },
-    { label: 'gpt-4-0314', id: 'gpt-4-0314' },
-    { label: 'gpt-4-0613', id: 'gpt-4-0613' },
-    { label: 'gpt-4-32k', id: 'gpt-4-32k' },
-    { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
-    { label: 'gpt-4-32k-0613', id: 'gpt-4-32k-0613' },
-]
-
 function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelectorProps) {
-    const fetcher = useMemo(() => getUniversalFetch(), [])
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
@@ -570,57 +553,26 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         setIsChatGPTNotLogin(false)
         setErrMsg('')
         setOptions([])
-        if (provider === 'OpenAI') {
-            setOptions(openAIModelOptions)
-        } else if (provider === 'ChatGPT') {
-            setIsLoading(true)
-            try {
-                ;(async () => {
-                    const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
-                    if (sessionResp.status !== 200) {
-                        setIsChatGPTNotLogin(true)
-                        setErrMsg('Failed to fetch ChatGPT Web accessToken')
-                        return
-                    }
-                    const sessionRespJsn = await sessionResp.json()
-                    const headers: Record<string, string> = {
-                        Authorization: `Bearer ${sessionRespJsn.accessToken}`,
-                    }
-                    const modelsResp = await fetcher(`${utils.defaultChatGPTWebAPI}/models`, {
-                        cache: 'no-cache',
-                        headers,
-                    })
-                    const modelsRespJsn = await modelsResp.json()
-                    if (!modelsRespJsn) {
-                        return
-                    }
-                    if (modelsResp.status !== 200) {
-                        if (modelsResp.status === 401) {
-                            setIsChatGPTNotLogin(true)
-                        }
-                        setErrMsg(modelsRespJsn.detail.message)
-                        return
-                    }
-                    const { models } = modelsRespJsn
-                    if (!models) {
-                        return
-                    }
-                    setOptions(
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        models.map((model: any) => ({
-                            label: `${model.title} (${model.tags.join(', ')})`,
-                            id: model.slug,
-                        }))
-                    )
-                })()
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (e: any) {
-                setErrMsg(JSON.stringify(e))
-            } finally {
-                setIsLoading(false)
-            }
+        const engine = getEngine(provider)
+        setIsLoading(true)
+        try {
+            ;(async () => {
+                const models = await engine.listModels()
+                setOptions(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    models.map((model: any) => ({
+                        label: model.name,
+                        id: model.id,
+                    }))
+                )
+            })()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            setErrMsg(JSON.stringify(e))
+        } finally {
+            setIsLoading(false)
         }
-    }, [fetcher, provider])
+    }, [provider])
 
     return (
         <div>
