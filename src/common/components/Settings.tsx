@@ -550,6 +550,7 @@ const openAIModelOptions: APIModelOption[] = [
     { label: 'gpt-3.5-turbo-16k', id: 'gpt-3.5-turbo-16k' },
     { label: 'gpt-3.5-turbo-16k-0613', id: 'gpt-3.5-turbo-16k-0613' },
     { label: 'gpt-4', id: 'gpt-4' },
+    { label: 'gpt-4-1106-preview (recommended)', id: 'gpt-4-1106-preview' },
     { label: 'gpt-4-0314', id: 'gpt-4-0314' },
     { label: 'gpt-4-0613', id: 'gpt-4-0613' },
     { label: 'gpt-4-32k', id: 'gpt-4-32k' },
