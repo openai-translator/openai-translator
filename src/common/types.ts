@@ -1,6 +1,7 @@
 import { Theme } from 'baseui-sd/theme'
-import { TranslateMode, Provider } from './translate'
+import { TranslateMode } from './translate'
 import { TTSProvider } from './tts/types'
+import { Provider } from './engines'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
