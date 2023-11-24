@@ -57,6 +57,8 @@ export interface ISettings {
     azureAPIModel: string
     miniMaxGroupID: string
     miniMaxAPIKey: string
+    moonshotAPIKey: string
+    moonshotAPIModel: string
     autoTranslate: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string
