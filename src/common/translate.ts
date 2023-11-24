@@ -11,6 +11,7 @@ import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'MiniMax'
 export type APIModel =
+    | 'gpt-3.5-turbo-1106'
     | 'gpt-3.5-turbo'
     | 'gpt-3.5-turbo-0301'
     | 'gpt-3.5-turbo-0613'
