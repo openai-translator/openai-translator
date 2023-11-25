@@ -1,9 +1,9 @@
 {
     "manifest_version": 3,
 
-    "name": "OpenAI Translator",
-    "description": "OpenAI-Translator is a Firefox extension that uses the ChatGPT API for translation.",
-    "version": "0.1.0",
+    "name": "GPT Tutor",
+    "description": "GPT-Tutor is a  extension that uses the ChatGPT API for language learning.",
+    "version": "0.1.1",
 
     "options_ui": {
         "page": "/src/browser-extension/options/index.html"
@@ -34,12 +34,13 @@
         "https://*.ingest.sentry.io/",
         "*://speech.platform.bing.com/",
         "https://*.googletagmanager.com/",
-        "https://*.google-analytics.com/"
+        "https://*.google-analytics.com/",
+        "https://*.chat.openai.com/"
     ],
 
     "browser_specific_settings": {
         "gecko": {
-            "id": "openaitranslator@gmail.com"
+            "id": "yaozeng1999@gmail.com"
         }
     }
 }

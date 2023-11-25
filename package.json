@@ -1,6 +1,6 @@
 {
   "name": "openai-translator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "openai-translator",
   "main": "index.js",
   "scripts": {

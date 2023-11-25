@@ -169,18 +169,28 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
     }, {})
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
+            console.log('Handling file change');
             if (event.target.files) {
-                const file = event.target.files[0]
+                const file = event.target.files[0];
+                console.log('Selected file:', file.name);
+    
                 if (file) {
-                    const importActions = await csvToActions(file)
-                    await actionService.bulkPut(importActions)
-                    refreshActions()
+                    console.log('Importing actions from file');
+                    const importActions = await csvToActions(file);
+                    console.log('Imported actions:', importActions.slice(0, 5)); // 显示前5条数据
+    
+                    // 假设 actionService.bulkPut 已经正确实现
+                    await actionService.bulkPut(importActions);
+                    console.log('Actions imported successfully');
+    
+                    // 假设 refreshActions 已经正确实现
+                    refreshActions();
                 }
             }
         } catch (error) {
-            console.error('Error handling file change:', error)
-            // Optionally, show an error message to the user
+            console.error('Error handling file change:', error);
         }
+    
     }
 
     const onCsvExportActions = async (group: string) => {
