@@ -314,6 +314,19 @@ fn main() {
                     NSWindow::setAllowsAutomaticWindowTabbing_(ns_window, cocoa::base::NO);
                 }
             }
+            #[cfg(target_os = "macos")]
+            {
+                use cocoa::appkit::NSWindowCollectionBehavior;
+                use cocoa::base::id;
+                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                let ns_win = window.ns_window().unwrap() as id;
+                unsafe {
+                    let mut collection_behavior = ns_win.collectionBehavior();
+                    collection_behavior |= NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
+
+                    ns_win.setCollectionBehavior_(collection_behavior);
+                }
+            }
             std::thread::spawn(move || {
                 #[cfg(target_os = "windows")]
                 {

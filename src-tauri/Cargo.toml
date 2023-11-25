@@ -37,6 +37,7 @@ tiny_http = "0.12.0"
 text-diff = "0.4.0"
 similar = "2.2.1"
 debug_print = "1.0.0"
+active-win-pos-rs = "0.8"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"
