@@ -2,6 +2,7 @@ use crate::config;
 use crate::utils;
 use crate::ALWAYS_ON_TOP;
 use crate::APP_HANDLE;
+use debug_print::debug_println;
 use mouse_position::mouse_position::Mouse;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
@@ -202,41 +203,46 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
                 }
             } else if !center {
                 let (mouse_logical_x, mouse_logical_y): (i32, i32) = get_mouse_location().unwrap();
-                let window_size = window.outer_size().unwrap();
+                let window_physical_size = window.outer_size().unwrap();
                 let scale_factor = window.scale_factor().unwrap_or(1.0);
-                let mut mouse_physical_position = PhysicalPosition::new(mouse_logical_x as i32, mouse_logical_y as i32);
+                let mut mouse_physical_position = PhysicalPosition::new(mouse_logical_x, mouse_logical_y);
                 if cfg!(target_os = "macos") {
                     mouse_physical_position =
                         LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64).to_physical(scale_factor);
                 }
 
-                let monitor = window.available_monitors().and_then(|monitors| {
+                let current_monitor = window.available_monitors().and_then(|monitors| {
                     Ok(monitors
                         .iter()
                         .find(|monitor| {
-                            let monitor_size = monitor.size();
-                            let monitor_position = monitor.position();
-                            mouse_physical_position.x >= monitor_position.x
-                                && mouse_physical_position.x <= monitor_position.x + (monitor_size.width as i32)
-                                && mouse_physical_position.y >= monitor_position.y
-                                && mouse_physical_position.y <= monitor_position.y + (monitor_size.height as i32)
+                            let monitor_physical_size = monitor.size();
+                            let monitor_physical_position = monitor.position();
+                            mouse_physical_position.x >= monitor_physical_position.x
+                                && mouse_physical_position.x <= monitor_physical_position.x + (monitor_physical_size.width as i32)
+                                && mouse_physical_position.y >= monitor_physical_position.y
+                                && mouse_physical_position.y <= monitor_physical_position.y + (monitor_physical_size.height as i32)
                         })
                         .cloned())
                 }).unwrap_or_else(|_| window.current_monitor().unwrap()).unwrap();
 
-                let monitor_size = monitor.size();
-                let monitor_physical_position = monitor.position();
+                let monitor_physical_size = current_monitor.size();
+                let monitor_physical_position = current_monitor.position();
 
                 let mut window_physical_position = mouse_physical_position;
-                if mouse_physical_position.x + (window_size.width as i32) > monitor_physical_position.x + (monitor_size.width as i32) {
-                    window_physical_position.x = monitor_physical_position.x + (monitor_size.width as i32) - (window_size.width as i32);
+                if mouse_physical_position.x + (window_physical_size.width as i32) > monitor_physical_position.x + (monitor_physical_size.width as i32) {
+                    window_physical_position.x = monitor_physical_position.x + (monitor_physical_size.width as i32) - (window_physical_size.width as i32);
                 }
-                if mouse_physical_position.y + (window_size.height as i32) > monitor_physical_position.y + (monitor_size.height as i32) {
-                    window_physical_position.y = monitor_physical_position.y + (monitor_size.height as i32) - (window_size.height as i32);
+                if mouse_physical_position.y + (window_physical_size.height as i32) > monitor_physical_position.y + (monitor_physical_size.height as i32) {
+                    window_physical_position.y = monitor_physical_position.y + (monitor_physical_size.height as i32) - (window_physical_size.height as i32);
                 }
                 if !cfg!(target_os = "macos") {
                     window.unminimize().unwrap();
                 }
+                debug_println!("Mouse physical position: {:?}", mouse_physical_position);
+                debug_println!("Monitor physical size: {:?}", monitor_physical_size);
+                debug_println!("Monitor physical position: {:?}", monitor_physical_position);
+                debug_println!("Window physical size: {:?}", window_physical_size);
+                debug_println!("Window physical position: {:?}", window_physical_position);
                 window.set_position(window_physical_position).unwrap();
             } else {
                 if !cfg!(target_os = "macos") {
