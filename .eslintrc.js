@@ -6,11 +6,6 @@ module.exports = {
         node: true,
     },
     extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-    overrides: [
-        {
-            files: ['../public/js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js'],
-        },
-    ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         project: true,
