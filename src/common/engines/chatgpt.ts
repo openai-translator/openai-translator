@@ -38,6 +38,7 @@ export class ChatGPT implements IEngine {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return models.map((model: any) => ({
             name: `${model.title} (${model.tags.join(', ')})`,
+            description: model.description,
             id: model.slug,
         }))
     }
@@ -109,6 +110,9 @@ export class ChatGPT implements IEngine {
                 }
 
                 if (!resp.message) {
+                    if (resp.error) {
+                        req.onError(`ChatGPT Web error: ${resp.error}`)
+                    }
                     return
                 }
 

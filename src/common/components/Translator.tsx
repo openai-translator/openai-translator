@@ -283,10 +283,15 @@ const useStyles = createUseStyles({
         },
     }),
     'errorMessage': {
-        display: 'flex',
-        color: 'red',
-        alignItems: 'center',
-        gap: '4px',
+        'display': 'flex',
+        'color': 'red',
+        'alignItems': 'center',
+        'gap': '4px',
+        '& *': {
+            '-ms-user-select': 'text',
+            '-webkit-user-select': 'text',
+            'user-select': 'text',
+        },
     },
     'actionButtonsContainer': {
         display: 'flex',
@@ -1029,12 +1034,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (!props.defaultShowSettings) {
             return
         }
-        if (
-            settings &&
-            ((settings.provider === 'ChatGPT' && !settings.apiModel) ||
-                (settings.provider !== 'ChatGPT' && !settings.apiKeys))
-        ) {
+        if (!settings) {
+            return
+        }
+        if (settings.provider === 'OpenAI' && !settings.apiKeys) {
             setShowSettings(true)
+            return
+        }
+        if (settings.provider === 'Azure' && !settings.azureAPIKeys) {
+            setShowSettings(true)
+            return
+        }
+        if (settings.provider === 'ChatGPT' && !settings.chatgptModel) {
+            setShowSettings(true)
+            return
+        }
+        if (settings.provider === 'MiniMax' && !settings.miniMaxAPIKey) {
+            setShowSettings(true)
+            return
+        }
+        if (settings.provider === 'Moonshot' && !settings.moonshotAPIKey) {
+            setShowSettings(true)
+            return
         }
     }, [props.defaultShowSettings, settings])
 

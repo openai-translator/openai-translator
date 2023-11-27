@@ -1,6 +1,7 @@
 export interface IModel {
     id: string
     name: string
+    description?: string
 }
 
 export interface IMessage {
