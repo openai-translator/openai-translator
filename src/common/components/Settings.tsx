@@ -37,6 +37,7 @@ import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
 import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 import { Provider, getEngine } from '../engines'
+import { IModel } from '../engines/interfaces'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -532,52 +533,84 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
 }
 
 interface APIModelSelectorProps {
+    currentProvider: Provider
     provider: Provider
+    apiKey?: string
     value?: string
     onChange?: (value: string) => void
     onBlur?: () => void
 }
 
 interface APIModelOption {
-    label: string
+    label: React.ReactNode
     id: string
 }
 
-function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelectorProps) {
+function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, onBlur }: APIModelSelectorProps) {
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
     const [errMsg, setErrMsg] = useState<string>()
     const [isChatGPTNotLogin, setIsChatGPTNotLogin] = useState(false)
     const [refreshFlag, refresh] = useReducer((x: number) => x + 1, 0)
+    const { theme } = useTheme()
 
     useEffect(() => {
         setIsChatGPTNotLogin(false)
         setErrMsg('')
         setOptions([])
+        if (provider !== currentProvider) {
+            return
+        }
         const engine = getEngine(provider)
         setIsLoading(true)
-        try {
-            ;(async () => {
-                const models = await engine.listModels()
+        ;(async () => {
+            try {
+                const models = await engine.listModels(apiKey)
                 setOptions(
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    models.map((model: any) => ({
-                        label: model.name,
+                    models.map((model: IModel) => ({
+                        label: (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 3,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        fontSize: '14px',
+                                        color: theme.colors.contentPrimary,
+                                    }}
+                                >
+                                    {model.name}
+                                </div>
+                                {model.description && (
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            color: theme.colors.contentTertiary,
+                                        }}
+                                    >
+                                        {model.description}
+                                    </div>
+                                )}
+                            </div>
+                        ),
                         id: model.id,
                     }))
                 )
-            })()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            if (provider === 'ChatGPT' && JSON.stringify(e).includes('not login')) {
-                setIsChatGPTNotLogin(true)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (e: any) {
+                if (provider === 'ChatGPT' && e.message && e.message.includes('not login')) {
+                    setIsChatGPTNotLogin(true)
+                }
+                setErrMsg(e.message)
+            } finally {
+                setIsLoading(false)
             }
-            setErrMsg(JSON.stringify(e))
-        } finally {
-            setIsLoading(false)
-        }
-    }, [provider, refreshFlag])
+        })()
+    }, [apiKey, currentProvider, provider, refreshFlag, theme.colors.contentPrimary, theme.colors.contentTertiary])
 
     return (
         <div>
@@ -638,7 +671,11 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                     </div>
                 )}
                 {isChatGPTNotLogin && (
-                    <div>
+                    <div
+                        style={{
+                            color: theme.colors.contentPrimary,
+                        }}
+                    >
                         <span>{t('Please login to ChatGPT Web')}: </span>
                         <a href='https://chat.openai.com' target='_blank' rel='noreferrer' style={linkStyle}>
                             Login
@@ -1222,7 +1259,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <Input autoFocus type='password' size='compact' name='apiKey' onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
-                        <APIModelSelector provider='OpenAI' onBlur={onBlur} />
+                        <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='apiURL' label={t('API URL')} required={values.provider === 'OpenAI'}>
                         <Input size='compact' onBlur={onBlur} />
@@ -1260,7 +1297,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='azureAPIModel' label={t('API Model')} required={values.provider === 'Azure'}>
-                        <APIModelSelector provider='OpenAI' onBlur={onBlur} />
+                        <APIModelSelector provider='Azure' currentProvider={values.provider} onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='azureAPIURL' label={t('API URL')} required={values.provider === 'Azure'}>
                         <Input size='compact' onBlur={onBlur} />
@@ -1275,7 +1312,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     }}
                 >
                     <FormItem name='chatgptModel' label={t('API Model')} required={values.provider === 'ChatGPT'}>
-                        <APIModelSelector provider='ChatGPT' onBlur={onBlur} />
+                        <APIModelSelector provider='ChatGPT' currentProvider={values.provider} onBlur={onBlur} />
                     </FormItem>
                 </div>
                 <div
@@ -1348,7 +1385,12 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='moonshotAPIModel' label={t('API Model')} required={values.provider === 'Moonshot'}>
-                        <APIModelSelector provider='Moonshot' onBlur={onBlur} key={values.moonshotAPIKey} />
+                        <APIModelSelector
+                            provider='Moonshot'
+                            currentProvider={values.provider}
+                            onBlur={onBlur}
+                            apiKey={values.moonshotAPIKey}
+                        />
                     </FormItem>
                 </div>
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>
@@ -1422,7 +1464,13 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='hotkey' label={t('Hotkey')}>
                     <HotkeyRecorder onBlur={onBlur} testId='hotkey-recorder' />
                 </FormItem>
-                <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
+                <FormItem
+                    style={{
+                        display: isDesktopApp && isMacOS ? 'block' : 'none',
+                    }}
+                    name='ocrHotkey'
+                    label={t('OCR Hotkey')}
+                >
                     <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
                 </FormItem>
                 <FormItem

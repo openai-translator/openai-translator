@@ -1,6 +1,7 @@
 export interface IModel {
     id: string
     name: string
+    description?: string
 }
 
 export interface IMessage {
@@ -20,6 +21,6 @@ export interface IMessageRequest {
 }
 
 export interface IEngine {
-    listModels(): Promise<IModel[]>
+    listModels(apiKey: string | undefined): Promise<IModel[]>
     sendMessage(req: IMessageRequest): Promise<void>
 }
