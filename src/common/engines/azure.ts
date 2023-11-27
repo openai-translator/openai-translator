@@ -20,6 +20,14 @@ export class Azure extends AbstractOpenAI {
         return apiKey
     }
 
+    async getHeaders(): Promise<Record<string, string>> {
+        const apiKey = await this.getAPIKey()
+        return {
+            'Content-Type': 'application/json',
+            'api-key': apiKey,
+        }
+    }
+
     async getAPIURL(): Promise<string> {
         const settings = await getSettings()
         return settings.azureAPIURL
