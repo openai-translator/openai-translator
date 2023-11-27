@@ -28,18 +28,22 @@ export abstract class AbstractOpenAI implements IEngine {
     abstract getAPIURL(): Promise<string>
     abstract getAPIURLPath(): Promise<string>
 
+    async getHeaders(): Promise<Record<string, string>> {
+        const apiKey = await this.getAPIKey()
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+        }
+    }
+
     async isChatAPI(): Promise<boolean> {
         return true
     }
 
     async sendMessage(req: IMessageRequest): Promise<void> {
         const model = await this.getAPIModel()
-        const apiKey = await this.getAPIKey()
         const url = `${await this.getAPIURL()}${await this.getAPIURLPath()}`
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-        }
+        const headers = await this.getHeaders()
         const isChatAPI = await this.isChatAPI()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const body: Record<string, any> = {
