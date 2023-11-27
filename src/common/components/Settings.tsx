@@ -535,6 +535,7 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
 interface APIModelSelectorProps {
     currentProvider: Provider
     provider: Provider
+    apiKey?: string
     value?: string
     onChange?: (value: string) => void
     onBlur?: () => void
@@ -545,7 +546,7 @@ interface APIModelOption {
     id: string
 }
 
-function APIModelSelector({ currentProvider, provider, value, onChange, onBlur }: APIModelSelectorProps) {
+function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, onBlur }: APIModelSelectorProps) {
     const { t } = useTranslation()
     const [isLoading, setIsLoading] = useState(false)
     const [options, setOptions] = useState<APIModelOption[]>([])
@@ -565,7 +566,7 @@ function APIModelSelector({ currentProvider, provider, value, onChange, onBlur }
         setIsLoading(true)
         ;(async () => {
             try {
-                const models = await engine.listModels()
+                const models = await engine.listModels(apiKey)
                 setOptions(
                     models.map((model: IModel) => ({
                         label: (
@@ -609,7 +610,7 @@ function APIModelSelector({ currentProvider, provider, value, onChange, onBlur }
                 setIsLoading(false)
             }
         })()
-    }, [currentProvider, provider, refreshFlag])
+    }, [apiKey, currentProvider, provider, refreshFlag, theme.colors.contentPrimary, theme.colors.contentTertiary])
 
     return (
         <div>
@@ -1296,7 +1297,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='azureAPIModel' label={t('API Model')} required={values.provider === 'Azure'}>
-                        <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
+                        <APIModelSelector provider='Azure' currentProvider={values.provider} onBlur={onBlur} />
                     </FormItem>
                     <FormItem name='azureAPIURL' label={t('API URL')} required={values.provider === 'Azure'}>
                         <Input size='compact' onBlur={onBlur} />
@@ -1388,7 +1389,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                             provider='Moonshot'
                             currentProvider={values.provider}
                             onBlur={onBlur}
-                            key={values.moonshotAPIKey}
+                            apiKey={values.moonshotAPIKey}
                         />
                     </FormItem>
                 </div>
@@ -1463,7 +1464,13 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='hotkey' label={t('Hotkey')}>
                     <HotkeyRecorder onBlur={onBlur} testId='hotkey-recorder' />
                 </FormItem>
-                <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
+                <FormItem
+                    style={{
+                        display: isDesktopApp && isMacOS ? 'block' : 'none',
+                    }}
+                    name='ocrHotkey'
+                    label={t('OCR Hotkey')}
+                >
                     <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
                 </FormItem>
                 <FormItem

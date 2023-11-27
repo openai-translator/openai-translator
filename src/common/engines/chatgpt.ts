@@ -7,7 +7,8 @@ import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 
 export class ChatGPT implements IEngine {
-    async listModels(): Promise<IModel[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         const fetcher = getUniversalFetch()
         const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
         if (sessionResp.status !== 200) {

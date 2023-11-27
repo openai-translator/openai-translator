@@ -3,7 +3,8 @@ import { fetchSSE, getSettings } from '../utils'
 import { IEngine, IMessageRequest, IModel } from './interfaces'
 
 export class MiniMax implements IEngine {
-    async listModels(): Promise<IModel[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return [
             {
                 id: 'abab5.5-chat',

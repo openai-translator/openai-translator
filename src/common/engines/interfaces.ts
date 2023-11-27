@@ -21,6 +21,6 @@ export interface IMessageRequest {
 }
 
 export interface IEngine {
-    listModels(): Promise<IModel[]>
+    listModels(apiKey: string | undefined): Promise<IModel[]>
     sendMessage(req: IMessageRequest): Promise<void>
 }
