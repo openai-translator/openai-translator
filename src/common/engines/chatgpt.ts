@@ -12,7 +12,19 @@ export class ChatGPT implements IEngine {
         const fetcher = getUniversalFetch()
         const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
         if (sessionResp.status !== 200) {
-            throw new Error(`Failed to get session: ${sessionResp.statusText}`)
+            try {
+                const sessionRespJsn = await sessionResp.json()
+                if (sessionRespJsn && sessionRespJsn.error) {
+                    throw new Error(sessionRespJsn.error)
+                }
+                if (sessionRespJsn && sessionRespJsn.detail) {
+                    throw new Error(`Failed to fetch ChatGPT Web accessToken: ${sessionRespJsn.detail}`)
+                } else {
+                    throw new Error(`Failed to fetch ChatGPT Web accessToken: ${sessionResp.statusText}`)
+                }
+            } catch {
+                throw new Error(`Failed to fetch ChatGPT Web accessToken: ${sessionResp.statusText}`)
+            }
         }
         const sessionRespJsn = await sessionResp.json()
         const headers: Record<string, string> = {
@@ -50,7 +62,16 @@ export class ChatGPT implements IEngine {
         let resp: Response | null = null
         resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: req.signal })
         if (resp.status !== 200) {
-            req.onError('Failed to fetch ChatGPT Web accessToken.')
+            try {
+                const respJsn = await resp.json()
+                if (respJsn && respJsn.detail) {
+                    req.onError(`Failed to fetch ChatGPT Web accessToken: ${respJsn.detail}`)
+                } else {
+                    req.onError(`Failed to fetch ChatGPT Web accessToken: ${resp.statusText}`)
+                }
+            } catch {
+                req.onError('Failed to fetch ChatGPT Web accessToken.')
+            }
             req.onStatusCode?.(resp.status)
             return
         }
