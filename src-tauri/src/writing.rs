@@ -185,7 +185,12 @@ pub fn writing() {
     do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
 
     if content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1)) {
-        content = content[*translated_fingerprint_count..].to_owned();
+        // use chars to get string slice
+        let mut translated_text = String::new();
+        for c in content.chars().skip(*translated_fingerprint_count) {
+            translated_text.push(c);
+        }
+        content = translated_text;
     }
     crate::utils::writing_text(content);
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { listen, TauriEvent } from '@tauri-apps/api/event'
-import { appWindow, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window'
+import { event } from '@tauri-apps/api'
+import { getCurrent, PhysicalPosition, PhysicalSize } from '@tauri-apps/api/window'
 import { useEffect } from 'react'
 
 export type WindowMemoProps = {
@@ -13,6 +13,7 @@ export type WindowMemoProps = {
  */
 export const useMemoWindow = (props: WindowMemoProps) => {
     useEffect(() => {
+        const appWindow = getCurrent()
         const initWindow = async () => {
             try {
                 if (props.position) {
@@ -55,16 +56,20 @@ export const useMemoWindow = (props: WindowMemoProps) => {
     useEffect(() => {
         let unListenMove: (() => void) | undefined
         let unListenResize: (() => void) | undefined
-        listen(TauriEvent.WINDOW_MOVED, (event: { payload: any }) => {
-            localStorage.setItem('_position', JSON.stringify(event.payload))
-        }).then((unListen) => {
-            unListenMove = unListen
-        })
-        listen(TauriEvent.WINDOW_RESIZED, (event: { payload: any }) => {
-            localStorage.setItem('_size', JSON.stringify(event.payload))
-        }).then((unListen) => {
-            unListenResize = unListen
-        })
+        event
+            .listen(event.TauriEvent.WINDOW_MOVED, (event: { payload: any }) => {
+                localStorage.setItem('_position', JSON.stringify(event.payload))
+            })
+            .then((unListen) => {
+                unListenMove = unListen
+            })
+        event
+            .listen(event.TauriEvent.WINDOW_RESIZED, (event: { payload: any }) => {
+                localStorage.setItem('_size', JSON.stringify(event.payload))
+            })
+            .then((unListen) => {
+                unListenResize = unListen
+            })
         return () => {
             unListenMove?.()
             unListenResize?.()

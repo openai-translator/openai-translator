@@ -30,7 +30,7 @@ import { BsTextareaT } from 'react-icons/bs'
 import { FcIdea } from 'react-icons/fc'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
-import type { Event } from '@tauri-apps/api/event'
+import { listen, Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
@@ -65,6 +65,7 @@ import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
 import Toaster from './Toaster'
+import { readBinaryFile } from '@tauri-apps/plugin-fs'
 
 const cache = new LRUCache({
     max: 500,
@@ -1080,8 +1081,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
         ;(async () => {
-            const { listen } = await import('@tauri-apps/api/event')
-            const { fs } = await import('@tauri-apps/api')
             listen('tauri://file-drop', async (e: Event<string>) => {
                 if (e.payload.length !== 1) {
                     alert('Only one file can be uploaded at a time.')
@@ -1102,7 +1101,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
                 const worker = createWorker()
 
-                const binaryFile = await fs.readBinaryFile(filePath)
+                const binaryFile = await readBinaryFile(filePath)
 
                 const file = new Blob([binaryFile.buffer], {
                     type: `image/${fileExtension}`,
@@ -1422,11 +1421,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 const actionID = item.id
                                                 if (actionID === '__manager__') {
                                                     if (isTauri()) {
-                                                        const { invoke } = await import('@tauri-apps/api')
+                                                        const { invoke } = await import('@tauri-apps/api/primitives')
                                                         if (!navigator.userAgent.includes('Windows')) {
                                                             await invoke('show_action_manager_window')
                                                         } else {
-                                                            const { LogicalSize, WebviewWindow } = await import(
+                                                            const { LogicalSize, Window: WebviewWindow } = await import(
                                                                 '@tauri-apps/api/window'
                                                             )
                                                             const windowLabel = 'action_manager'

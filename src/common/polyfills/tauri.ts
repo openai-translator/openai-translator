@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs'
-import { invoke } from '@tauri-apps/api/tauri'
+import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs'
+import { invoke } from '@tauri-apps/api/primitives'
 import { IBrowser } from '../types'
 
 async function getSettings(): Promise<Record<string, any>> {

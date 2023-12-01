@@ -1,62 +1,48 @@
-use tauri::Manager;
-use tauri::{
-    AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
-};
+use std::sync::atomic::Ordering;
 
+use crate::ALWAYS_ON_TOP;
 use crate::config::get_config;
 use crate::ocr::ocr;
 use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
-use crate::ALWAYS_ON_TOP;
-use std::sync::atomic::Ordering;
 
-pub fn menu() -> SystemTray {
+use tauri::{
+    Icon,
+    menu::{Menu, MenuItem},
+    tray::{ClickType, TrayIconBuilder},
+    Manager, Runtime,
+};
+
+pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let config = get_config().unwrap();
     let mut ocr_text = String::from("OCR");
     if let Some(ocr_hotkey) = config.ocr_hotkey {
         ocr_text = format!("OCR ({})", ocr_hotkey);
     }
-    let ocr: CustomMenuItem = CustomMenuItem::new("ocr".to_string(), ocr_text);
-    let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "Show");
-    let hide = CustomMenuItem::new("hide".to_string(), "Hide");
-    let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    pin.selected = ALWAYS_ON_TOP.load(Ordering::Acquire);
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(ocr)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(show)
-        .add_item(hide)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(pin)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(quit);
-
-    #[cfg(target_os = "macos")]
-    {
-        SystemTray::new()
-            .with_menu(tray_menu)
-            .with_menu_on_left_click(false)
+    let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None);
+    let show_i = MenuItem::with_id(app, "show", "Show", true, None);
+    let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None);
+    let pin_i = MenuItem::with_id(app, "pin", "Pin", true, None);
+    if ALWAYS_ON_TOP.load(Ordering::Acquire) {
+        pin_i.set_text("Unpin").unwrap();
     }
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None);
+    let menu = Menu::with_items(
+        app,
+        &[
+            &ocr_i,
+            &show_i,
+            &hide_i,
+            &pin_i,
+            &quit_i,
+        ],
+    )?;
 
-    #[cfg(not(target_os = "macos"))]
-    {
-        SystemTray::new().with_menu(tray_menu)
-    }
-}
-
-pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
-    match event {
-        SystemTrayEvent::LeftClick {
-            position: _,
-            size: _,
-            ..
-        } => {
-            let window = app.get_window(MAIN_WIN_NAME).unwrap();
-            window.set_focus().unwrap();
-            window.unminimize().unwrap();
-            window.show().unwrap();
-        }
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+    let _ = TrayIconBuilder::with_id("tray")
+        .tooltip("OpenAI Translator")
+        .icon(Icon::File("./icons/favicon.ico".into()))
+        .menu(&menu)
+        .menu_on_left_click(false)
+        .on_menu_event(move |app, event| match event.id.as_ref() {
             "ocr" => {
                 ocr();
             }
@@ -73,10 +59,27 @@ pub fn handler(app: &AppHandle, event: SystemTrayEvent) {
             }
             "pin" => {
                 set_main_window_always_on_top();
+                let text = pin_i.text().unwrap();
+                if text == "Pin" {
+                    pin_i.set_text("Unpin").unwrap();
+                } else {
+                    pin_i.set_text("Pin").unwrap();
+                }
             }
             "quit" => app.exit(0),
             _ => {}
-        },
-        _ => {}
-    }
+        })
+        .on_tray_icon_event(|tray, event| {
+            if event.click_type == ClickType::Left {
+                let app = tray.app_handle();
+                if let Some(window) = app.get_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+        })
+        .build(app);
+
+    Ok(())
 }
+

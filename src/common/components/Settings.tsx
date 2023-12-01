@@ -1058,7 +1058,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         if (settings) {
             ;(async () => {
                 if (isTauri) {
-                    const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
+                    const { isEnabled: autostartIsEnabled } = await import('@tauri-apps/plugin-autostart')
                     settings.runAtStartup = await autostartIsEnabled()
                 }
                 setValues(settings)
@@ -1084,7 +1084,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         enable: autostartEnable,
                         disable: autostartDisable,
                         isEnabled: autostartIsEnabled,
-                    } = await import('tauri-plugin-autostart-api')
+                    } = await import('@tauri-apps/plugin-autostart')
                     if (data.runAtStartup) {
                         await autostartEnable()
                     } else {
