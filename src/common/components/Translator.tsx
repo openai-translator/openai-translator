@@ -24,13 +24,9 @@ import { defaultAPIURL, isDesktopApp, isTauri } from '../utils'
 import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
-import { RecognizeResult, createWorker } from 'tesseract.js'
-import { BsTextareaT } from 'react-icons/bs'
 import { addNewNote, isConnected } from '../anki/anki-connect'
 import icon from '../assets/images/icon.png'
-import rocket from '../assets/images/rocket.gif'
-import partyPopper from '../assets/images/party-popper.gif'
-import type { Event } from '@tauri-apps/api/event'
+import actionsData from '../services/prompts.json';
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
@@ -390,9 +386,6 @@ const actionStrItems: Record<TranslateMode, IActionStrItem> = {
     },
 }
 
-export interface TesseractResult extends RecognizeResult {
-    text: string
-}
 
 export interface MovementXY {
     x: number
@@ -609,8 +602,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, {})
     useEffect(() => {
         if (!actions) {
+            actionService.bulkPut(actionsData)
             setDisplayedActions([])
             setHiddenActions([])
+            refreshActions()
             return
         }
 
@@ -1091,94 +1086,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [isOCRProcessing])
 
-    useEffect(() => {
-        if (!isTauri()) {
-            return
-        }
-        ;(async () => {
-            const { listen } = await import('@tauri-apps/api/event')
-            const { fs } = await import('@tauri-apps/api')
-            listen('tauri://file-drop', async (e: Event<string>) => {
-                if (e.payload.length !== 1) {
-                    alert('Only one file can be uploaded at a time.')
-                    return
-                }
 
-                const filePath = e.payload[0]
-
-                if (!filePath) {
-                    return
-                }
-
-                const fileExtension = filePath.split('.').pop()?.toLowerCase() || ''
-                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                    alert('invalid file type')
-                    return
-                }
-
-                const worker = createWorker()
-
-                const binaryFile = await fs.readBinaryFile(filePath)
-
-                const file = new Blob([binaryFile.buffer], {
-                    type: `image/${fileExtension}`,
-                })
-
-                const fileSize = file.size / 1024 / 1024
-                if (fileSize > 1) {
-                    alert('File size must be less than 1MB')
-                    return
-                }
-
-                setOriginalText('')
-                setIsOCRProcessing(true)
-
-                await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
-                await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
-
-                const { data } = await (await worker).recognize(file)
-
-                setOriginalText(data.text)
-                setIsOCRProcessing(false)
-
-                await (await worker).terminate()
-            })
-        })()
-    }, [])
-
-    const onDrop = async (acceptedFiles: File[]) => {
-        const worker = createWorker()
-
-        setOriginalText('')
-        setIsOCRProcessing(true)
-
-        if (acceptedFiles.length !== 1) {
-            alert('Only one file can be uploaded at a time.')
-            return
-        }
-
-        const file = acceptedFiles[0]
-        if (!file.type.startsWith('image/')) {
-            alert('invalid file type')
-            return
-        }
-
-        const fileSize = file.size / (1024 * 1024)
-        if (fileSize > 1) {
-            alert('File size must be less than 1MB')
-            return
-        }
-
-        await (await worker).loadLanguage('eng+chi_sim+chi_tra+jpn+rus+kor')
-        await (await worker).initialize('eng+chi_sim+chi_tra+jpn+rus+kor')
-
-        const { data } = await (await worker).recognize(file)
-
-        setOriginalText(data.text)
-        setIsOCRProcessing(false)
-
-        await (await worker).terminate()
-    }
 
     const editableStopSpeakRef = useRef<() => void>(() => null)
     const translatedStopSpeakRef = useRef<() => void>(() => null)
@@ -1501,42 +1409,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             >
                                 {editableText}
                             </div>
-                            <Dropzone onDrop={onDrop} noClick={true}>
+                            <Dropzone noClick={true}>
                                 {({ getRootProps, isDragActive }) => (
                                     <div {...getRootProps()}>
-                                        {isDragActive ? (
-                                            <div className={styles.fileDragArea}> Drop file below </div>
-                                        ) : (
-                                            <div
-                                                className={styles.OCRStatusBar}
-                                                style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    gap: 8,
-                                                    opacity: showOCRProcessing ? 1 : 0,
-                                                    marginBottom: showOCRProcessing ? 10 : 0,
-                                                    fontSize: '11px',
-                                                    height: showOCRProcessing ? 26 : 0,
-                                                    transition: 'all 0.3s linear',
-                                                    overflow: 'hidden',
-                                                }}
-                                            >
-                                                <div
-                                                    style={{
-                                                        fontSize: '12px',
-                                                    }}
-                                                >
-                                                    {isOCRProcessing ? 'OCR Processing...' : 'OCR Success'}
-                                                </div>
-                                                {showOCRProcessing && (
-                                                    <div>
-                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
                                         <Textarea
                                             inputRef={editorRef}
                                             autoFocus={autoFocus}
@@ -1662,18 +1537,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </Dropzone>
                             <div className={styles.actionButtonsContainer}>
                                 <>
-                                    <Tooltip content={t('Upload an image for OCR translation')} placement='bottom'>
-                                        <div className={styles.actionButton}>
-                                            <Dropzone onDrop={onDrop}>
-                                                {({ getRootProps, getInputProps }) => (
-                                                    <div {...getRootProps()} className={styles.actionButton}>
-                                                        <input {...getInputProps({ multiple: false })} />
-                                                        <BsTextareaT size={15} />
-                                                    </div>
-                                                )}
-                                            </Dropzone>
-                                        </div>
-                                    </Tooltip>
                                     <StatefulTooltip content={t('Add new conversation')} showArrow placement='top'>
                                         <div className={styles.actionButton} onClick={() => handleConversationClick()}>
                                             <AiOutlinePlusSquare size={15} />

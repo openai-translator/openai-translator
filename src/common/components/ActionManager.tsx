@@ -16,8 +16,10 @@ import { Action } from '../internal-services/db'
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-sd/modal'
 import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
-import { isDesktopApp, exportToCsv, csvToActions } from '../utils'
+import { isDesktopApp, exportToJson,jsonToActions} from '../utils'
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md'
+
+
 
 const useStyles = createUseStyles({
     root: () => ({
@@ -167,42 +169,62 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
         groups[group].push(action)
         return groups
     }, {})
+
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
             console.log('Handling file change');
-            if (event.target.files) {
-                const file = event.target.files[0];
-                console.log('Selected file:', file.name);
-    
-                if (file) {
-                    console.log('Importing actions from file');
-                    const importActions = await csvToActions(file);
-                    console.log('Imported actions:', importActions.slice(0, 5)); // 显示前5条数据
-    
-                    // 假设 actionService.bulkPut 已经正确实现
-                    await actionService.bulkPut(importActions);
-                    console.log('Actions imported successfully');
-    
-                    // 假设 refreshActions 已经正确实现
-                    refreshActions();
-                }
+            
+            // 检查是否有文件被选中
+            if (!event.target.files || event.target.files.length === 0) {
+                console.error('No file selected');
+                return; // 没有文件被选中时退出函数
             }
+    
+            const file = event.target.files[0];
+    
+            if (!file) {
+                console.error('No file found');
+                return; // 文件对象为空时退出函数
+            }
+    
+            // 检查文件类型（可选）
+            if (file.type !== 'application/json') {
+                console.error('Invalid file type:', file.type);
+                return; // 文件类型不匹配时退出函数
+            }
+    
+            const importActions = await jsonToActions(file);
+    
+            // 检查导入的数据是否有效
+            if (!importActions || importActions.length === 0) {
+                console.error('No valid actions to import');
+                return; // 导入的数据为空或无效时退出函数
+            }
+    
+            await actionService.bulkPut(importActions);
+    
+            refreshActions();
         } catch (error) {
             console.error('Error handling file change:', error);
         }
-    
-    }
+    };
 
-    const onCsvExportActions = async (group: string) => {
+
+    const ExportActions = async (group: string) => {
         try {
             const filteredActions = actions.filter((action) => {
                 return action.group === group
             })
-            await exportToCsv<Action>(group + `-${new Date().valueOf()}`, filteredActions)
+            await exportToJson<Action>(group + `-${new Date().valueOf()}`, filteredActions)
         } catch (e) {
             console.error(e)
         }
     }
+
+    
+    
+
+    
 
     return (
         <div
@@ -267,7 +289,7 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                             <Button
                                 size='mini'
                                 onClick={() => {
-                                    onCsvExportActions(group)
+                                    ExportActions(group)
                                 }}
                             >
                                 {t('Export')}

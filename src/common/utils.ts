@@ -2,7 +2,6 @@
 import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
-import csvtojson from 'csvtojson';
 import { Action } from './internal-services/db'
 
 export const defaultAPIURL = 'https://api.openai.com'
@@ -156,45 +155,23 @@ export const isUsingOpenAIOfficial = async () => {
     return settings.provider === 'ChatGPT' || (await isUsingOpenAIOfficialAPIEndpoint())
 }
 
-// js to csv
-export async function exportToCsv<T extends Action>(filename: string, rows: T[]) {
+
+export async function exportToJson<T extends Action>(filename: string, rows: T[]) {
     if (!rows.length) return
-    filename += '.csv'
-    const columns = Object.keys(rows[0])
-    let csvFile = ''
-    for (const key of columns) {
-        csvFile += key + ','
-    }
-    csvFile += '\r\n'
-
-    const processRow = function (row: T) {
-        let s = ''
-        for (const key of columns) {
-            let value = `${row[key]}`
-            if (key === 'rolePrompt' || key === 'commandPrompt') {
-                // 替换换行符和双引号
-                value = value.replace(/\n/g, ' ').replace(/"/g, '""')
-            }
-            s += '"' + value + '"' + ','
-        }
-        return s + '\r\n'
-    }
-
-    for (let i = 0; i < rows.length; i++) {
-        csvFile += processRow(rows[i])
-    }
+    filename += '.json'
+    const jsonFile = JSON.stringify(rows, null, 2) // 格式化 JSON 字符串
 
     if (isDesktopApp()) {
         const { BaseDirectory, writeTextFile } = await import('@tauri-apps/api/fs')
         try {
-            return await writeTextFile(filename, csvFile, { dir: BaseDirectory.Desktop })
+            return await writeTextFile(filename, jsonFile, { dir: BaseDirectory.Desktop })
         } catch (e) {
             console.error(e)
         }
     } else {
         const link = document.createElement('a')
         if (link.download !== undefined) {
-            link.setAttribute('href', 'data:text/csv;charset=utf-8,ufeff' + encodeURIComponent(csvFile))
+            link.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(jsonFile))
             link.setAttribute('download', filename)
             document.body.appendChild(link)
             link.click()
@@ -205,23 +182,20 @@ export async function exportToCsv<T extends Action>(filename: string, rows: T[])
 
 
 
-export async function csvToActions(file: File): Promise<Action[]> {
+
+
+export async function jsonToActions(file: File): Promise<Action[]> {
     try {
-        console.log('Starting csvToActions function');
+        console.log('Starting jsonToActions function');
 
         // 读取文件内容
         console.log('Reading file content');
         const fileContent = await file.text();
         console.log('File content:', fileContent.substring(0, 100)); // 显示前100字符，以避免太长
 
-        // 清理数据
-        console.log('Cleaning file content');
-        const cleanContent = fileContent.replace(/^\ufeff/, '');
-        console.log('Cleaned content:', cleanContent.substring(0, 100)); // 显示前100字符
-
-        // 使用csvtojson库解析CSV数据
-        console.log('Parsing CSV data');
-        const parsedData = await csvtojson().fromString(cleanContent);
+        // 解析JSON数据
+        console.log('Parsing JSON data');
+        const parsedData = JSON.parse(fileContent);
         console.log('Parsed data:', parsedData.slice(0, 5)); // 显示前5条数据
 
         // 简单验证以检查parsedData是否为动作数组
@@ -229,18 +203,14 @@ export async function csvToActions(file: File): Promise<Action[]> {
             throw new Error('Invalid file format: Expected an array of actions');
         }
 
-        console.log('Mapping parsed data');
-        return parsedData.map(action => ({
-            ...action,
-            id: action.id || action.ufeffid,
-            idx: action.idx || action.ufeffidx,
-        }));
+        console.log('Returning parsed data');
+        return parsedData;
     } catch (error) {
         console.error('Error importing actions:', error);
         return [];
     }
-
 }
+
 
 interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
