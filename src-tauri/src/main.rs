@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+mod fetch;
 mod config;
 mod lang;
 mod ocr;
@@ -23,6 +24,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
+use crate::fetch::fetch_stream;
 use crate::writing::{writing, write_to_input, finish_writing};
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
@@ -354,6 +356,7 @@ fn main() {
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,
+            fetch_stream,
             writing,
             write_to_input,
             finish_writing,

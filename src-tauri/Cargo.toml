@@ -43,6 +43,9 @@ text-diff = "0.4.0"
 similar = "2.2.1"
 debug_print = "1.0.0"
 active-win-pos-rs = "0.8"
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+futures-util = "0.3.29"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"
