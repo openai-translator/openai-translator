@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getCurrent } from '@tauri-apps/plugin-window'
+import { getCurrent } from '@tauri-apps/api/window'
 import { invoke } from '@tauri-apps/api/primitives'
 import { useTheme } from '../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
