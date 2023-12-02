@@ -66,6 +66,7 @@ import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
 import Toaster from './Toaster'
 import { readBinaryFile } from '@tauri-apps/plugin-fs'
+import { getCurrent } from '@tauri-apps/api/window'
 
 const cache = new LRUCache({
     max: 500,
@@ -512,6 +513,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.focus()
         editor.spellcheck = false
     }, [props.uuid])
+
+    useEffect(() => {
+        if (!isTauri()) {
+            return undefined
+        }
+        let unlisten: (() => void) | undefined = undefined
+        const appWindow = getCurrent()
+        appWindow
+            .listen('tauri://focus', () => {
+                const editor = editorRef.current
+                if (!editor) {
+                    return
+                }
+                editor.focus()
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+        return () => {
+            unlisten?.()
+        }
+    }, [])
 
     const [highlightWords, setHighlightWords] = useState<string[]>([])
 
