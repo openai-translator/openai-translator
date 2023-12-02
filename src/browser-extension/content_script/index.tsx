@@ -119,7 +119,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                             text={text}
                             engine={engine}
                             autoFocus={autoFocus}
-                            showSettings={isUserscript ? true : false}
+                            showSettingsIcon={isUserscript ? true : false}
                             defaultShowSettings={isUserscript ? true : false}
                             showLogo={false}
                         />

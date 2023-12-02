@@ -28,6 +28,7 @@ export function App() {
     const [text, setText] = useState('')
     const [uuid, setUUID] = useState('')
     const [isPinned, setPinned] = useState(false)
+    const [showSettings, setShowSettings] = useState(false)
 
     useMemoWindow({ size: true, position: false })
     useEffect(() => {
@@ -42,7 +43,7 @@ export function App() {
     }, [])
 
     useEffect(() => {
-        let unlisten
+        let unlisten: (() => void) | undefined = undefined
         ;(async () => {
             unlisten = await listen('change-text', async (event: Event<string>) => {
                 const selectedText = event.payload
@@ -53,7 +54,23 @@ export function App() {
                 }
             })
         })()
-        return unlisten
+        return () => {
+            unlisten?.()
+        }
+    }, [])
+
+    useEffect(() => {
+        let unlisten: (() => void) | undefined = undefined
+        ;(async () => {
+            unlisten = await listen('show-settings', async () => {
+                const uuid_ = uuidv4().replace(/-/g, '').slice(0, 6)
+                setShowSettings(true)
+                setUUID(uuid_)
+            })
+        })()
+        return () => {
+            unlisten?.()
+        }
     }, [])
 
     const { settings } = useSettings()
@@ -220,7 +237,8 @@ export function App() {
                 uuid={uuid}
                 text={text}
                 engine={engine}
-                showSettings
+                showSettingsIcon
+                showSettings={showSettings}
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
