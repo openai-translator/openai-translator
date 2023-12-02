@@ -3,8 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+mod fetch;
 mod config;
-mod hotkey;
 mod lang;
 mod ocr;
 mod writing;
@@ -24,6 +24,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
 use crate::ocr::ocr;
+use crate::fetch::fetch_stream;
 use crate::writing::{writing, write_to_input, finish_writing};
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
@@ -32,7 +33,7 @@ use crate::windows::{
 
 use mouce::Mouse;
 use once_cell::sync::OnceCell;
-use tauri::api::notification::Notification;
+use tauri_plugin_notification::NotificationExt;
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tiny_http::{Response as HttpResponse, Server};
@@ -265,25 +266,28 @@ fn main() {
         *CPU_VENDOR.lock() = vendor_id;
     }
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             println!("{}, {argv:?}, {cwd}", app.package_info().name);
-            Notification::new(&app.config().tauri.bundle.identifier)
+            app.notification()
+                .builder()
                 .title("This app is already running!")
                 .body("You can find it in the tray menu.")
-                .icon("icon")
-                .notify(app)
-                .unwrap();
-            app.emit_all("single-instance", Payload { args: argv, cwd })
+                .show()
                 .unwrap();
         }))
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--silently"]),
         ))
-        // .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(move |app| {
             let app_handle = app.handle();
-            APP_HANDLE.get_or_init(|| app.handle());
+            APP_HANDLE.get_or_init(|| app.handle().clone());
+            tray::create_tray(&app_handle)?;
+            app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
+            app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
                 window.unminimize().unwrap();
@@ -298,11 +302,12 @@ fn main() {
             if !query_accessibility_permissions() {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
                 window.minimize().unwrap();
-                Notification::new(&app.config().tauri.bundle.identifier)
+                app.notification()
+                    .builder()
                     .title("Accessibility permissions")
                     .body("Please grant accessibility permissions to the app")
                     .icon("icon.png")
-                    .notify(&app_handle)
+                    .show()
                     .unwrap();
             }
             #[cfg(target_os = "macos")]
@@ -351,13 +356,12 @@ fn main() {
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,
+            fetch_stream,
             writing,
             write_to_input,
             finish_writing,
             detect_lang,
         ])
-        .system_tray(tray::menu())
-        .on_system_tray_event(tray::handler)
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {

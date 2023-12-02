@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import { appWindow } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/window'
 import { listen, Event } from '@tauri-apps/api/event'
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/primitives'
 import { bindHotkey, bindOCRHotkey, bindWritingHotkey } from './utils'
 import { useTheme } from '../common/hooks/useTheme'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
@@ -127,6 +127,7 @@ export function App() {
         if (isMacOS || isLinux) {
             return
         }
+        const appWindow = getCurrent()
         function handlePin() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             invoke('set_main_window_always_on_top').then((pinned: any) => {

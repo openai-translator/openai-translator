@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { appWindow } from '@tauri-apps/api/window'
-import { invoke } from '@tauri-apps/api/tauri'
+import { getCurrent } from '@tauri-apps/plugin-window'
+import { invoke } from '@tauri-apps/api/primitives'
 import { useTheme } from '../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -39,6 +39,7 @@ export function Window(props: IWindowProps) {
     }, [i18n, settings])
 
     useEffect(() => {
+        const appWindow = getCurrent()
         if (isMacOS || isLinux) {
             return
         }

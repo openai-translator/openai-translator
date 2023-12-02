@@ -1,3 +1,6 @@
+use tauri::path::BaseDirectory;
+use tauri::Manager;
+
 #[cfg(not(target_os = "macos"))]
 pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
@@ -12,11 +15,11 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
         rel_path = "resources/bin/ocr_apple".to_string();
     }
 
-    let bin_path = APP_HANDLE
-        .get()
-        .unwrap()
-        .path_resolver()
-        .resolve_resource(rel_path)
+    let app = APP_HANDLE.get().unwrap();
+
+    let bin_path = app
+        .path()
+        .resolve(rel_path, BaseDirectory::Resource)
         .expect("failed to resolve ocr binary resource");
 
     let output = std::process::Command::new(bin_path)

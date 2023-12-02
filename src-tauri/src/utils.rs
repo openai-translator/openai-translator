@@ -1,7 +1,8 @@
-use tauri::Manager;
 use parking_lot::Mutex;
 use enigo::*;
 use std::{thread, time::Duration};
+use tauri::path::BaseDirectory;
+use tauri::Manager;
 
 use crate::APP_HANDLE;
 
@@ -27,8 +28,8 @@ pub fn select_all(enigo: &mut Enigo) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/select-all.applescript")
+        .path()
+        .resolve("resources/select-all.applescript", BaseDirectory::Resource)
         .expect("failed to resolve select-all.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -64,8 +65,8 @@ pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/left.applescript")
+        .path()
+        .resolve("resources/left.applescript", BaseDirectory::Resource)
         .expect("failed to resolve left.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -87,8 +88,8 @@ pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/right.applescript")
+        .path()
+        .resolve("resources/right.applescript", BaseDirectory::Resource)
         .expect("failed to resolve right.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -110,8 +111,8 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/backspace.applescript")
+        .path()
+        .resolve("resources/backspace.applescript", BaseDirectory::Resource)
         .expect("failed to resolve backspace.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -173,8 +174,8 @@ pub fn copy(enigo: &mut Enigo) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/copy.applescript")
+        .path()
+        .resolve("resources/copy.applescript", BaseDirectory::Resource)
         .expect("failed to resolve copy.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -214,8 +215,8 @@ pub fn paste(enigo: &mut Enigo) {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/paste.applescript")
+        .path()
+        .resolve("resources/paste.applescript", BaseDirectory::Resource)
         .expect("failed to resolve paste.applescript");
 
     std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
@@ -335,8 +336,8 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/get-selected-text-by-ax.applescript")
+        .path()
+        .resolve("resources/get-selected-text-by-ax.applescript", BaseDirectory::Resource)
         .expect("failed to resolve get-selected-text-by-ax.applescript");
 
     match std::process::Command::new("osascript")
@@ -371,8 +372,8 @@ pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
-        .path_resolver()
-        .resolve_resource("resources/get-selected-text.applescript")
+        .path()
+        .resolve("resources/get-selected-text.applescript", BaseDirectory::Resource)
         .expect("failed to resolve get-selected-text.applescript");
 
     match std::process::Command::new("osascript")
@@ -404,21 +405,21 @@ pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<
 
 pub fn send_text(text: String) {
     match APP_HANDLE.get() {
-        Some(handle) => handle.emit_all("change-text", text).unwrap_or_default(),
+        Some(handle) => handle.emit("change-text", text).unwrap_or_default(),
         None => {}
     }
 }
 
 pub fn writing_text(text: String) {
     match APP_HANDLE.get() {
-        Some(handle) => handle.emit_all("writing-text", text).unwrap_or_default(),
+        Some(handle) => handle.emit("writing-text", text).unwrap_or_default(),
         None => {}
     }
 }
 
 pub fn show() {
     match APP_HANDLE.get() {
-        Some(handle) => handle.emit_all("show", "").unwrap_or_default(),
+        Some(handle) => handle.emit("show", "").unwrap_or_default(),
         None => {}
     }
 }

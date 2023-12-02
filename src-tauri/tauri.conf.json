@@ -10,43 +10,33 @@
     "productName": "OpenAI Translator",
     "version": "0.1.0"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "globalShortcut": {
-        "all": true
-      },
-      "window": {
-        "all": true
-      },
-      "clipboard": {
-        "all": true
-      },
-      "http": {
-        "all": true,
-        "request": true
-      },
-      "notification": {
-        "all": true
-      },
-      "fs": {
-        "all": false,
-        "scope": ["**", "$CONFIG/*/**"],
-        "writeFile": true,
-        "readFile": true,
-        "readDir": true
-      },
-      "dialog": {
-        "all": false,
-        "message": true
-      }
+  "plugins": {
+    "http": {
+      "all": true,
+      "request": true,
+      "scope": ["https://*", "http://*"]
     },
+    "fs": {
+      "scope": [
+        "**",
+        "$CONFIG/*/**"
+      ]
+    },
+    "shell": {
+      "open": true
+    },
+    "updater": {
+      "endpoints": [
+        "https://github.com/yetone/openai-translator/releases/latest/download/latest.json"
+      ]
+    }
+  },
+  "tauri": {
     "bundle": {
       "active": true,
+      "appimage": {
+        "bundleMediaFramework": true
+      },
       "category": "DeveloperTool",
       "copyright": "",
       "deb": {
@@ -64,9 +54,6 @@
       ],
       "identifier": "xyz.yetone.apps.openai-translator",
       "longDescription": "",
-      "appimage": {
-        "bundleMediaFramework": true
-      },
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -79,6 +66,10 @@
       ],
       "shortDescription": "",
       "targets": "all",
+      "updater": {
+        "active": true,
+        "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3MzdGN0RCQjhGMkVENDEKUldSQjdmSzQyL2MzTjFaY0dIKzQzVnJYSjFwMlhFZmhjWmU5emZoVUt2OWExcVorbDRkK0NBaDMK"
+      },
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
@@ -91,32 +82,20 @@
     "security": {
       "csp": null
     },
-    "updater": {
-      "active": true,
-      "dialog": true,
-      "endpoints": [
-        "https://github.com/yetone/openai-translator/releases/latest/download/latest.json"
-      ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3MzdGN0RCQjhGMkVENDEKUldSQjdmSzQyL2MzTjFaY0dIKzQzVnJYSjFwMlhFZmhjWmU5emZoVUt2OWExcVorbDRkK0NBaDMK"
-    },
     "windows": [
       {
-        "url": "src/tauri/index.html",
         "fullscreen": false,
-        "width": 620,
         "height": 700,
-        "minWidth": 540,
+        "hiddenTitle": true,
         "minHeight": 600,
+        "minWidth": 540,
         "resizable": true,
         "title": "OpenAI Translator",
         "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "visible": true
+        "url": "src/tauri/index.html",
+        "visible": true,
+        "width": 620
       }
-    ],
-    "systemTray": {
-      "iconPath": "icons/favicon.ico",
-      "iconAsTemplate": true
-    }
+    ]
   }
 }

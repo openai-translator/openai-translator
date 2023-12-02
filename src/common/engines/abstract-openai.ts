@@ -92,8 +92,9 @@ export abstract class AbstractOpenAI implements IEngine {
                 let resp
                 try {
                     resp = JSON.parse(msg)
-                    // eslint-disable-next-line no-empty
-                } catch {
+                    // eslint-disable-next-line no-empty, @typescript-eslint/no-explicit-any
+                } catch (e: any) {
+                    req.onError?.(e?.message ?? 'Cannot parse response JSON')
                     req.onFinished('stop')
                     finished = true
                     return

@@ -10,7 +10,13 @@ export class ChatGPT implements IEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         const fetcher = getUniversalFetch()
-        const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
+        const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, {
+            cache: 'no-cache',
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) chatall/1.29.40 Chrome/114.0.5735.134 Safari/537.36',
+            },
+        })
         if (sessionResp.status !== 200) {
             try {
                 const sessionRespJsn = await sessionResp.json()
