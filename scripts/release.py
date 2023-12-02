@@ -1,3 +1,4 @@
+import os
 import subprocess
 from functools import reduce
 
@@ -13,6 +14,8 @@ def get_current_version_from_tag():
     return version
 
 def generate_new_version():
+    if os.getenv('VERSION'):
+        return os.getenv('VERSION')
     """Generate the new version for the current release."""
     # Get the current version.
     previous_version = get_current_version_from_tag()
