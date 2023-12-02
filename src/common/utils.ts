@@ -262,30 +262,36 @@ interface FetchSSEOptions extends RequestInit {
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, onStatusCode, fetcher = getUniversalFetch(), ...fetchOptions } = options
 
+    const parser = createParser((event) => {
+        if (event.type === 'event') {
+            onMessage(event.data)
+        }
+    })
+
     if (isTauri()) {
         const id = uuidv4()
         let unlisten: (() => void) | undefined = undefined
         return await new Promise<void>((resolve, reject) => {
-            ;(async () => {
-                unlisten = await listen(
-                    'fetch-stream-chunk',
-                    (event: Event<{ id: string; data: string; done: boolean }>) => {
-                        const payload = event.payload
-                        if (payload.id === id) {
-                            if (payload.done) {
-                                resolve()
-                                return
-                            }
-                            for (const line of payload.data.split('\n')) {
-                                if (line.startsWith('data:')) {
-                                    const msg = line.slice(5)
-                                    onMessage(msg)
-                                }
-                            }
-                        }
+            options.signal?.addEventListener('abort', () => {
+                unlisten?.()
+            })
+            listen('fetch-stream-chunk', (event: Event<{ id: string; data: string; done: boolean }>) => {
+                const payload = event.payload
+                if (payload.id === id) {
+                    if (payload.done) {
+                        resolve()
+                        return
                     }
-                )
-            })()
+                    parser.feed(payload.data)
+                }
+            })
+                .then((cb) => {
+                    unlisten = cb
+                })
+                .catch((e) => {
+                    reject(e)
+                })
+
             invoke('fetch_stream', {
                 id,
                 url: input,
@@ -295,9 +301,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                     reject(e)
                 })
                 .finally(() => {
-                    if (unlisten) {
-                        unlisten()
-                    }
+                    unlisten?.()
                 })
         })
     }
@@ -308,12 +312,6 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         onError(await resp.json())
         return
     }
-
-    const parser = createParser((event) => {
-        if (event.type === 'event') {
-            onMessage(event.data)
-        }
-    })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const reader = resp.body!.getReader()
     try {

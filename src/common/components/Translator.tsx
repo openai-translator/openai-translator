@@ -949,7 +949,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         })
                     } else {
                         setActionStr((actionStr_) => {
-                            setErrorMessage(`${actionStr_} failed: ${reason}`)
+                            let errMsg = `${actionStr_} failed, finish_reason: ${reason}`
+                            if (reason === 'content_filter') {
+                                errMsg = `很抱歉！由于您使用的是中国的 LLM，所以会有敏感词限制，很不幸这个请求已经触发了敏感词，请您接受这个结果。`
+                            }
+                            setErrorMessage(errMsg)
                             return 'Error'
                         })
                     }
