@@ -3,7 +3,7 @@ use std::sync::atomic::Ordering;
 use crate::ALWAYS_ON_TOP;
 use crate::config::get_config;
 use crate::ocr::ocr;
-use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
+use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME, show_settings_window};
 
 use tauri::{
     menu::{Menu, MenuItem},
@@ -17,6 +17,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     if let Some(ocr_hotkey) = config.ocr_hotkey {
         ocr_text = format!("OCR ({})", ocr_hotkey);
     }
+    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None);
     let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None);
     let show_i = MenuItem::with_id(app, "show", "Show", true, None);
     let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None);
@@ -28,6 +29,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let menu = Menu::with_items(
         app,
         &[
+            &settings_i,
             &ocr_i,
             &show_i,
             &hide_i,
@@ -39,6 +41,9 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let tray = app.tray().unwrap();
     tray.set_menu(Some(menu.clone()))?;
     tray.on_menu_event(move |app, event| match event.id.as_ref() {
+        "settings" => {
+            show_settings_window();
+        }
         "ocr" => {
             ocr();
         }

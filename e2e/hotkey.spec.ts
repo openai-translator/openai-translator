@@ -8,6 +8,7 @@ test('hotkey should work', async ({ page, extensionId }) => {
         await page.goto(getOptionsPageUrl(extensionId))
         const input = page.locator('input[name="apiKey"]')
         await input.fill('fake-api-key')
+        await page.getByTestId('shortcuts').click()
         await page.getByTestId('hotkey-recorder').click()
         await page.keyboard.down('Alt')
         await page.keyboard.down('x')

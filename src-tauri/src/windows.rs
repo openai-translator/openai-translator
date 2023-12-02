@@ -10,6 +10,7 @@ use enigo::*;
 use window_shadows::set_shadow;
 
 pub const MAIN_WIN_NAME: &str = "main";
+pub const SETTINGS_WIN_NAME: &str = "settings";
 pub const ACTION_MANAGER_WIN_NAME: &str = "action_manager";
 pub const THUMB_WIN_NAME: &str = "thumb";
 
@@ -322,6 +323,58 @@ pub fn show_action_manager_window() {
             .center()
             .focused(true)
             .title("OpenAI Translator Action Manager");
+
+            #[cfg(target_os = "macos")]
+            {
+                builder
+                    .hidden_title(true)
+                    .title_bar_style(tauri::TitleBarStyle::Overlay)
+                    .build()
+                    .unwrap();
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+                window.set_always_on_top(true).unwrap();
+
+                set_shadow(&window, true).unwrap();
+            }
+
+            #[cfg(target_os = "linux")]
+            {
+                let window = builder.decorations(false).build().unwrap();
+                window.set_always_on_top(true).unwrap();
+
+                set_shadow(&window, true).unwrap();
+            }
+        }
+    }
+}
+
+pub fn show_settings_window() {
+    let handle = APP_HANDLE.get().unwrap();
+    match handle.get_window(SETTINGS_WIN_NAME) {
+        Some(window) => {
+            window.unminimize().unwrap();
+            window.center().unwrap();
+            window.set_focus().unwrap();
+            window.show().unwrap();
+        }
+        None => {
+            let builder = tauri::WindowBuilder::new(
+                handle,
+                SETTINGS_WIN_NAME,
+                tauri::WindowUrl::App("src/tauri/settings.html".into()),
+            )
+            .fullscreen(false)
+            .inner_size(660.0, 800.0)
+            .min_inner_size(660.0, 600.0)
+            .resizable(true)
+            .skip_taskbar(true)
+            .center()
+            .focused(true)
+            .title("OpenAI Translator Settings");
 
             #[cfg(target_os = "macos")]
             {

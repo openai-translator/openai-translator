@@ -6,8 +6,9 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
-import { AiOutlineTranslation, AiOutlineFileSync } from 'react-icons/ai'
+import { AiOutlineFileSync } from 'react-icons/ai'
 import { IoSettingsOutline } from 'react-icons/io5'
+import { TiArrowBack } from 'react-icons/ti'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import * as mdIcons from 'react-icons/md'
@@ -96,30 +97,20 @@ const useStyles = createUseStyles({
         height: '100%',
         boxSizing: 'border-box',
     },
-    'footer': (props: IThemedStyleProps) =>
-        props.isDesktopApp
-            ? {
-                  color: props.theme.colors.contentSecondary,
-                  position: 'fixed',
-                  width: '100%',
-                  height: '42px',
-                  cursor: 'pointer',
-                  left: '0',
-                  bottom: '0',
-                  paddingLeft: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                  backdropFilter: 'blur(10px)',
-              }
-            : {
-                  color: props.theme.colors.contentSecondary,
-                  position: 'absolute',
-                  cursor: 'pointer',
-                  bottom: '16px',
-                  left: '16px',
-                  lineHeight: '1',
-              },
+    'footer': (props: IThemedStyleProps) => ({
+        color: props.theme.colors.contentSecondary,
+        position: 'fixed',
+        width: '100%',
+        height: '42px',
+        cursor: 'pointer',
+        left: '0',
+        bottom: '0',
+        paddingLeft: '6px',
+        display: 'flex',
+        alignItems: 'center',
+        background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(10px)',
+    }),
     'popupCardHeaderContainer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
@@ -426,6 +417,7 @@ export interface IInnerTranslatorProps {
     text: string
     writing?: boolean
     autoFocus?: boolean
+    showSettingsIcon?: boolean
     showSettings?: boolean
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
@@ -458,6 +450,10 @@ export function Translator(props: ITranslatorProps) {
 
 function InnerTranslator(props: IInnerTranslatorProps) {
     const [showSettings, setShowSettings] = useState(false)
+
+    useEffect(() => {
+        setShowSettings(props.showSettings ?? false)
+    }, [props.showSettings, props.uuid])
 
     const { showLogo = true } = props
 
@@ -512,7 +508,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         editor.focus()
         editor.spellcheck = false
-    }, [props.uuid])
+    }, [props.uuid, showSettings])
 
     useEffect(() => {
         if (!isTauri()) {
@@ -1279,6 +1275,45 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setActionStr('Stopped')
     }
 
+    const [isScrolledToTop, setIsScrolledToTop] = useState(false)
+    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
+
+    useEffect(() => {
+        const isOnTop = () => {
+            return document.documentElement.scrollTop === 0
+        }
+        const isOnBottom = () => {
+            const scrollTop = document.documentElement.scrollTop
+
+            const windowHeight = window.innerHeight
+
+            const documentHeight = document.documentElement.scrollHeight
+
+            return scrollTop + windowHeight >= documentHeight
+        }
+
+        setIsScrolledToTop(isOnTop())
+        setIsScrolledToBottom(isOnBottom())
+
+        const onScroll = () => {
+            setIsScrolledToTop(isOnTop())
+            setIsScrolledToBottom(isOnBottom())
+        }
+
+        window.addEventListener('scroll', onScroll)
+        window.addEventListener('resize', onScroll)
+        const observer = new MutationObserver(onScroll)
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        })
+        return () => {
+            window.removeEventListener('scroll', onScroll)
+            window.removeEventListener('resize', onScroll)
+            observer.disconnect()
+        }
+    }, [showSettings])
+
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1298,7 +1333,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             >
                 <InnerSettings
                     onSave={(oldSettings) => {
-                        setShowSettings(false)
                         props.onSettingsSave?.(oldSettings)
                     }}
                 />
@@ -1315,6 +1349,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         data-tauri-drag-region
                         style={{
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
+                            boxShadow: isScrolledToTop ? undefined : theme.lighting.shadow600,
                         }}
                     >
                         {showLogo && <LogoWithText ref={logoWithTextRef} />}
@@ -1430,7 +1465,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 )
                             })}
                         </div>
-                        {props.showSettings && (
+                        {props.showSettingsIcon && (
                             <div className={styles.popupCardHeaderMoreActionsContainer}>
                                 <StatefulPopover
                                     autoFocus={false}
@@ -1981,12 +2016,36 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     </div>
                 </div>
             </div>
-            {props.showSettings && (
-                <div className={styles.footer}>
+            {props.showSettingsIcon && (
+                <div
+                    className={styles.footer}
+                    style={{
+                        boxShadow: isScrolledToBottom ? undefined : theme.lighting.shadow700,
+                    }}
+                >
                     <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>
-                        <div onClick={() => setShowSettings((s) => !s)}>
-                            {showSettings ? <AiOutlineTranslation size={15} /> : <IoSettingsOutline size={15} />}
-                        </div>
+                        <Button
+                            size='mini'
+                            kind='tertiary'
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                e.preventDefault()
+                                setShowSettings((s) => !s)
+                            }}
+                        >
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                    fontSize: '11px',
+                                }}
+                            >
+                                {showSettings ? <TiArrowBack size={15} /> : <IoSettingsOutline size={15} />}
+                                {showSettings ? t('Go back') : ''}
+                            </div>
+                        </Button>
                     </Tooltip>
                 </div>
             )}
@@ -2043,7 +2102,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     />
                 </ModalHeader>
                 <ModalBody>
-                    <ActionManager draggable={props.showSettings} />
+                    <ActionManager draggable={props.showSettingsIcon} />
                 </ModalBody>
             </Modal>
             <Toaster />
