@@ -82,6 +82,10 @@
     "security": {
       "csp": null
     },
+    "trayIcon": {
+      "iconAsTemplate": true,
+      "iconPath": "icons/favicon.ico"
+    },
     "windows": [
       {
         "fullscreen": false,

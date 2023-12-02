@@ -6,9 +6,8 @@ use crate::ocr::ocr;
 use crate::windows::{set_main_window_always_on_top, MAIN_WIN_NAME};
 
 use tauri::{
-    Icon,
     menu::{Menu, MenuItem},
-    tray::{ClickType, TrayIconBuilder},
+    tray::ClickType,
     Manager, Runtime,
 };
 
@@ -37,48 +36,45 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         ],
     )?;
 
-    let _ = TrayIconBuilder::with_id("tray")
-        .tooltip("OpenAI Translator")
-        .icon(Icon::File("./icons/favicon.ico".into()))
-        .menu(&menu)
-        .menu_on_left_click(false)
-        .on_menu_event(move |app, event| match event.id.as_ref() {
-            "ocr" => {
-                ocr();
+    let tray = app.tray().unwrap();
+    tray.set_menu(Some(menu.clone()))?;
+    tray.on_menu_event(move |app, event| match event.id.as_ref() {
+        "ocr" => {
+            ocr();
+        }
+        "show" => {
+            let window = app.get_window(MAIN_WIN_NAME).unwrap();
+            window.set_focus().unwrap();
+            window.show().unwrap();
+        }
+        "hide" => {
+            let window = app.get_window(MAIN_WIN_NAME).unwrap();
+            window.set_focus().unwrap();
+            window.unminimize().unwrap();
+            window.hide().unwrap();
+        }
+        "pin" => {
+            set_main_window_always_on_top();
+            let text = pin_i.text().unwrap();
+            if text == "Pin" {
+                pin_i.set_text("Unpin").unwrap();
+            } else {
+                pin_i.set_text("Pin").unwrap();
             }
-            "show" => {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                window.set_focus().unwrap();
-                window.show().unwrap();
+        }
+        "quit" => app.exit(0),
+        _ => {}
+    });
+    tray.on_tray_icon_event(|tray, event| {
+        if event.click_type == ClickType::Left {
+            let app = tray.app_handle();
+            if let Some(window) = app.get_window(MAIN_WIN_NAME) {
+                let _ = window.show();
+                let _ = window.set_focus();
             }
-            "hide" => {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                window.set_focus().unwrap();
-                window.unminimize().unwrap();
-                window.hide().unwrap();
-            }
-            "pin" => {
-                set_main_window_always_on_top();
-                let text = pin_i.text().unwrap();
-                if text == "Pin" {
-                    pin_i.set_text("Unpin").unwrap();
-                } else {
-                    pin_i.set_text("Pin").unwrap();
-                }
-            }
-            "quit" => app.exit(0),
-            _ => {}
-        })
-        .on_tray_icon_event(|tray, event| {
-            if event.click_type == ClickType::Left {
-                let app = tray.app_handle();
-                if let Some(window) = app.get_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
-                }
-            }
-        })
-        .build(app);
+        }
+    });
+    tray.set_show_menu_on_left_click(false)?;
 
     Ok(())
 }
