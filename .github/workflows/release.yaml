@@ -157,24 +157,25 @@ jobs:
           name: tauri-renderer
           path: dist/tauri
 
+      - name: Install Cargo Tauri for info
+        run: cargo install tauri-cli --version "^2.0.0-alpha"
+
+      - name: Tauri info
+        run: cargo tauri info
+
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
 
       - name: Build Tauri App
-        uses: tauri-apps/tauri-action@dev
+        uses: tauri-apps/tauri-action@v0
         if: matrix.config.os != 'macos-latest' || matrix.config.arch != 'aarch64'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           releaseBody: ${{ needs.create-release.outputs.release_body }}
-
-      - name: Install Cargo Tauri for info
-        run: cargo install tauri-cli --version "^2.0.0-alpha"
-
-      - name: Tauri info
-        run: cargo tauri info
+          tauriScript: cargo tauri
 
       - name: Build Tauri App (macOS aarch64)
         uses: tauri-apps/tauri-action@v0
