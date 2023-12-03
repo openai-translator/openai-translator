@@ -1387,7 +1387,15 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         artwork={() => {
                             return <BsKeyboard size={14} />
                         }}
-                        overrides={tabOverrides}
+                        overrides={{
+                            ...tabOverrides,
+                            Tab: {
+                                ...tabOverrides.Tab,
+                                props: {
+                                    'data-testid': 'shortcuts',
+                                },
+                            },
+                        }}
                     />
                 </Tabs>
             </nav>
