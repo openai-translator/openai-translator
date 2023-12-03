@@ -128,5 +128,14 @@
   "Loud": "大声",
   "Add": "追加",
   "Go back": "戻る",
+  "Updater": "更新プログラム",
+  "Checking for the latest version ...": "最新バージョンを確認中...",
+  "Congratulations! You are now using the latest version!": "おめでとうございます！あなたは今最新バージョンを使用しています！",
+  "A new version is available!": "新しいバージョンが利用可能です！",
+  "The current version is {{0}}, and the latest version is": "現在のバージョンは{{0}}で、最新バージョンは",
+  "The release content:": "リリース内容：",
+  "The update content:": "更新内容：",
+  "Close": "閉じる",
+  "Update": "更新",
   "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

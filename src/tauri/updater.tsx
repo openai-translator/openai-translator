@@ -13,6 +13,7 @@ import { ProgressBarRounded } from 'baseui-sd/progress-bar'
 import { createUseStyles } from 'react-jss'
 import { MdBrowserUpdated } from 'react-icons/md'
 import { IoIosCloseCircleOutline } from 'react-icons/io'
+import { useTranslation } from 'react-i18next'
 
 const useStyles = createUseStyles({
     icon: {
@@ -32,6 +33,7 @@ export function UpdaterWindow() {
     const [isDownloading, setIsDownloading] = useState(false)
     const [checkResult, setCheckResult] = useState<Update | null>(null)
     const [progress, setProgress] = useState(0)
+    const { t } = useTranslation()
 
     useEffect(() => {
         setIsChecking(true)
@@ -78,7 +80,7 @@ export function UpdaterWindow() {
                     }}
                 >
                     <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
-                    OpenAI Translator Updater
+                    OpenAI Translator {t('Updater')}
                 </div>
                 <div
                     style={{
@@ -106,7 +108,7 @@ export function UpdaterWindow() {
                             }}
                         >
                             <img src={getAssetUrl(monkey)} width='40px' />
-                            Checking for the latest version ...
+                            {t('Checking for the latest version ...')}
                         </div>
                     )}
                     {!isChecking && (
@@ -126,7 +128,7 @@ export function UpdaterWindow() {
                                 }}
                             >
                                 {!checkResult ? (
-                                    <div>Congratulations! You are now using the latest version!</div>
+                                    <div>{t('Congratulations! You are now using the latest version!')}</div>
                                 ) : (
                                     <div>
                                         <p>
@@ -135,10 +137,11 @@ export function UpdaterWindow() {
                                                     fontWeight: 'bold',
                                                 }}
                                             >
-                                                A new version is available!
+                                                {t('A new version is available!')}
                                             </span>{' '}
-                                            The current version is <span>{checkResult.currentVersion}</span>, and the
-                                            latest version is{' '}
+                                            {t('The current version is {{0}}, and the latest version is', [
+                                                checkResult.currentVersion,
+                                            ])}{' '}
                                             <span
                                                 style={{
                                                     color: theme.colors.positive,
@@ -149,7 +152,7 @@ export function UpdaterWindow() {
                                             </span>
                                             .
                                         </p>
-                                        <p>The release content:</p>
+                                        <p>{t('The update content:')}</p>
                                     </div>
                                 )}
                             </div>
@@ -232,7 +235,7 @@ export function UpdaterWindow() {
                                 }}
                             >
                                 <IoIosCloseCircleOutline size={12} />
-                                Close
+                                {t('Close')}
                             </div>
                         </Button>
                         {checkResult &&
@@ -278,7 +281,7 @@ export function UpdaterWindow() {
                                         }}
                                     >
                                         <MdBrowserUpdated size={12} />
-                                        Upgrade
+                                        {t('Update')}
                                     </div>
                                 </Button>
                             ))}

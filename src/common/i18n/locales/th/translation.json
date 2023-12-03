@@ -127,5 +127,14 @@
   "Loud": "ดัง",
   "Add": "เพิ่ม",
   "Go back": "ย้อนกลับ",
+  "Updater": "อัปเดต",
+  "Checking for the latest version ...": "กำลังตรวจสอบเวอร์ชันล่าสุด ...",
+  "Congratulations! You are now using the latest version!": "ขอแสดงความยินดี! คุณกำลังใช้เวอร์ชันล่าสุด!",
+  "A new version is available!": "มีเวอร์ชันใหม่!",
+  "The current version is {{0}}, and the latest version is": "เวอร์ชันปัจจุบันคือ {{0}} และเวอร์ชันล่าสุดคือ",
+  "The release content:": "เนื้อหาการเปิดตัว:",
+  "The update content:": "เนื้อหาการอัปเดต:",
+  "Close": "ปิด",
+  "Update": "อัปเดต",
   "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

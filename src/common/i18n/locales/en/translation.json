@@ -128,5 +128,14 @@
   "Loud": "Loud",
   "Add": "Add",
   "Go back": "Go back",
+  "Updater": "Updater",
+  "Checking for the latest version ...": "Checking for the latest version ...",
+  "Congratulations! You are now using the latest version!": "Congratulations! You are now using the latest version!",
+  "A new version is available!": "A new version is available!",
+  "The current version is {{0}}, and the latest version is": "The current version is {{0}}, and the latest version is",
+  "The release content:": "The release content:",
+  "The update content:": "The update content:",
+  "Close": "Close",
+  "Update": "Update",
   "If you find this tool helpful, you can buy me a cup of coffee.": "If you find this tool helpful, you can buy me a cup of coffee."
 }
