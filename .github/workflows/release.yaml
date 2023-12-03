@@ -124,8 +124,8 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install --no-frozen-lockfile # change this to npm or pnpm depending on which one you use
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
         with:
           targets: ${{ matrix.config.rust_target }}
 

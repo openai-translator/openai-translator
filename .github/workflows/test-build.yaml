@@ -25,8 +25,8 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
