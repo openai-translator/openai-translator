@@ -26,6 +26,12 @@ dependencies:
   '@tauri-apps/plugin-http':
     specifier: 2.0.0-alpha.3
     version: 2.0.0-alpha.3
+  '@tauri-apps/plugin-process':
+    specifier: 2.0.0-alpha.3
+    version: 2.0.0-alpha.3
+  '@tauri-apps/plugin-updater':
+    specifier: 2.0.0-alpha.3
+    version: 2.0.0-alpha.3
   '@tauri-apps/plugin-window':
     specifier: 2.0.0-alpha.1
     version: 2.0.0-alpha.1
@@ -1526,6 +1532,18 @@ packages:
 
   /@tauri-apps/plugin-http@2.0.0-alpha.3:
     resolution: {integrity: sha512-d2pgHdJKokuBvBYA6wmvYdmV+6F6/yPw4PdGNsqmYhSDvb7e3MPKV5xxK8AlYMQz/kJf9jL1VnDwmgn6x4ZSqA==}
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.11
+    dev: false
+
+  /@tauri-apps/plugin-process@2.0.0-alpha.3:
+    resolution: {integrity: sha512-XfDBtjW5s584/OJvpaWo3EGtB/lRYltWUmdRotEs4CMWZRRidDfIWf39BWLEXOnik7aMZOA9LVURaTU2QHBy+g==}
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.11
+    dev: false
+
+  /@tauri-apps/plugin-updater@2.0.0-alpha.3:
+    resolution: {integrity: sha512-ZMNOpMrBEMCSBmI5Re09mhEldiDmHZBWaFkLXbDo8rcSM8OH2WaUQMDc6kmsu4pWgE/gs7RlwULmf9h3UZ+wLQ==}
     dependencies:
       '@tauri-apps/api': 2.0.0-alpha.11
     dev: false
