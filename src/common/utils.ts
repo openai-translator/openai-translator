@@ -4,7 +4,7 @@ import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 import { v4 as uuidv4 } from 'uuid'
 import { invoke } from '@tauri-apps/api/primitives'
-import { listen, Event } from '@tauri-apps/api/event'
+import { listen, Event, emit } from '@tauri-apps/api/event'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -274,6 +274,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         return await new Promise<void>((resolve, reject) => {
             options.signal?.addEventListener('abort', () => {
                 unlisten?.()
+                emit('abort-fetch-stream', { id })
             })
             listen('fetch-stream-chunk', (event: Event<{ id: string; data: string; done: boolean }>) => {
                 const payload = event.payload
