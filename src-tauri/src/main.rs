@@ -29,6 +29,7 @@ use crate::writing::{writing, write_to_input, finish_writing};
 use crate::windows::{
     get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
     show_main_window_with_selected_text, MAIN_WIN_NAME,
+    show_updater_window, close_updater_window,
 };
 
 use mouce::Mouse;
@@ -282,6 +283,7 @@ fn main() {
             MacosLauncher::LaunchAgent,
             Some(vec!["--silently"]),
         ))
+        .plugin(tauri_plugin_process::init())
         .setup(move |app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
@@ -353,6 +355,8 @@ fn main() {
             clear_config_cache,
             show_main_window_with_selected_text,
             show_action_manager_window,
+            show_updater_window,
+            close_updater_window,
             get_main_window_always_on_top,
             set_main_window_always_on_top,
             ocr,

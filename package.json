@@ -33,6 +33,8 @@
     "@tauri-apps/plugin-fs": "2.0.0-alpha.3",
     "@tauri-apps/plugin-global-shortcut": "2.0.0-alpha.3",
     "@tauri-apps/plugin-http": "2.0.0-alpha.3",
+    "@tauri-apps/plugin-process": "2.0.0-alpha.3",
+    "@tauri-apps/plugin-updater": "2.0.0-alpha.3",
     "@tauri-apps/plugin-window": "2.0.0-alpha.1",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-syntax-highlighter": "^15.5.7",
