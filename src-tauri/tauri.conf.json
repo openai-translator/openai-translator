@@ -68,6 +68,7 @@
       "targets": "all",
       "updater": {
         "active": true,
+        "dialog": true,
         "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3MzdGN0RCQjhGMkVENDEKUldSQjdmSzQyL2MzTjFaY0dIKzQzVnJYSjFwMlhFZmhjWmU5emZoVUt2OWExcVorbDRkK0NBaDMK"
       },
       "windows": {
