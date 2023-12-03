@@ -1061,7 +1061,7 @@ export function Settings({ engine, ...props }: ISettingsProps) {
 export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProps) {
     const { theme, themeType } = useTheme()
 
-    const { setThemeType } = useThemeType()
+    const { refreshThemeType } = useThemeType()
 
     const { t } = useTranslation()
 
@@ -1124,9 +1124,6 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
 
     const onSubmit = useCallback(
         async (data: ISettings) => {
-            if (data.themeType) {
-                setThemeType(data.themeType)
-            }
             setLoading(true)
             const oldSettings = await utils.getSettings()
             if (isTauri) {
@@ -1148,6 +1145,10 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
             }
             await utils.setSettings(data)
 
+            if (data.themeType) {
+                refreshThemeType()
+            }
+
             toast(t('Saved'), {
                 icon: '👍',
                 duration: 3000,
@@ -1156,7 +1157,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
             setSettings(data)
             onSave?.(oldSettings)
         },
-        [isTauri, onSave, setSettings, setThemeType, t]
+        [isTauri, onSave, setSettings, refreshThemeType, t]
     )
 
     const onBlur = useCallback(async () => {
