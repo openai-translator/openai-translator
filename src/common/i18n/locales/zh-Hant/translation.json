@@ -128,5 +128,14 @@
   "Loud": "响亮",
   "Add": "添加",
   "Go back": "返回",
+  "Updater": "更新器",
+  "Checking for the latest version ...": "正在檢查最新版本...",
+  "Congratulations! You are now using the latest version!": "恭喜！您現在正在使用最新版本！",
+  "A new version is available!": "有新版本可用！",
+  "The current version is {{0}}, and the latest version is": "當前版本為 {{0}}，最新版本為",
+  "The release content:": "發佈內容：",
+  "The update content:": "更新內容：",
+  "Close": "關閉",
+  "Update": "更新",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您覺得這個工具有幫助，可以請我喝杯咖啡。"
 }

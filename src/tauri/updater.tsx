@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Window } from './Window'
-import { check } from '@tauri-apps/plugin-updater'
+import { Update, check } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { Button } from 'baseui-sd/button'
 import { invoke } from '@tauri-apps/api/primitives'
@@ -11,6 +11,9 @@ import icon from '../common/assets/images/icon.png'
 import { getAssetUrl } from '../common/utils'
 import { ProgressBarRounded } from 'baseui-sd/progress-bar'
 import { createUseStyles } from 'react-jss'
+import { MdBrowserUpdated } from 'react-icons/md'
+import { IoIosCloseCircleOutline } from 'react-icons/io'
+import { useTranslation } from 'react-i18next'
 
 const useStyles = createUseStyles({
     icon: {
@@ -28,21 +31,15 @@ export function UpdaterWindow() {
     const styles = useStyles()
     const [isChecking, setIsChecking] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
-    const [currentVersion, setCurrentVersion] = useState('')
-    const [latestVersion, setLatestVersion] = useState('')
-    const [releaseContent, setReleaseContent] = useState('')
+    const [checkResult, setCheckResult] = useState<Update | null>(null)
     const [progress, setProgress] = useState(0)
+    const { t } = useTranslation()
 
     useEffect(() => {
         setIsChecking(true)
         check()
             .then((result) => {
-                if (!result) {
-                    return
-                }
-                setCurrentVersion(result.currentVersion)
-                setLatestVersion(result.version)
-                setReleaseContent(result.body ?? 'no release content')
+                setCheckResult(result)
             })
             .finally(() => {
                 setIsChecking(false)
@@ -83,7 +80,7 @@ export function UpdaterWindow() {
                     }}
                 >
                     <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
-                    OpenAI Translator Updater
+                    OpenAI Translator {t('Updater')}
                 </div>
                 <div
                     style={{
@@ -111,7 +108,7 @@ export function UpdaterWindow() {
                             }}
                         >
                             <img src={getAssetUrl(monkey)} width='40px' />
-                            Checking for the latest version ...
+                            {t('Checking for the latest version ...')}
                         </div>
                     )}
                     {!isChecking && (
@@ -120,6 +117,8 @@ export function UpdaterWindow() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '10px',
+                                justifyContent: 'center',
+                                alignItems: 'center',
                             }}
                         >
                             <div
@@ -128,36 +127,36 @@ export function UpdaterWindow() {
                                     lineHeight: '1.6',
                                 }}
                             >
-                                {latestVersion &&
-                                    (latestVersion === currentVersion ? (
-                                        <div>Congratulations! You are now using the latest version!</div>
-                                    ) : (
-                                        <div>
-                                            <p>
-                                                <span
-                                                    style={{
-                                                        fontWeight: 'bold',
-                                                    }}
-                                                >
-                                                    A new version is available!
-                                                </span>{' '}
-                                                The current version is <span>{currentVersion}</span>, and the latest
-                                                version is{' '}
-                                                <span
-                                                    style={{
-                                                        color: theme.colors.positive,
-                                                        fontWeight: 'bold',
-                                                    }}
-                                                >
-                                                    {latestVersion}
-                                                </span>
-                                                .
-                                            </p>
-                                            <p>The release content:</p>
-                                        </div>
-                                    ))}
+                                {!checkResult ? (
+                                    <div>{t('Congratulations! You are now using the latest version!')}</div>
+                                ) : (
+                                    <div>
+                                        <p>
+                                            <span
+                                                style={{
+                                                    fontWeight: 'bold',
+                                                }}
+                                            >
+                                                {t('A new version is available!')}
+                                            </span>{' '}
+                                            {t('The current version is {{0}}, and the latest version is', [
+                                                checkResult.currentVersion,
+                                            ])}{' '}
+                                            <span
+                                                style={{
+                                                    color: theme.colors.positive,
+                                                    fontWeight: 'bold',
+                                                }}
+                                            >
+                                                {checkResult.version}
+                                            </span>
+                                            .
+                                        </p>
+                                        <p>{t('The update content:')}</p>
+                                    </div>
+                                )}
                             </div>
-                            {currentVersion !== latestVersion && releaseContent && (
+                            {checkResult && checkResult.body && (
                                 <ul
                                     style={{
                                         fontSize: '16px',
@@ -168,7 +167,7 @@ export function UpdaterWindow() {
                                         padding: '0px',
                                     }}
                                 >
-                                    {releaseContent
+                                    {checkResult.body
                                         .split('\n')
                                         .filter((line) => !!line.trim())
                                         .map((line, idx) => {
@@ -215,7 +214,7 @@ export function UpdaterWindow() {
                             flexDirection: 'row',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            gap: '10px',
+                            gap: '20px',
                         }}
                     >
                         <Button
@@ -227,9 +226,19 @@ export function UpdaterWindow() {
                                 invoke('close_updater_window')
                             }}
                         >
-                            Close
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                }}
+                            >
+                                <IoIosCloseCircleOutline size={12} />
+                                {t('Close')}
+                            </div>
                         </Button>
-                        {latestVersion !== currentVersion &&
+                        {checkResult &&
                             (isDownloading ? (
                                 <ProgressBarRounded progress={progress} />
                             ) : (
@@ -263,7 +272,17 @@ export function UpdaterWindow() {
                                         }
                                     }}
                                 >
-                                    Upgrade
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                        }}
+                                    >
+                                        <MdBrowserUpdated size={12} />
+                                        {t('Update')}
+                                    </div>
                                 </Button>
                             ))}
                     </div>
