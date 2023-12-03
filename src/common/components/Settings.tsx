@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import _ from 'underscore'
-import { Tabs, Tab } from 'baseui-sd/tabs-motion'
+import { Tabs, Tab, StyledTabList, StyledTabPanel } from 'baseui-sd/tabs-motion'
 import { SlSpeech } from 'react-icons/sl'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
@@ -42,6 +42,7 @@ import { Provider, getEngine } from '../engines'
 import { IModel } from '../engines/interfaces'
 import { PiTextbox } from 'react-icons/pi'
 import { BsKeyboard } from 'react-icons/bs'
+import { Cell, Grid } from 'baseui-sd/layout-grid'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1208,7 +1209,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
 
     const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false)
 
-    const [activeTab, setActiveTab] = useState('0')
+    const [activeTab, setActiveTab] = useState(0)
 
     const [isScrolled, setIsScrolled] = useState(window.scrollY > 0)
 
@@ -1221,6 +1222,59 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
             window.removeEventListener('scroll', onScroll)
         }
     }, [])
+
+    const tabsOverrides = {
+        Root: {
+            style: {
+                '& button:hover': {
+                    background: 'transparent !important',
+                },
+            },
+        },
+        TabList: {
+            style: () => ({}),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            component: function TabsListOverride(props: any) {
+                return (
+                    <Grid behavior='fluid'>
+                        <Cell span={12}>
+                            <StyledTabList {...props} />
+                        </Cell>
+                    </Grid>
+                )
+            },
+        },
+    }
+
+    const tabOverrides = {
+        TabPanel: {
+            style: {
+                padding: '0px',
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            component: function TabsListOverride(props: any) {
+                return (
+                    <Grid>
+                        <Cell span={[1, 2, 3]}>
+                            <StyledTabPanel {...props} />
+                        </Cell>
+                    </Grid>
+                )
+            },
+        },
+        Tab: {
+            style: {
+                'color': theme.colors.black,
+                'background': 'transparent',
+                ':hover': {
+                    background: 'rgba(255, 255, 255, 0.35) !important',
+                },
+                ':active': {
+                    background: 'rgba(255, 255, 255, 0.45) !important',
+                },
+            },
+        },
+    }
 
     return (
         <div
@@ -1299,21 +1353,10 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     </div>
                 </div>
                 <Tabs
-                    overrides={{
-                        Root: {
-                            style: {
-                                '& button:hover': {
-                                    background: 'transparent !important',
-                                },
-                            },
-                        },
-                        TabList: {
-                            style: () => ({}),
-                        },
-                    }}
+                    overrides={tabsOverrides}
                     activeKey={activeTab}
                     onChange={({ activeKey }) => {
-                        setActiveTab(activeKey as string)
+                        setActiveTab(parseInt(activeKey as string, 10))
                     }}
                     fill='fixed'
                     renderAll
@@ -1323,66 +1366,21 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         artwork={() => {
                             return <IoSettingsOutline size={14} />
                         }}
-                        overrides={{
-                            TabPanel: {
-                                style: {
-                                    padding: '0px',
-                                },
-                            },
-                            Tab: {
-                                style: {
-                                    'color': theme.colors.black,
-                                    'background': 'transparent',
-                                    ':hover': {
-                                        background: 'transparent !important',
-                                    },
-                                },
-                            },
-                        }}
+                        overrides={tabOverrides}
                     />
                     <Tab
                         title={t('TTS')}
                         artwork={() => {
                             return <SlSpeech size={14} />
                         }}
-                        overrides={{
-                            TabPanel: {
-                                style: {
-                                    padding: '0px',
-                                },
-                            },
-                            Tab: {
-                                style: {
-                                    'color': theme.colors.black,
-                                    'background': 'transparent',
-                                    ':hover': {
-                                        background: 'transparent !important',
-                                    },
-                                },
-                            },
-                        }}
+                        overrides={tabOverrides}
                     />
                     <Tab
                         title={t('Writing')}
                         artwork={() => {
                             return <PiTextbox size={14} />
                         }}
-                        overrides={{
-                            TabPanel: {
-                                style: {
-                                    padding: '0px',
-                                },
-                            },
-                            Tab: {
-                                style: {
-                                    'color': theme.colors.black,
-                                    'background': 'transparent',
-                                    ':hover': {
-                                        background: 'transparent !important',
-                                    },
-                                },
-                            },
-                        }}
+                        overrides={tabOverrides}
                     />
                     <Tab
                         title={t('Shortcuts')}
@@ -1390,21 +1388,11 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                             return <BsKeyboard size={14} />
                         }}
                         overrides={{
-                            TabPanel: {
-                                style: {
-                                    padding: '0px',
-                                },
-                            },
+                            ...tabOverrides,
                             Tab: {
+                                ...tabOverrides.Tab,
                                 props: {
                                     'data-testid': 'shortcuts',
-                                },
-                                style: {
-                                    'color': theme.colors.black,
-                                    'background': 'transparent',
-                                    ':hover': {
-                                        background: 'transparent !important',
-                                    },
                                 },
                             },
                         }}
@@ -1449,7 +1437,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                 <div>
                     <div
                         style={{
-                            display: activeTab === '0' ? 'block' : 'none',
+                            display: activeTab === 0 ? 'block' : 'none',
                         }}
                     >
                         <FormItem name='i18n' label={t('i18n')}>
@@ -1732,7 +1720,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     </div>
                     <div
                         style={{
-                            display: activeTab === '1' ? 'block' : 'none',
+                            display: activeTab === 1 ? 'block' : 'none',
                         }}
                     >
                         <FormItem name='tts' label={t('TTS')}>
@@ -1741,7 +1729,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     </div>
                     <div
                         style={{
-                            display: activeTab === '2' ? 'block' : 'none',
+                            display: activeTab === 2 ? 'block' : 'none',
                         }}
                     >
                         <FormItem
@@ -1778,7 +1766,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     </div>
                     <div
                         style={{
-                            display: activeTab === '3' ? 'block' : 'none',
+                            display: activeTab === 3 ? 'block' : 'none',
                         }}
                     >
                         <FormItem name='hotkey' label={t('Hotkey')}>
