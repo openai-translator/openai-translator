@@ -12,12 +12,9 @@ mod tray;
 mod utils;
 mod windows;
 
-#[cfg(target_os = "macos")]
-use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
 use windows::get_main_window;
 use std::env;
-use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_autostart::MacosLauncher;
@@ -267,7 +264,8 @@ fn main() {
         let vendor_id = cpu.vendor_id().to_string();
         *CPU_VENDOR.lock() = vendor_id;
     }
-    tauri::Builder::default()
+
+    let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_notification::init())
@@ -300,12 +298,6 @@ fn main() {
                 window.set_focus().unwrap();
                 window.show().unwrap();
             }
-            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                window.set_decorations(false)?;
-                // Try set shadow and ignore errors if it failed.
-                set_shadow(&window, true).unwrap_or_default();
-            }
             if !query_accessibility_permissions() {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
                 window.minimize().unwrap();
@@ -317,28 +309,6 @@ fn main() {
                     .show()
                     .unwrap();
             }
-            #[cfg(target_os = "macos")]
-            {
-                // Disable the automatic creation of "Show Tab Bar" etc menu items on macOS
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                unsafe {
-                    let ns_window = window.ns_window().unwrap() as cocoa::base::id;
-                    NSWindow::setAllowsAutomaticWindowTabbing_(ns_window, cocoa::base::NO);
-                }
-            }
-            #[cfg(target_os = "macos")]
-            {
-                use cocoa::appkit::NSWindowCollectionBehavior;
-                use cocoa::base::id;
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                let ns_win = window.ns_window().unwrap() as id;
-                unsafe {
-                    let mut collection_behavior = ns_win.collectionBehavior();
-                    collection_behavior |= NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
-
-                    ns_win.setCollectionBehavior_(collection_behavior);
-                }
-            }
             std::thread::spawn(move || {
                 #[cfg(target_os = "windows")]
                 {
@@ -347,6 +317,7 @@ fn main() {
                 }
                 #[cfg(not(target_os = "windows"))]
                 {
+                    use std::path::Path;
                     let path = Path::new("/tmp/openai-translator.sock");
                     std::fs::remove_file(path).unwrap_or_default();
                     let server = Server::http_unix(path).unwrap();
@@ -372,28 +343,32 @@ fn main() {
             detect_lang,
         ])
         .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|app, event| {
-            if let tauri::RunEvent::WindowEvent {
-                label,
-                event: tauri::WindowEvent::CloseRequested { api, .. },
-                ..
-            } = event
-            {
-                if label != MAIN_WIN_NAME {
-                    return;
-                }
+        .expect("error while building tauri application");
 
-                #[cfg(target_os = "macos")]
-                {
-                    tauri::AppHandle::hide(&app.app_handle()).unwrap();
-                }
-                #[cfg(target_os = "windows")]
-                {
-                    let window = app.get_window(label.as_str()).unwrap();
-                    window.hide().unwrap();
-                }
-                api.prevent_close();
+    #[cfg(target_os = "macos")]
+    app.set_activation_policy(tauri::ActivationPolicy::Regular);
+
+    app.run(|app, event| {
+        if let tauri::RunEvent::WindowEvent {
+            label,
+            event: tauri::WindowEvent::CloseRequested { api, .. },
+            ..
+        } = event
+        {
+            if label != MAIN_WIN_NAME {
+                return;
             }
-        });
+
+            #[cfg(target_os = "macos")]
+            {
+                tauri::AppHandle::hide(&app.app_handle()).unwrap();
+            }
+            #[cfg(target_os = "windows")]
+            {
+                let window = app.get_window(label.as_str()).unwrap();
+                window.hide().unwrap();
+            }
+            api.prevent_close();
+        }
+    });
 }
