@@ -1211,7 +1211,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 >
                     <MyCheckbox onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='chatContext' label={t('Set Context')}>
+                <FormItem name='chatContext' label={t('Save Conversation')}>
                     <ChatContextCheckbox onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='autoTranslate' label={t('Auto Translate')}>

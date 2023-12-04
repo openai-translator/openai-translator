@@ -6,7 +6,7 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
-import { AiOutlineTranslation, AiOutlineFileSync, AiOutlinePlusSquare } from 'react-icons/ai'
+import { AiOutlineTranslation, AiOutlineLock, AiOutlinePlusSquare } from 'react-icons/ai'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import * as mdIcons from 'react-icons/md'
@@ -1729,24 +1729,37 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 </div>
             )}
 
-            <Tooltip content={t('选择使用场景')} placement='bottom'>
-                <Select
-                    options={Object.keys(actionGroups).map((key) => ({ id: key, label: key }))}
-                    value={[{ id: selectedGroup }]}
-                    overrides={{
-                        Root: {
-                            style: {
-                                minWidth: '110px',
-                                width: '30%',
-                            },
-                        },
-                    }}
-                    onChange={({ value }) => {
-                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
-                        setSelectedGroup(groupId as string)
-                    }}
-                />
-            </Tooltip>
+<Tooltip content={t('选择使用场景')} placement='bottom'>
+    <Select
+        options={[
+            ...Object.keys(actionGroups).map((key) => ({ id: key, label: key })),
+            { id: 'unlock_features', label: (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <AiOutlineLock style={{ marginRight: '5px' }} />
+                    解锁更多功能
+                </div>
+            ) } // 新增的选项
+        ]}
+        value={[{ id: selectedGroup }]}
+        overrides={{
+            Root: {
+                style: {
+                    minWidth: '110px',
+                    width: '30%',
+                },
+            },
+        }}
+        onChange={({ value }) => {
+            const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0];
+            if (groupId === 'unlock_features') {
+                window.open('https://chatgpt-tutor.vercel.app/docs/introduction', '_blank'); // 打开新网页
+            } else {
+                setSelectedGroup(groupId as string);
+            }
+        }}
+    />
+</Tooltip>
+
             <Modal
                 isOpen={!isDesktopApp() && showActionManager}
                 onClose={() => {

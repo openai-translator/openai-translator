@@ -473,7 +473,7 @@ export class WebAPI {
             })
             //  set title
 
-            if (conversationId && settings.chatContext === false) {
+            if (settings.chatContext === false) {
                 await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
                     method: 'PATCH',
                     headers,
