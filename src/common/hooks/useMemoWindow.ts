@@ -3,6 +3,7 @@ import { event } from '@tauri-apps/api'
 import { getCurrent } from '@tauri-apps/api/window'
 import { restoreStateCurrent, saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { useEffect } from 'react'
+import _ from 'underscore'
 
 export type WindowMemoProps = {
     size: boolean
@@ -37,20 +38,15 @@ export const useMemoWindow = (props: WindowMemoProps) => {
     useEffect(() => {
         let unListenMove: (() => void) | undefined
         let unListenResize: (() => void) | undefined
-        event
-            .listen(event.TauriEvent.WINDOW_MOVED, () => {
-                saveWindowState(StateFlags.ALL)
-            })
-            .then((unListen) => {
-                unListenMove = unListen
-            })
-        event
-            .listen(event.TauriEvent.WINDOW_RESIZED, () => {
-                saveWindowState(StateFlags.ALL)
-            })
-            .then((unListen) => {
-                unListenResize = unListen
-            })
+        const cb = _.debounce(() => {
+            saveWindowState(StateFlags.ALL)
+        }, 3000)
+        event.listen(event.TauriEvent.WINDOW_MOVED, cb).then((unListen) => {
+            unListenMove = unListen
+        })
+        event.listen(event.TauriEvent.WINDOW_RESIZED, cb).then((unListen) => {
+            unListenResize = unListen
+        })
         return () => {
             unListenMove?.()
             unListenResize?.()
