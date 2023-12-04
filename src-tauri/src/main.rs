@@ -279,7 +279,6 @@ fn main() {
                 .show()
                 .unwrap();
         }))
-        .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--silently"]),

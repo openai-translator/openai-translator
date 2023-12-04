@@ -22,7 +22,7 @@ export function App() {
     const [uuid, setUUID] = useState('')
     const [showSettings, setShowSettings] = useState(false)
 
-    useMemoWindow()
+    useMemoWindow({ size: true, position: false })
 
     useEffect(() => {
         setupAnalysis()
