@@ -64,8 +64,8 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
     while let Some(item) = stream.next().await {
         let chunk = item.map_err(|err| format!("failed to read response: {}", err))?;
         let chunk_str = String::from_utf8(chunk.to_vec()).unwrap();
-        // use debug_print::debug_println;
-        // debug_println!("chunk: {}", chunk_str);
+        use debug_print::debug_println;
+        debug_println!("chunk: {}", chunk_str);
         app_handle.emit("fetch-stream-chunk", StreamChunk {
             id: id.clone(),
             data: chunk_str.clone(),
