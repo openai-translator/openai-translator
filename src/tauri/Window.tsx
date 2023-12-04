@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getCurrent } from '@tauri-apps/api/window'
-import { invoke } from '@tauri-apps/api/primitives'
 import { useTheme } from '../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -11,25 +10,78 @@ import { ErrorFallback } from '../common/components/ErrorFallback'
 import '../common/i18n.js'
 import { useTranslation } from 'react-i18next'
 import { useSettings } from '../common/hooks/useSettings'
+import { IThemedStyleProps } from '../common/types'
+import { createUseStyles } from 'react-jss'
+import { invoke } from '@tauri-apps/api/primitives'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
 })
 
 export interface IWindowProps {
+    isMainWindow?: boolean
+    windowsTitlebarDisableDarkMode?: boolean
     children: React.ReactNode
 }
 
 export function Window(props: IWindowProps) {
+    const { theme } = useTheme()
+    return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <StyletronProvider value={engine}>
+                <BaseProvider theme={theme}>
+                    <InnerWindow {...props} />
+                </BaseProvider>
+            </StyletronProvider>
+        </ErrorBoundary>
+    )
+}
+
+const useStyles = createUseStyles({
+    titlebar: () => ({
+        height: '30px',
+        background: 'transparent',
+        userSelect: 'none',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 2147483647,
+    }),
+    titlebarButton: (props: IThemedStyleProps & { windowsTitlebarDisableDarkMode?: boolean }) => ({
+        'display': 'inline-flex',
+        'justifyContent': 'center',
+        'alignItems': 'center',
+        'width': '30px',
+        'height': '30px',
+        '&:hover': {
+            background:
+                props.windowsTitlebarDisableDarkMode !== true && props.themeType === 'dark' ? '#353535' : '#e9e9e9',
+        },
+    }),
+})
+
+export function InnerWindow(props: IWindowProps) {
+    const { theme, themeType } = useTheme()
+    const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
     const isMacOS = navigator.userAgent.includes('Mac OS X')
     const isLinux = navigator.userAgent.includes('Linux')
-    const pinIconRef = useRef<HTMLDivElement>(null)
-    const minimizeIconRef = useRef<HTMLDivElement>(null)
-    const maximizeIconRef = useRef<HTMLDivElement>(null)
-    const closeIconRef = useRef<HTMLDivElement>(null)
     const [isPinned, setPinned] = useState(false)
     const { i18n } = useTranslation()
     const { settings } = useSettings()
+
+    useEffect(() => {
+        if (!props.isMainWindow) {
+            return
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoke('get_main_window_always_on_top').then((pinned: any) => {
+            return setPinned(pinned)
+        })
+    }, [props.isMainWindow])
+
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (settings?.i18n !== (i18n as any).language) {
@@ -38,49 +90,48 @@ export function Window(props: IWindowProps) {
         }
     }, [i18n, settings])
 
-    useEffect(() => {
+    const handlePin = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
         const appWindow = getCurrent()
-        if (isMacOS || isLinux) {
-            return
-        }
-        function handlePin() {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            invoke('set_main_window_always_on_top').then((pinned: any) => {
-                setPinned(pinned)
-            })
-        }
-        function handleMinimize() {
-            appWindow.minimize()
-        }
-        async function handleMaximize() {
-            if (await appWindow.isMaximized()) {
-                await appWindow.unmaximize()
-            } else {
-                await appWindow.maximize()
-            }
-        }
-        function handleClose() {
-            appWindow.hide()
-        }
-        const pinIcon = pinIconRef.current
-        const minimizeIcon = minimizeIconRef.current
-        const maximizeIcon = maximizeIconRef.current
-        const closeIcon = closeIconRef.current
-        pinIcon?.addEventListener('click', handlePin)
-        minimizeIcon?.addEventListener('click', handleMinimize)
-        maximizeIcon?.addEventListener('click', handleMaximize)
-        closeIcon?.addEventListener('click', handleClose)
-        return () => {
-            pinIcon?.removeEventListener('click', handlePin)
-            minimizeIcon?.removeEventListener('click', handleMinimize)
-            maximizeIcon?.removeEventListener('click', handleMaximize)
-            closeIcon?.removeEventListener('click', handleClose)
-        }
-    }, [isLinux, isMacOS])
+        setPinned((prev) => {
+            const isPinned_ = !prev
+            appWindow.setAlwaysOnTop(isPinned_)
+            return isPinned_
+        })
+    }, [])
 
-    const { theme, themeType } = useTheme()
+    const handleMinimize = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const appWindow = getCurrent()
+        appWindow.minimize()
+    }, [])
 
-    const svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+    const handleMaximize = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const appWindow = getCurrent()
+        const isMaximized = await appWindow.isMaximized()
+        if (isMaximized) {
+            await appWindow.unmaximize()
+        } else {
+            await appWindow.maximize()
+        }
+    }, [])
+
+    const handleClose = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const appWindow = getCurrent()
+        appWindow.hide()
+    }, [])
+
+    let svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+
+    if (props.windowsTitlebarDisableDarkMode) {
+        svgPathColor = '#000'
+    }
 
     return (
         <div
@@ -91,10 +142,10 @@ export function Window(props: IWindowProps) {
                 minHeight: '100vh',
             }}
         >
-            <div className='titlebar' data-tauri-drag-region>
+            <div className={styles.titlebar} data-tauri-drag-region>
                 {!isMacOS && !isLinux && (
                     <>
-                        <div className='titlebar-button' id='titlebar-pin' ref={pinIconRef}>
+                        <div className={styles.titlebarButton} onClick={handlePin}>
                             <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
                                 {isPinned ? (
                                     <path
@@ -110,17 +161,17 @@ export function Window(props: IWindowProps) {
                                 )}
                             </svg>
                         </div>
-                        <div className='titlebar-button' id='titlebar-minimize' ref={minimizeIconRef}>
+                        <div className={styles.titlebarButton} onClick={handleMinimize}>
                             <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
                                 <path fill={svgPathColor} d='M20 14H4v-4h16' />
                             </svg>
                         </div>
-                        <div className='titlebar-button' id='titlebar-maximize' ref={maximizeIconRef}>
+                        <div className={styles.titlebarButton} onClick={handleMaximize}>
                             <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
                                 <path fill={svgPathColor} d='M4 4h16v16H4V4m2 4v10h12V8H6Z' />
                             </svg>
                         </div>
-                        <div className='titlebar-button' id='titlebar-close' ref={closeIconRef}>
+                        <div className={styles.titlebarButton} onClick={handleClose}>
                             <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
                                 <path
                                     fill={svgPathColor}
@@ -131,11 +182,7 @@ export function Window(props: IWindowProps) {
                     </>
                 )}
             </div>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <StyletronProvider value={engine}>
-                    <BaseProvider theme={theme}>{props.children}</BaseProvider>
-                </StyletronProvider>
-            </ErrorBoundary>
+            {props.children}
         </div>
     )
 }

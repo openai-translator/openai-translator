@@ -45,6 +45,7 @@ export interface IThemedStyleProps {
 }
 
 export interface ISettings {
+    automaticCheckForUpdates: boolean
     apiKeys: string
     apiURL: string
     apiURLPath: string

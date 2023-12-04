@@ -424,6 +424,7 @@ export interface IInnerTranslatorProps {
     editorRows?: number
     showLogo?: boolean
     onSettingsSave?: (oldSettings: ISettings) => void
+    onSettingsShow?: (isShow: boolean) => void
 }
 
 export interface ITranslatorProps extends IInnerTranslatorProps {
@@ -454,6 +455,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setShowSettings(props.showSettings ?? false)
     }, [props.showSettings, props.uuid])
+
+    const { onSettingsShow } = props
+
+    useEffect(() => {
+        onSettingsShow?.(showSettings)
+    }, [onSettingsShow, showSettings])
 
     const { showLogo = true } = props
 

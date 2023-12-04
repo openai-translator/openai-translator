@@ -36,6 +36,7 @@ export async function getAzureApiKey(): Promise<string> {
 
 // In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
 const settingKeys: Record<keyof ISettings, number> = {
+    automaticCheckForUpdates: 1,
     apiKeys: 1,
     apiURL: 1,
     apiURLPath: 1,
@@ -143,6 +144,9 @@ export async function getSettings(): Promise<ISettings> {
         if (!settings.chatgptModel) {
             settings.chatgptModel = settings.apiModel
         }
+    }
+    if (settings.automaticCheckForUpdates === undefined || settings.automaticCheckForUpdates === null) {
+        settings.automaticCheckForUpdates = true
     }
     return settings
 }

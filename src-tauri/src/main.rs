@@ -12,11 +12,11 @@ mod tray;
 mod utils;
 mod windows;
 
-#[cfg(target_os = "macos")]
-use cocoa::appkit::NSWindow;
+use config::get_config;
 use parking_lot::Mutex;
+use tauri_plugin_updater::UpdaterExt;
+use windows::get_main_window;
 use std::env;
-use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_autostart::MacosLauncher;
@@ -38,7 +38,6 @@ use tauri_plugin_notification::NotificationExt;
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tiny_http::{Response as HttpResponse, Server};
-use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 pub static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
@@ -266,7 +265,8 @@ fn main() {
         let vendor_id = cpu.vendor_id().to_string();
         *CPU_VENDOR.lock() = vendor_id;
     }
-    tauri::Builder::default()
+
+    let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_notification::init())
@@ -287,19 +287,17 @@ fn main() {
         .setup(move |app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
-            tray::create_tray(&app_handle)?;
+            tray::create_tray(&app_handle, false)?;
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                let window = get_main_window(false, false, false);
                 window.unminimize().unwrap();
                 window.hide().unwrap();
-            }
-            if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                window.set_decorations(false)?;
-                // Try set shadow and ignore errors if it failed.
-                set_shadow(&window, true).unwrap_or_default();
+            } else {
+                let window = get_main_window(false, false, false);
+                window.set_focus().unwrap();
+                window.show().unwrap();
             }
             if !query_accessibility_permissions() {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();
@@ -312,28 +310,6 @@ fn main() {
                     .show()
                     .unwrap();
             }
-            #[cfg(target_os = "macos")]
-            {
-                // Disable the automatic creation of "Show Tab Bar" etc menu items on macOS
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                unsafe {
-                    let ns_window = window.ns_window().unwrap() as cocoa::base::id;
-                    NSWindow::setAllowsAutomaticWindowTabbing_(ns_window, cocoa::base::NO);
-                }
-            }
-            #[cfg(target_os = "macos")]
-            {
-                use cocoa::appkit::NSWindowCollectionBehavior;
-                use cocoa::base::id;
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
-                let ns_win = window.ns_window().unwrap() as id;
-                unsafe {
-                    let mut collection_behavior = ns_win.collectionBehavior();
-                    collection_behavior |= NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
-
-                    ns_win.setCollectionBehavior_(collection_behavior);
-                }
-            }
             std::thread::spawn(move || {
                 #[cfg(target_os = "windows")]
                 {
@@ -342,12 +318,31 @@ fn main() {
                 }
                 #[cfg(not(target_os = "windows"))]
                 {
+                    use std::path::Path;
                     let path = Path::new("/tmp/openai-translator.sock");
                     std::fs::remove_file(path).unwrap_or_default();
                     let server = Server::http_unix(path).unwrap();
                     launch_ipc_server(&server);
                 }
             });
+
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(60 * 10));
+                    let mut builder = handle.updater_builder();
+                    let updater = builder.build().unwrap();
+
+                    match updater.check().await {
+                        Ok(Some(_)) => {
+                            tray::create_tray(&handle, true).unwrap();
+                        }
+                        Ok(None) => {}
+                        Err(_) => {}
+                    }
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -367,14 +362,38 @@ fn main() {
             detect_lang,
         ])
         .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|app, event| {
-            if let tauri::RunEvent::WindowEvent {
+        .expect("error while building tauri application");
+
+    #[cfg(target_os = "macos")]
+    app.set_activation_policy(tauri::ActivationPolicy::Regular);
+
+    app.run(|app, event| {
+        match event {
+            tauri::RunEvent::Ready => {
+                let handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    let mut builder = handle.updater_builder();
+                    let updater = builder.build().unwrap();
+
+                    match updater.check().await {
+                        Ok(Some(_)) => {
+                            tray::create_tray(&handle, true).unwrap();
+                            let config = get_config().unwrap();
+                            if config.automatic_check_for_updates.is_none() || config.automatic_check_for_updates.is_some_and(|x| x == true) {
+                                std::thread::sleep(std::time::Duration::from_secs(3));
+                                show_updater_window();
+                            }
+                        }
+                        Ok(None) => {}
+                        Err(_) => {}
+                    }
+                });
+            }
+            tauri::RunEvent::WindowEvent {
                 label,
                 event: tauri::WindowEvent::CloseRequested { api, .. },
                 ..
-            } = event
-            {
+            } => {
                 if label != MAIN_WIN_NAME {
                     return;
                 }
@@ -390,5 +409,7 @@ fn main() {
                 }
                 api.prevent_close();
             }
-        });
+            _ => {}
+        }
+    });
 }
