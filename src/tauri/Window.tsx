@@ -17,6 +17,7 @@ const engine = new Styletron({
 })
 
 export interface IWindowProps {
+    windowsTitlebarDisableDarkMode?: boolean
     children: React.ReactNode
 }
 
@@ -80,7 +81,11 @@ export function Window(props: IWindowProps) {
 
     const { theme, themeType } = useTheme()
 
-    const svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+    let svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+
+    if (props.windowsTitlebarDisableDarkMode) {
+        svgPathColor = '#000'
+    }
 
     return (
         <div

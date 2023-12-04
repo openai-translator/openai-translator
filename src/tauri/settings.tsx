@@ -4,7 +4,7 @@ import { Window } from './Window'
 
 export function SettingsWindow() {
     return (
-        <Window>
+        <Window windowsTitlebarDisableDarkMode>
             <InnerSettings showFooter />
         </Window>
     )
