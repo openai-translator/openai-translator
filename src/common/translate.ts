@@ -8,6 +8,7 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { oneLine } from 'common-tags'
+import { getArkoseToken } from '../../public/index'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -339,6 +340,7 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
+            const arkoseToken = await getArkoseToken()
             body = {
                 action: 'next',
                 messages: [
@@ -357,6 +359,7 @@ export class WebAPI {
                 model: settings.apiModel, // 'text-davinci-002-render-sha'
                 conversation_id: (await getConversationId()) || undefined,
                 parent_message_id: (await getlastMessageId()) || uuidv4(),
+                arkose_token: arkoseToken,
                 timezone_offset_min: -480, // adjust this to the correct timezone
             }
         } else {
