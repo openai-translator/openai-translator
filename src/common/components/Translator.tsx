@@ -1752,7 +1752,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         onChange={({ value }) => {
             const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0];
             if (groupId === 'unlock_features') {
-                window.open('https://chatgpt-tutor.vercel.app/docs/introduction', '_blank'); // 打开新网页
+                window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank'); // 打开新网页
             } else {
                 setSelectedGroup(groupId as string);
             }

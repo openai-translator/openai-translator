@@ -11,7 +11,7 @@ export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
-export const defaultChatContext = false
+export const defaultChatContext = true
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultSelectInputElementsText = true
