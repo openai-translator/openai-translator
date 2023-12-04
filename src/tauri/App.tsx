@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
@@ -126,8 +126,14 @@ export function App() {
         bindWritingHotkey()
     }, [])
 
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+
+    const onSettingsShow = useCallback((isShow: boolean) => {
+        setIsSettingsOpen(isShow)
+    }, [])
+
     return (
-        <Window isMainWindow>
+        <Window isMainWindow windowsTitlebarDisableDarkMode={isSettingsOpen}>
             <Translator
                 uuid={uuid}
                 text={text}
@@ -144,6 +150,7 @@ export function App() {
                     bindOCRHotkey(oldSettings.ocrHotkey)
                     bindWritingHotkey(oldSettings.writingHotkey)
                 }}
+                onSettingsShow={onSettingsShow}
             />
         </Window>
     )

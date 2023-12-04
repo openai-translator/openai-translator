@@ -50,21 +50,22 @@ const useStyles = createUseStyles({
         right: 0,
         zIndex: 2147483647,
     }),
-    titlebarButton: (props: IThemedStyleProps) => ({
+    titlebarButton: (props: IThemedStyleProps & { windowsTitlebarDisableDarkMode?: boolean }) => ({
         'display': 'inline-flex',
         'justifyContent': 'center',
         'alignItems': 'center',
         'width': '30px',
         'height': '30px',
         '&:hover': {
-            background: props.themeType === 'dark' ? '#353535' : '#e9e9e9',
+            background:
+                props.windowsTitlebarDisableDarkMode !== true && props.themeType === 'dark' ? '#353535' : '#e9e9e9',
         },
     }),
 })
 
 export function InnerWindow(props: IWindowProps) {
     const { theme, themeType } = useTheme()
-    const styles = useStyles({ theme, themeType })
+    const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
     const isMacOS = navigator.userAgent.includes('Mac OS X')
     const isLinux = navigator.userAgent.includes('Linux')
     const [isPinned, setPinned] = useState(false)
