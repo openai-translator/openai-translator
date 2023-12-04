@@ -58,6 +58,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>, has_updates: bool) -> 
         "show" => {
             let window = app.get_window(MAIN_WIN_NAME).unwrap();
             window.set_focus().unwrap();
+            window.unminimize().unwrap();
             window.show().unwrap();
         }
         "hide" => {
@@ -82,6 +83,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>, has_updates: bool) -> 
         if event.click_type == ClickType::Left {
             let app = tray.app_handle();
             if let Some(window) = app.get_window(MAIN_WIN_NAME) {
+                window.unminimize().unwrap();
                 let _ = window.show();
                 let _ = window.set_focus();
             }
