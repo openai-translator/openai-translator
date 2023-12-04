@@ -15,6 +15,7 @@ mod windows;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::NSWindow;
 use parking_lot::Mutex;
+use windows::get_main_window;
 use std::env;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -291,9 +292,13 @@ fn main() {
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                let window = get_main_window(true, false);
                 window.unminimize().unwrap();
                 window.hide().unwrap();
+            } else {
+                let window = get_main_window(true, false);
+                window.set_focus().unwrap();
+                window.show().unwrap();
             }
             if cfg!(target_os = "windows") || cfg!(target_os = "linux") {
                 let window = app.get_window(MAIN_WIN_NAME).unwrap();

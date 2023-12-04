@@ -184,6 +184,12 @@ pub fn show_thumb(x: i32, y: i32) {
 }
 
 pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
+    let window = get_main_window(center, set_focus);
+    window.show().unwrap();
+    window
+}
+
+pub fn get_main_window(center: bool, set_focus: bool) -> tauri::Window {
     let handle = APP_HANDLE.get().unwrap();
     match handle.get_window(MAIN_WIN_NAME) {
         Some(window) => {
@@ -252,7 +258,6 @@ pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
             if set_focus {
                 window.set_focus().unwrap();
             }
-            window.show().unwrap();
             window
         }
         None => {

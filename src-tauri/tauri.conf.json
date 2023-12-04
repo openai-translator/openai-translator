@@ -88,21 +88,6 @@
     "trayIcon": {
       "iconAsTemplate": true,
       "iconPath": "icons/favicon.ico"
-    },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 700,
-        "hiddenTitle": true,
-        "minHeight": 600,
-        "minWidth": 540,
-        "resizable": true,
-        "title": "OpenAI Translator",
-        "titleBarStyle": "Overlay",
-        "url": "src/tauri/index.html",
-        "visible": true,
-        "width": 620
-      }
-    ]
+    }
   }
 }
