@@ -38,7 +38,6 @@ use tauri_plugin_notification::NotificationExt;
 use tauri::{AppHandle, LogicalPosition, LogicalSize};
 use tauri::{Manager, PhysicalPosition, PhysicalSize};
 use tiny_http::{Response as HttpResponse, Server};
-use window_shadows::set_shadow;
 
 pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 pub static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
@@ -329,27 +328,9 @@ fn main() {
             });
 
             let handle = app.handle().clone();
-            let config = get_config().unwrap();
-            if config.automatic_check_for_updates.is_none() || config.automatic_check_for_updates.is_some_and(|x| x == true) {
-                tauri::async_runtime::spawn(async move {
-                    let mut builder = handle.updater_builder();
-                    let updater = builder.build().unwrap();
-
-                    match updater.check().await {
-                        Ok(Some(_)) => {
-                            tray::create_tray(&handle, true).unwrap();
-                            show_updater_window();
-                        }
-                        Ok(None) => {}
-                        Err(_) => {}
-                    }
-                });
-            }
-
-            let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 loop {
-                    std::thread::sleep(std::time::Duration::from_secs(10));
+                    std::thread::sleep(std::time::Duration::from_secs(60 * 10));
                     let mut builder = handle.updater_builder();
                     let updater = builder.build().unwrap();
 
@@ -388,26 +369,48 @@ fn main() {
     app.set_activation_policy(tauri::ActivationPolicy::Regular);
 
     app.run(|app, event| {
-        if let tauri::RunEvent::WindowEvent {
-            label,
-            event: tauri::WindowEvent::CloseRequested { api, .. },
-            ..
-        } = event
-        {
-            if label != MAIN_WIN_NAME {
-                return;
-            }
+        match event {
+            tauri::RunEvent::Ready => {
+                let handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    let mut builder = handle.updater_builder();
+                    let updater = builder.build().unwrap();
 
-            #[cfg(target_os = "macos")]
-            {
-                tauri::AppHandle::hide(&app.app_handle()).unwrap();
+                    match updater.check().await {
+                        Ok(Some(_)) => {
+                            tray::create_tray(&handle, true).unwrap();
+                            let config = get_config().unwrap();
+                            if config.automatic_check_for_updates.is_none() || config.automatic_check_for_updates.is_some_and(|x| x == true) {
+                                std::thread::sleep(std::time::Duration::from_secs(3));
+                                show_updater_window();
+                            }
+                        }
+                        Ok(None) => {}
+                        Err(_) => {}
+                    }
+                });
             }
-            #[cfg(target_os = "windows")]
-            {
-                let window = app.get_window(label.as_str()).unwrap();
-                window.hide().unwrap();
+            tauri::RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::CloseRequested { api, .. },
+                ..
+            } => {
+                if label != MAIN_WIN_NAME {
+                    return;
+                }
+
+                #[cfg(target_os = "macos")]
+                {
+                    tauri::AppHandle::hide(&app.app_handle()).unwrap();
+                }
+                #[cfg(target_os = "windows")]
+                {
+                    let window = app.get_window(label.as_str()).unwrap();
+                    window.hide().unwrap();
+                }
+                api.prevent_close();
             }
-            api.prevent_close();
+            _ => {}
         }
     });
 }
