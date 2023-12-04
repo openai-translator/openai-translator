@@ -1069,6 +1069,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
 
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<ISettings>({
+        automaticCheckForUpdates: false,
         apiKeys: '',
         apiURL: utils.defaultAPIURL,
         apiURLPath: utils.defaultAPIURLPath,
@@ -1709,6 +1710,15 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                                 <RunAtStartupCheckbox onBlur={onBlur} />
                             </FormItem>
                         )}
+                        <FormItem
+                            style={{
+                                display: isDesktopApp ? 'block' : 'none',
+                            }}
+                            name='automaticCheckForUpdates'
+                            label={t('Automatic check for updates')}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
                         <FormItem
                             style={{
                                 display: isDesktopApp ? 'block' : 'none',

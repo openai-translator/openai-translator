@@ -11,13 +11,16 @@ use tauri::{
     Manager, Runtime,
 };
 
-pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
+pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>, has_updates: bool) -> tauri::Result<()> {
     let config = get_config().unwrap();
     let mut ocr_text = String::from("OCR");
     if let Some(ocr_hotkey) = config.ocr_hotkey {
         ocr_text = format!("OCR ({})", ocr_hotkey);
     }
     let check_for_updates_i = MenuItem::with_id(app, "check_for_updates", "Check for Updates...", true, None);
+    if has_updates {
+        check_for_updates_i.set_text("💡 New version available!").unwrap();
+    }
     let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None);
     let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None);
     let show_i = MenuItem::with_id(app, "show", "Show", true, None);

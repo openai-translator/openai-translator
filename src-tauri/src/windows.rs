@@ -225,12 +225,12 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 }
 
 pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
-    let window = get_main_window(center, set_focus);
+    let window = get_main_window(center, true, set_focus);
     window.show().unwrap();
     window
 }
 
-pub fn get_main_window(center: bool, set_focus: bool) -> tauri::Window {
+pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -> tauri::Window {
     let handle = APP_HANDLE.get().unwrap();
     let window = match handle.get_window(MAIN_WIN_NAME) {
         Some(window) => {
@@ -251,7 +251,6 @@ pub fn get_main_window(center: bool, set_focus: bool) -> tauri::Window {
             .min_inner_size(540.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
-            .center()
             .focused(false)
             .title("OpenAI Translator");
 
@@ -273,7 +272,7 @@ pub fn get_main_window(center: bool, set_focus: bool) -> tauri::Window {
         if !cfg!(target_os = "macos") {
             window.unminimize().unwrap();
         }
-    } else if !center {
+    } else if to_mouse_position {
         let (mouse_logical_x, mouse_logical_y): (i32, i32) = get_mouse_location().unwrap();
         let window_physical_size = window.outer_size().unwrap();
         let scale_factor = window.scale_factor().unwrap_or(1.0);
@@ -316,7 +315,7 @@ pub fn get_main_window(center: bool, set_focus: bool) -> tauri::Window {
         debug_println!("Window physical size: {:?}", window_physical_size);
         debug_println!("Window physical position: {:?}", window_physical_position);
         window.set_position(window_physical_position).unwrap();
-    } else {
+    } else if center {
         if !cfg!(target_os = "macos") {
             window.unminimize().unwrap();
         }

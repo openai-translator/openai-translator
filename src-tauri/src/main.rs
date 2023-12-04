@@ -12,7 +12,9 @@ mod tray;
 mod utils;
 mod windows;
 
+use config::get_config;
 use parking_lot::Mutex;
+use tauri_plugin_updater::UpdaterExt;
 use windows::get_main_window;
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -278,6 +280,7 @@ fn main() {
                 .show()
                 .unwrap();
         }))
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--silently"]),
@@ -286,15 +289,15 @@ fn main() {
         .setup(move |app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
-            tray::create_tray(&app_handle)?;
+            tray::create_tray(&app_handle, false)?;
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
-                let window = get_main_window(false, false);
+                let window = get_main_window(false, false, false);
                 window.unminimize().unwrap();
                 window.hide().unwrap();
             } else {
-                let window = get_main_window(false, false);
+                let window = get_main_window(false, false, false);
                 window.set_focus().unwrap();
                 window.show().unwrap();
             }
@@ -324,6 +327,42 @@ fn main() {
                     launch_ipc_server(&server);
                 }
             });
+
+            let handle = app.handle().clone();
+            let config = get_config().unwrap();
+            if config.automatic_check_for_updates.is_none() || config.automatic_check_for_updates.is_some_and(|x| x == true) {
+                tauri::async_runtime::spawn(async move {
+                    let mut builder = handle.updater_builder();
+                    let updater = builder.build().unwrap();
+
+                    match updater.check().await {
+                        Ok(Some(_)) => {
+                            tray::create_tray(&handle, true).unwrap();
+                            show_updater_window();
+                        }
+                        Ok(None) => {}
+                        Err(_) => {}
+                    }
+                });
+            }
+
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(10));
+                    let mut builder = handle.updater_builder();
+                    let updater = builder.build().unwrap();
+
+                    match updater.check().await {
+                        Ok(Some(_)) => {
+                            tray::create_tray(&handle, true).unwrap();
+                        }
+                        Ok(None) => {}
+                        Err(_) => {}
+                    }
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

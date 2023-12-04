@@ -13,7 +13,6 @@ import { translate } from '../common/translate'
 import { detectLang, intoLangCode } from '../common/lang'
 import { useSettings } from '../common/hooks/useSettings'
 import { setupAnalysis } from '../common/analysis'
-import { check } from '@tauri-apps/plugin-updater'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -32,17 +31,6 @@ export function App() {
     const [showSettings, setShowSettings] = useState(false)
 
     useMemoWindow({ size: true, position: false })
-
-    useEffect(() => {
-        check().then((result) => {
-            if (!result) {
-                return
-            }
-            if (result.currentVersion !== result.version) {
-                invoke('show_updater_window')
-            }
-        })
-    }, [])
 
     useEffect(() => {
         setupAnalysis()
