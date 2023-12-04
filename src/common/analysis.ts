@@ -23,7 +23,12 @@ export async function doSetupAnalysis() {
     if (isDesktopApp()) {
         Sentry.init({
             dsn: 'https://477519542bd6491cb347ca3f55fcdce6@o441417.ingest.sentry.io/4505051776090112',
-            integrations: [new Sentry.BrowserTracing(), new Sentry.Replay()],
+            integrations: [
+                new Sentry.BrowserTracing({
+                    traceFetch: false,
+                }),
+                new Sentry.Replay(),
+            ],
             // Performance Monitoring
             tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
             // Session Replay
