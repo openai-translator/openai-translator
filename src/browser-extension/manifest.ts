@@ -30,6 +30,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             {
                 matches: ['<all_urls>'],
                 all_frames: true,
+                match_about_blank: true,
                 js: ['src/browser-extension/content_script/index.tsx'],
             },
         ],
