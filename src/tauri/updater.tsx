@@ -28,6 +28,7 @@ const useStyles = createUseStyles({
 })
 
 export function UpdaterWindow() {
+    const { theme, themeType } = useTheme()
     const styles = useStyles()
     const [isChecking, setIsChecking] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
@@ -46,8 +47,6 @@ export function UpdaterWindow() {
             })
     }, [])
 
-    const { theme, themeType } = useTheme()
-
     return (
         <Window>
             <div
@@ -62,6 +61,7 @@ export function UpdaterWindow() {
             >
                 <div
                     style={{
+                        color: theme.colors.contentPrimary,
                         position: 'fixed',
                         top: 0,
                         left: 0,
@@ -92,6 +92,7 @@ export function UpdaterWindow() {
                 <div
                     style={{
                         flexGrow: 1,
+                        color: theme.colors.contentPrimary,
                         display: 'flex',
                         justifyContent: 'center',
                         padding: '0px 20px 20px 20px',
