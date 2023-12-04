@@ -30,7 +30,7 @@ export function App() {
     const [isPinned, setPinned] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
 
-    useMemoWindow({ size: true, position: false })
+    useMemoWindow()
 
     useEffect(() => {
         setupAnalysis()
