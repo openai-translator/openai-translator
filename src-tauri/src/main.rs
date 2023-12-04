@@ -290,11 +290,11 @@ fn main() {
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
-                let window = get_main_window(true, false);
+                let window = get_main_window(false, false);
                 window.unminimize().unwrap();
                 window.hide().unwrap();
             } else {
-                let window = get_main_window(true, false);
+                let window = get_main_window(false, false);
                 window.set_focus().unwrap();
                 window.show().unwrap();
             }
