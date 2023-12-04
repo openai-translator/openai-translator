@@ -64,7 +64,7 @@ import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
-import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
+import { useTranslatorStore, setEditableText, setOriginalText } from '../store'
 import Toaster from './Toaster'
 import { readBinaryFile } from '@tauri-apps/plugin-fs'
 import { getCurrent } from '@tauri-apps/api/window'
@@ -715,7 +715,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp(), showLogo })
     const [isLoading, setIsLoading] = useState(false)
-    const { editableText, originalText, detectedOriginalText } = useTranslatorStore()
+    const { editableText, originalText } = useTranslatorStore()
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [tokenCount, setTokenCount] = useState(0)
     const [translatedText, setTranslatedText] = useState('')
@@ -733,8 +733,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [props.text, props.uuid])
 
     useEffect(() => {
-        setEditableText(detectedOriginalText)
-    }, [detectedOriginalText])
+        setEditableText(originalText)
+    }, [originalText])
 
     useLazyEffect(
         () => {
@@ -789,25 +789,38 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
 
         ;(async () => {
-            const sourceLang_ = await detectLang(originalText)
-            setSourceLang(sourceLang_)
+            const newSourceLang = await detectLang(originalText)
+            setSourceLang(newSourceLang)
             setTargetLang((targetLang_) => {
-                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
-                    return (
-                        (sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
-                            ? 'en'
-                            : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
-                    )
-                }
-                if (!targetLang_) {
-                    if (settings?.defaultTargetLanguage) {
-                        return settings.defaultTargetLanguage as LangCode
+                const newTargetLang = (() => {
+                    if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || newSourceLang === targetLang_)) {
+                        return (
+                            (newSourceLang === 'zh-Hans' || newSourceLang === 'zh-Hant'
+                                ? 'en'
+                                : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
+                        )
                     }
-                    return sourceLang_
-                }
-                return targetLang_
+                    if (!targetLang_) {
+                        if (settings?.defaultTargetLanguage) {
+                            return settings.defaultTargetLanguage as LangCode
+                        }
+                        return newSourceLang
+                    }
+                    return targetLang_
+                })()
+                setTranslateDeps((oldV) => {
+                    const newV = {
+                        sourceLang: newSourceLang,
+                        targetLang: newTargetLang,
+                        text: originalText,
+                    }
+                    if (_.isEqual(oldV, newV)) {
+                        return oldV
+                    }
+                    return newV
+                })
+                return newTargetLang
             })
-            setDetectedOriginalText(originalText)
         })()
     }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, props.uuid])
 
@@ -911,13 +924,25 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             console.info(`Auto collecting word: ${editableText}`)
         }
     }, [isWordMode, isAutoCollectOn, editableText, onWordCollection, checkWordCollection])
+
     const autoCollectRef = useRef(autoCollect)
     useEffect(() => {
         autoCollectRef.current = autoCollect
     }, [autoCollect])
 
+    const [translateDeps, setTranslateDeps] = useState<{
+        sourceLang?: LangCode
+        targetLang?: LangCode
+        text?: string
+    }>({
+        sourceLang: undefined,
+        targetLang: undefined,
+        text: undefined,
+    })
+
     const translateText = useCallback(
-        async (text: string, selectedWord: string, writing: boolean, signal: AbortSignal) => {
+        async (selectedWord: string, signal: AbortSignal) => {
+            const { text, sourceLang, targetLang } = translateDeps
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
                 return
             }
@@ -1035,8 +1060,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
         },
         [
-            sourceLang,
-            targetLang,
+            translateDeps,
             activateAction?.id,
             currentTranslateMode,
             settings?.provider,
@@ -1050,16 +1074,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translateControllerRef = useRef<AbortController | null>(null)
     useEffect(() => {
-        if (editableText !== detectedOriginalText) {
-            return
-        }
         translateControllerRef.current = new AbortController()
         const { signal } = translateControllerRef.current
-        translateText(detectedOriginalText, selectedWord, props.writing ?? false, signal)
+        translateText(selectedWord, signal)
         return () => {
             translateControllerRef.current?.abort()
         }
-    }, [translateText, editableText, detectedOriginalText, selectedWord, props.writing])
+    }, [translateText, selectedWord])
 
     useEffect(() => {
         if (!props.defaultShowSettings) {
@@ -1378,13 +1399,19 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     onChange={({ value }) => {
                                         const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
                                         setSourceLang(langId as LangCode)
+                                        setTranslateDeps((v) => {
+                                            return {
+                                                ...v,
+                                                sourceLang: langId as LangCode,
+                                            }
+                                        })
                                     }}
                                 />
                             </div>
                             <div
                                 className={styles.arrow}
                                 onClick={() => {
-                                    setDetectedOriginalText(translatedText)
+                                    setOriginalText(translatedText)
                                     setSourceLang(targetLang ?? 'en')
                                     setTargetLang(sourceLang)
                                 }}
@@ -1413,6 +1440,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         stopAutomaticallyChangeTargetLang.current = true
                                         const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
                                         setTargetLang(langId as LangCode)
+                                        setTranslateDeps((v) => {
+                                            return {
+                                                ...v,
+                                                targetLang: langId as LangCode,
+                                            }
+                                        })
                                     }}
                                 />
                             </div>
@@ -1689,9 +1722,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 display: 'flex',
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
-                                                paddingTop:
-                                                    editableText && editableText !== detectedOriginalText ? 8 : 0,
-                                                height: editableText && editableText !== detectedOriginalText ? 28 : 0,
+                                                paddingTop: editableText && editableText !== originalText ? 8 : 0,
+                                                height: editableText && editableText !== originalText ? 28 : 0,
                                                 transition: 'all 0.3s linear',
                                                 overflow: 'hidden',
                                             }}
@@ -1847,7 +1879,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 )}
                             </div>
                         </div>
-                        {detectedOriginalText !== '' && (
+                        {originalText !== '' && (
                             <div
                                 className={styles.popupCardTranslatedContainer}
                                 ref={translatedContainerRef}
