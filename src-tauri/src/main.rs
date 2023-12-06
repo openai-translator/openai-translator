@@ -49,9 +49,21 @@ pub static PREVIOUS_RELEASE_POSITION: Mutex<(i32, i32)> = Mutex::new((0, 0));
 pub static RELEASE_THREAD_ID: Mutex<u32> = Mutex::new(0);
 
 #[derive(Clone, serde::Serialize)]
-struct Payload {
-    args: Vec<String>,
-    cwd: String,
+#[serde(rename_all = "camelCase")]
+pub struct UpdateResult {
+    version: String,
+    current_version: String,
+    body: Option<String>,
+}
+
+pub static UPDATE_RESULT: Mutex<Option<Option<UpdateResult>>> = Mutex::new(None);
+
+#[tauri::command]
+fn get_update_result() -> (bool, Option<UpdateResult>) {
+    if UPDATE_RESULT.lock().is_none() {
+        return (false, None);
+    }
+    return (true, UPDATE_RESULT.lock().clone().unwrap());
 }
 
 #[cfg(target_os = "macos")]
@@ -287,7 +299,7 @@ fn main() {
         .setup(move |app| {
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
-            tray::create_tray(&app_handle, false)?;
+            tray::create_tray(&app_handle)?;
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
@@ -334,10 +346,24 @@ fn main() {
                     let updater = builder.build().unwrap();
 
                     match updater.check().await {
-                        Ok(Some(_)) => {
-                            tray::create_tray(&handle, true).unwrap();
+                        Ok(Some(update)) => {
+                            *UPDATE_RESULT.lock() = Some(Some(UpdateResult{
+                                version: update.version,
+                                current_version: update.current_version,
+                                body: update.body,
+                            }));
+                            tray::create_tray(&handle).unwrap();
                         }
-                        Ok(None) => {}
+                        Ok(None) => {
+                            if UPDATE_RESULT.lock().is_some() {
+                                if let Some(Some(_)) = *UPDATE_RESULT.lock() {
+                                    *UPDATE_RESULT.lock() = Some(None);
+                                    tray::create_tray(&handle).unwrap();
+                                }
+                            } else {
+                                *UPDATE_RESULT.lock() = Some(None);
+                            }
+                        }
                         Err(_) => {}
                     }
                 }
@@ -346,6 +372,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            get_update_result,
             get_config_content,
             clear_config_cache,
             windows::show_main_window_command,
@@ -377,15 +404,29 @@ fn main() {
                     let updater = builder.build().unwrap();
 
                     match updater.check().await {
-                        Ok(Some(_)) => {
-                            tray::create_tray(&handle, true).unwrap();
+                        Ok(Some(update)) => {
+                            *UPDATE_RESULT.lock() = Some(Some(UpdateResult{
+                                version: update.version,
+                                current_version: update.current_version,
+                                body: update.body,
+                            }));
+                            tray::create_tray(&handle).unwrap();
                             let config = get_config().unwrap();
                             if config.automatic_check_for_updates.is_none() || config.automatic_check_for_updates.is_some_and(|x| x == true) {
                                 std::thread::sleep(std::time::Duration::from_secs(3));
                                 show_updater_window();
                             }
                         }
-                        Ok(None) => {}
+                        Ok(None) => {
+                            if UPDATE_RESULT.lock().is_some() {
+                                if let Some(Some(_)) = *UPDATE_RESULT.lock() {
+                                    *UPDATE_RESULT.lock() = Some(None);
+                                    tray::create_tray(&handle).unwrap();
+                                }
+                            } else {
+                                *UPDATE_RESULT.lock() = Some(None);
+                            }
+                        }
                         Err(_) => {}
                     }
                 });
