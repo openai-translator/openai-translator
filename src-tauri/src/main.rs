@@ -76,7 +76,7 @@ fn launch_ipc_server(server: &Server) {
         let mut selected_text = String::new();
         req.as_reader().read_to_string(&mut selected_text).unwrap();
         utils::send_text(selected_text);
-        let window = windows::show_main_window(false, false);
+        let window = windows::show_main_window(false, true, false);
         window.set_focus().unwrap();
         utils::show();
         let response = HttpResponse::from_string("ok");
@@ -230,7 +230,7 @@ fn main() {
                     windows::close_thumb();
                     let selected_text = (*SELECTED_TEXT.lock()).to_string();
                     if !selected_text.is_empty() {
-                        let window = windows::show_main_window(false, false);
+                        let window = windows::show_main_window(false, true, false);
                         utils::send_text(selected_text);
                         if cfg!(target_os = "windows") {
                             window.set_always_on_top(true).unwrap();
@@ -348,6 +348,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_config_content,
             clear_config_cache,
+            windows::show_main_window_command,
             show_main_window_with_selected_text,
             show_action_manager_window,
             show_updater_window,

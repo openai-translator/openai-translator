@@ -65,6 +65,7 @@ export interface ISettings {
     defaultTargetLanguage: string
     alwaysShowIcons: boolean
     hotkey?: string
+    displayWindowHotkey?: string
     ocrHotkey?: string
     writingTargetLanguage: string
     writingHotkey?: string

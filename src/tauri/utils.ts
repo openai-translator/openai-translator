@@ -15,6 +15,19 @@ export async function bindHotkey(oldHotKey?: string) {
     })
 }
 
+export async function bindDisplayWindowHotkey(oldHotKey?: string) {
+    if (oldHotKey && (await isRegistered(oldHotKey))) {
+        await unregister(oldHotKey)
+    }
+    const settings = await getSettings()
+    if (!settings.displayWindowHotkey) return
+    await register(settings.displayWindowHotkey, () => {
+        invoke('show_main_window_command')
+    }).then(() => {
+        console.log('register display window hotkey success')
+    })
+}
+
 export async function bindOCRHotkey(oldOCRHotKey?: string) {
     if (oldOCRHotKey && (await isRegistered(oldOCRHotKey))) {
         await unregister(oldOCRHotKey)
