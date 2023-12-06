@@ -3,7 +3,7 @@ import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/primitives'
-import { bindHotkey, bindOCRHotkey, bindWritingHotkey } from './utils'
+import { bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey } from './utils'
 import { useMemoWindow } from '../common/hooks/useMemoWindow'
 import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../common/constants'
@@ -122,6 +122,7 @@ export function App() {
 
     useEffect(() => {
         bindHotkey()
+        bindDisplayWindowHotkey()
         bindOCRHotkey()
         bindWritingHotkey()
     }, [])
@@ -147,6 +148,7 @@ export function App() {
                 onSettingsSave={(oldSettings) => {
                     invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
+                    bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)
                     bindWritingHotkey(oldSettings.writingHotkey)
                 }}

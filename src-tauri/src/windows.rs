@@ -9,6 +9,7 @@ use mouse_position::mouse_position::Mouse;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use enigo::*;
+#[cfg(not(target_os = "macos"))]
 use window_shadows::set_shadow;
 
 pub const MAIN_WIN_NAME: &str = "main";
@@ -49,7 +50,7 @@ pub fn get_main_window_always_on_top() -> bool {
 
 #[tauri::command]
 pub fn show_main_window_with_selected_text() {
-    let mut window = show_main_window(false, false);
+    let mut window = show_main_window(false, true, false);
     let mut enigo = Enigo::new();
     let selected_text;
     if cfg!(target_os = "macos") {
@@ -72,7 +73,7 @@ pub fn show_main_window_with_selected_text() {
     if !selected_text.is_empty() {
         utils::send_text(selected_text);
     } else {
-        window = show_main_window(true, false);
+        window = show_main_window(true, false, false);
     }
 
     window.set_focus().unwrap();
@@ -224,8 +225,13 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
     }
 }
 
-pub fn show_main_window(center: bool, set_focus: bool) -> tauri::Window {
-    let window = get_main_window(center, true, set_focus);
+#[tauri::command]
+pub fn show_main_window_command() {
+    show_main_window(false, false, true);
+}
+
+pub fn show_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -> tauri::Window {
+    let window = get_main_window(center, to_mouse_position, set_focus);
     window.show().unwrap();
     window
 }

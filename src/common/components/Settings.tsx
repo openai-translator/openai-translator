@@ -1089,6 +1089,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         defaultTargetLanguage: utils.defaultTargetLanguage,
         alwaysShowIcons: !isTauri,
         hotkey: '',
+        displayWindowHotkey: '',
         i18n: utils.defaulti18n,
         restorePreviousPosition: false,
         selectInputElementsText: utils.defaultSelectInputElementsText,
@@ -1782,6 +1783,9 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     >
                         <FormItem name='hotkey' label={t('Hotkey')}>
                             <HotkeyRecorder onBlur={onBlur} testId='hotkey-recorder' />
+                        </FormItem>
+                        <FormItem name='displayWindowHotkey' label={t('Display window Hotkey')}>
+                            <HotkeyRecorder onBlur={onBlur} testId='display-window-hotkey-recorder' />
                         </FormItem>
                         <FormItem
                             style={{
