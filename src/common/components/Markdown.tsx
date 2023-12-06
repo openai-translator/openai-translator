@@ -1,7 +1,5 @@
 import ReactMarkdown from 'react-markdown'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import oneDark from 'react-syntax-highlighter/dist/esm/styles/prism/one-dark'
-import oneLight from 'react-syntax-highlighter/dist/esm/styles/prism/one-light'
+import { CodeBlock } from './CodeBlock'
 import { useTheme } from '../hooks/useTheme'
 
 export interface IMarkdownProps {
@@ -9,28 +7,36 @@ export interface IMarkdownProps {
 }
 
 export function Markdown({ children }: IMarkdownProps) {
-    const { themeType } = useTheme()
+    const { theme } = useTheme()
 
     return (
         <ReactMarkdown
             components={{
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 code({ node, inline, className, children, ...props }) {
+                    if (inline) {
+                        return (
+                            <code
+                                {...props}
+                                className={className}
+                                style={{
+                                    backgroundColor: theme.colors.backgroundSecondary,
+                                    color: theme.colors.contentSecondary,
+                                    padding: '0.2rem',
+                                    borderRadius: '0.2rem',
+                                }}
+                            >
+                                {children}
+                            </code>
+                        )
+                    }
                     const match = /language-(\w+)/.exec(className || '')
-                    return !inline && match ? (
-                        <SyntaxHighlighter
-                            {...props}
-                            style={themeType === 'dark' ? oneDark : oneLight}
-                            language={match[1]}
-                            PreTag='div'
-                        >
-                            {String(children).replace(/\n$/, '')}
-                        </SyntaxHighlighter>
-                    ) : (
-                        <code {...props} className={className}>
-                            {children}
-                        </code>
-                    )
+                    let language = 'text'
+                    if (match) {
+                        language = match[1]
+                    }
+                    const code = (children as string[])[0]
+                    return <CodeBlock code={code} language={language} />
                 },
             }}
         >

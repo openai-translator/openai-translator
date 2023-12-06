@@ -274,6 +274,9 @@ const useStyles = createUseStyles({
             '-webkit-user-select': 'text',
             'user-select': 'text',
         },
+        '& > div': {
+            width: '100%',
+        },
     }),
     'errorMessage': {
         'display': 'flex',
