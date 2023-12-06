@@ -30,21 +30,32 @@ const useStyles = createUseStyles({
 export function UpdaterWindow() {
     const { theme, themeType } = useTheme()
     const styles = useStyles()
-    const [isChecking, setIsChecking] = useState(false)
+    const [isChecking, setIsChecking] = useState(true)
     const [isDownloading, setIsDownloading] = useState(false)
-    const [checkResult, setCheckResult] = useState<Update | null>(null)
+    const [checkResult, setCheckResult] = useState<{
+        version: string
+        currentVersion: string
+        body?: string
+    } | null>(null)
     const [progress, setProgress] = useState(0)
     const { t } = useTranslation()
 
     useEffect(() => {
         setIsChecking(true)
-        check()
-            .then((result) => {
+        invoke<[boolean, Update]>('get_update_result').then(([exists, result]) => {
+            if (exists) {
                 setCheckResult(result)
-            })
-            .finally(() => {
                 setIsChecking(false)
-            })
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        setIsChecking(true)
+        check().then((result) => {
+            setCheckResult(result)
+            setIsChecking(false)
+        })
     }, [])
 
     return (
@@ -66,7 +77,7 @@ export function UpdaterWindow() {
                         top: 0,
                         left: 0,
                         width: '100%',
-                        height: '80px',
+                        height: '90px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -78,8 +89,9 @@ export function UpdaterWindow() {
                         gap: '10px',
                         zIndex: 1,
                     }}
+                    data-tauri-drag-region
                 >
-                    <img data-tauri-drag-region className={styles.icon} src={getAssetUrl(icon)} />
+                    <img className={styles.icon} src={getAssetUrl(icon)} />
                     OpenAI Translator {t('Updater')}
                 </div>
                 <div
