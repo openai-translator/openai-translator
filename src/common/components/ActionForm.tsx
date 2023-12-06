@@ -5,7 +5,7 @@ import { createForm } from './Form'
 import { Input } from 'baseui-sd/input'
 import { Textarea } from 'baseui-sd/textarea'
 import { Button } from 'baseui-sd/button'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { actionService } from '../services/action'
 import { createUseStyles } from 'react-jss'
 import { IThemedStyleProps } from '../types'
@@ -116,8 +116,17 @@ export function ActionForm(props: IActionFormProps) {
         </div>
     )
 
+    const [values, setValues] = useState<ICreateActionOption | undefined>(props.action)
+    useEffect(() => {
+        setValues(props.action)
+    }, [props.action])
+
+    const handleValuesChange = useCallback((_changes: Partial<ICreateActionOption>, values: ICreateActionOption) => {
+        setValues(values)
+    }, [])
+
     return (
-        <Form initialValues={props.action} onFinish={onSubmit}>
+        <Form initialValues={values} onValuesChange={handleValuesChange} onFinish={onSubmit}>
             <FormItem required name='name' label={t('Name')}>
                 <Input size='compact' />
             </FormItem>
@@ -125,10 +134,32 @@ export function ActionForm(props: IActionFormProps) {
                 <IconPicker />
             </FormItem>
             <FormItem required name='rolePrompt' label={t('Role Prompt')} caption={rolePromptCaption}>
-                <Textarea size='compact' />
+                <Textarea
+                    rows={4}
+                    overrides={{
+                        Root: {
+                            style: {
+                                width: '100%',
+                            },
+                        },
+                    }}
+                    size='compact'
+                    resize='vertical'
+                />
             </FormItem>
             <FormItem required name='commandPrompt' label={t('Command Prompt')} caption={commandPromptCaption}>
-                <Textarea size='compact' />
+                <Textarea
+                    rows={4}
+                    overrides={{
+                        Root: {
+                            style: {
+                                width: '100%',
+                            },
+                        },
+                    }}
+                    size='compact'
+                    resize='vertical'
+                />
             </FormItem>
             <FormItem name='outputRenderingFormat' label={t('Output rendering format')}>
                 <RenderingFormatSelector />
