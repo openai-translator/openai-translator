@@ -23,13 +23,13 @@ use tauri_plugin_autostart::MacosLauncher;
 
 use crate::config::{clear_config_cache, get_config_content};
 use crate::lang::detect_lang;
-use crate::ocr::ocr;
 use crate::fetch::fetch_stream;
-use crate::writing::{writing, write_to_input, finish_writing};
+use crate::ocr::ocr_command;
+use crate::writing::{writing_command, write_to_input, finish_writing};
 use crate::windows::{
-    get_main_window_always_on_top, set_main_window_always_on_top, show_action_manager_window,
-    show_main_window_with_selected_text, MAIN_WIN_NAME,
-    show_updater_window, close_updater_window,
+    get_main_window_always_on_top, show_action_manager_window,
+    show_main_window_with_selected_text_command, MAIN_WIN_NAME,
+    show_updater_window, close_updater_window, show_main_window_command,
 };
 
 use mouce::Mouse;
@@ -375,16 +375,14 @@ fn main() {
             get_update_result,
             get_config_content,
             clear_config_cache,
-            windows::show_main_window_command,
-            show_main_window_with_selected_text,
+            show_main_window_command,
+            show_main_window_with_selected_text_command,
             show_action_manager_window,
-            show_updater_window,
             close_updater_window,
             get_main_window_always_on_top,
-            set_main_window_always_on_top,
-            ocr,
+            ocr_command,
             fetch_stream,
-            writing,
+            writing_command,
             write_to_input,
             finish_writing,
             detect_lang,

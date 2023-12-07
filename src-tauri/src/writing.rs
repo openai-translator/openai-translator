@@ -29,7 +29,7 @@ struct IncrementalAction {
 static INCREMENTAL_ACTIONS: Mutex<Vec<IncrementalAction>> = Mutex::new(Vec::new());
 
 #[tauri::command]
-pub fn writing() {
+pub fn writing_command() {
     let is_writing = IS_WRITING.lock();
     if *is_writing {
         return;
