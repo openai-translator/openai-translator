@@ -255,7 +255,7 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
                 }
             }
             enigo.key_sequence(&char);
-            thread::sleep(Duration::from_millis(20));
+            thread::sleep(Duration::from_millis(5));
         }
     } else {
         enigo.key_sequence(&text);
