@@ -1021,7 +1021,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     onStatusCode: (statusCode) => {
                         setIsNotLogin(statusCode === 401 || statusCode === 403)
                     },
-                    onMessage: (message) => {
+                    onMessage: async (message) => {
                         if (!message.content) {
                             return
                         }

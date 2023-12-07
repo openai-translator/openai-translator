@@ -13,7 +13,7 @@ export interface IMessageRequest {
     rolePrompt: string
     commandPrompt: string
     assistantPrompts?: string[]
-    onMessage: (message: { content: string; role: string; isFullText?: boolean }) => void
+    onMessage: (message: { content: string; role: string; isFullText?: boolean }) => Promise<void>
     onError: (error: string) => void
     onFinished: (reason: string) => void
     onStatusCode?: (statusCode: number) => void

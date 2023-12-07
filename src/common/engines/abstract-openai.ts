@@ -87,7 +87,7 @@ export abstract class AbstractOpenAI implements IEngine {
             headers,
             body: JSON.stringify(body),
             signal: req.signal,
-            onMessage: (msg) => {
+            onMessage: async (msg) => {
                 if (finished) return
                 let resp
                 try {
@@ -102,7 +102,7 @@ export abstract class AbstractOpenAI implements IEngine {
 
                 const { choices } = resp
                 if (!choices || choices.length === 0) {
-                    return { error: 'No result' }
+                    return
                 }
                 const { finish_reason: finishReason } = choices[0]
                 if (finishReason) {
@@ -116,13 +116,13 @@ export abstract class AbstractOpenAI implements IEngine {
                     // It's used for Azure OpenAI Service's legacy parameters.
                     targetTxt = choices[0].text
 
-                    req.onMessage({ content: targetTxt, role: '' })
+                    await req.onMessage({ content: targetTxt, role: '' })
                 } else {
                     const { content = '', role } = choices[0].delta
 
                     targetTxt = content
 
-                    req.onMessage({ content: targetTxt, role })
+                    await req.onMessage({ content: targetTxt, role })
                 }
             },
             onError: (err) => {
