@@ -8,7 +8,7 @@ import { getLangConfig, LangCode } from './components/lang/lang'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { oneLine } from 'common-tags'
-import { getArkoseToken } from '../../public/index'
+import { getArkoseToken } from './arkose/index'
 export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
@@ -340,7 +340,11 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
-            const arkoseToken = await getArkoseToken()
+            let arkoseToken: string | null = null
+            // 优先通过存储在本地存储中的token，无法获取时调用函数生成。
+            if (settings.apiModel.startsWith('gpt-4')) {
+                arkoseToken = localStorage.getItem('arkose') || (await getArkoseToken())
+            }
             body = {
                 action: 'next',
                 messages: [
@@ -475,7 +479,6 @@ export class WebAPI {
                 },
             })
             //  set title
-
             if (settings.chatContext === false) {
                 await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
                     method: 'PATCH',

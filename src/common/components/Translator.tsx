@@ -1134,6 +1134,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         })
     }
 
+    const tokenRemovedEvent = new Event('tokenRegenerate')
+
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1459,6 +1461,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             )
                                                         }
                                                         setOriginalText(editableText)
+                                                        if (tokenRemovedEvent) {
+                                                            document.dispatchEvent(tokenRemovedEvent);
+                                                                            }
                                                     }
                                                 }
                                             }}
@@ -1511,6 +1516,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             )
                                                         }
                                                         setOriginalText(editableText)
+                                                        if (tokenRemovedEvent) {
+                                                            document.dispatchEvent(tokenRemovedEvent);
+                                                                            }
                                                     }}
                                                     startEnhancer={<IoIosRocket size={13} />}
                                                     overrides={{
