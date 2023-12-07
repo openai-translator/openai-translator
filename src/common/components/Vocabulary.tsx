@@ -270,7 +270,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                 signal,
                 text: str,
                 articlePrompt: prompt || '',
-                onMessage: (message) => {
+                onMessage: async (message) => {
                     if (!message.content) {
                         return
                     }

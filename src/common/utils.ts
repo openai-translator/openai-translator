@@ -257,7 +257,7 @@ export async function exportToCsv<T extends Record<string, string | number>>(fil
 }
 
 interface FetchSSEOptions extends RequestInit {
-    onMessage(data: string): void
+    onMessage(data: string): Promise<void>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
@@ -267,9 +267,9 @@ interface FetchSSEOptions extends RequestInit {
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const { onMessage, onError, onStatusCode, fetcher = getUniversalFetch(), ...fetchOptions } = options
 
-    const parser = createParser((event) => {
+    const parser = createParser(async (event) => {
         if (event.type === 'event') {
-            onMessage(event.data)
+            await onMessage(event.data)
         }
     })
 

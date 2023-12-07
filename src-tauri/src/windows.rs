@@ -140,9 +140,6 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
                 .skip_taskbar(true)
                 .decorations(false);
 
-            #[cfg(not(target_os = "macos"))]
-            let builder = builder.transparent(true);
-
             let window = build_window(builder);
 
             window.unminimize().unwrap();
@@ -208,7 +205,7 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 
     #[cfg(target_os = "windows")]
     {
-        let window = builder.decorations(false).build().unwrap();
+        let window = builder.transparent(true).decorations(false).build().unwrap();
 
         set_shadow(&window, true).unwrap();
 
@@ -217,7 +214,7 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 
     #[cfg(target_os = "linux")]
     {
-        let window = builder.decorations(false).build().unwrap();
+        let window = builder.transparent(true).decorations(false).build().unwrap();
 
         set_shadow(&window, true).unwrap();
 

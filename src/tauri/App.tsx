@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Translator } from '../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
@@ -21,6 +21,48 @@ export function App() {
     const [text, setText] = useState('')
     const [uuid, setUUID] = useState('')
     const [showSettings, setShowSettings] = useState(false)
+    const writingQueue = useRef<Array<string | number>>([])
+    const isWriting = useRef(false)
+
+    const [writingFlag, writing] = useReducer((x: number) => x + 1, 0)
+
+    useEffect(() => {
+        if (isWriting.current) {
+            return
+        }
+        if (writingQueue.current.length > 0) {
+            isWriting.current = true
+            const buffer = []
+            let isFinished = false
+            while (writingQueue.current.length > 0) {
+                const text = writingQueue.current.shift()
+                if (typeof text === 'string') {
+                    buffer.push(text)
+                } else {
+                    isFinished = true
+                    break
+                }
+            }
+            if (buffer.length > 0) {
+                invoke('write_to_input', { text: buffer.join('') }).finally(() => {
+                    if (isFinished) {
+                        invoke('finish_writing').finally(() => {
+                            isWriting.current = false
+                            writing()
+                        })
+                    } else {
+                        isWriting.current = false
+                        writing()
+                    }
+                })
+            } else if (isFinished) {
+                invoke('finish_writing').finally(() => {
+                    isWriting.current = false
+                    writing()
+                })
+            }
+        }
+    }, [writingFlag])
 
     useMemoWindow({ size: true, position: false })
 
@@ -86,19 +128,20 @@ export function App() {
                         text: inputText,
                         detectFrom: sourceLang,
                         detectTo: targetLang,
-                        onMessage: (message) => {
+                        onMessage: async (message) => {
                             if (!message.content) {
                                 return
                             }
-                            invoke('write_to_input', {
-                                text: message.content,
-                            })
+                            writingQueue.current.push(message.content)
+                            writing()
                         },
                         onFinish: () => {
-                            invoke('finish_writing')
+                            writingQueue.current.push(0)
+                            writing()
                         },
                         onError: () => {
-                            invoke('finish_writing')
+                            writingQueue.current.push(0)
+                            writing()
                         },
                     })
                 }

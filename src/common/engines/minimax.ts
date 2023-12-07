@@ -59,7 +59,7 @@ export class MiniMax implements IEngine {
             headers,
             body: JSON.stringify(body),
             signal: req.signal,
-            onMessage: (msg) => {
+            onMessage: async (msg) => {
                 if (finished) return
                 let resp
                 try {
@@ -73,7 +73,7 @@ export class MiniMax implements IEngine {
 
                 const { choices } = resp
                 if (!choices || choices.length === 0) {
-                    return { error: 'No result' }
+                    return
                 }
                 const { finish_reason: finishReason } = choices[0]
                 if (finishReason) {
@@ -85,7 +85,7 @@ export class MiniMax implements IEngine {
                 for (const msg of choices[0].messages) {
                     const targetTxt = msg.text
 
-                    req.onMessage({ content: targetTxt, role: '' })
+                    await req.onMessage({ content: targetTxt, role: '' })
                 }
             },
             onError: (err) => {

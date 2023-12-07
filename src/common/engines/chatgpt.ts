@@ -119,7 +119,7 @@ export class ChatGPT implements IEngine {
             onStatusCode: (status) => {
                 req.onStatusCode?.(status)
             },
-            onMessage: (msg) => {
+            onMessage: async (msg) => {
                 if (finished) return
                 let resp
                 try {
@@ -148,7 +148,7 @@ export class ChatGPT implements IEngine {
                 if (author.role === 'assistant') {
                     const targetTxt = content.parts.join('')
                     const textDelta = targetTxt.slice(length)
-                    req.onMessage({ content: textDelta, role: '' })
+                    await req.onMessage({ content: textDelta, role: '' })
                     length = targetTxt.length
                 }
             },

@@ -30,7 +30,7 @@ interface BaseTranslateQuery {
     detectTo: LangCode
     mode?: Exclude<TranslateMode, 'big-bang'>
     action: Action
-    onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
+    onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => Promise<void>
     onError: (error: string) => void
     onFinish: (reason: string) => void
     onStatusCode?: (statusCode: number) => void
@@ -404,8 +404,8 @@ If you understand, say "yes", and then we will begin.`
         rolePrompt,
         commandPrompt,
         assistantPrompts,
-        onMessage: (message) => {
-            query.onMessage({ ...message, isWordMode })
+        onMessage: async (message) => {
+            await query.onMessage({ ...message, isWordMode })
         },
         onFinished: (reason) => {
             query.onFinish(reason)
