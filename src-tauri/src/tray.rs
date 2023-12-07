@@ -1,4 +1,4 @@
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{Ordering, AtomicBool};
 
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 use crate::config::get_config;
@@ -10,6 +10,8 @@ use tauri::{
     tray::ClickType,
     Manager, Runtime,
 };
+
+pub static TRAY_EVENT_REGISTERED: AtomicBool = AtomicBool::new(false);
 
 pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let config = get_config().unwrap();
@@ -45,6 +47,10 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 
     let tray = app.tray().unwrap();
     tray.set_menu(Some(menu.clone()))?;
+    if TRAY_EVENT_REGISTERED.load(Ordering::Acquire) {
+        return Ok(());
+    }
+    TRAY_EVENT_REGISTERED.store(true, Ordering::Release);
     tray.on_menu_event(move |app, event| match event.id.as_ref() {
         "check_for_updates" => {
             show_updater_window();
@@ -69,12 +75,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         }
         "pin" => {
             set_main_window_always_on_top();
-            let text = pin_i.text().unwrap();
-            if text == "Pin" {
-                pin_i.set_text("Unpin").unwrap();
-            } else {
-                pin_i.set_text("Pin").unwrap();
-            }
+            create_tray(app).unwrap();
         }
         "quit" => app.exit(0),
         _ => {}
