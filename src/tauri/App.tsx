@@ -30,25 +30,38 @@ export function App() {
         if (isWriting.current) {
             return
         }
-        isWriting.current = true
-        ;(async () => {
+        if (writingQueue.current.length > 0) {
+            isWriting.current = true
+            const buffer = []
+            let isFinished = false
             while (writingQueue.current.length > 0) {
                 const text = writingQueue.current.shift()
-                try {
-                    if (typeof text === 'number') {
-                        await invoke('finish_writing')
-                    } else {
-                        await invoke('write_to_input', {
-                            text,
-                        })
-                    }
-                } catch (e) {
-                    console.error(e)
+                if (typeof text === 'string') {
+                    buffer.push(text)
+                } else {
+                    isFinished = true
+                    break
                 }
             }
-            isWriting.current = false
-            writing()
-        })()
+            if (buffer.length > 0) {
+                invoke('write_to_input', { text: buffer.join('') }).finally(() => {
+                    if (isFinished) {
+                        invoke('finish_writing').finally(() => {
+                            isWriting.current = false
+                            writing()
+                        })
+                    } else {
+                        isWriting.current = false
+                        writing()
+                    }
+                })
+            } else if (isFinished) {
+                invoke('finish_writing').finally(() => {
+                    isWriting.current = false
+                    writing()
+                })
+            }
+        }
     }, [writingFlag])
 
     useMemoWindow({ size: true, position: false })
