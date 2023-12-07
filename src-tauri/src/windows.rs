@@ -26,7 +26,6 @@ pub fn get_mouse_location() -> Result<(i32, i32), String> {
     }
 }
 
-#[tauri::command]
 pub fn set_main_window_always_on_top() -> bool {
     let handle = APP_HANDLE.get().unwrap();
     let window = handle.get_window(MAIN_WIN_NAME).unwrap();
@@ -49,7 +48,7 @@ pub fn get_main_window_always_on_top() -> bool {
 }
 
 #[tauri::command]
-pub fn show_main_window_with_selected_text() {
+pub async fn show_main_window_with_selected_text_command() {
     let mut window = show_main_window(false, true, false);
     let mut enigo = Enigo::new();
     let selected_text;
@@ -226,7 +225,7 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 }
 
 #[tauri::command]
-pub fn show_main_window_command() {
+pub async fn show_main_window_command() {
     show_main_window(false, false, true);
 }
 
@@ -332,7 +331,7 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
 }
 
 #[tauri::command]
-pub fn show_action_manager_window() {
+pub async fn show_action_manager_window() {
     let window = get_action_manager_window();
     window.show().unwrap();
 }
@@ -408,7 +407,6 @@ pub fn get_settings_window() -> tauri::Window {
     window
 }
 
-#[tauri::command]
 pub fn show_updater_window() {
     let window = get_updater_window();
     window.show().unwrap();

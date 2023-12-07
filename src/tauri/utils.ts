@@ -9,7 +9,7 @@ export async function bindHotkey(oldHotKey?: string) {
     const settings = await getSettings()
     if (!settings.hotkey) return
     await register(settings.hotkey, () => {
-        invoke('show_main_window_with_selected_text')
+        invoke('show_main_window_with_selected_text_command')
     }).then(() => {
         console.log('register hotkey success')
     })
@@ -35,7 +35,7 @@ export async function bindOCRHotkey(oldOCRHotKey?: string) {
     const settings = await getSettings()
     if (!settings.ocrHotkey) return
     await register(settings.ocrHotkey, () => {
-        invoke('ocr')
+        invoke('ocr_command')
     }).then(() => {
         console.log('OCR hotkey registered')
     })
@@ -48,7 +48,7 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
     const settings = await getSettings()
     if (!settings.writingHotkey) return
     await register(settings.writingHotkey, () => {
-        invoke('writing')
+        invoke('writing_command')
     }).then(() => {
         console.log('writing hotkey registered')
     })

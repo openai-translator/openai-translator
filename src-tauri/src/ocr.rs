@@ -40,6 +40,10 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[tauri::command]
+pub fn ocr_command() {
+    ocr();
+}
+
 pub fn ocr() {
     do_ocr().unwrap();
 }
