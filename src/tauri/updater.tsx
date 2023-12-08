@@ -264,14 +264,18 @@ export function UpdaterWindow() {
                                         try {
                                             const id = window.setInterval(() => {
                                                 setProgress((progress) => {
-                                                    const v = progress + 0.1
-                                                    if (v >= 1) {
+                                                    if (progress >= 1) {
                                                         window.clearInterval(id)
-                                                        return 0.9
+                                                        return 1
+                                                    }
+                                                    const v = progress + 0.1
+                                                    if (v >= 0.99) {
+                                                        window.clearInterval(id)
+                                                        return 0.99
                                                     }
                                                     return v
                                                 })
-                                            }, 1000)
+                                            }, 1500)
                                             const update = await check()
                                             await update?.downloadAndInstall((progress) => {
                                                 if (progress.event === 'Finished') {
