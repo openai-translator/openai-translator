@@ -219,7 +219,7 @@ export async function translate(query: TranslateQuery) {
         const toChinese = chineseLangCodes.indexOf(targetLangCode) >= 0
         const targetLangConfig = getLangConfig(targetLangCode)
         const sourceLangConfig = getLangConfig(sourceLangCode)
-        console.log('Source language is', sourceLangConfig)
+        console.debug('Source language is', sourceLangConfig)
         rolePrompt = targetLangConfig.rolePrompt
 
         switch (query.action.mode) {
@@ -242,7 +242,9 @@ export async function translate(query: TranslateQuery) {
                     .replace('${targetLang}', targetLangName)
                     .replace('${text}', query.text)
                 if (query.action.outputRenderingFormat) {
-                    commandPrompt += `. Format: ${query.action.outputRenderingFormat}`
+                    commandPrompt =
+                        `(Requirements: The output format must be ${query.action.outputRenderingFormat}) ` +
+                        commandPrompt
                 }
                 break
             case 'translate':
@@ -327,7 +329,6 @@ Examples:
 <index>. <sentence>(<sentence translation>)
 Etymology:
 <etymology>`
-                        console.log(rolePrompt)
                         commandPrompt = 'I understand. Please give me the word.'
                         contentPrompt = `The word is: ${query.text}`
                     }
