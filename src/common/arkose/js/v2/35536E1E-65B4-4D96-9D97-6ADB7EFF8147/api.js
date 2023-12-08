@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { loadScripts } from '../../../index'
 
 class EnforcementGenerator {
     constructor() {
@@ -53,13 +54,13 @@ class EnforcementGenerator {
     }
 }
 
-const enforcementGenerator = new EnforcementGenerator();
+export const enforcementGenerator = new EnforcementGenerator();
 
 
-async function getArkoseToken() {
+export async function getArkoseToken() {
     try {
-        const token = await enforcementGenerator.generate();
-        console.log('Token:', token);
+            const token = await enforcementGenerator.generate();
+            console.log('Token:', token);
         return token;
     } catch (error) {
         console.error('Error getting arkose token:', error.message);
@@ -67,34 +68,31 @@ async function getArkoseToken() {
 }
 
 let count = 0;
-const maxCount = 3;
+const maxCount = 1;
 const intervalId = setInterval(async () => {
-    // 首先检查计数器
-    if (count >= maxCount || localStorage.getItem('arkose')) {
-        clearInterval(intervalId);
-        return;
-    }
-
     count++;
     console.log(`Attempt ${count}:`);
-    const token = await getArkoseToken();
-}, 1000);
+    if (localStorage.getItem('apiModel')) {
+        const token = await getArkoseToken();
+    }
 
-
+    if (count >= maxCount) {
+        console.log('不使用gpt-4 Model');
+        clearInterval(intervalId);
+    }
+}, 1000); // 1000 milliseconds = 1 second
 
 function manageTokenListener() {
-    const hasPlus = localStorage.getItem('apiModel');
+    const hasToken = localStorage.getItem('arkose');
     const listenerExists = document.tokenListenerExists; // 自定义标记，用于跟踪监听器状态
 
-    if (hasPlus && !listenerExists) {
-        // 如果使用gpt-4且监听器不存在，则添加监听器
+    if (hasToken && !listenerExists) {
+        // 如果有 token 且监听器不存在，则添加监听器
         document.addEventListener('tokenRegenerate', getArkoseToken);
-        document.addEventListener('tokenInit', getArkoseToken);
         document.tokenListenerExists = true; // 标记监听器已添加
-    } else if (!hasPlus && listenerExists) {
-        // 如果不使用gpt-4且监听器存在，则移除监听器
+    } else if (!hasToken && listenerExists) {
+        // 如果没有 token 且监听器存在，则移除监听器
         document.removeEventListener('tokenRegenerate', getArkoseToken);
-        document.addEventListener('tokenInit', getArkoseToken);
         document.tokenListenerExists = false; // 标记监听器已移除
     }
 }

@@ -965,7 +965,7 @@ export function Settings({ engine, ...props }: ISettingsProps) {
 
 export function InnerSettings({ onSave }: IInnerSettingsProps) {
     const { theme } = useTheme()
-
+    const tokenRegenerateEvent = new Event('tokenRegenerate')
     const { setThemeType } = useThemeType()
 
     const { t } = useTranslation()
@@ -1015,6 +1015,10 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const onSubmit = useCallback(
         async (data: ISettings) => {
+            if (data.apiModel === 'gpt-4') {
+                document.dispatchEvent(tokenRegenerateEvent)
+                console.log('使用gpt-4');
+            }
             if (data.themeType) {
                 setThemeType(data.themeType)
             }

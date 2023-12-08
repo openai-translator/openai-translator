@@ -20,7 +20,7 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, isDesktopApp, isTauri } from '../utils'
+import { defaultAPIURL, getSettings, isDesktopApp, isTauri } from '../utils'
 import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -55,7 +55,6 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
-
 const cache = new LRUCache({
     max: 500,
     maxSize: 5000,
@@ -425,9 +424,23 @@ export function Translator(props: ITranslatorProps) {
     )
 }
 
+const tokenRegenerateEvent = new Event('tokenRegenerate')
+
+export async function initArkosetoken() {
+    const settings = await getSettings()
+    if (settings.apiModel.startsWith('gpt-4')) {
+        console.log('当前正在使用gpt-4');
+        localStorage.setItem('apiModel', 'gpt-4')
+        document.dispatchEvent(tokenRegenerateEvent)
+    } else if (localStorage.getItem('apiModel')) {
+        localStorage.removeItem('apiModel')
+    }
+}
+
 function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
+        initArkosetoken()
     }, [])
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
@@ -1134,8 +1147,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         })
     }
 
-    const tokenRemovedEvent = new Event('tokenRegenerate')
-
+    const tokenRegenerateEvent = new Event('tokenRegenerate')
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1450,7 +1462,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     : Math.min(Math.max(editableText.split('\n').length, 3), 12)
                                             }
                                             onChange={(e) => setEditableText(e.target.value)}
-                                            onKeyPress={(e) => {
+                                            onKeyPress={async (e) => {
                                                 if (e.key === 'Enter') {
                                                     if (!e.shiftKey) {
                                                         e.preventDefault()
@@ -1461,9 +1473,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             )
                                                         }
                                                         setOriginalText(editableText)
-                                                        if (tokenRemovedEvent) {
-                                                            document.dispatchEvent(tokenRemovedEvent);
-                                                                            }
+                                                        const settings = await getSettings()
+                                                        if (settings.apiModel.startsWith('gpt-4')) {
+                                                            document.dispatchEvent(tokenRegenerateEvent);
+                                                        }                     
                                                     }
                                                 }
                                             }}
@@ -1507,7 +1520,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </div>
                                                 <Button
                                                     size='mini'
-                                                    onClick={(e) => {
+                                                    onClick={async (e) => {
                                                         e.preventDefault()
                                                         e.stopPropagation()
                                                         if (!activateAction) {
@@ -1516,9 +1529,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             )
                                                         }
                                                         setOriginalText(editableText)
-                                                        if (tokenRemovedEvent) {
-                                                            document.dispatchEvent(tokenRemovedEvent);
-                                                                            }
+                                                        const settings = await getSettings()
+                                                        if (settings.apiModel.startsWith('gpt-4')) {
+                                                            document.dispatchEvent(tokenRegenerateEvent);
+                                                        }    
                                                     }}
                                                     startEnhancer={<IoIosRocket size={13} />}
                                                     overrides={{
