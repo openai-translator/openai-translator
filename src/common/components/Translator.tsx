@@ -1380,7 +1380,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         data-tauri-drag-region
                         style={{
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
-                            boxShadow: isScrolledToTop ? undefined : theme.lighting.shadow600,
+                            boxShadow: isDesktopApp() && !isScrolledToTop ? theme.lighting.shadow600 : undefined,
                         }}
                     >
                         {showLogo && <LogoWithText ref={logoWithTextRef} />}
