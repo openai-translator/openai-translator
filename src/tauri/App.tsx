@@ -12,13 +12,13 @@ import { detectLang, intoLangCode } from '../common/lang'
 import { useSettings } from '../common/hooks/useSettings'
 import { setupAnalysis } from '../common/analysis'
 import { Window } from './Window'
+import { setExternalOriginalText } from '../common/store'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
 })
 
 export function App() {
-    const [text, setText] = useState('')
     const [uuid, setUUID] = useState('')
     const [showSettings, setShowSettings] = useState(false)
     const writingQueue = useRef<Array<string | number>>([])
@@ -78,7 +78,7 @@ export function App() {
                 if (selectedText) {
                     const uuid_ = uuidv4().replace(/-/g, '').slice(0, 6)
                     setUUID(uuid_)
-                    setText(selectedText)
+                    setExternalOriginalText(selectedText)
                 }
             })
         })()
@@ -180,7 +180,6 @@ export function App() {
         <Window isMainWindow windowsTitlebarDisableDarkMode={isSettingsOpen}>
             <Translator
                 uuid={uuid}
-                text={text}
                 engine={engine}
                 showSettingsIcon
                 showSettings={showSettings}
