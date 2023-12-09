@@ -18,7 +18,7 @@ import { GlobalSuspense } from '../../common/components/GlobalSuspense'
 import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
 import TitleBar from './TitleBar'
-import { setOriginalText } from '../../common/store'
+import { setExternalOriginalText } from '../../common/store'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -92,7 +92,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
     const settings = await utils.getSettings()
     let $popupCard = await queryPopupCardElement()
     if ($popupCard && settings.pinned) {
-        setOriginalText(text)
+        setExternalOriginalText(text)
         return
     } else {
         $popupCard = await createPopupCard()
@@ -116,7 +116,6 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                     <InnerContainer reference={reference}>
                         <TitleBar pinned={settings.pinned} onClose={hidePopupCard} engine={engine} />
                         <Translator
-                            text={text}
                             engine={engine}
                             autoFocus={autoFocus}
                             showSettingsIcon={isUserscript ? true : false}
@@ -128,6 +127,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
             </GlobalSuspense>
         </React.StrictMode>
     )
+    setExternalOriginalText(text)
 }
 
 async function showPopupThumb(text: string, x: number, y: number) {
