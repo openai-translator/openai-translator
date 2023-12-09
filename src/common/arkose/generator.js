@@ -12,7 +12,6 @@ class ArkoseTokenGenerator {
 
 
     injectScript() {
-        console.log('Attempting to load Arkose API script');
         if (window.location.href.startsWith('https://chat.openai.com/')) {
             return 
         }
@@ -22,7 +21,6 @@ class ArkoseTokenGenerator {
         script.defer = true
         script.setAttribute('data-callback', 'useArkoseSetupEnforcement')
         script.onload = () => {
-            console.log('Arkose API script loaded successfully')
             this.scriptLoaded = true
         }
         script.onerror = (e) => {

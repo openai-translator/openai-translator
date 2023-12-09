@@ -8,13 +8,11 @@ class EnforcementGenerator {
     }
 
     useArkoseSetupEnforcement(enforcement) {
-        console.log('useArkoseSetupEnforcement called');
         if (!enforcement) {
             console.error('useArkoseSetupEnforcement called with null enforcement');
             return;
         }
         this.enforcement = enforcement;
-        console.log('Enforcement object set:', this.enforcement);
 
         enforcement.setConfig({
             onCompleted: (r) => {
@@ -58,9 +56,7 @@ const enforcementGenerator = new EnforcementGenerator();
 
 async function getArkoseToken() {
     try {
-        const token = await enforcementGenerator.generate();
-        console.log('Token:', token);
-        return token;
+         await enforcementGenerator.generate()
     } catch (error) {
         console.error('Error getting arkose token:', error.message);
     }
@@ -76,8 +72,7 @@ const intervalId = setInterval(async () => {
     }
 
     count++;
-    console.log(`Attempt ${count}:`);
-    const token = await getArkoseToken();
+    getArkoseToken();
 }, 1000);
 
 

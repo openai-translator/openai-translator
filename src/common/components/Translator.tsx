@@ -429,7 +429,6 @@ const tokenRegenerateEvent = new Event('tokenRegenerate')
 export async function initArkosetoken() {
     const settings = await getSettings()
     if (settings.apiModel.startsWith('gpt-4')) {
-        console.log('当前正在使用gpt-4');
         localStorage.setItem('apiModel', 'gpt-4')
         document.dispatchEvent(tokenRegenerateEvent)
     } else if (localStorage.getItem('apiModel')) {

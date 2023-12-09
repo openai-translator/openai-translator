@@ -1,7 +1,7 @@
 {
-  "name": "openai-translator",
-  "version": "0.1.1",
-  "description": "openai-translator",
+  "name": "gpt-tutor",
+  "version": "0.1.4",
+  "description": "gpt-tutor",
   "main": "index.js",
   "scripts": {
     "build-tauri-renderer": "tsc && vite build -c vite.config.tauri.ts",

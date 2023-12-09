@@ -1017,7 +1017,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         async (data: ISettings) => {
             if (data.apiModel === 'gpt-4') {
                 document.dispatchEvent(tokenRegenerateEvent)
-                console.log('使用gpt-4');
             }
             if (data.themeType) {
                 setThemeType(data.themeType)
