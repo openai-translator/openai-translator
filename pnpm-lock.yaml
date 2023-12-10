@@ -29,6 +29,9 @@ dependencies:
   '@tauri-apps/plugin-process':
     specifier: 2.0.0-alpha.3
     version: 2.0.0-alpha.3
+  '@tauri-apps/plugin-shell':
+    specifier: 2.0.0-alpha.3
+    version: 2.0.0-alpha.3
   '@tauri-apps/plugin-updater':
     specifier: 2.0.0-alpha.3
     version: 2.0.0-alpha.3
@@ -59,6 +62,9 @@ dependencies:
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
+  dayjs:
+    specifier: ^1.11.10
+    version: 1.11.10
   dexie:
     specifier: ^3.2.3
     version: 3.2.3
@@ -1557,6 +1563,12 @@ packages:
       '@tauri-apps/api': 2.0.0-alpha.11
     dev: false
 
+  /@tauri-apps/plugin-shell@2.0.0-alpha.3:
+    resolution: {integrity: sha512-v4qLTE9DfzpYdcjZq3ASOC7gFtMtzIDWN5Bo2FheB+pHQvDRq8mrP8gTdkL4/9pQaOFlB0B+MKCwANYhD1jLEQ==}
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.11
+    dev: false
+
   /@tauri-apps/plugin-updater@2.0.0-alpha.3:
     resolution: {integrity: sha512-ZMNOpMrBEMCSBmI5Re09mhEldiDmHZBWaFkLXbDo8rcSM8OH2WaUQMDc6kmsu4pWgE/gs7RlwULmf9h3UZ+wLQ==}
     dependencies:
@@ -3014,6 +3026,10 @@ packages:
   /date-fns@2.29.3:
     resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
     engines: {node: '>=0.11'}
+    dev: false
+
+  /dayjs@1.11.10:
+    resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
     dev: false
 
   /debounce-fn@4.0.0:
