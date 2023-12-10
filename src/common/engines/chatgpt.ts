@@ -148,8 +148,8 @@ export class ChatGPT implements IEngine {
                 if (author.role === 'assistant') {
                     const targetTxt = content.parts.join('')
                     const textDelta = targetTxt.slice(length)
-                    await req.onMessage({ content: textDelta, role: '' })
                     length = targetTxt.length
+                    await req.onMessage({ content: textDelta, role: '' })
                 }
             },
             onError: (err) => {
