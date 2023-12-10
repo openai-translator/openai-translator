@@ -12,10 +12,10 @@ use tauri::{LogicalPosition, Manager, PhysicalPosition};
 #[cfg(not(target_os = "macos"))]
 use window_shadows::set_shadow;
 
-pub const MAIN_WIN_NAME: &str = "main";
+pub const TRANSLATOR_WIN_NAME: &str = "translator";
 pub const SETTINGS_WIN_NAME: &str = "settings";
 pub const ACTION_MANAGER_WIN_NAME: &str = "action_manager";
-pub const ACTION_UPDATER_WIN_NAME: &str = "updater";
+pub const UPDATER_WIN_NAME: &str = "updater";
 pub const THUMB_WIN_NAME: &str = "thumb";
 
 pub fn get_mouse_location() -> Result<(i32, i32), String> {
@@ -26,9 +26,9 @@ pub fn get_mouse_location() -> Result<(i32, i32), String> {
     }
 }
 
-pub fn set_main_window_always_on_top() -> bool {
+pub fn set_translator_window_always_on_top() -> bool {
     let handle = APP_HANDLE.get().unwrap();
-    let window = handle.get_window(MAIN_WIN_NAME).unwrap();
+    let window = handle.get_window(TRANSLATOR_WIN_NAME).unwrap();
 
     let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
 
@@ -43,13 +43,13 @@ pub fn set_main_window_always_on_top() -> bool {
 }
 
 #[tauri::command]
-pub fn get_main_window_always_on_top() -> bool {
+pub fn get_translator_window_always_on_top() -> bool {
     ALWAYS_ON_TOP.load(Ordering::Acquire)
 }
 
 #[tauri::command]
-pub async fn show_main_window_with_selected_text_command() {
-    let mut window = show_main_window(false, true, false);
+pub async fn show_translator_window_with_selected_text_command() {
+    let mut window = show_translator_window(false, true, false);
     let mut enigo = Enigo::new();
     let selected_text;
     if cfg!(target_os = "macos") {
@@ -72,7 +72,7 @@ pub async fn show_main_window_with_selected_text_command() {
     if !selected_text.is_empty() {
         utils::send_text(selected_text);
     } else {
-        window = show_main_window(true, false, false);
+        window = show_translator_window(true, false, false);
     }
 
     window.set_focus().unwrap();
@@ -127,7 +127,7 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
             let builder = tauri::WindowBuilder::new(
                 handle,
                 THUMB_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/thumb.html".into()),
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
             .fullscreen(false)
             .focused(false)
@@ -231,19 +231,27 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 }
 
 #[tauri::command]
-pub async fn show_main_window_command() {
-    show_main_window(false, false, true);
+pub async fn show_translator_window_command() {
+    show_translator_window(false, false, true);
 }
 
-pub fn show_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -> tauri::Window {
-    let window = get_main_window(center, to_mouse_position, set_focus);
+pub fn show_translator_window(
+    center: bool,
+    to_mouse_position: bool,
+    set_focus: bool,
+) -> tauri::Window {
+    let window = get_translator_window(center, to_mouse_position, set_focus);
     window.show().unwrap();
     window
 }
 
-pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -> tauri::Window {
+pub fn get_translator_window(
+    center: bool,
+    to_mouse_position: bool,
+    set_focus: bool,
+) -> tauri::Window {
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(MAIN_WIN_NAME) {
+    let window = match handle.get_window(TRANSLATOR_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
             if set_focus {
@@ -254,16 +262,16 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
         None => {
             let builder = tauri::WindowBuilder::new(
                 handle,
-                MAIN_WIN_NAME,
+                TRANSLATOR_WIN_NAME,
                 tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
+            .title("OpenAI Translator")
             .fullscreen(false)
             .inner_size(620.0, 700.0)
             .min_inner_size(540.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
-            .focused(false)
-            .title("OpenAI Translator");
+            .focused(false);
 
             build_window(builder)
         }
@@ -377,16 +385,16 @@ pub fn get_action_manager_window() -> tauri::Window {
             let builder = tauri::WindowBuilder::new(
                 handle,
                 ACTION_MANAGER_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/action_manager.html".into()),
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
+            .title("OpenAI Translator Action Manager")
             .fullscreen(false)
             .inner_size(700.0, 700.0)
             .min_inner_size(660.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
             .center()
-            .focused(true)
-            .title("OpenAI Translator Action Manager");
+            .focused(true);
 
             return build_window(builder);
         }
@@ -415,16 +423,16 @@ pub fn get_settings_window() -> tauri::Window {
             let builder = tauri::WindowBuilder::new(
                 handle,
                 SETTINGS_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/settings.html".into()),
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
+            .title("OpenAI Translator Settings")
             .fullscreen(false)
             .inner_size(660.0, 800.0)
             .min_inner_size(660.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
             .center()
-            .focused(true)
-            .title("OpenAI Translator Settings");
+            .focused(true);
 
             return build_window(builder);
         }
@@ -442,7 +450,7 @@ pub fn show_updater_window() {
 
 pub fn get_updater_window() -> tauri::Window {
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(ACTION_UPDATER_WIN_NAME) {
+    let window = match handle.get_window(UPDATER_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
             window.center().unwrap();
@@ -452,17 +460,17 @@ pub fn get_updater_window() -> tauri::Window {
         None => {
             let builder = tauri::WindowBuilder::new(
                 handle,
-                ACTION_UPDATER_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/updater.html".into()),
+                UPDATER_WIN_NAME,
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
             )
+            .title("OpenAI Translator Updater")
             .fullscreen(false)
             .inner_size(500.0, 500.0)
             .min_inner_size(200.0, 200.0)
             .resizable(true)
             .skip_taskbar(true)
             .center()
-            .focused(true)
-            .title("OpenAI Translator Updater");
+            .focused(true);
 
             return build_window(builder);
         }

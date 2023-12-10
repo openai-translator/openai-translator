@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
-import { createRoot } from 'react-dom/client'
-import { Window } from './Window'
+import { Window } from '../components/Window'
 import { Update, check } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { Button } from 'baseui-sd/button'
 import { invoke } from '@tauri-apps/api/primitives'
-import { useTheme } from '../common/hooks/useTheme'
-import monkey from '../common/assets/images/monkey.gif'
-import icon from '../common/assets/images/icon.png'
-import { getAssetUrl } from '../common/utils'
+import { useTheme } from '../../common/hooks/useTheme'
+import monkey from '../../common/assets/images/monkey.gif'
+import icon from '../../common/assets/images/icon.png'
+import { getAssetUrl } from '../../common/utils'
 import { ProgressBarRounded } from 'baseui-sd/progress-bar'
 import { createUseStyles } from 'react-jss'
 import { MdBrowserUpdated } from 'react-icons/md'
@@ -313,8 +312,3 @@ export function UpdaterWindow() {
         </Window>
     )
 }
-
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const root = createRoot(document.getElementById('root')!)
-
-root.render(<UpdaterWindow />)

@@ -1,10 +1,8 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import icon from '../common/assets/images/icon.png'
-import { useTheme } from '../common/hooks/useTheme'
+import icon from '../../common/assets/images/icon.png'
+import { useTheme } from '../../common/hooks/useTheme'
 import { BaseProvider } from 'baseui-sd'
 
-export function Thumb() {
+export function ThumbWindow() {
     const { theme } = useTheme()
 
     return (
@@ -28,8 +26,3 @@ export function Thumb() {
         </BaseProvider>
     )
 }
-
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const root = createRoot(document.getElementById('root')!)
-
-root.render(<Thumb />)

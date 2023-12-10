@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getCurrent } from '@tauri-apps/api/window'
-import { useTheme } from '../common/hooks/useTheme'
+import { useTheme } from '../../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import { PREFIX } from '../common/constants'
+import { PREFIX } from '../../common/constants'
 import { ErrorBoundary } from 'react-error-boundary'
-import { ErrorFallback } from '../common/components/ErrorFallback'
-import '../common/i18n.js'
+import { ErrorFallback } from '../../common/components/ErrorFallback'
+import '../../common/i18n.js'
 import { useTranslation } from 'react-i18next'
-import { useSettings } from '../common/hooks/useSettings'
-import { IThemedStyleProps } from '../common/types'
+import { useSettings } from '../../common/hooks/useSettings'
+import { IThemedStyleProps } from '../../common/types'
 import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/primitives'
 import { open } from '@tauri-apps/plugin-shell'
@@ -20,7 +20,7 @@ const engine = new Styletron({
 })
 
 export interface IWindowProps {
-    isMainWindow?: boolean
+    isTranslatorWindow?: boolean
     windowsTitlebarDisableDarkMode?: boolean
     children: React.ReactNode
 }
@@ -74,14 +74,14 @@ export function InnerWindow(props: IWindowProps) {
     const { settings } = useSettings()
 
     useEffect(() => {
-        if (!props.isMainWindow) {
+        if (!props.isTranslatorWindow) {
             return
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        invoke('get_main_window_always_on_top').then((pinned: any) => {
+        invoke('get_translator_window_always_on_top').then((pinned: any) => {
             return setPinned(pinned)
         })
-    }, [props.isMainWindow])
+    }, [props.isTranslatorWindow])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

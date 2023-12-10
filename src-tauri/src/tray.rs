@@ -3,7 +3,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use crate::config::get_config;
 use crate::ocr::ocr;
 use crate::windows::{
-    set_main_window_always_on_top, show_settings_window, show_updater_window, MAIN_WIN_NAME,
+    set_translator_window_always_on_top, show_settings_window, show_updater_window,
+    TRANSLATOR_WIN_NAME,
 };
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 
@@ -67,19 +68,19 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             ocr();
         }
         "show" => {
-            let window = app.get_window(MAIN_WIN_NAME).unwrap();
+            let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
             window.set_focus().unwrap();
             window.unminimize().unwrap();
             window.show().unwrap();
         }
         "hide" => {
-            let window = app.get_window(MAIN_WIN_NAME).unwrap();
+            let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
             window.set_focus().unwrap();
             window.unminimize().unwrap();
             window.hide().unwrap();
         }
         "pin" => {
-            set_main_window_always_on_top();
+            set_translator_window_always_on_top();
             create_tray(app).unwrap();
         }
         "quit" => app.exit(0),
@@ -88,7 +89,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     tray.on_tray_icon_event(|tray, event| {
         if event.click_type == ClickType::Left {
             let app = tray.app_handle();
-            if let Some(window) = app.get_window(MAIN_WIN_NAME) {
+            if let Some(window) = app.get_window(TRANSLATOR_WIN_NAME) {
                 window.unminimize().unwrap();
                 let _ = window.show();
                 let _ = window.set_focus();

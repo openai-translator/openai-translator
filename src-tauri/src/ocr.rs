@@ -1,7 +1,12 @@
 use tauri::path::BaseDirectory;
 use tauri::Manager;
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "linux")]
+pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
 pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }

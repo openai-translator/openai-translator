@@ -21,15 +21,16 @@ use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
-use windows::get_main_window;
+use windows::get_translator_window;
 
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
 use crate::ocr::ocr_command;
 use crate::windows::{
-    get_main_window_always_on_top, show_action_manager_window, show_main_window_command,
-    show_main_window_with_selected_text_command, show_updater_window, MAIN_WIN_NAME,
+    get_translator_window_always_on_top, show_action_manager_window,
+    show_translator_window_command, show_translator_window_with_selected_text_command,
+    show_updater_window, TRANSLATOR_WIN_NAME,
 };
 use crate::writing::{finish_writing, write_to_input, writing_command};
 
@@ -89,7 +90,7 @@ fn launch_ipc_server(server: &Server) {
         let mut selected_text = String::new();
         req.as_reader().read_to_string(&mut selected_text).unwrap();
         utils::send_text(selected_text);
-        let window = windows::show_main_window(false, true, false);
+        let window = windows::show_translator_window(false, true, false);
         window.set_focus().unwrap();
         utils::show();
         let response = HttpResponse::from_string("ok");
@@ -241,7 +242,7 @@ fn bind_mouse_hook() {
                     windows::close_thumb();
                     let selected_text = (*SELECTED_TEXT.lock()).to_string();
                     if !selected_text.is_empty() {
-                        let window = windows::show_main_window(false, true, false);
+                        let window = windows::show_translator_window(false, true, false);
                         utils::send_text(selected_text);
                         if cfg!(target_os = "windows") {
                             window.set_always_on_top(true).unwrap();
@@ -324,16 +325,16 @@ fn main() {
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
             if silently {
-                let window = get_main_window(false, false, false);
+                let window = get_translator_window(false, false, false);
                 window.unminimize().unwrap();
                 window.hide().unwrap();
             } else {
-                let window = get_main_window(false, false, false);
+                let window = get_translator_window(false, false, false);
                 window.set_focus().unwrap();
                 window.show().unwrap();
             }
             if !query_accessibility_permissions() {
-                let window = app.get_window(MAIN_WIN_NAME).unwrap();
+                let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
                 window.minimize().unwrap();
                 app.notification()
                     .builder()
@@ -396,10 +397,10 @@ fn main() {
             get_update_result,
             get_config_content,
             clear_config_cache,
-            show_main_window_command,
-            show_main_window_with_selected_text_command,
+            show_translator_window_command,
+            show_translator_window_with_selected_text_command,
             show_action_manager_window,
-            get_main_window_always_on_top,
+            get_translator_window_always_on_top,
             ocr_command,
             fetch_stream,
             writing_command,
@@ -470,7 +471,7 @@ fn main() {
             event: tauri::WindowEvent::CloseRequested { api, .. },
             ..
         } => {
-            if label != MAIN_WIN_NAME {
+            if label != TRANSLATOR_WIN_NAME {
                 return;
             }
 
