@@ -391,7 +391,15 @@ fn main() {
         .expect("error while building tauri application");
 
     #[cfg(target_os = "macos")]
-    app.set_activation_policy(tauri::ActivationPolicy::Regular);
+    {
+
+        let config = config::get_config_by_app(app.handle()).unwrap();
+        if config.hide_the_icon_in_the_dock.unwrap_or(false) {
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+        } else {
+            app.set_activation_policy(tauri::ActivationPolicy::Regular);
+        }
+    }
 
     app.run(|app, event| {
         match event {

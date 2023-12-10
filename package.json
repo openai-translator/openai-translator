@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-tauri-renderer": "tsc && vite build -c vite.config.tauri.ts",
-    "dev-tauri-renderer": "vite -c vite.config.tauri.ts",
+    "dev-tauri-renderer": "vite -c vite.config.tauri.ts --force",
     "build-tauri": "npm run build-tauri-renderer && tauri build",
     "dev-tauri": "tauri dev",
     "dev-chromium": "vite -c vite.config.chromium.ts",

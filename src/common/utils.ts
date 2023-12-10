@@ -72,6 +72,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     allowUsingClipboardWhenSelectedTextNotAvailable: 1,
     pinned: 1,
     autoCollect: 1,
+    hideTheIconInTheDock: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

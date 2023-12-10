@@ -1096,6 +1096,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         readSelectedWordsFromInputElementsText: utils.defaultReadSelectedWordsFromInputElementsText,
         runAtStartup: false,
         writingTargetLanguage: utils.defaultWritingTargetLanguage,
+        hideTheIconInTheDock: false,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
@@ -1711,6 +1712,15 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                                 <RunAtStartupCheckbox onBlur={onBlur} />
                             </FormItem>
                         )}
+                        <FormItem
+                            style={{
+                                display: isMacOS ? 'block' : 'none',
+                            }}
+                            name='hideTheIconInTheDock'
+                            label={t('Hide the icon in the Dock bar')}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
                         <FormItem
                             style={{
                                 display: isDesktopApp ? 'block' : 'none',

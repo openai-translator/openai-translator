@@ -89,4 +89,5 @@ export interface ISettings {
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
     pinned?: boolean
     autoCollect?: boolean
+    hideTheIconInTheDock?: boolean
 }
