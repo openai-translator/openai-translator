@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import _ from 'underscore'
 import { Tabs, Tab, StyledTabList, StyledTabPanel } from 'baseui-sd/tabs-motion'
 import { SlSpeech } from 'react-icons/sl'
@@ -29,7 +29,7 @@ import AppConfig from '../../../package.json'
 import { useSettings } from '../hooks/useSettings'
 import { defaultTTSProvider, langCode2TTSLang } from '../tts'
 import { RiDeleteBin5Line } from 'react-icons/ri'
-import { IoIosSave, IoMdAdd } from 'react-icons/io'
+import { IoIosHelpCircleOutline, IoIosSave, IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { useThemeType } from '../hooks/useThemeType'
@@ -37,12 +37,23 @@ import { Slider } from 'baseui-sd/slider'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
-import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
+import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-sd/modal'
 import { Provider, getEngine } from '../engines'
 import { IModel } from '../engines/interfaces'
 import { PiTextbox } from 'react-icons/pi'
 import { BsKeyboard } from 'react-icons/bs'
 import { Cell, Grid } from 'baseui-sd/layout-grid'
+import {
+    II18nPromotionContent,
+    IPromotionResponse,
+    fetchPromotions,
+    II18nPromotionContentItem,
+    IPromotionItem,
+} from '../services/promotion'
+import useSWR from 'swr'
+import { Markdown } from './Markdown'
+import dayjs from 'dayjs'
+import { open } from '@tauri-apps/plugin-shell'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -827,6 +838,34 @@ function RunAtStartupCheckbox({ value, onChange, onBlur }: RunAtStartupCheckboxP
 }
 
 const useStyles = createUseStyles({
+    promotion: (props: IThemedStyleProps) => {
+        return {
+            'display': 'flex',
+            'flexDirection': 'column',
+            'gap': '3px',
+            'borderRadius': '0.31rem',
+            'padding': '0.15rem 0.4rem',
+            'color': props.themeType === 'dark' ? props.theme.colors.black : props.theme.colors.contentPrimary,
+            'backgroundColor': props.theme.colors.warning100,
+            '& p': {
+                margin: '2px 0',
+            },
+            '& a': {
+                color: props.themeType === 'dark' ? props.theme.colors.black : props.theme.colors.contentPrimary,
+                textDecoration: 'underline',
+            },
+        }
+    },
+    disclaimer: (props: IThemedStyleProps) => {
+        return {
+            'color': props.theme.colors.contentPrimary,
+            'lineHeight': 1.8,
+            '& a': {
+                color: props.theme.colors.contentPrimary,
+                textDecoration: 'underline',
+            },
+        }
+    },
     footer: (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
@@ -1059,6 +1098,20 @@ export function Settings({ engine, ...props }: ISettingsProps) {
 }
 
 export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProps) {
+    const { data: promotions, mutate: refetchPromotions } = useSWR<IPromotionResponse>('promotions', fetchPromotions)
+
+    useEffect(() => {
+        const timer = setInterval(
+            () => {
+                refetchPromotions()
+            },
+            1000 * 60 * 10
+        )
+        return () => {
+            clearInterval(timer)
+        }
+    }, [refetchPromotions])
+
     const { theme, themeType } = useTheme()
 
     const { refreshThemeType } = useThemeType()
@@ -1280,6 +1333,67 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         },
     }
 
+    const getPromotionItem = (items?: IPromotionItem[]) => {
+        if (!items) {
+            return undefined
+        }
+
+        return items.find((item) => {
+            if (item.started_at) {
+                if (dayjs(item.started_at).isAfter(dayjs())) {
+                    return false
+                }
+            }
+            if (item.ended_at) {
+                if (dayjs(item.ended_at).isBefore(dayjs())) {
+                    return false
+                }
+            }
+            return true
+        })
+    }
+
+    const getI18nPromotionContent = (contentItem: II18nPromotionContentItem) => {
+        let c =
+            contentItem.content[
+                (values.i18n as keyof II18nPromotionContent | undefined) ?? contentItem.fallback_language
+            ]
+        if (!c) {
+            c = contentItem.content[contentItem.fallback_language]
+        }
+        return c
+    }
+
+    const renderI18nPromotionContent = (contentItem: II18nPromotionContentItem) => {
+        if (contentItem.format === 'text') {
+            return <span>{getI18nPromotionContent(contentItem)}</span>
+        }
+
+        if (contentItem.format === 'html') {
+            return (
+                <div
+                    dangerouslySetInnerHTML={{
+                        __html: getI18nPromotionContent(contentItem) ?? '',
+                    }}
+                />
+            )
+        }
+
+        if (contentItem.format === 'markdown') {
+            return <Markdown linkTarget='_blank'>{getI18nPromotionContent(contentItem) ?? ''}</Markdown>
+        }
+
+        return <div />
+    }
+
+    const [disclaimerContent, setDisclaimerContent] = useState<React.ReactNode>()
+    const [disclaimerAgreeLink, setDisclaimerAgreeLink] = useState<string>()
+    const [showDisclaimerModal, setShowDisclaimerModal] = useState(false)
+
+    const openaiAPIKeyPromotion = useMemo(() => {
+        return getPromotionItem(promotions?.openai_api_key)
+    }, [promotions])
+
     return (
         <div
             style={{
@@ -1460,18 +1574,69 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                                 name='apiKeys'
                                 label={t('API Key')}
                                 caption={
-                                    <div>
-                                        {t('Go to the')}{' '}
-                                        <a
-                                            target='_blank'
-                                            href='https://platform.openai.com/account/api-keys'
-                                            rel='noreferrer'
-                                            style={linkStyle}
-                                        >
-                                            {t('OpenAI page')}
-                                        </a>{' '}
-                                        {t(
-                                            'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 3,
+                                        }}
+                                    >
+                                        <div>
+                                            {t('Go to the')}{' '}
+                                            <a
+                                                target='_blank'
+                                                href='https://platform.openai.com/account/api-keys'
+                                                rel='noreferrer'
+                                                style={linkStyle}
+                                            >
+                                                {t('OpenAI page')}
+                                            </a>{' '}
+                                            {t(
+                                                'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
+                                            )}
+                                        </div>
+                                        {openaiAPIKeyPromotion && (
+                                            <div className={styles.promotion}>
+                                                <div
+                                                    onClick={(e) => {
+                                                        if ((e.target as HTMLElement).tagName === 'A') {
+                                                            const href = (e.target as HTMLAnchorElement).href
+                                                            if (href && href.startsWith('http')) {
+                                                                e.preventDefault()
+                                                                e.stopPropagation()
+                                                                setDisclaimerContent(
+                                                                    renderI18nPromotionContent(
+                                                                        openaiAPIKeyPromotion.disclaimer
+                                                                    )
+                                                                )
+                                                                setDisclaimerAgreeLink(href)
+                                                                setShowDisclaimerModal(true)
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    {renderI18nPromotionContent(openaiAPIKeyPromotion.promotion)}
+                                                </div>
+                                                {openaiAPIKeyPromotion.configuration_doc_link && (
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
+                                                            gap: 3,
+                                                        }}
+                                                    >
+                                                        <IoIosHelpCircleOutline size={12} />
+                                                        <a
+                                                            href={openaiAPIKeyPromotion.configuration_doc_link}
+                                                            target='_blank'
+                                                            rel='noreferrer'
+                                                        >
+                                                            {t('How to Use')}
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 }
@@ -1874,6 +2039,46 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         </div>
                     </div>
                 </ModalBody>
+            </Modal>
+            <Modal
+                isOpen={showDisclaimerModal}
+                onClose={() => setShowDisclaimerModal(false)}
+                closeable
+                size='auto'
+                autoFocus
+                animate
+            >
+                <ModalHeader>{t('Disclaimer')}</ModalHeader>
+                <ModalBody className={styles.disclaimer}>{disclaimerContent}</ModalBody>
+                <ModalFooter>
+                    <ModalButton
+                        size='compact'
+                        kind='tertiary'
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setShowDisclaimerModal(false)
+                        }}
+                    >
+                        {t('Disagree')}
+                    </ModalButton>
+                    <ModalButton
+                        size='compact'
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                            if (isTauri) {
+                                if (disclaimerAgreeLink) {
+                                    open(disclaimerAgreeLink)
+                                }
+                            } else {
+                                window.open(disclaimerAgreeLink)
+                            }
+                        }}
+                    >
+                        {t('Agree and continue')}
+                    </ModalButton>
+                </ModalFooter>
             </Modal>
         </div>
     )

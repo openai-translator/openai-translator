@@ -13,6 +13,7 @@ import { useSettings } from '../common/hooks/useSettings'
 import { IThemedStyleProps } from '../common/types'
 import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/primitives'
+import { open } from '@tauri-apps/plugin-shell'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -140,6 +141,17 @@ export function InnerWindow(props: IWindowProps) {
                 background: theme.colors.backgroundPrimary,
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
                 minHeight: '100vh',
+            }}
+            onClick={(e) => {
+                // if e.target is a
+                if ((e.target as HTMLElement).tagName === 'A') {
+                    const href = (e.target as HTMLAnchorElement).href
+                    if (href && href.startsWith('http')) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        open(href)
+                    }
+                }
             }}
         >
             <div className={styles.titlebar} data-tauri-drag-region>

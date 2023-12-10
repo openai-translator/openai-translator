@@ -59,6 +59,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             'https://*.googletagmanager.com/',
             'https://*.google-analytics.com/',
             'https://*.minimax.chat/',
+            'https://*.githubusercontent.com/',
         ],
     }
 
