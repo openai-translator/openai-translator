@@ -14,6 +14,8 @@ mod windows;
 
 use config::get_config;
 use parking_lot::Mutex;
+use serde_json::json;
+use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_updater::UpdaterExt;
 use windows::get_main_window;
 use std::env;
@@ -279,6 +281,11 @@ fn main() {
     }
 
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_aptabase::Builder::new("A-US-9856842764").with_panic_hook(Box::new(|client, info| {
+            client.track_event("panic", Some(json!({
+                "info": format!("{:?}", info)
+            })));
+        })).build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
@@ -298,6 +305,7 @@ fn main() {
         ))
         .plugin(tauri_plugin_process::init())
         .setup(move |app| {
+            app.track_event("app_started", None);
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
             tray::create_tray(&app_handle)?;
@@ -404,6 +412,10 @@ fn main() {
 
     app.run(|app, event| {
         match event {
+            tauri::RunEvent::Exit { .. } => {
+                app.track_event("app_exited", None);
+                app.flush_events_blocking();
+            }
             tauri::RunEvent::Ready => {
                 let handle = app.clone();
                 tauri::async_runtime::spawn(async move {

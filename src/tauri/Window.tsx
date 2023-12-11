@@ -14,6 +14,19 @@ import { IThemedStyleProps } from '../common/types'
 import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/primitives'
 import { open } from '@tauri-apps/plugin-shell'
+import { trackEvent } from '@aptabase/tauri'
+
+addEventListener('unhandledrejection', (e) => {
+    trackEvent('promise_rejected', {
+        message: (e.reason?.message || e.reason || e).toString(),
+    })
+})
+
+window.addEventListener('error', (e) => {
+    trackEvent('js_error', {
+        message: e.message,
+    })
+})
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
