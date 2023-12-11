@@ -126,7 +126,6 @@ dependencies = [
  "tauri-plugin-shell",
  "tauri-plugin-single-instance",
  "tauri-plugin-updater",
- "tauri-plugin-window-state",
  "text-diff",
  "tiny_http",
  "tokio",
@@ -332,15 +331,6 @@ name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
-
-[[package]]
-name = "bincode"
-version = "1.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "bindgen"
@@ -4314,20 +4304,6 @@ dependencies = [
  "tokio",
  "url",
  "zip",
-]
-
-[[package]]
-name = "tauri-plugin-window-state"
-version = "2.0.0-alpha.4"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v2#a848e1870a71b7460a0c56ba44cc1af61d818483"
-dependencies = [
- "bincode",
- "bitflags 2.4.1",
- "log",
- "serde",
- "serde_json",
- "tauri",
- "thiserror",
 ]
 
 [[package]]

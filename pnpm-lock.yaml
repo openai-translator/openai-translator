@@ -41,9 +41,6 @@ dependencies:
   '@tauri-apps/plugin-window':
     specifier: 2.0.0-alpha.1
     version: 2.0.0-alpha.1
-  '@tauri-apps/plugin-window-state':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
   '@types/react-copy-to-clipboard':
     specifier: ^5.0.4
     version: 5.0.4
@@ -1580,12 +1577,6 @@ packages:
 
   /@tauri-apps/plugin-updater@2.0.0-alpha.3:
     resolution: {integrity: sha512-ZMNOpMrBEMCSBmI5Re09mhEldiDmHZBWaFkLXbDo8rcSM8OH2WaUQMDc6kmsu4pWgE/gs7RlwULmf9h3UZ+wLQ==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-window-state@2.0.0-alpha.3:
-    resolution: {integrity: sha512-APjS6e09jESZLg7iwZWXToQrEKM/lfKI2wKW6K4vjzqAKXhxc/qzc60qLL7x+AustKaOHELeFXte021pcLXjjA==}
     dependencies:
       '@tauri-apps/api': 2.0.0-alpha.11
     dev: false
