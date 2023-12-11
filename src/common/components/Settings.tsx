@@ -48,12 +48,13 @@ import {
     IPromotionResponse,
     fetchPromotions,
     II18nPromotionContentItem,
-    IPromotionItem,
+    getPromotionItem,
 } from '../services/promotion'
 import useSWR from 'swr'
 import { Markdown } from './Markdown'
-import dayjs from 'dayjs'
 import { open } from '@tauri-apps/plugin-shell'
+import { getCurrent } from '@tauri-apps/api/window'
+import { usePromotionShowed } from '../hooks/usePromotionShowed'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1112,13 +1113,31 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         }
     }, [refetchPromotions])
 
+    const isTauri = utils.isTauri()
+
+    useEffect(() => {
+        if (!isTauri) {
+            return undefined
+        }
+        let unlisten: (() => void) | undefined = undefined
+        const appWindow = getCurrent()
+        appWindow
+            .listen('tauri://focus', () => {
+                refetchPromotions()
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+        return () => {
+            unlisten?.()
+        }
+    }, [isTauri, refetchPromotions])
+
     const { theme, themeType } = useTheme()
 
     const { refreshThemeType } = useThemeType()
 
     const { t } = useTranslation()
-
-    const isTauri = utils.isTauri()
 
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<ISettings>({
@@ -1333,26 +1352,6 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         },
     }
 
-    const getPromotionItem = (items?: IPromotionItem[]) => {
-        if (!items) {
-            return undefined
-        }
-
-        return items.find((item) => {
-            if (item.started_at) {
-                if (dayjs(item.started_at).isAfter(dayjs())) {
-                    return false
-                }
-            }
-            if (item.ended_at) {
-                if (dayjs(item.ended_at).isBefore(dayjs())) {
-                    return false
-                }
-            }
-            return true
-        })
-    }
-
     const getI18nPromotionContent = (contentItem: II18nPromotionContentItem) => {
         let c =
             contentItem.content[
@@ -1393,6 +1392,12 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     const openaiAPIKeyPromotion = useMemo(() => {
         return getPromotionItem(promotions?.openai_api_key)
     }, [promotions])
+
+    const { setPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+
+    useEffect(() => {
+        setPromotionShowed(true)
+    }, [setPromotionShowed])
 
     return (
         <div
@@ -1641,7 +1646,13 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                                     </div>
                                 }
                             >
-                                <Input autoFocus type='password' size='compact' name='apiKey' onBlur={onBlur} />
+                                <Input
+                                    autoFocus={!openaiAPIKeyPromotion}
+                                    type='password'
+                                    size='compact'
+                                    name='apiKey'
+                                    onBlur={onBlur}
+                                />
                             </FormItem>
                             <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
                                 <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
