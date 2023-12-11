@@ -94,7 +94,11 @@ export abstract class AbstractOpenAI implements IEngine {
                     resp = JSON.parse(msg)
                     // eslint-disable-next-line no-empty, @typescript-eslint/no-explicit-any
                 } catch (e: any) {
-                    req.onError?.(e?.message ?? 'Cannot parse response JSON')
+                    // avoid `Unexpected token 'D', "[DONE]" is not valid JSON`
+                    if (msg.trim() !== '[DONE]') {
+                        req.onError?.(e?.message ?? 'Cannot parse response JSON')
+                    }
+
                     req.onFinished('stop')
                     finished = true
                     return
