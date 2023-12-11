@@ -69,6 +69,9 @@ import { readBinaryFile } from '@tauri-apps/plugin-fs'
 import { getCurrent } from '@tauri-apps/api/window'
 import { useDeepCompareCallback } from 'use-deep-compare'
 import { useTranslatorStore } from '../store'
+import useSWR from 'swr'
+import { IPromotionResponse, fetchPromotions, getPromotionItem } from '../services/promotion'
+import { usePromotionShowed } from '../hooks/usePromotionShowed'
 
 const cache = new LRUCache({
     max: 500,
@@ -1429,6 +1432,47 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         [actions, activateAction, editableText, getTranslateDeps]
     )
 
+    const { data: promotions, mutate: refetchPromotions } = useSWR<IPromotionResponse>(
+        ['promotions', showSettings],
+        fetchPromotions
+    )
+
+    useEffect(() => {
+        const timer = setInterval(
+            () => {
+                refetchPromotions()
+            },
+            1000 * 60 * 10
+        )
+        return () => {
+            clearInterval(timer)
+        }
+    }, [refetchPromotions])
+
+    useEffect(() => {
+        if (!isTauri()) {
+            return undefined
+        }
+        let unlisten: (() => void) | undefined = undefined
+        const appWindow = getCurrent()
+        appWindow
+            .listen('tauri://focus', () => {
+                refetchPromotions()
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+        return () => {
+            unlisten?.()
+        }
+    }, [refetchPromotions])
+
+    const promotion = useMemo(() => {
+        return getPromotionItem(promotions?.openai_api_key)
+    }, [promotions])
+
+    const { promotionShowed } = usePromotionShowed(promotion)
+
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1441,17 +1485,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 paddingBottom: showSettings ? '0px' : '30px',
             }}
         >
-            <div
-                style={{
-                    display: showSettings ? 'block' : 'none',
-                }}
-            >
+            {showSettings && (
                 <InnerSettings
                     onSave={(oldSettings) => {
                         props.onSettingsSave?.(oldSettings)
                     }}
                 />
-            </div>
+            )}
             <div
                 style={{
                     display: !showSettings ? 'block' : 'none',
@@ -2159,7 +2199,30 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     fontSize: '11px',
                                 }}
                             >
-                                {showSettings ? <TiArrowBack size={15} /> : <IoSettingsOutline size={15} />}
+                                {showSettings ? (
+                                    <TiArrowBack size={15} />
+                                ) : (
+                                    <div
+                                        style={{
+                                            position: 'relative',
+                                        }}
+                                    >
+                                        <IoSettingsOutline size={15} />
+                                        {promotion && !promotionShowed && (
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    width: '0.45rem',
+                                                    height: '0.45rem',
+                                                    top: '-4px',
+                                                    right: '-6px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: theme.colors.warning400,
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                                 {showSettings ? t('Go back') : ''}
                             </div>
                         </Button>
