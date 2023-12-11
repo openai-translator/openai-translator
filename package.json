@@ -26,6 +26,7 @@
     "url": "https://github.com/openai-translator/openai-translator.git"
   },
   "dependencies": {
+    "@aptabase/tauri": "^0.4.1",
     "@floating-ui/dom": "^1.5.1",
     "@sentry/react": "^7.61.0",
     "@tauri-apps/api": "2.0.0-alpha.11",
@@ -37,7 +38,6 @@
     "@tauri-apps/plugin-shell": "2.0.0-alpha.3",
     "@tauri-apps/plugin-updater": "2.0.0-alpha.3",
     "@tauri-apps/plugin-window": "2.0.0-alpha.1",
-    "@tauri-apps/plugin-window-state": "2.0.0-alpha.3",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",

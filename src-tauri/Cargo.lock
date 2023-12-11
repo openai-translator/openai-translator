@@ -116,6 +116,7 @@ dependencies = [
  "sysinfo",
  "tauri",
  "tauri-build",
+ "tauri-plugin-aptabase",
  "tauri-plugin-autostart",
  "tauri-plugin-fs",
  "tauri-plugin-global-shortcut",
@@ -125,7 +126,6 @@ dependencies = [
  "tauri-plugin-shell",
  "tauri-plugin-single-instance",
  "tauri-plugin-updater",
- "tauri-plugin-window-state",
  "text-diff",
  "tiny_http",
  "tokio",
@@ -331,15 +331,6 @@ name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
-
-[[package]]
-name = "bincode"
-version = "1.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "bindgen"
@@ -1325,12 +1316,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures"
+version = "0.3.29"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da0290714b38af9b4a7b094b8a37086d1b4e61f2df9122c3cad2577669145335"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "futures-executor",
+ "futures-io",
+ "futures-sink",
+ "futures-task",
+ "futures-util",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff4dd66668b557604244583e3e1e1eada8c5c2e96a6d0d6653ede395b78bbacb"
 dependencies = [
  "futures-core",
+ "futures-sink",
 ]
 
 [[package]]
@@ -1400,6 +1407,7 @@ version = "0.3.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a19526d624e703a3179b3d322efec918b6246ea0fa51d41124525f00f1cc8104"
 dependencies = [
+ "futures-channel",
  "futures-core",
  "futures-io",
  "futures-macro",
@@ -2764,6 +2772,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "os_info"
+version = "3.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "006e42d5b888366f1880eda20371fedde764ed2213dc8496f49622fa0c99cd5e"
+dependencies = [
+ "log",
+ "serde",
+ "winapi 0.3.9",
+]
+
+[[package]]
 name = "os_pipe"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3888,6 +3907,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "sys-locale"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e801cf239ecd6ccd71f03d270d67dd53d13e90aab208bf4b8fe4ad957ea949b0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "sysinfo"
 version = "0.28.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4120,6 +4148,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-aptabase"
+version = "0.4.2"
+source = "git+https://github.com/aptabase/tauri-plugin-aptabase?branch=v2#03bf4ec2ed68462167b84f38f295f05c622f2b4b"
+dependencies = [
+ "futures",
+ "log",
+ "os_info",
+ "rand 0.8.5",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sys-locale",
+ "tauri",
+ "thiserror",
+ "time",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "tauri-plugin-autostart"
 version = "2.0.0-alpha.4"
 source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v2#a848e1870a71b7460a0c56ba44cc1af61d818483"
@@ -4256,20 +4304,6 @@ dependencies = [
  "tokio",
  "url",
  "zip",
-]
-
-[[package]]
-name = "tauri-plugin-window-state"
-version = "2.0.0-alpha.4"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v2#a848e1870a71b7460a0c56ba44cc1af61d818483"
-dependencies = [
- "bincode",
- "bitflags 2.4.1",
- "log",
- "serde",
- "serde_json",
- "tauri",
- "thiserror",
 ]
 
 [[package]]

@@ -30,7 +30,6 @@ cpuid = "0.1.1"
 sysinfo = "0.28.3"
 parking_lot = "0.12.1"
 mouce = "0.2.41"
-tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-notification = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-http = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-global-shortcut = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
@@ -48,6 +47,7 @@ active-win-pos-rs = "0.8"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 futures-util = "0.3.29"
+tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase", branch = "v2" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"
