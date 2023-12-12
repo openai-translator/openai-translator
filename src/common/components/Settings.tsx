@@ -1987,7 +1987,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         </FormItem>
                         <FormItem
                             style={{
-                                display: isDesktopApp && isMacOS ? 'block' : 'none',
+                                display: isDesktopApp ? 'block' : 'none',
                             }}
                             name='ocrHotkey'
                             label={t('OCR Hotkey')}

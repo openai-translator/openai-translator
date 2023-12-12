@@ -26,7 +26,7 @@ use windows::get_translator_window;
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
-use crate::ocr::ocr_command;
+use crate::ocr::{cut_image, finish_ocr, ocr_command, screenshot};
 use crate::windows::{
     get_translator_window_always_on_top, show_action_manager_window,
     show_translator_window_command, show_translator_window_with_selected_text_command,
@@ -407,6 +407,9 @@ fn main() {
             write_to_input,
             finish_writing,
             detect_lang,
+            cut_image,
+            finish_ocr,
+            screenshot,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

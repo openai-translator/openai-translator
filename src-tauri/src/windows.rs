@@ -17,6 +17,53 @@ pub const SETTINGS_WIN_NAME: &str = "settings";
 pub const ACTION_MANAGER_WIN_NAME: &str = "action_manager";
 pub const UPDATER_WIN_NAME: &str = "updater";
 pub const THUMB_WIN_NAME: &str = "thumb";
+pub const SCREENSHOT_WIN_NAME: &str = "screenshot";
+
+fn get_dummy_window() -> tauri::Window {
+    let app_handle = APP_HANDLE.get().unwrap();
+    match app_handle.get_window("dummy") {
+        Some(window) => {
+            debug_println!("Dummy window found!");
+            window
+        }
+        None => {
+            debug_println!("Create dummy window!");
+            tauri::WindowBuilder::new(
+                app_handle,
+                "dummy",
+                tauri::WindowUrl::App("src/tauri/dummy.html".into()),
+            )
+            .title("Dummy")
+            .visible(false)
+            .build()
+            .unwrap()
+        }
+    }
+}
+
+pub fn get_current_monitor() -> tauri::Monitor {
+    let dummy_window = get_dummy_window();
+    let monitors = dummy_window.available_monitors().unwrap();
+
+    let (x, y) = match Mouse::get_mouse_position() {
+        Mouse::Position { x, y } => (x, y),
+        _ => (0, 0),
+    };
+
+    for m in monitors {
+        let size = m.size();
+        let position = m.position();
+
+        if x >= position.x
+            && x <= (position.x + size.width as i32)
+            && y >= position.y
+            && y <= (position.y + size.height as i32)
+        {
+            return m;
+        }
+    }
+    dummy_window.primary_monitor().unwrap().unwrap()
+}
 
 pub fn get_mouse_location() -> Result<(i32, i32), String> {
     let position = Mouse::get_mouse_position();
@@ -148,8 +195,6 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
         }
     };
 
-    post_process_window(&window);
-
     if cfg!(target_os = "macos") {
         window
             .set_position(LogicalPosition::new(
@@ -170,6 +215,8 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
 }
 
 pub fn post_process_window(window: &tauri::Window) {
+    let _ = window.current_monitor();
+
     #[cfg(target_os = "macos")]
     {
         use cocoa::appkit::NSWindowCollectionBehavior;
@@ -200,10 +247,12 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
             .build()
             .unwrap();
 
+        post_process_window(&window);
+
         window
     }
 
-    #[cfg(target_os = "windows")]
+    #[cfg(not(target_os = "macos"))]
     {
         let window = builder
             .transparent(true)
@@ -213,18 +262,7 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 
         set_shadow(&window, true).unwrap();
 
-        window
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-        let window = builder
-            .transparent(true)
-            .decorations(false)
-            .build()
-            .unwrap();
-
-        set_shadow(&window, true).unwrap();
+        post_process_window(&window);
 
         window
     }
@@ -250,6 +288,7 @@ pub fn get_translator_window(
     to_mouse_position: bool,
     set_focus: bool,
 ) -> tauri::Window {
+    let current_monitor = get_current_monitor();
     let handle = APP_HANDLE.get().unwrap();
     let window = match handle.get_window(TRANSLATOR_WIN_NAME) {
         Some(window) => {
@@ -277,8 +316,6 @@ pub fn get_translator_window(
         }
     };
 
-    post_process_window(&window);
-
     let restore_previous_position = match config::get_config() {
         Ok(config) => config.restore_previous_position.unwrap_or(false),
         Err(e) => {
@@ -301,33 +338,6 @@ pub fn get_translator_window(
                 LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64)
                     .to_physical(scale_factor);
         }
-
-        let current_monitor = window
-            .available_monitors()
-            .map(|monitors| {
-                monitors
-                    .iter()
-                    .find(|monitor| {
-                        let monitor_physical_size = monitor.size();
-                        let monitor_physical_position = monitor.position();
-                        mouse_physical_position.x >= monitor_physical_position.x
-                            && mouse_physical_position.x
-                                <= monitor_physical_position.x
-                                    + (monitor_physical_size.width as i32)
-                            && mouse_physical_position.y >= monitor_physical_position.y
-                            && mouse_physical_position.y
-                                <= monitor_physical_position.y
-                                    + (monitor_physical_size.height as i32)
-                    })
-                    .cloned()
-            })
-            .unwrap_or_else(|e| {
-                eprintln!("Error get available monitors: {}", e);
-                None
-            })
-            .or_else(|| window.current_monitor().unwrap())
-            .or_else(|| window.primary_monitor().unwrap())
-            .expect("No current monitor found");
 
         let monitor_physical_size = current_monitor.size();
         let monitor_physical_position = current_monitor.position();
@@ -400,8 +410,6 @@ pub fn get_action_manager_window() -> tauri::Window {
         }
     };
 
-    post_process_window(&window);
-
     window
 }
 
@@ -437,8 +445,6 @@ pub fn get_settings_window() -> tauri::Window {
             return build_window(builder);
         }
     };
-
-    post_process_window(&window);
 
     window
 }
@@ -476,7 +482,55 @@ pub fn get_updater_window() -> tauri::Window {
         }
     };
 
-    post_process_window(&window);
+    window
+}
+
+pub fn show_screenshot_window() {
+    let _ = get_screenshot_window();
+    // window.show().unwrap();
+}
+
+pub fn get_screenshot_window() -> tauri::Window {
+    let handle = APP_HANDLE.get().unwrap();
+    let current_monitor = get_current_monitor();
+    let dpi = current_monitor.scale_factor();
+    let physical_position = current_monitor.position();
+    let position: tauri::LogicalPosition<f64> = physical_position.to_logical(dpi);
+
+    let window = match handle.get_window(SCREENSHOT_WIN_NAME) {
+        Some(window) => {
+            window.set_focus().unwrap();
+            window
+        }
+        None => {
+            let builder = tauri::WindowBuilder::new(
+                handle,
+                SCREENSHOT_WIN_NAME,
+                tauri::WindowUrl::App("src/tauri/index.html".into()),
+            )
+            .title("OpenAI Translator Screenshot")
+            .position(position.x, position.y)
+            .visible(false)
+            .focused(true);
+
+            let window = build_window(builder);
+            window
+        }
+    };
+
+    window.set_resizable(false).unwrap();
+    window.set_skip_taskbar(true).unwrap();
+    #[cfg(target_os = "macos")]
+    {
+        let size = current_monitor.size();
+        window.set_decorations(false).unwrap();
+        window.set_size(*size).unwrap();
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    window.set_fullscreen(true).unwrap();
+
+    window.set_always_on_top(true).unwrap();
 
     window
 }

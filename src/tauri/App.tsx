@@ -6,6 +6,7 @@ import { SettingsWindow } from './windows/SettingsWindow'
 import { ActionManagerWindow } from './windows/ActionManagerWindow'
 import { ThumbWindow } from './windows/ThumbWindow'
 import { UpdaterWindow } from './windows/UpdaterWindow'
+import { ScreenshotWindow } from './windows/ScreenshotWindow'
 
 const windowsMap: Record<string, typeof TranslatorWindow> = {
     translator: TranslatorWindow,
@@ -13,6 +14,7 @@ const windowsMap: Record<string, typeof TranslatorWindow> = {
     settings: SettingsWindow,
     thumb: ThumbWindow,
     updater: UpdaterWindow,
+    screenshot: ScreenshotWindow,
 }
 
 export function App() {
