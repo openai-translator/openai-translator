@@ -5,10 +5,10 @@ use crate::APP_HANDLE;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::NSWindow;
 use debug_print::debug_println;
+use enigo::*;
 use mouse_position::mouse_position::Mouse;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
-use enigo::*;
 #[cfg(not(target_os = "macos"))]
 use window_shadows::set_shadow;
 
@@ -128,16 +128,16 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
                 handle,
                 THUMB_WIN_NAME,
                 tauri::WindowUrl::App("src/tauri/thumb.html".into()),
-                )
-                .fullscreen(false)
-                .focused(false)
-                .inner_size(20.0, 20.0)
-                .min_inner_size(20.0, 20.0)
-                .max_inner_size(20.0, 20.0)
-                .visible(true)
-                .resizable(false)
-                .skip_taskbar(true)
-                .decorations(false);
+            )
+            .fullscreen(false)
+            .focused(false)
+            .inner_size(20.0, 20.0)
+            .min_inner_size(20.0, 20.0)
+            .max_inner_size(20.0, 20.0)
+            .visible(true)
+            .resizable(false)
+            .skip_taskbar(true)
+            .decorations(false);
 
             let window = build_window(builder);
 
@@ -153,16 +153,16 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
     if cfg!(target_os = "macos") {
         window
             .set_position(LogicalPosition::new(
-                    x as f64 + position_offset,
-                    y as f64 + position_offset,
-                    ))
+                x as f64 + position_offset,
+                y as f64 + position_offset,
+            ))
             .unwrap();
     } else {
         window
             .set_position(PhysicalPosition::new(
-                    x as f64 + position_offset,
-                    y as f64 + position_offset,
-                    ))
+                x as f64 + position_offset,
+                y as f64 + position_offset,
+            ))
             .unwrap();
     }
 
@@ -183,7 +183,8 @@ pub fn post_process_window(window: &tauri::Window) {
         let ns_win = window.ns_window().unwrap() as id;
         unsafe {
             let mut collection_behavior = ns_win.collectionBehavior();
-            collection_behavior |= NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
+            collection_behavior |=
+                NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
 
             ns_win.setCollectionBehavior_(collection_behavior);
         }
@@ -204,7 +205,11 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 
     #[cfg(target_os = "windows")]
     {
-        let window = builder.transparent(true).decorations(false).build().unwrap();
+        let window = builder
+            .transparent(true)
+            .decorations(false)
+            .build()
+            .unwrap();
 
         set_shadow(&window, true).unwrap();
 
@@ -213,7 +218,11 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
 
     #[cfg(target_os = "linux")]
     {
-        let window = builder.transparent(true).decorations(false).build().unwrap();
+        let window = builder
+            .transparent(true)
+            .decorations(false)
+            .build()
+            .unwrap();
 
         set_shadow(&window, true).unwrap();
 
@@ -281,10 +290,12 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
         let mut mouse_physical_position = PhysicalPosition::new(mouse_logical_x, mouse_logical_y);
         if cfg!(target_os = "macos") {
             mouse_physical_position =
-                LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64).to_physical(scale_factor);
+                LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64)
+                    .to_physical(scale_factor);
         }
 
-        let current_monitor = window.available_monitors()
+        let current_monitor = window
+            .available_monitors()
             .map(|monitors| {
                 monitors
                     .iter()
@@ -292,11 +303,15 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
                         let monitor_physical_size = monitor.size();
                         let monitor_physical_position = monitor.position();
                         mouse_physical_position.x >= monitor_physical_position.x
-                            && mouse_physical_position.x <= monitor_physical_position.x + (monitor_physical_size.width as i32)
+                            && mouse_physical_position.x
+                                <= monitor_physical_position.x
+                                    + (monitor_physical_size.width as i32)
                             && mouse_physical_position.y >= monitor_physical_position.y
-                            && mouse_physical_position.y <= monitor_physical_position.y + (monitor_physical_size.height as i32)
+                            && mouse_physical_position.y
+                                <= monitor_physical_position.y
+                                    + (monitor_physical_size.height as i32)
                     })
-                .cloned()
+                    .cloned()
             })
             .unwrap_or_else(|e| {
                 eprintln!("Error get available monitors: {}", e);
@@ -310,11 +325,19 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
         let monitor_physical_position = current_monitor.position();
 
         let mut window_physical_position = mouse_physical_position;
-        if mouse_physical_position.x + (window_physical_size.width as i32) > monitor_physical_position.x + (monitor_physical_size.width as i32) {
-            window_physical_position.x = monitor_physical_position.x + (monitor_physical_size.width as i32) - (window_physical_size.width as i32);
+        if mouse_physical_position.x + (window_physical_size.width as i32)
+            > monitor_physical_position.x + (monitor_physical_size.width as i32)
+        {
+            window_physical_position.x = monitor_physical_position.x
+                + (monitor_physical_size.width as i32)
+                - (window_physical_size.width as i32);
         }
-        if mouse_physical_position.y + (window_physical_size.height as i32) > monitor_physical_position.y + (monitor_physical_size.height as i32) {
-            window_physical_position.y = monitor_physical_position.y + (monitor_physical_size.height as i32) - (window_physical_size.height as i32);
+        if mouse_physical_position.y + (window_physical_size.height as i32)
+            > monitor_physical_position.y + (monitor_physical_size.height as i32)
+        {
+            window_physical_position.y = monitor_physical_position.y
+                + (monitor_physical_size.height as i32)
+                - (window_physical_size.height as i32);
         }
         if !cfg!(target_os = "macos") {
             window.unminimize().unwrap();

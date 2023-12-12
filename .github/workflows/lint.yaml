@@ -10,7 +10,7 @@ on:
 
 jobs:
   typos-check:
-    name: Spell Check with Typos
+    name: spellcheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Actions Repository
@@ -19,6 +19,21 @@ jobs:
         uses: crate-ci/typos@v1.16.10
         with:
           config: ./typos.toml
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - uses: mbrobbel/rustfmt-check@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mode: review
+          args: --manifest-path src-tauri/Cargo.toml
 
   eslint:
     runs-on: ubuntu-latest
