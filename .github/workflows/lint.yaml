@@ -10,7 +10,7 @@ on:
 
 jobs:
   typos-check:
-    name: spellcheck
+    name: Spell Check with Typos
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Actions Repository
