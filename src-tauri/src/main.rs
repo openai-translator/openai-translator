@@ -229,7 +229,7 @@ fn main() {
                     }
                     std::thread::spawn(move || {
                         let _lock = RELEASE_THREAD_ID.lock();
-                        let selected_text = utils::get_selected_text().unwrap();
+                        let selected_text = utils::get_selected_text().unwrap_or_default();
                         if !selected_text.is_empty() {
                             {
                                 *SELECTED_TEXT.lock() = selected_text;

@@ -284,19 +284,27 @@ pub fn get_main_window(center: bool, to_mouse_position: bool, set_focus: bool) -
                 LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64).to_physical(scale_factor);
         }
 
-        let current_monitor = window.available_monitors().and_then(|monitors| {
-            Ok(monitors
-               .iter()
-               .find(|monitor| {
-                   let monitor_physical_size = monitor.size();
-                   let monitor_physical_position = monitor.position();
-                   mouse_physical_position.x >= monitor_physical_position.x
-                       && mouse_physical_position.x <= monitor_physical_position.x + (monitor_physical_size.width as i32)
-                       && mouse_physical_position.y >= monitor_physical_position.y
-                       && mouse_physical_position.y <= monitor_physical_position.y + (monitor_physical_size.height as i32)
-               })
-               .cloned())
-        }).unwrap_or_else(|_| window.current_monitor().unwrap()).unwrap();
+        let current_monitor = window.available_monitors()
+            .map(|monitors| {
+                monitors
+                    .iter()
+                    .find(|monitor| {
+                        let monitor_physical_size = monitor.size();
+                        let monitor_physical_position = monitor.position();
+                        mouse_physical_position.x >= monitor_physical_position.x
+                            && mouse_physical_position.x <= monitor_physical_position.x + (monitor_physical_size.width as i32)
+                            && mouse_physical_position.y >= monitor_physical_position.y
+                            && mouse_physical_position.y <= monitor_physical_position.y + (monitor_physical_size.height as i32)
+                    })
+                .cloned()
+            })
+            .unwrap_or_else(|e| {
+                eprintln!("Error get available monitors: {}", e);
+                None
+            })
+            .or_else(|| window.current_monitor().unwrap())
+            .or_else(|| window.primary_monitor().unwrap())
+            .expect("No current monitor found");
 
         let monitor_physical_size = current_monitor.size();
         let monitor_physical_position = current_monitor.position();
