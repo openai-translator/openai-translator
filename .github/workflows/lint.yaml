@@ -32,7 +32,7 @@ jobs:
       - uses: mbrobbel/rustfmt-check@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          mode: review
+          mode: ${{ github.event_name != 'pull_request' && 'commit' || 'review' }}
           args: --manifest-path src-tauri/Cargo.toml
 
   eslint:
