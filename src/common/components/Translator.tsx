@@ -1394,7 +1394,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [showSettings])
 
-    const showSubmitButton = useMemo(() => {
+    const showSubmitButton = () => {
         if (activateAction?.id === undefined) {
             return false
         }
@@ -1412,7 +1412,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
 
         return false
-    }, [activateAction?.id, editableText, translateDeps.action?.id, translateDeps.text])
+    }
 
     const handleSubmit = useCallback(
         (e: React.SyntheticEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1423,13 +1423,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 action = actions?.find((action) => action.mode === 'translate')
                 setActivateAction(action)
             }
+            const text = editorRef.current?.value ?? ''
             if (action) {
-                getTranslateDeps(editableText, action).then((v) => {
+                getTranslateDeps(text, action).then((v) => {
                     setTranslateDeps(v)
                 })
             }
         },
-        [actions, activateAction, editableText, getTranslateDeps]
+        [actions, activateAction, getTranslateDeps]
     )
 
     const { data: promotions, mutate: refetchPromotions } = useSWR<IPromotionResponse>(
@@ -1541,9 +1542,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     setTranslateDeps((v) => ({
                                         ...v,
                                         text: translatedText,
+                                        sourceLang: targetLang ?? 'en',
+                                        targetLang: sourceLang,
                                     }))
                                     setSourceLang(targetLang ?? 'en')
                                     setTargetLang(sourceLang)
+                                    editorRef.current?.focus()
                                 }}
                             >
                                 <Tooltip content='Exchange' placement='top'>
@@ -1849,8 +1853,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 display: 'flex',
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
-                                                paddingTop: showSubmitButton ? 8 : 0,
-                                                height: showSubmitButton ? 28 : 0,
+                                                paddingTop: showSubmitButton() ? 8 : 0,
+                                                height: showSubmitButton() ? 28 : 0,
                                                 transition: 'all 0.3s linear',
                                                 overflow: 'hidden',
                                             }}
