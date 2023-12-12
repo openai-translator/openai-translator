@@ -1,10 +1,13 @@
+use futures_util::stream::{AbortHandle, Abortable};
 use futures_util::StreamExt;
-use futures_util::stream::{Abortable, AbortHandle};
 use std::collections::HashMap;
 
+use reqwest::{
+    header::{HeaderMap, HeaderName},
+    Client,
+};
+use serde::{Deserialize, Serialize};
 use tauri::Manager;
-use reqwest::{Client, header::{HeaderMap, HeaderName}};
-use serde::{Serialize, Deserialize};
 
 use crate::APP_HANDLE;
 
@@ -39,8 +42,11 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         .default_headers(headers)
         .build()
         .map_err(|err| format!("failed to generate client: {}", err))?;
-    
-    let request_builder = client.request(options.method.parse().unwrap(), url.parse::<reqwest::Url>().unwrap());
+
+    let request_builder = client.request(
+        options.method.parse().unwrap(),
+        url.parse::<reqwest::Url>().unwrap(),
+    );
 
     let stream = request_builder
         .body(options.body)
@@ -66,18 +72,28 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         let chunk_str = String::from_utf8(chunk.to_vec()).unwrap();
         use debug_print::debug_println;
         debug_println!("chunk: {}", chunk_str);
-        app_handle.emit("fetch-stream-chunk", StreamChunk {
-            id: id.clone(),
-            data: chunk_str.clone(),
-            done: false,
-        }).unwrap();
+        app_handle
+            .emit(
+                "fetch-stream-chunk",
+                StreamChunk {
+                    id: id.clone(),
+                    data: chunk_str.clone(),
+                    done: false,
+                },
+            )
+            .unwrap();
     }
 
-    app_handle.emit("fetch-stream-chunk", StreamChunk {
-        id: id.clone(),
-        data: "".to_string(),
-        done: true,
-    }).unwrap();
+    app_handle
+        .emit(
+            "fetch-stream-chunk",
+            StreamChunk {
+                id: id.clone(),
+                data: "".to_string(),
+                done: true,
+            },
+        )
+        .unwrap();
 
     app_handle.unlisten(listen_id);
 

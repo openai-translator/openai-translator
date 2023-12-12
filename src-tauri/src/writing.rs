@@ -1,12 +1,15 @@
+use crate::utils::{backspace_click, left_arrow_click, right_arrow_click, select_all, INPUT_LOCK};
 use debug_print::debug_println;
+use enigo::*;
 use parking_lot::Mutex;
-use std::{thread, time::Duration};
 use similar::utils::diff_chars;
 use similar::{Algorithm, ChangeTag};
-use enigo::*;
-use crate::utils::{INPUT_LOCK, select_all, left_arrow_click, backspace_click, right_arrow_click};
+use std::{thread, time::Duration};
 
-pub fn get_input_text(enigo: &mut Enigo, cancel_select: bool) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_input_text(
+    enigo: &mut Enigo,
+    cancel_select: bool,
+) -> Result<String, Box<dyn std::error::Error>> {
     select_all(enigo);
     return crate::utils::get_selected_text_by_clipboard(enigo, cancel_select);
 }
@@ -40,10 +43,15 @@ pub fn writing_command() {
     }
     let mut is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
     let mut enigo = Enigo::new();
-    let selected_text = crate::utils::get_selected_text_by_clipboard(&mut enigo, false).unwrap_or_default();
+    let selected_text =
+        crate::utils::get_selected_text_by_clipboard(&mut enigo, false).unwrap_or_default();
     if !selected_text.is_empty() {
         *is_translate_selected_text = true;
-        do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
+        do_write_to_input(
+            &mut enigo,
+            TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(),
+            false,
+        );
         crate::utils::writing_text(selected_text);
         return;
     }
@@ -63,34 +71,39 @@ pub fn writing_command() {
         return;
     }
     debug_println!("content: {:?}", content.chars());
-    debug_println!("previous_translated_text: {:?}", previous_translated_text.chars());
+    debug_println!(
+        "previous_translated_text: {:?}",
+        previous_translated_text.chars()
+    );
     let changeset = diff_chars(Algorithm::Myers, &*previous_translated_text, &content);
     debug_println!("changeset: {:?}", changeset);
-    let modifications_count = changeset.iter().filter(|(change_tag, _)| {
-        match change_tag {
+    let modifications_count = changeset
+        .iter()
+        .filter(|(change_tag, _)| match change_tag {
             ChangeTag::Insert => true,
             ChangeTag::Delete => true,
             _ => false,
-        }
-    }).count();
+        })
+        .count();
     let translated_fingerprint_count = ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
-    let mut is_all_translated_before = content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1));
+    let mut is_all_translated_before = content
+        .starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count))
+        && !content
+            .starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1));
     let mut need_to_add_fingerprint = NEED_TO_ADD_FINGERPRINT.lock();
     *need_to_add_fingerprint = false;
 
     if !is_all_translated_before {
         match changeset.iter().next().clone() {
-            Some(change) => {
-                match change {
-                    (ChangeTag::Delete, text) => {
-                        if *text == ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count) {
-                            *need_to_add_fingerprint = true;
-                            is_all_translated_before = true;
-                        }
+            Some(change) => match change {
+                (ChangeTag::Delete, text) => {
+                    if *text == ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count) {
+                        *need_to_add_fingerprint = true;
+                        is_all_translated_before = true;
                     }
-                    _ => {}
                 }
-            }
+                _ => {}
+            },
             None => {}
         }
         if !is_all_translated_before && changeset.len() >= 2 {
@@ -98,7 +111,11 @@ pub fn writing_command() {
             let second_change = changeset.iter().nth(1).unwrap();
             match (first_change, second_change) {
                 ((ChangeTag::Insert, _), (ChangeTag::Equal, text)) => {
-                    if text.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !text.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1)) {
+                    if text.starts_with(
+                        &ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count),
+                    ) && !text.starts_with(
+                        &ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1),
+                    ) {
                         *need_to_add_fingerprint = true;
                         is_all_translated_before = true;
                     }
@@ -109,7 +126,11 @@ pub fn writing_command() {
     }
 
     debug_println!("is_all_translated_before: {:?}", is_all_translated_before);
-    if !previous_translated_text.is_empty() && modifications_count > 0 && modifications_count < 10 && is_all_translated_before {
+    if !previous_translated_text.is_empty()
+        && modifications_count > 0
+        && modifications_count < 10
+        && is_all_translated_before
+    {
         let mut incremental_actions = Vec::new();
         let mut is_first_insertion = true;
         let mut prev_insertion_index = 0;
@@ -142,24 +163,29 @@ pub fn writing_command() {
             let mut right_arrow_click_count = 0;
             if is_first_insertion {
                 is_first_insertion = false;
-                left_arrow_click_count = changeset[i+1..].iter().fold(0, |acc, change| {
-                    match change {
-                        (ChangeTag::Insert, text) => acc + text.chars().count(),
-                        (ChangeTag::Equal, text) => acc + text.chars().count(),
-                        _ => acc,
-                    }
-                }) + suffix_newline_count;
+                left_arrow_click_count =
+                    changeset[i + 1..]
+                        .iter()
+                        .fold(0, |acc, change| match change {
+                            (ChangeTag::Insert, text) => acc + text.chars().count(),
+                            (ChangeTag::Equal, text) => acc + text.chars().count(),
+                            _ => acc,
+                        })
+                        + suffix_newline_count;
             } else {
-                right_arrow_click_count = changeset[prev_insertion_index+1..i].iter().fold(0, |acc, change| {
-                    match change {
+                right_arrow_click_count = changeset[prev_insertion_index + 1..i].iter().fold(
+                    0,
+                    |acc, change| match change {
                         (ChangeTag::Insert, text) => acc + text.chars().count(),
                         (ChangeTag::Equal, text) => acc + text.chars().count(),
                         _ => acc,
-                    }
-                }) + prefix_newline_count;
+                    },
+                ) + prefix_newline_count;
             }
             prev_insertion_index = i;
-            let insertion_content = insertion_content[prefix_newline_count..insertion_content.len()-suffix_newline_count].to_owned();
+            let insertion_content = insertion_content
+                [prefix_newline_count..insertion_content.len() - suffix_newline_count]
+                .to_owned();
             let incremental_action = IncrementalAction {
                 left_arrow_click_count,
                 right_arrow_click_count,
@@ -173,8 +199,13 @@ pub fn writing_command() {
         }
         thread::spawn(move || {
             let mut global_incremental_actions = INCREMENTAL_ACTIONS.lock();
-            let reversed_incremental_actions = incremental_actions.iter().rev().map(|action| action.to_owned()).collect::<Vec<_>>();
-            let incremental_action = reversed_incremental_actions[reversed_incremental_actions.len()-1].clone();
+            let reversed_incremental_actions = incremental_actions
+                .iter()
+                .rev()
+                .map(|action| action.to_owned())
+                .collect::<Vec<_>>();
+            let incremental_action =
+                reversed_incremental_actions[reversed_incremental_actions.len() - 1].clone();
             *global_incremental_actions = reversed_incremental_actions;
             do_incremental_writing(&incremental_action);
         });
@@ -184,7 +215,10 @@ pub fn writing_command() {
     thread::sleep(Duration::from_millis(30));
     do_write_to_input(&mut enigo, "Translating... ✍️".to_string(), false);
 
-    if content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count)) && !content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1)) {
+    if content.starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count))
+        && !content
+            .starts_with(&ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count + 1))
+    {
         // use chars to get string slice
         let mut translated_text = String::new();
         for c in content.chars().skip(*translated_fingerprint_count) {
@@ -200,10 +234,21 @@ fn do_incremental_writing(incremental_action: &IncrementalAction) {
     if incremental_action.left_arrow_click_count > 0 {
         left_arrow_click(&mut enigo, incremental_action.left_arrow_click_count);
     } else if incremental_action.right_arrow_click_count > 0 {
-        right_arrow_click(&mut enigo, incremental_action.right_arrow_click_count + incremental_action.insertion_content.chars().count());
+        right_arrow_click(
+            &mut enigo,
+            incremental_action.right_arrow_click_count
+                + incremental_action.insertion_content.chars().count(),
+        );
     }
-    backspace_click(&mut enigo, incremental_action.insertion_content.chars().count());
-    do_write_to_input(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(), false);
+    backspace_click(
+        &mut enigo,
+        incremental_action.insertion_content.chars().count(),
+    );
+    do_write_to_input(
+        &mut enigo,
+        TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned(),
+        false,
+    );
     crate::utils::writing_text(incremental_action.insertion_content.to_owned());
 }
 
@@ -217,7 +262,10 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
             if char == "\n" {
                 if let Ok(config) = crate::config::get_config() {
                     if let Some(writing_newline_hotkey) = config.writing_newline_hotkey {
-                        let keys = writing_newline_hotkey.split("+").map(|c| c.trim()).collect::<Vec<&str>>();
+                        let keys = writing_newline_hotkey
+                            .split("+")
+                            .map(|c| c.trim())
+                            .collect::<Vec<&str>>();
                         for key in &keys {
                             if key.len() == 1 {
                                 enigo.key_down(Key::Layout(key.chars().next().unwrap()));
@@ -278,7 +326,14 @@ pub fn write_to_input(text: String) {
             thread::sleep(Duration::from_millis(50));
             need_to_add_fingerprint = true;
         } else {
-            backspace_click(&mut enigo, TRANSLATE_SELECTED_TEXT_PLACEHOLDER.to_owned().chars().count() - 1);
+            backspace_click(
+                &mut enigo,
+                TRANSLATE_SELECTED_TEXT_PLACEHOLDER
+                    .to_owned()
+                    .chars()
+                    .count()
+                    - 1,
+            );
         }
     }
     let mut global_need_to_add_fingerprint = NEED_TO_ADD_FINGERPRINT.lock();
@@ -289,7 +344,11 @@ pub fn write_to_input(text: String) {
         if *translated_fingerprint_count > 7 {
             *translated_fingerprint_count = 1;
         }
-        new_text = format!("{}{}", ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count), text);
+        new_text = format!(
+            "{}{}",
+            ALL_TRANSLATED_FINGERPRINT.repeat(*translated_fingerprint_count),
+            text
+        );
     }
     *is_start_writing = true;
     do_write_to_input(&mut enigo, new_text, true);
@@ -309,7 +368,7 @@ pub fn finish_writing() {
         if incremental_actions.is_empty() {
             false
         } else {
-            let incremental_action = &incremental_actions[incremental_actions.len()-1];
+            let incremental_action = &incremental_actions[incremental_actions.len() - 1];
             incremental_action.left_arrow_click_count > 0
         }
     };
@@ -320,7 +379,7 @@ pub fn finish_writing() {
     if incremental_actions.len() > 1 {
         let mut new_incremental_actions = incremental_actions.clone();
         new_incremental_actions.pop().unwrap();
-        let incremental_action = new_incremental_actions[new_incremental_actions.len()-1].clone();
+        let incremental_action = new_incremental_actions[new_incremental_actions.len() - 1].clone();
         *incremental_actions = new_incremental_actions;
         do_incremental_writing(&incremental_action);
     } else {
@@ -335,9 +394,13 @@ pub fn finish_writing() {
         let input_text = get_input_text(&mut enigo, true).unwrap_or_default();
         let input_text = input_text.replace("\r\n", "\n");
 
-        let fingerprint_count = input_text.chars().take_while(|c| *c == ALL_TRANSLATED_FINGERPRINT.chars().next().unwrap()).count();
+        let fingerprint_count = input_text
+            .chars()
+            .take_while(|c| *c == ALL_TRANSLATED_FINGERPRINT.chars().next().unwrap())
+            .count();
         if fingerprint_count > 0 {
-            let mut global_all_translated_fingerprint_count = ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
+            let mut global_all_translated_fingerprint_count =
+                ALL_TRANSLATED_FINGERPRINT_COUNT.lock();
             *global_all_translated_fingerprint_count = fingerprint_count;
         }
 

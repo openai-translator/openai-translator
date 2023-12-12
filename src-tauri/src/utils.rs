@@ -1,5 +1,5 @@
-use parking_lot::Mutex;
 use enigo::*;
+use parking_lot::Mutex;
 use std::{thread, time::Duration};
 use tauri::path::BaseDirectory;
 use tauri::Manager;
@@ -32,7 +32,12 @@ pub fn select_all(enigo: &mut Enigo) {
         .resolve("resources/select-all.applescript", BaseDirectory::Resource)
         .expect("failed to resolve select-all.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[allow(dead_code)]
@@ -69,7 +74,13 @@ pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
         .resolve("resources/left.applescript", BaseDirectory::Resource)
         .expect("failed to resolve left.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .arg(n.to_string())
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[cfg(not(target_os = "macos"))]
@@ -92,7 +103,13 @@ pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
         .resolve("resources/right.applescript", BaseDirectory::Resource)
         .expect("failed to resolve right.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .arg(n.to_string())
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[cfg(not(target_os = "macos"))]
@@ -115,7 +132,13 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
         .resolve("resources/backspace.applescript", BaseDirectory::Resource)
         .expect("failed to resolve backspace.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).arg(n.to_string()).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .arg(n.to_string())
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[allow(dead_code)]
@@ -178,7 +201,12 @@ pub fn copy(enigo: &mut Enigo) {
         .resolve("resources/copy.applescript", BaseDirectory::Resource)
         .expect("failed to resolve copy.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[allow(dead_code)]
@@ -219,7 +247,12 @@ pub fn paste(enigo: &mut Enigo) {
         .resolve("resources/paste.applescript", BaseDirectory::Resource)
         .expect("failed to resolve paste.applescript");
 
-    std::process::Command::new("osascript").arg(apple_script).spawn().expect("failed to run applescript").wait().expect("failed to wait");
+    std::process::Command::new("osascript")
+        .arg(apple_script)
+        .spawn()
+        .expect("failed to run applescript")
+        .wait()
+        .expect("failed to wait");
 }
 
 #[allow(dead_code)]
@@ -240,7 +273,10 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
     get_selected_text_by_clipboard(&mut enigo, false)
 }
 
-pub fn get_selected_text_by_clipboard(enigo: &mut Enigo, cancel_select: bool) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard(
+    enigo: &mut Enigo,
+    cancel_select: bool,
+) -> Result<String, Box<dyn std::error::Error>> {
     use arboard::Clipboard;
 
     let old_clipboard = (Clipboard::new()?.get_text(), Clipboard::new()?.get_image());
@@ -316,7 +352,10 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
             println!("get_selected_text_by_ax error: {}", err);
             match get_config() {
                 Ok(config) => {
-                    if config.allow_using_clipboard_when_selected_text_not_available.unwrap_or(false) {
+                    if config
+                        .allow_using_clipboard_when_selected_text_not_available
+                        .unwrap_or(false)
+                    {
                         get_selected_text_by_clipboard_using_applescript()
                     } else {
                         Ok(String::new())
@@ -337,7 +376,10 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
         .get()
         .unwrap()
         .path()
-        .resolve("resources/get-selected-text-by-ax.applescript", BaseDirectory::Resource)
+        .resolve(
+            "resources/get-selected-text-by-ax.applescript",
+            BaseDirectory::Resource,
+        )
         .expect("failed to resolve get-selected-text-by-ax.applescript");
 
     match std::process::Command::new("osascript")
@@ -368,12 +410,16 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_selected_text_by_clipboard_using_applescript() -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_selected_text_by_clipboard_using_applescript(
+) -> Result<String, Box<dyn std::error::Error>> {
     let apple_script = APP_HANDLE
         .get()
         .unwrap()
         .path()
-        .resolve("resources/get-selected-text.applescript", BaseDirectory::Resource)
+        .resolve(
+            "resources/get-selected-text.applescript",
+            BaseDirectory::Resource,
+        )
         .expect("failed to resolve get-selected-text.applescript");
 
     match std::process::Command::new("osascript")
