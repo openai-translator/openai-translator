@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@aptabase/tauri':
+    specifier: github:aptabase/tauri-plugin-aptabase#v2
+    version: github.com/aptabase/tauri-plugin-aptabase/0ce6517a72cbd7ac89d9c23328006a2208429897
   '@floating-ui/dom':
     specifier: ^1.5.1
     version: 1.5.1
@@ -7729,6 +7732,14 @@ packages:
       '@types/react': 18.2.18
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  github.com/aptabase/tauri-plugin-aptabase/0ce6517a72cbd7ac89d9c23328006a2208429897:
+    resolution: {tarball: https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/0ce6517a72cbd7ac89d9c23328006a2208429897}
+    name: '@aptabase/tauri'
+    version: 0.4.2
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.11
     dev: false
 
   github.com/tauri-apps/tauri-plugin-autostart/7404c3ccd2e45c642e3b876500ab79d88af85e4d:

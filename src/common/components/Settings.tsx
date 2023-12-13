@@ -55,6 +55,7 @@ import { Markdown } from './Markdown'
 import { open } from '@tauri-apps/plugin-shell'
 import { getCurrent } from '@tauri-apps/api/window'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
+import { trackEvent } from '@aptabase/tauri'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1133,6 +1134,13 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         }
     }, [isTauri, refetchPromotions])
 
+    useEffect(() => {
+        if (!isTauri) {
+            return
+        }
+        trackEvent('screen_view', { name: 'Settings' })
+    }, [isTauri])
+
     const { theme, themeType } = useTheme()
 
     const { refreshThemeType } = useThemeType()
@@ -1222,6 +1230,10 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
 
             if (data.themeType) {
                 refreshThemeType()
+            }
+
+            if (isTauri) {
+                trackEvent('save_settings')
             }
 
             toast(t('Saved'), {
