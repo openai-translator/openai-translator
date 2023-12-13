@@ -14,6 +14,7 @@ import { createUseStyles } from 'react-jss'
 import { MdBrowserUpdated } from 'react-icons/md'
 import { IoIosCloseCircleOutline } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
+import { getCurrent } from '@tauri-apps/api/window'
 
 const useStyles = createUseStyles({
     icon: {
@@ -233,10 +234,14 @@ export function UpdaterWindow() {
                         <Button
                             size='compact'
                             kind='secondary'
-                            onClick={(e) => {
+                            onClick={async (e) => {
                                 e.stopPropagation()
                                 e.preventDefault()
-                                invoke('close_updater_window')
+                                const appWindow = getCurrent()
+                                await appWindow.hide()
+                                setTimeout(() => {
+                                    appWindow.close()
+                                }, 5000)
                             }}
                         >
                             <div

@@ -28,9 +28,8 @@ use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
 use crate::ocr::ocr_command;
 use crate::windows::{
-    close_updater_window, get_main_window_always_on_top, show_action_manager_window,
-    show_main_window_command, show_main_window_with_selected_text_command, show_updater_window,
-    MAIN_WIN_NAME,
+    get_main_window_always_on_top, show_action_manager_window, show_main_window_command,
+    show_main_window_with_selected_text_command, show_updater_window, MAIN_WIN_NAME,
 };
 use crate::writing::{finish_writing, write_to_input, writing_command};
 
@@ -400,7 +399,6 @@ fn main() {
             show_main_window_command,
             show_main_window_with_selected_text_command,
             show_action_manager_window,
-            close_updater_window,
             get_main_window_always_on_top,
             ocr_command,
             fetch_stream,
