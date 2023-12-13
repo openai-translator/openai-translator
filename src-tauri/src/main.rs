@@ -98,9 +98,7 @@ fn launch_ipc_server(server: &Server) {
     }
 }
 
-fn main() {
-    let silently = env::args().any(|arg| arg == "--silently");
-
+fn bind_mouse_hook() {
     let mut mouse_manager = Mouse::new();
 
     if !query_accessibility_permissions() {
@@ -272,6 +270,10 @@ fn main() {
             println!("Error: {}", e);
         }
     }
+}
+
+fn main() {
+    let silently = env::args().any(|arg| arg == "--silently");
 
     let mut sys = System::new();
     sys.refresh_cpu(); // Refreshing CPU information.
@@ -427,6 +429,7 @@ fn main() {
         }
         tauri::RunEvent::Ready => {
             app.track_event("app_started", None);
+            bind_mouse_hook();
             let handle = app.clone();
             tauri::async_runtime::spawn(async move {
                 let mut builder = handle.updater_builder();
