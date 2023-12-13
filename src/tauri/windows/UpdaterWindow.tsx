@@ -14,6 +14,7 @@ import { MdBrowserUpdated } from 'react-icons/md'
 import { IoIosCloseCircleOutline } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
 import { getCurrent } from '@tauri-apps/api/window'
+import { trackEvent } from '@aptabase/tauri'
 
 const useStyles = createUseStyles({
     icon: {
@@ -28,6 +29,10 @@ const useStyles = createUseStyles({
 })
 
 export function UpdaterWindow() {
+    useEffect(() => {
+        trackEvent('screen_view', { name: 'Updater' })
+    }, [])
+
     const { theme, themeType } = useTheme()
     const styles = useStyles()
     const [isChecking, setIsChecking] = useState(true)

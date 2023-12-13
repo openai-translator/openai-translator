@@ -1,3 +1,4 @@
+import { trackEvent } from '@aptabase/tauri'
 import { appCacheDir, join } from '@tauri-apps/api/path'
 import { convertFileSrc, invoke } from '@tauri-apps/api/primitives'
 import { getCurrent, currentMonitor } from '@tauri-apps/api/window'
@@ -23,6 +24,10 @@ export function ScreenshotWindow() {
     const [mouseMoveY, setMouseMoveY] = useState(0)
     const imgRef = useRef<HTMLImageElement>(null)
     const appWindow = getCurrent()
+
+    useEffect(() => {
+        trackEvent('screen_view', { name: 'Screenshot' })
+    }, [])
 
     useEffect(() => {
         currentMonitor().then((monitor) => {
