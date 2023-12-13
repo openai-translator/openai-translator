@@ -1,5 +1,6 @@
 use futures_util::stream::{AbortHandle, Abortable};
 use futures_util::StreamExt;
+use reqwest::StatusCode;
 use std::collections::HashMap;
 
 use reqwest::{
@@ -23,6 +24,7 @@ pub(crate) struct StreamChunk {
     id: String,
     data: String,
     done: bool,
+    status: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -48,12 +50,15 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         url.parse::<reqwest::Url>().unwrap(),
     );
 
-    let stream = request_builder
+    let resp = request_builder
         .body(options.body)
         .send()
         .await
-        .map_err(|err| format!("failed to call API: {}", err))?
-        .bytes_stream();
+        .map_err(|err| format!("failed to call API: {}", err))?;
+
+    let status = resp.status();
+
+    let stream = resp.bytes_stream();
 
     let app_handle = APP_HANDLE.get().unwrap();
     let (abort_handle, abort_registration) = AbortHandle::new_pair();
@@ -79,6 +84,7 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
                     id: id.clone(),
                     data: chunk_str.clone(),
                     done: false,
+                    status: status.as_u16(),
                 },
             )
             .unwrap();
@@ -91,6 +97,7 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
                 id: id.clone(),
                 data: "".to_string(),
                 done: true,
+                status: status.as_u16(),
             },
         )
         .unwrap();
