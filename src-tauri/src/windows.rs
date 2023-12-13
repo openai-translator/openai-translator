@@ -45,27 +45,39 @@ fn get_dummy_window() -> tauri::Window {
 }
 
 pub fn get_current_monitor() -> tauri::Monitor {
-    let dummy_window = get_dummy_window();
-    let monitors = dummy_window.available_monitors().unwrap();
-
-    let (x, y) = match Mouse::get_mouse_position() {
-        Mouse::Position { x, y } => (x, y),
-        _ => (0, 0),
-    };
-
-    for m in monitors {
-        let size = m.size();
-        let position = m.position();
-
-        if x >= position.x
-            && x <= (position.x + size.width as i32)
-            && y >= position.y
-            && y <= (position.y + size.height as i32)
-        {
-            return m;
-        }
+    let window = get_dummy_window();
+    let (mouse_logical_x, mouse_logical_y): (i32, i32) = get_mouse_location().unwrap();
+    let scale_factor = window.scale_factor().unwrap_or(1.0);
+    let mut mouse_physical_position = PhysicalPosition::new(mouse_logical_x, mouse_logical_y);
+    if cfg!(target_os = "macos") {
+        mouse_physical_position =
+            LogicalPosition::new(mouse_logical_x as f64, mouse_logical_y as f64)
+                .to_physical(scale_factor);
     }
-    dummy_window.primary_monitor().unwrap().unwrap()
+    window
+        .available_monitors()
+        .map(|monitors| {
+            monitors
+                .iter()
+                .find(|monitor| {
+                    let monitor_physical_size = monitor.size();
+                    let monitor_physical_position = monitor.position();
+                    mouse_physical_position.x >= monitor_physical_position.x
+                        && mouse_physical_position.x
+                            <= monitor_physical_position.x + (monitor_physical_size.width as i32)
+                        && mouse_physical_position.y >= monitor_physical_position.y
+                        && mouse_physical_position.y
+                            <= monitor_physical_position.y + (monitor_physical_size.height as i32)
+                })
+                .cloned()
+        })
+        .unwrap_or_else(|e| {
+            eprintln!("Error get available monitors: {}", e);
+            None
+        })
+        .or_else(|| window.current_monitor().unwrap())
+        .or_else(|| window.primary_monitor().unwrap())
+        .expect("No current monitor found")
 }
 
 pub fn get_mouse_location() -> Result<(i32, i32), String> {
