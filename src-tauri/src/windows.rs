@@ -1,5 +1,6 @@
 use crate::config;
 use crate::utils;
+use crate::UpdateResult;
 use crate::ALWAYS_ON_TOP;
 use crate::APP_HANDLE;
 #[cfg(target_os = "macos")]
@@ -7,8 +8,10 @@ use cocoa::appkit::NSWindow;
 use debug_print::debug_println;
 use enigo::*;
 use mouse_position::mouse_position::Mouse;
+use serde_json::json;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
+use tauri_plugin_updater::UpdaterExt;
 #[cfg(not(target_os = "macos"))]
 use window_shadows::set_shadow;
 
@@ -452,6 +455,44 @@ pub fn get_settings_window() -> tauri::Window {
 pub fn show_updater_window() {
     let window = get_updater_window();
     window.show().unwrap();
+    let window_clone = window.clone();
+    window.listen("check_update", move |event| {
+        let handle = APP_HANDLE.get().unwrap();
+        let window_clone = window_clone.clone();
+        tauri::async_runtime::spawn(async move {
+            let mut builder = handle.updater_builder();
+            let updater = builder.build().unwrap();
+
+            match updater.check().await {
+                Ok(Some(update)) => {
+                    handle
+                        .emit(
+                            "update_result",
+                            json!({
+                                "result": UpdateResult {
+                                    version: update.version,
+                                    current_version: update.current_version,
+                                    body: update.body,
+                                }
+                            }),
+                        )
+                        .unwrap();
+                }
+                Ok(None) => {
+                    handle
+                        .emit(
+                            "update_result",
+                            json!({
+                                "result": None::<UpdateResult>
+                            }),
+                        )
+                        .unwrap();
+                }
+                Err(_) => {}
+            }
+            window_clone.unlisten(event.id())
+        });
+    });
 }
 
 pub fn get_updater_window() -> tauri::Window {
