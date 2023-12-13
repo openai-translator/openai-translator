@@ -283,11 +283,16 @@ fn main() {
     let mut app = tauri::Builder::default()
         .plugin(
             tauri_plugin_aptabase::Builder::new("A-US-9856842764")
-                .with_panic_hook(Box::new(|client, info| {
+                .with_panic_hook(Box::new(|client, info, msg| {
+                    let location = info
+                        .location()
+                        .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
+                        .unwrap_or_else(|| "".to_string());
+
                     client.track_event(
                         "panic",
                         Some(json!({
-                            "info": format!("{:?}", info)
+                            "info": format!("{} ({})", msg, location),
                         })),
                     );
                 }))
@@ -312,7 +317,6 @@ fn main() {
         ))
         .plugin(tauri_plugin_process::init())
         .setup(move |app| {
-            app.track_event("app_started", None);
             let app_handle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
             tray::create_tray(&app_handle)?;
@@ -422,6 +426,7 @@ fn main() {
             app.flush_events_blocking();
         }
         tauri::RunEvent::Ready => {
+            app.track_event("app_started", None);
             let handle = app.clone();
             tauri::async_runtime::spawn(async move {
                 let mut builder = handle.updater_builder();
