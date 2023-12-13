@@ -54,18 +54,23 @@ export const useMemoWindow = (props: WindowMemoProps) => {
     }, [props.position, props.size])
 
     useEffect(() => {
+        const appWindow = getCurrent()
         let unListenMove: (() => void) | undefined
         let unListenResize: (() => void) | undefined
         event
-            .listen(event.TauriEvent.WINDOW_MOVED, (event: { payload: any }) => {
-                localStorage.setItem('_position', JSON.stringify(event.payload))
+            .listen(event.TauriEvent.WINDOW_MOVED, (event: { windowLabel: string; payload: any }) => {
+                if (event.windowLabel === appWindow.label) {
+                    localStorage.setItem('_position', JSON.stringify(event.payload))
+                }
             })
             .then((unListen) => {
                 unListenMove = unListen
             })
         event
-            .listen(event.TauriEvent.WINDOW_RESIZED, (event: { payload: any }) => {
-                localStorage.setItem('_size', JSON.stringify(event.payload))
+            .listen(event.TauriEvent.WINDOW_RESIZED, (event: { windowLabel: string; payload: any }) => {
+                if (event.windowLabel === appWindow.label) {
+                    localStorage.setItem('_size', JSON.stringify(event.payload))
+                }
             })
             .then((unListen) => {
                 unListenResize = unListen

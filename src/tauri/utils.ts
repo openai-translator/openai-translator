@@ -9,7 +9,7 @@ export async function bindHotkey(oldHotKey?: string) {
     const settings = await getSettings()
     if (!settings.hotkey) return
     await register(settings.hotkey, () => {
-        invoke('show_main_window_with_selected_text_command')
+        invoke('show_translator_window_with_selected_text_command')
     }).then(() => {
         console.log('register hotkey success')
     })
@@ -22,7 +22,7 @@ export async function bindDisplayWindowHotkey(oldHotKey?: string) {
     const settings = await getSettings()
     if (!settings.displayWindowHotkey) return
     await register(settings.displayWindowHotkey, () => {
-        invoke('show_main_window_command')
+        invoke('show_translator_window_command')
     }).then(() => {
         console.log('register display window hotkey success')
     })

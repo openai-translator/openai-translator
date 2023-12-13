@@ -17,10 +17,14 @@
       "scope": ["https://*", "http://*"]
     },
     "fs": {
-      "scope": [
-        "**",
-        "$CONFIG/*/**"
-      ]
+      "scope": {
+        "allow": [
+          "**",
+          "$CONFIG/*/**",
+          "$APPCONFIG/**",
+          "$APPCACHE/**"
+        ]
+      }
     },
     "shell": {
       "open": true
@@ -83,7 +87,13 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": ["$CACHE/**", "$CONFIG/**", "$APPCACHE/**" ]
+        }
+      }
     },
     "trayIcon": {
       "iconAsTemplate": true,

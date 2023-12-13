@@ -1,10 +1,12 @@
 use crate::utils::{backspace_click, left_arrow_click, right_arrow_click, select_all, INPUT_LOCK};
+use crate::APP_HANDLE;
 use debug_print::debug_println;
 use enigo::*;
 use parking_lot::Mutex;
 use similar::utils::diff_chars;
 use similar::{Algorithm, ChangeTag};
 use std::{thread, time::Duration};
+use tauri_plugin_aptabase::EventTracker;
 
 pub fn get_input_text(
     enigo: &mut Enigo,
@@ -37,6 +39,8 @@ pub fn writing_command() {
     if *is_writing {
         return;
     }
+    let app_handle = APP_HANDLE.get().unwrap();
+    app_handle.track_event("writing", None);
     {
         let mut incremental_actions = INCREMENTAL_ACTIONS.lock();
         incremental_actions.clear();

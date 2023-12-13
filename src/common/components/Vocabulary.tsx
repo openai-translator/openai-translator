@@ -18,9 +18,10 @@ import { format } from 'date-fns'
 import { useCollectedWordTotal } from '../hooks/useCollectedWordTotal'
 import { RiPictureInPictureExitLine } from 'react-icons/ri'
 import { Tooltip } from './Tooltip'
-import { isDesktopApp } from '../utils'
+import { isDesktopApp, isTauri } from '../utils'
 import { vocabularyService } from '../services/vocabulary'
 import { VocabularyItem } from '../internal-services/db'
+import { trackEvent } from '@aptabase/tauri'
 
 const RANDOM_SIZE = 10
 const MAX_WORDS = 50
@@ -154,6 +155,14 @@ interface IVocabularyProps {
 }
 
 const Vocabulary = (props: IVocabularyProps) => {
+    useEffect(() => {
+        if (!isTauri()) {
+            return
+        }
+
+        trackEvent('screen_view', { name: 'Vocabulary' })
+    }, [])
+
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
 
