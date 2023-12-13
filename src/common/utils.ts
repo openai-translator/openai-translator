@@ -282,16 +282,30 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 unlisten?.()
                 emit('abort-fetch-stream', { id })
             })
-            listen('fetch-stream-chunk', (event: Event<{ id: string; data: string; done: boolean }>) => {
-                const payload = event.payload
-                if (payload.id === id) {
+            listen(
+                'fetch-stream-chunk',
+                (event: Event<{ id: string; data: string; done: boolean; status: number }>) => {
+                    const payload = event.payload
+                    if (payload.id !== id) {
+                        return
+                    }
                     if (payload.done) {
+                        resolve()
+                        return
+                    }
+                    if (payload.status !== 200) {
+                        try {
+                            const data = JSON.parse(payload.data)
+                            onError(data)
+                        } catch (e) {
+                            onError(payload.data)
+                        }
                         resolve()
                         return
                     }
                     parser.feed(payload.data)
                 }
-            })
+            )
                 .then((cb) => {
                     unlisten = cb
                 })
