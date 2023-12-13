@@ -472,14 +472,3 @@ pub fn get_updater_window() -> tauri::Window {
 
     window
 }
-
-#[tauri::command]
-pub fn close_updater_window() {
-    let handle = APP_HANDLE.get().unwrap();
-    match handle.get_window(ACTION_UPDATER_WIN_NAME) {
-        Some(window) => {
-            window.close().unwrap();
-        }
-        None => {}
-    }
-}

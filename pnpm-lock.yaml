@@ -35,9 +35,6 @@ dependencies:
   '@tauri-apps/plugin-updater':
     specifier: 2.0.0-alpha.3
     version: 2.0.0-alpha.3
-  '@tauri-apps/plugin-window':
-    specifier: 2.0.0-alpha.1
-    version: 2.0.0-alpha.1
   '@types/react-copy-to-clipboard':
     specifier: ^5.0.4
     version: 5.0.4
@@ -1418,11 +1415,6 @@ packages:
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
-  /@tauri-apps/api@2.0.0-alpha.6:
-    resolution: {integrity: sha512-ZMOc3eu9amwvkC6M69h3hWt4/EsFaAXmtkiw4xd2LN59/lTb4ZQiVfq2QKlRcu1rj3n/Tcr7U30ZopvHwXBGIg==}
-    engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
-    dev: false
-
   /@tauri-apps/cli-darwin-arm64@2.0.0-alpha.18:
     resolution: {integrity: sha512-FBfbfSupOYG9BXmoGi1uRoMspqm5F0BdQbfgEuTkAnTl8cxUQnzOnoEc+qkd5+QqNCPssO89nsvijDLJmyK3AQ==}
     engines: {node: '>= 10'}
@@ -1570,12 +1562,6 @@ packages:
     resolution: {integrity: sha512-ZMNOpMrBEMCSBmI5Re09mhEldiDmHZBWaFkLXbDo8rcSM8OH2WaUQMDc6kmsu4pWgE/gs7RlwULmf9h3UZ+wLQ==}
     dependencies:
       '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-window@2.0.0-alpha.1:
-    resolution: {integrity: sha512-dFOAgal/3Txz3SQ+LNQq0AK1EPC+acdaFlwPVB/6KXUZYmaFleIlzgxDVoJCQ+/xOhxvYrdQaFLefh0I/Kldbg==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.6
     dev: false
 
   /@tootallnate/once@2.0.0:
