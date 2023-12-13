@@ -46,8 +46,12 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         .map_err(|err| format!("failed to generate client: {}", err))?;
 
     let request_builder = client.request(
-        options.method.parse().unwrap(),
-        url.parse::<reqwest::Url>().unwrap(),
+        options
+            .method
+            .parse()
+            .map_err(|err| format!("failed to parse method: {}", err))?,
+        url.parse::<reqwest::Url>()
+            .map_err(|err| format!("failed to parse url: {}", err))?,
     );
 
     let resp = request_builder
@@ -74,7 +78,8 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
 
     while let Some(item) = stream.next().await {
         let chunk = item.map_err(|err| format!("failed to read response: {}", err))?;
-        let chunk_str = String::from_utf8(chunk.to_vec()).unwrap();
+        let chunk_str = String::from_utf8(chunk.to_vec())
+            .map_err(|err| format!("failed to convert chunk to utf-8: {}", err))?;
         use debug_print::debug_println;
         debug_println!("chunk: {}", chunk_str);
         app_handle
