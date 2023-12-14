@@ -51,6 +51,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     miniMaxAPIKey: 1,
     moonshotAPIKey: 1,
     moonshotAPIModel: 1,
+    geminiAPIKey: 1,
+    geminiAPIModel: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
