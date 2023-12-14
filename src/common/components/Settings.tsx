@@ -1050,6 +1050,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
+              { label: 'Gemini', id: 'Gemini' },
           ] as {
               label: string
               id: Provider
@@ -1164,6 +1165,8 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         miniMaxAPIKey: '',
         moonshotAPIKey: '',
         moonshotAPIModel: '',
+        geminiAPIKey: '',
+        geminiAPIModel: '',
         autoTranslate: utils.defaultAutoTranslate,
         defaultTranslateMode: 'translate',
         defaultTargetLanguage: utils.defaultTargetLanguage,
@@ -1581,6 +1584,40 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='provider' label={t('Default service provider')} required>
                             <ProviderSelector />
                         </FormItem>
+                        <div
+                            style={{
+                                display: values.provider === 'Gemini' ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                name='geminiAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'Gemini'}
+                            >
+                                <APIModelSelector provider='Gemini' currentProvider={values.provider} onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                required={values.provider === 'Gemini'}
+                                name='geminiAPIKey'
+                                label='Gemini API Key'
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href='https://makersuite.google.com/app/apikey'
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            Google AI Studio
+                                        </a>{' '}
+                                        {t('to get your API Key.')}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                        </div>
                         <div
                             style={{
                                 display: values.provider === 'OpenAI' ? 'block' : 'none',
