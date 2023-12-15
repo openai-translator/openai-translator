@@ -73,6 +73,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     pinned: 1,
     autoCollect: 1,
     hideTheIconInTheDock: 1,
+    languageDetectionEngine: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -149,6 +150,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.automaticCheckForUpdates === undefined || settings.automaticCheckForUpdates === null) {
         settings.automaticCheckForUpdates = true
+    }
+    if (!settings.languageDetectionEngine) {
+        settings.languageDetectionEngine = 'baidu'
     }
     return settings
 }
