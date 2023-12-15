@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import _ from 'underscore'
 import { Tabs, Tab, StyledTabList, StyledTabPanel } from 'baseui-sd/tabs-motion'
-import { SlSpeech } from 'react-icons/sl'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
 import wechat from '../assets/images/wechat.png'
@@ -58,6 +57,7 @@ import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { trackEvent } from '@aptabase/tauri'
 import { Skeleton } from 'baseui-sd/skeleton'
 import { SpeakerIcon } from './SpeakerIcon'
+import { RxSpeakerLoud } from 'react-icons/rx'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1678,7 +1678,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     <Tab
                         title={t('TTS')}
                         artwork={() => {
-                            return <SlSpeech size={14} />
+                            return <RxSpeakerLoud size={14} />
                         }}
                         overrides={tabOverrides}
                     />
@@ -2058,17 +2058,11 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
+                        <FormItem name='restorePreviousPosition' label={t('Fixed Position')}>
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                             <SelectInputElementsCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem
-                            name='readSelectedWordsFromInputElementsText'
-                            label={t('Read the selected words in input')}
-                        >
-                            <ReadSelectedWordsFromInputElementsCheckbox onBlur={onBlur} />
                         </FormItem>
                         {isTauri && (
                             <FormItem name='runAtStartup' label={t('Run at startup')}>
@@ -2108,6 +2102,12 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                             display: activeTab === 1 ? 'block' : 'none',
                         }}
                     >
+                        <FormItem
+                            name='readSelectedWordsFromInputElementsText'
+                            label={t('Read the selected words in input')}
+                        >
+                            <ReadSelectedWordsFromInputElementsCheckbox onBlur={onBlur} />
+                        </FormItem>
                         <FormItem name='tts' label={t('TTS')}>
                             <TTSVoicesSettings onBlur={onBlur} />
                         </FormItem>
