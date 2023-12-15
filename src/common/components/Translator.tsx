@@ -802,6 +802,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 })
                 return action
             }
+            setEditableText(externalOriginalText)
             getTranslateDeps(externalOriginalText, action).then((v) => {
                 setTranslateDeps(v)
             })
@@ -869,7 +870,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 action: activateAction,
             })
         })
-    }, [activateAction, getTranslateDeps, props.uuid])
+    }, [activateAction, getTranslateDeps])
 
     const [actionStr, setActionStr] = useState('')
 
@@ -1042,6 +1043,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             let isStopped = false
             try {
+                // console.debug('translate', sourceLang, targetLang, text)
                 await translate({
                     action,
                     signal,

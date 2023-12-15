@@ -6,6 +6,8 @@ import ISO6391 from 'iso-639-1'
 import { LANG_CONFIGS, Config as OptionalLangConfig } from './data'
 import { oneLine } from 'common-tags'
 import { getUniversalFetch } from '../universal-fetch'
+import qs from 'qs'
+import { getSettings } from '../utils'
 
 export type LangCode =
     | 'en'
@@ -97,44 +99,153 @@ export function getLangName(langCode: string): string {
     return langName || langMap.get(langCode) || langCode
 }
 
-export async function baiduDetectLang(text: string): Promise<LangCode> {
+export async function googleDetectLang(text: string): Promise<LangCode> {
+    const langMap: Record<string, LangCode> = {
+        'zh-CN': 'zh-Hans',
+        'zh-TW': 'zh-Hant',
+        'ja': 'ja',
+        'en': 'en',
+        'ko': 'ko',
+        'fr': 'fr',
+        'es': 'es',
+        'ru': 'ru',
+        'de': 'de',
+        'it': 'it',
+        'tr': 'tr',
+        'pt': 'pt',
+        'vi': 'vi',
+        'id': 'id',
+        'th': 'th',
+        'ar': 'ar',
+        'hi': 'hi',
+        'mn': 'mn',
+        'fa': 'fa',
+    }
+
     const fetcher = getUniversalFetch()
-    let detectedText = text.trim()
-    return new Promise((resolve) => {
-        if (!detectedText) {
-            resolve('en')
-            return
+    const resp = await fetcher(
+        `https://translate.google.com/translate_a/single?dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&${qs.stringify(
+            {
+                client: 'gtx',
+                sl: 'auto',
+                tl: 'zh-CN',
+                hl: 'zh-CN',
+                ie: 'UTF-8',
+                oe: 'UTF-8',
+                otf: '1',
+                ssel: '0',
+                tsel: '0',
+                kc: '7',
+                q: text,
+            }
+        )}`,
+        {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' },
         }
-        if (detectedText.match(/^[a-zA-Z0-9]+$/)) {
-            resolve('en')
-            return
+    )
+    if (resp.ok) {
+        const result = await resp.json()
+        if (result[2] && result[2] in langMap) {
+            return langMap[result[2] as string]
         }
-        if (detectedText.length > 1000) {
-            detectedText = detectedText.slice(0, 1000)
-        }
-        const data = new URLSearchParams()
-        data.append('query', detectedText)
-        const url = 'https://fanyi.baidu.com/langdetect?' + data.toString()
-        fetcher(url, {
-            method: 'POST',
-            mode: 'cors',
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                const langCode = res.data.lan
-                if (langCode === 'zh') {
-                    resolve(isTraditional(detectedText) ? 'zh-Hant' : 'zh-Hans')
-                } else {
-                    resolve(langCode)
-                }
-            })
-            .catch(() => {
-                resolve('en')
-            })
-    })
+    }
+    return 'en'
 }
 
-export async function detectLang(text: string): Promise<LangCode> {
+export async function bingDetectLang(text: string): Promise<LangCode> {
+    const tokenURL = 'https://edge.microsoft.com/translate/auth'
+
+    const fetcher = getUniversalFetch()
+
+    const tokenResp = await fetcher(tokenURL, {
+        method: 'GET',
+        headers: {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.42',
+        },
+    })
+
+    if (tokenResp.ok) {
+        const token = await tokenResp.text()
+        const url = `https://api-edge.cognitive.microsofttranslator.com/detect?${qs.stringify({
+            'api-version': '3.0',
+        })}`
+
+        const resp = await fetcher(url, {
+            method: 'POST',
+            headers: {
+                'accept': '*/*',
+                'accept-language': 'zh-TW,zh;q=0.9,ja;q=0.8,zh-CN;q=0.7,en-US;q=0.6,en;q=0.5',
+                'authorization': 'Bearer ' + token,
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                'pragma': 'no-cache',
+                'sec-ch-ua': '"Microsoft Edge";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'cross-site',
+                'Referer': 'https://appsumo.com/',
+                'Referrer-Policy': 'strict-origin-when-cross-origin',
+                'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.42',
+            },
+            body: JSON.stringify([{ Text: text }]),
+        })
+
+        if (resp.ok) {
+            const result = await resp.json()
+            if (result[0].language) {
+                return result[0].language
+            }
+        }
+    }
+    return 'en'
+}
+
+export async function baiduDetectLang(text: string): Promise<LangCode> {
+    const langMap: Record<string, LangCode> = {
+        zh: 'zh-Hans',
+        cht: 'zh-Hant',
+        en: 'en',
+        jp: 'ja',
+        kor: 'ko',
+        fra: 'fr',
+        spa: 'es',
+        ru: 'ru',
+        de: 'de',
+        it: 'it',
+        tr: 'tr',
+        pt: 'pt',
+        vie: 'vi',
+        id: 'id',
+        th: 'th',
+        ar: 'ar',
+        hi: 'hi',
+        per: 'fa',
+    }
+
+    const fetcher = getUniversalFetch()
+    const data = new URLSearchParams()
+    data.append('query', text)
+    const url = 'https://fanyi.baidu.com/langdetect?' + data.toString()
+    const resp = await fetcher(url, {
+        method: 'POST',
+    })
+
+    if (resp.ok) {
+        const jsn = await resp.json()
+        if (jsn && jsn.lan) {
+            return langMap[jsn.lan] || 'en'
+        }
+    }
+
+    return 'en'
+}
+
+export async function localDetectLang(text: string): Promise<LangCode> {
     if (text.length > 200) {
         text = text.slice(0, 200)
     }
@@ -225,6 +336,26 @@ export async function detectLang(text: string): Promise<LangCode> {
         return isTraditional(text) ? 'zh-Hant' : 'zh-Hans'
     } else {
         return langWeightResult[0] as LangCode
+    }
+}
+
+export async function detectLang(text: string): Promise<LangCode> {
+    let detectedText = text
+    if (detectedText.length > 1000) {
+        detectedText = detectedText.slice(0, 1000)
+    }
+    const settings = await getSettings()
+    switch (settings.languageDetectionEngine) {
+        case 'baidu':
+            return await baiduDetectLang(detectedText)
+        case 'google':
+            return await googleDetectLang(detectedText)
+        case 'bing':
+            return await bingDetectLang(detectedText)
+        case 'local':
+            return await localDetectLang(detectedText)
+        default:
+            return await localDetectLang(detectedText)
     }
 }
 
