@@ -2,6 +2,7 @@ import { Theme } from 'baseui-sd/theme'
 import { TranslateMode } from './translate'
 import { TTSProvider } from './tts/types'
 import { Provider } from './engines'
+import { LangCode } from './lang'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ISync {
@@ -74,7 +75,7 @@ export interface ISettings {
     i18n?: string
     tts?: {
         voices?: {
-            lang: string
+            lang: LangCode
             voice: string
         }[]
         provider?: TTSProvider
