@@ -401,8 +401,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
             const newVoices = voices.map((item) => {
                 if (item.lang === prevLang) {
                     return {
-                        ...item,
                         lang: newLang,
+                        voice: '',
                     }
                 }
                 return item
@@ -530,68 +530,94 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                 >
                     {isVoicesLoading && <Skeleton rows={6} height='300px' width='100%' animation />}
                     {!isVoicesLoading &&
-                        (value?.voices ?? []).map(({ lang, voice }) => (
-                            <div className={styles.voiceSelector} key={lang}>
-                                <Select
-                                    size='compact'
-                                    clearable={false}
-                                    options={getLangOptions(lang)}
-                                    placeholder={t('Please select a language')}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                width: '120px',
-                                                flexShrink: 0,
+                        (value?.voices ?? []).map(({ lang, voice }) => {
+                            const langOptions = getLangOptions(lang)
+                            const selectedLang = langOptions.find((opt) => opt.id === lang)
+                            const voiceOptions = getVoiceOptions(lang)
+                            const selectedVoice = voiceOptions.find((opt) => opt.id === voice)
+                            return (
+                                <div className={styles.voiceSelector} key={lang}>
+                                    <Select
+                                        key={`lang-${lang}`}
+                                        size='mini'
+                                        clearable={false}
+                                        options={langOptions}
+                                        placeholder={t('Please select a language')}
+                                        overrides={{
+                                            Root: {
+                                                style: {
+                                                    width: '120px',
+                                                    flexShrink: 0,
+                                                },
                                             },
-                                        },
-                                    }}
-                                    onChange={({ option }) => handleChangeLang(lang, option?.id as LangCode)}
-                                    value={[{ id: lang }]}
-                                />
-                                <Select
-                                    size='compact'
-                                    options={getVoiceOptions(lang)}
-                                    placeholder={t('Please select a voice')}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                flexShrink: 1,
-                                                minWidth: '200px',
+                                        }}
+                                        onChange={({ option }) => handleChangeLang(lang, option?.id as LangCode)}
+                                        value={selectedLang ? [{ id: selectedLang.id }] : undefined}
+                                    />
+                                    <Select
+                                        size='mini'
+                                        options={voiceOptions}
+                                        placeholder={t('Please select a voice')}
+                                        overrides={{
+                                            ControlContainer: {
+                                                style: {
+                                                    boxSizing: 'border-box',
+                                                    height: '32px',
+                                                },
                                             },
-                                        },
-                                    }}
-                                    value={[{ id: voice }]}
-                                    onChange={({ option }) => handleChangeVoice(lang, option?.id as string)}
-                                    clearable={false}
-                                    onBlur={onBlur}
-                                />
-                                <Button
-                                    shape='circle'
-                                    size='mini'
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                flexShrink: 0,
+                                            InputContainer: {
+                                                style: {
+                                                    boxSizing: 'border-box',
+                                                    height: '32px',
+                                                },
                                             },
-                                        },
-                                    }}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        handleDeleteLang(lang)
-                                    }}
-                                >
-                                    <RiDeleteBin5Line />
-                                </Button>
-                                <SpeakerButton
-                                    provider={value?.provider}
-                                    lang={lang}
-                                    voice={voice}
-                                    volume={value?.volume}
-                                    rate={value?.rate}
-                                />
-                            </div>
-                        ))}
+                                            ValueContainer: {
+                                                style: {
+                                                    paddingTop: '0px',
+                                                    paddingBottom: '0px',
+                                                },
+                                            },
+                                            Root: {
+                                                style: {
+                                                    flexShrink: 1,
+                                                    minWidth: '200px',
+                                                },
+                                            },
+                                        }}
+                                        value={selectedVoice ? [{ id: selectedVoice.id }] : undefined}
+                                        onChange={({ option }) => handleChangeVoice(lang, option?.id as string)}
+                                        clearable={false}
+                                        onBlur={onBlur}
+                                        autoFocus={!selectedVoice}
+                                    />
+                                    <Button
+                                        shape='circle'
+                                        size='mini'
+                                        overrides={{
+                                            Root: {
+                                                style: {
+                                                    flexShrink: 0,
+                                                },
+                                            },
+                                        }}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            handleDeleteLang(lang)
+                                        }}
+                                    >
+                                        <RiDeleteBin5Line />
+                                    </Button>
+                                    <SpeakerButton
+                                        provider={value?.provider}
+                                        lang={lang}
+                                        voice={voice}
+                                        volume={value?.volume}
+                                        rate={value?.rate}
+                                    />
+                                </div>
+                            )
+                        })}
                 </div>
                 <div
                     style={{
@@ -608,6 +634,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                             clearable={false}
                             options={getLangOptions('')}
                             onChange={({ option }) => handleAddLang(option?.id as LangCode)}
+                            autoFocus
                         />
                     )}
                     <Button
