@@ -45,6 +45,8 @@ export interface IThemedStyleProps {
     showLogo?: boolean
 }
 
+export type LanguageDetectionEngine = 'google' | 'baidu' | 'bing' | 'local'
+
 export interface ISettings {
     automaticCheckForUpdates: boolean
     apiKeys: string
@@ -91,4 +93,5 @@ export interface ISettings {
     pinned?: boolean
     autoCollect?: boolean
     hideTheIconInTheDock?: boolean
+    languageDetectionEngine?: LanguageDetectionEngine
 }

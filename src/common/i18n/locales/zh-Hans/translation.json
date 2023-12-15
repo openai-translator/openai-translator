@@ -146,5 +146,10 @@
   "How to Use": "使用方法",
   "Please select a language": "请选择一种语言",
   "Please select a voice": "请选择一种声音",
+  "Language detection engine": "语种检测引擎",
+  "Google": "谷歌",
+  "Baidu": "百度",
+  "Bing": "必应",
+  "Local": "本地",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }

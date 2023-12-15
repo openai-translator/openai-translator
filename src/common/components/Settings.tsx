@@ -21,7 +21,7 @@ import { LangCode, supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { ISettings, IThemedStyleProps, ThemeType } from '../types'
+import { ISettings, IThemedStyleProps, LanguageDetectionEngine, ThemeType } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IoCloseCircle, IoRefreshSharp, IoSettingsOutline } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
@@ -201,6 +201,43 @@ function ThemeTypeSelector({ value, onChange, onBlur }: IThemeTypeSelectorProps)
                 { label: t('Follow the System'), id: 'followTheSystem' },
                 { label: t('Dark'), id: 'dark' },
                 { label: t('Light'), id: 'light' },
+            ]}
+        />
+    )
+}
+
+interface ILanguageDetectionEngineSelectorProps {
+    value?: LanguageDetectionEngine
+    onChange?: (value: LanguageDetectionEngine) => void
+    onBlur?: () => void
+}
+
+function LanguageDetectionEngineSelector({ value, onChange, onBlur }: ILanguageDetectionEngineSelectorProps) {
+    const { t } = useTranslation()
+
+    return (
+        <Select
+            size='compact'
+            onBlur={onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                value
+                    ? [
+                          {
+                              id: value,
+                          },
+                      ]
+                    : []
+            }
+            onChange={(params) => {
+                onChange?.(params.value[0].id as LanguageDetectionEngine)
+            }}
+            options={[
+                { label: t('Baidu'), id: 'baidu' },
+                { label: t('Google'), id: 'google' },
+                { label: t('Bing'), id: 'bing' },
+                { label: t('Local'), id: 'local' },
             ]}
         />
     )
@@ -1970,6 +2007,9 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         </FormItem>
                         <FormItem name='defaultTargetLanguage' label={t('Default target language')}>
                             <LanguageSelector onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='languageDetectionEngine' label={t('Language detection engine')}>
+                            <LanguageDetectionEngineSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='themeType' label={t('Theme')}>
                             <ThemeTypeSelector onBlur={onBlur} />

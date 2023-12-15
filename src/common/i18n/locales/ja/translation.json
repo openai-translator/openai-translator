@@ -146,5 +146,10 @@
   "How to Use": "使い方",
   "Please select a language": "言語を選択してください",
   "Please select a voice": "声を選択してください",
+  "Language detection engine": "言語検出エンジン",
+  "Google": "Google",
+  "Baidu": "Baidu",
+  "Bing": "Bing",
+  "Local": "Local",
   "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }
