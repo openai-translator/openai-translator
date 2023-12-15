@@ -41,6 +41,7 @@
   "to get your API Key.": "にアクセスして、APIキーを取得してください。",
   "to get your Group ID.": "にアクセスして、グループIDを取得してください。",
   "Restore Previous Position": "以前の位置を復元",
+  "Fixed Position": "固定位置",
   "Run at startup": "起動時に実行",
   "API Model": "API モデル",
   "Chars Limited": "文字数が制限を超えています",
