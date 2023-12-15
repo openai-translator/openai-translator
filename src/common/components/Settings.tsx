@@ -14,7 +14,7 @@ import { Input } from 'baseui-sd/input'
 import { createForm } from './Form'
 import { Button } from 'baseui-sd/button'
 import { TranslateMode, APIModel } from '../translate'
-import { Select, Value, Option } from 'baseui-sd/select'
+import { Select, Value, Option, SelectProps } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { LangCode, supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
@@ -127,11 +127,6 @@ interface AutoTranslateCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
     onBlur?: () => void
-}
-
-interface IProviderSelectorProps {
-    value?: Provider
-    onChange?: (value: Provider) => void
 }
 
 function TranslateModeSelector({ value, onChange, onBlur }: ITranslateModeSelectorProps) {
@@ -1202,10 +1197,53 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
     )
 }
 
-function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
+interface IProviderSelectorProps {
+    value?: Provider
+    onChange?: (value: Provider) => void
+    hasPromotion?: boolean
+}
+
+function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorProps) {
+    const { theme } = useTheme()
+
+    let overrides: SelectProps['overrides'] = undefined
+    if (hasPromotion && value !== 'OpenAI') {
+        overrides = {
+            ControlContainer: {
+                style: {
+                    borderColor: theme.colors.warning300,
+                },
+            },
+        }
+    }
+
     const options = utils.isDesktopApp()
         ? ([
-              { label: 'OpenAI', id: 'OpenAI' },
+              {
+                  label: (
+                      <div
+                          style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 10,
+                          }}
+                      >
+                          OpenAI
+                          {hasPromotion && value !== 'OpenAI' && (
+                              <div
+                                  style={{
+                                      width: '0.45rem',
+                                      height: '0.45rem',
+                                      borderRadius: '50%',
+                                      backgroundColor: theme.colors.warning300,
+                                  }}
+                              />
+                          )}
+                      </div>
+                  ),
+                  id: 'OpenAI',
+              },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
@@ -1227,6 +1265,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
 
     return (
         <Select
+            overrides={overrides}
             size='compact'
             searchable={false}
             clearable={false}
@@ -1318,36 +1357,8 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     const { t } = useTranslation()
 
     const [loading, setLoading] = useState(false)
-    const [values, setValues] = useState<ISettings>({
-        automaticCheckForUpdates: false,
-        apiKeys: '',
-        apiURL: utils.defaultAPIURL,
-        apiURLPath: utils.defaultAPIURLPath,
-        apiModel: utils.defaultAPIModel,
-        provider: utils.defaultProvider,
-        chatgptModel: utils.defaultChatGPTModel,
-        azureAPIKeys: '',
-        azureAPIURL: utils.defaultAPIURL,
-        azureAPIURLPath: utils.defaultAPIURLPath,
-        azureAPIModel: utils.defaultAPIModel,
-        miniMaxGroupID: '',
-        miniMaxAPIKey: '',
-        moonshotAPIKey: '',
-        moonshotAPIModel: '',
-        autoTranslate: utils.defaultAutoTranslate,
-        defaultTranslateMode: 'translate',
-        defaultTargetLanguage: utils.defaultTargetLanguage,
-        alwaysShowIcons: !isTauri,
-        hotkey: '',
-        displayWindowHotkey: '',
-        i18n: utils.defaulti18n,
-        restorePreviousPosition: false,
-        selectInputElementsText: utils.defaultSelectInputElementsText,
-        readSelectedWordsFromInputElementsText: utils.defaultReadSelectedWordsFromInputElementsText,
-        runAtStartup: false,
-        writingTargetLanguage: utils.defaultWritingTargetLanguage,
-        hideTheIconInTheDock: false,
-    })
+    const { settings, setSettings } = useSettings()
+    const [values, setValues] = useState<ISettings>(settings)
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
     const [form] = useForm()
@@ -1355,8 +1366,6 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     useEffect(() => {
         form.setFieldsValue(values)
     }, [form, values])
-
-    const { settings, setSettings } = useSettings()
 
     useEffect(() => {
         if (settings) {
@@ -1575,11 +1584,21 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         return getPromotionItem(promotions?.openai_api_key)
     }, [promotions])
 
-    const { setPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+    const { promotionShowed, setPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+
+    const isOpenAI = values.provider === 'OpenAI'
 
     useEffect(() => {
-        setPromotionShowed(true)
-    }, [setPromotionShowed])
+        if (isOpenAI) {
+            setPromotionShowed(true)
+        }
+        // const timer = setTimeout(() => {
+        //     setPromotionShowed(true)
+        // }, 15000)
+        // return () => {
+        //     clearTimeout(timer)
+        // }
+    }, [setPromotionShowed, isOpenAI])
 
     console.debug('render settings')
 
@@ -1750,8 +1769,33 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='i18n' label={t('i18n')}>
                             <Ii18nSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='provider' label={t('Default service provider')} required>
-                            <ProviderSelector />
+                        <FormItem
+                            name='provider'
+                            label={
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: 10,
+                                    }}
+                                >
+                                    {t('Default service provider')}
+                                    {openaiAPIKeyPromotion !== undefined && !promotionShowed && (
+                                        <div
+                                            style={{
+                                                width: '0.45rem',
+                                                height: '0.45rem',
+                                                borderRadius: '50%',
+                                                backgroundColor: theme.colors.warning300,
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            }
+                            required
+                        >
+                            <ProviderSelector hasPromotion={openaiAPIKeyPromotion !== undefined && !promotionShowed} />
                         </FormItem>
                         <div
                             style={{
