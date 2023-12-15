@@ -536,6 +536,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                     size='compact'
                                     clearable={false}
                                     options={getLangOptions(lang)}
+                                    placeholder={t('Please select a language')}
                                     overrides={{
                                         Root: {
                                             style: {
@@ -550,6 +551,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                 <Select
                                     size='compact'
                                     options={getVoiceOptions(lang)}
+                                    placeholder={t('Please select a voice')}
                                     overrides={{
                                         Root: {
                                             style: {
@@ -602,6 +604,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                     {showLangSelector && (
                         <Select
                             size='mini'
+                            placeholder={t('Please select a language')}
                             clearable={false}
                             options={getLangOptions('')}
                             onChange={({ option }) => handleAddLang(option?.id as LangCode)}
@@ -609,6 +612,13 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                     )}
                     <Button
                         size='mini'
+                        overrides={{
+                            Root: {
+                                style: {
+                                    flexShrink: 0,
+                                },
+                            },
+                        }}
                         startEnhancer={() => <IoMdAdd size={12} />}
                         onClick={(e) => {
                             e.preventDefault()
