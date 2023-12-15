@@ -27,7 +27,7 @@ import { IoCloseCircle, IoRefreshSharp, IoSettingsOutline } from 'react-icons/io
 import { useTranslation } from 'react-i18next'
 import AppConfig from '../../../package.json'
 import { useSettings } from '../hooks/useSettings'
-import { defaultTTSProvider, langCode2TTSLang } from '../tts'
+import { defaultTTSProvider, langCode2TTSLang, ttsLangTestTextMap } from '../tts'
 import { RiDeleteBin5Line } from 'react-icons/ri'
 import { IoIosHelpCircleOutline, IoIosSave, IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
@@ -242,11 +242,7 @@ interface ISpeakerButtonProps {
 }
 
 function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISpeakerButtonProps) {
-    const text =
-        text_ ??
-        (lang === 'zh-Hans' || lang === 'zh-Hant'
-            ? '欢迎使用 OpenAI Translator'
-            : 'Welcome to use the OpenAI Translator!')
+    const text = text_ ?? ttsLangTestTextMap[lang]
 
     return (
         <Button
