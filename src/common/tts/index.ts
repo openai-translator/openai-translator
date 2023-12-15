@@ -1,10 +1,11 @@
-import { SpeakOptions } from './types'
+import { DoSpeakOptions, SpeakOptions } from './types'
 import { getSettings } from '../utils'
 import { speak as edgeSpeak } from './edge-tts'
+import { LangCode } from '../lang'
 
 export const defaultTTSProvider = 'EdgeTTS'
 
-export const langCode2TTSLang: Record<string, string> = {
+export const langCode2TTSLang: Partial<Record<LangCode, string>> = {
     'en': 'en-US',
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
@@ -42,16 +43,52 @@ if (window.speechSynthesis) {
     }
 }
 
-export async function speak({ text, lang, onFinish }: SpeakOptions) {
+export async function speak({ text, lang, onFinish, signal }: SpeakOptions) {
     const settings = await getSettings()
-    const langTag = langCode2TTSLang[lang ?? 'en'] ?? 'en-US'
     const voiceCfg = settings.tts?.voices?.find((item) => item.lang === lang)
-    const rate = (settings.tts?.rate ?? 10) / 10
+    const rate = settings.tts?.rate
     const volume = settings.tts?.volume
+    const provider = settings.tts?.provider ?? defaultTTSProvider
 
-    if (!settings.tts?.provider || settings.tts?.provider === 'EdgeTTS') {
-        return edgeSpeak({ text, lang: langTag, onFinish, voice: voiceCfg?.voice, rate, volume: volume ?? 100 })
+    return await doSpeak({
+        provider,
+        text,
+        lang: lang ?? 'en',
+        voice: voiceCfg?.voice,
+        rate,
+        volume,
+        onFinish,
+        signal,
+    })
+}
+
+export async function doSpeak({
+    provider,
+    text,
+    lang,
+    voice,
+    rate: rate_,
+    volume,
+    onFinish,
+    signal,
+    onStartSpeaking,
+}: DoSpeakOptions) {
+    const rate = (rate_ ?? 10) / 10
+
+    if (provider === 'EdgeTTS') {
+        return edgeSpeak({
+            text,
+            lang,
+            onFinish,
+            voice: voice,
+            rate,
+            volume: volume ?? 100,
+            signal,
+            onStartSpeaking,
+        })
     }
+
+    const ttsLang = langCode2TTSLang[lang] ?? 'en-US'
 
     const utterance = new SpeechSynthesisUtterance()
     if (onFinish) {
@@ -59,14 +96,22 @@ export async function speak({ text, lang, onFinish }: SpeakOptions) {
     }
 
     utterance.text = text
-    utterance.lang = langTag
+    utterance.lang = ttsLang
     utterance.rate = rate
     utterance.volume = volume ? volume / 100 : 1
 
-    const defaultVoice = supportVoices.find((v) => v.lang === langTag) ?? null
-    const settingsVoice = supportVoices.find((v) => v.voiceURI === voiceCfg?.voice)
+    const defaultVoice = supportVoices.find((v) => v.lang === ttsLang) ?? null
+    const settingsVoice = supportVoices.find((v) => v.voiceURI === voice)
     utterance.voice = settingsVoice ?? defaultVoice
 
+    signal.addEventListener(
+        'abort',
+        () => {
+            speechSynthesis.cancel()
+        },
+        { once: true }
+    )
+
+    onStartSpeaking?.()
     speechSynthesis.speak(utterance)
-    return { stopSpeak: () => speechSynthesis.cancel() }
 }

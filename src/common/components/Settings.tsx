@@ -17,7 +17,7 @@ import { Button } from 'baseui-sd/button'
 import { TranslateMode, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
-import { supportedLanguages } from '../lang'
+import { LangCode, supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
@@ -31,7 +31,7 @@ import { defaultTTSProvider, langCode2TTSLang } from '../tts'
 import { RiDeleteBin5Line } from 'react-icons/ri'
 import { IoIosHelpCircleOutline, IoIosSave, IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
-import { getEdgeVoices } from '../tts/edge-tts'
+import { fetchEdgeVoices } from '../tts/edge-tts'
 import { useThemeType } from '../hooks/useThemeType'
 import { Slider } from 'baseui-sd/slider'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -56,6 +56,8 @@ import { open } from '@tauri-apps/plugin-shell'
 import { getCurrent } from '@tauri-apps/api/window'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { trackEvent } from '@aptabase/tauri'
+import { Skeleton } from 'baseui-sd/skeleton'
+import { SpeakerIcon } from './SpeakerIcon'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -205,23 +207,20 @@ function ThemeTypeSelector({ value, onChange, onBlur }: IThemeTypeSelectorProps)
 }
 
 const useTTSSettingsStyles = createUseStyles({
-    settingsLabel: (props: IThemedStyleProps) => ({
+    label: (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentPrimary,
-        display: 'block',
-        marignTop: '4px',
+        fontWeight: 500,
     }),
     voiceSelector: {
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
-        marginTop: '10px',
         width: '100%',
     },
-    providerSelector: {
-        marginTop: '10px',
-    },
     formControl: {
-        marginBottom: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
     },
     tickBar: (props: IThemedStyleProps) => ({
         color: props.theme.colors.contentPrimary,
@@ -233,7 +232,46 @@ const useTTSSettingsStyles = createUseStyles({
     }),
 })
 
-interface TTSVoicesSettingsProps {
+interface ISpeakerButtonProps {
+    provider?: TTSProvider
+    lang: LangCode
+    voice: string
+    rate?: number
+    volume?: number
+    text?: string
+}
+
+function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISpeakerButtonProps) {
+    const text =
+        text_ ??
+        (lang === 'zh-Hans' || lang === 'zh-Hant'
+            ? '欢迎使用 OpenAI Translator'
+            : 'Welcome to use the OpenAI Translator!')
+
+    return (
+        <Button
+            shape='circle'
+            size='mini'
+            overrides={{
+                Root: {
+                    style: {
+                        flexShrink: 0,
+                    },
+                },
+            }}
+            onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                const target = e.target as HTMLButtonElement
+                target.querySelector('div')?.click()
+            }}
+        >
+            <SpeakerIcon provider={provider} text={text} lang={lang} voice={voice} rate={rate} volume={volume} />
+        </Button>
+    )
+}
+
+interface ITTSVoicesSettingsProps {
     value?: ISettings['tts']
     onChange?: (value: ISettings['tts']) => void
     onBlur?: () => void
@@ -247,7 +285,9 @@ const ttsProviderOptions: {
     { label: 'System Default', id: 'WebSpeech' },
 ]
 
-function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) {
+function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps) {
+    console.debug('render tts voices settings')
+
     const { t } = useTranslation()
     const { theme, themeType } = useTheme()
 
@@ -255,29 +295,43 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
 
     const [showLangSelector, setShowLangSelector] = useState(false)
 
-    const [supportVoices, setSupportVoices] = useState<SpeechSynthesisVoice[]>([])
+    const [supportedVoices, setSupportedVoices] = useState<SpeechSynthesisVoice[]>([])
+
+    const provider = value?.provider ?? defaultTTSProvider
+
+    const { data: edgeVoices, isLoading: isEdgeVoicesLoading } = useSWR(
+        provider === 'EdgeTTS' ? 'edgeVoices' : null,
+        fetchEdgeVoices
+    )
+
+    const { data: webSpeechVoices, isLoading: isWebSpeechVoicesLoading } = useSWR(
+        provider === 'WebSpeech' ? 'webSpeechVoices' : null,
+        async () => {
+            return speechSynthesis.getVoices()
+        }
+    )
+
+    const isVoicesLoading = isEdgeVoicesLoading || isWebSpeechVoicesLoading
 
     useEffect(() => {
-        ;(async () => {
-            switch (value?.provider ?? defaultTTSProvider) {
-                case 'EdgeTTS':
-                    setSupportVoices(await getEdgeVoices())
-                    break
-                case 'WebSpeech':
-                    setSupportVoices(speechSynthesis.getVoices())
-                    break
-                default:
-                    setSupportVoices(await getEdgeVoices())
-                    break
-            }
-        })()
-    }, [value?.provider])
+        switch (provider) {
+            case 'EdgeTTS':
+                setSupportedVoices(edgeVoices ?? [])
+                break
+            case 'WebSpeech':
+                setSupportedVoices(webSpeechVoices ?? [])
+                break
+            default:
+                setSupportedVoices(edgeVoices ?? [])
+                break
+        }
+    }, [edgeVoices, provider, webSpeechVoices])
 
     const getLangOptions = useCallback(
         (lang: string) => {
             return supportedLanguages.reduce((acc, [langCode, label]) => {
                 const ttsLang = langCode2TTSLang[langCode]
-                if (ttsLang && supportVoices.find((v) => v.lang === ttsLang)) {
+                if (ttsLang && supportedVoices.find((v) => v.lang === ttsLang)) {
                     if (value?.voices?.find((item) => item.lang === langCode) && langCode !== lang) {
                         return acc
                     }
@@ -292,17 +346,41 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                 return acc
             }, [] as Value)
         },
-        [value?.voices, supportVoices]
+        [value?.voices, supportedVoices]
     )
 
     const getVoiceOptions = useCallback(
-        (lang: string) => {
+        (lang: LangCode) => {
             const ttsLang = langCode2TTSLang[lang]
-            return supportVoices
+            return supportedVoices
                 .filter((v) => v.lang.split('-')[0] === lang || v.lang === ttsLang)
-                .map((sv) => ({ id: sv.voiceURI, label: sv.name, lang: sv.lang }))
+                .filter((v, idx, items) => items.findIndex((item) => item.name === v.name) === idx)
+                .map((sv) => ({
+                    id: sv.voiceURI,
+                    label: (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 8,
+                            }}
+                            key={sv.voiceURI}
+                        >
+                            {sv.name}
+                            <SpeakerButton
+                                provider={value?.provider}
+                                lang={lang}
+                                voice={sv.voiceURI}
+                                volume={value?.volume}
+                                rate={value?.rate}
+                            />
+                        </div>
+                    ),
+                    lang: sv.lang,
+                }))
         },
-        [supportVoices]
+        [supportedVoices, value?.provider, value?.rate, value?.volume]
     )
 
     const handleDeleteLang = useCallback(
@@ -318,7 +396,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     )
 
     const handleChangeLang = useCallback(
-        (prevLang: string, newLang: string) => {
+        (prevLang: LangCode, newLang: LangCode) => {
             const voices = value?.voices ?? []
             const newVoices = voices.map((item) => {
                 if (item.lang === prevLang) {
@@ -336,7 +414,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     )
 
     const handleAddLang = useCallback(
-        (lang: string) => {
+        (lang: LangCode) => {
             const voices = value?.voices ?? []
             onChange?.({
                 ...value,
@@ -381,23 +459,28 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     )
 
     return (
-        <div>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+                marginTop: 20,
+            }}
+        >
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>{t('Provider')}</label>
-                <div className={styles.providerSelector}>
-                    <Select
-                        size='compact'
-                        clearable={false}
-                        searchable={false}
-                        options={ttsProviderOptions}
-                        value={[{ id: value?.provider ?? 'EdgeTTS' }]}
-                        onChange={({ option }) => handleChangeProvider(option?.id as TTSProvider)}
-                        onBlur={onBlur}
-                    />
-                </div>
+                <label className={styles.label}>{t('Provider')}</label>
+                <Select
+                    size='compact'
+                    clearable={false}
+                    searchable={false}
+                    options={ttsProviderOptions}
+                    value={[{ id: value?.provider ?? 'EdgeTTS' }]}
+                    onChange={({ option }) => handleChangeProvider(option?.id as TTSProvider)}
+                    onBlur={onBlur}
+                />
             </div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>{t('Rate')}</label>
+                <label className={styles.label}>{t('Rate')}</label>
                 <Slider
                     min={1}
                     max={20}
@@ -417,7 +500,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                 />
             </div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>{t('Volume')}</label>
+                <label className={styles.label}>{t('Volume')}</label>
                 <Slider
                     min={0}
                     max={100}
@@ -437,60 +520,77 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                 />
             </div>
             <div className={styles.formControl}>
-                <label className={styles.settingsLabel}>{t('Voice')}</label>
-                {(value?.voices ?? []).map(({ lang, voice }) => (
-                    <div className={styles.voiceSelector} key={lang}>
-                        <Select
-                            size='compact'
-                            clearable={false}
-                            options={getLangOptions(lang)}
-                            overrides={{
-                                Root: {
-                                    style: {
-                                        width: '140px',
-                                        flexShrink: 0,
-                                    },
-                                },
-                            }}
-                            onChange={({ option }) => handleChangeLang(lang, option?.id as string)}
-                            value={[{ id: lang }]}
-                        />
-                        <Select
-                            size='compact'
-                            options={getVoiceOptions(lang)}
-                            overrides={{
-                                Root: {
-                                    style: {
-                                        flexShrink: 1,
-                                        minWidth: '200px',
-                                    },
-                                },
-                            }}
-                            value={[{ id: voice }]}
-                            onChange={({ option }) => handleChangeVoice(lang, option?.id as string)}
-                            clearable={false}
-                            onBlur={onBlur}
-                        />
-                        <Button
-                            shape='circle'
-                            size='mini'
-                            overrides={{
-                                Root: {
-                                    style: {
-                                        flexShrink: 0,
-                                    },
-                                },
-                            }}
-                            onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                handleDeleteLang(lang)
-                            }}
-                        >
-                            <RiDeleteBin5Line />
-                        </Button>
-                    </div>
-                ))}
+                <label className={styles.label}>{t('Voice')}</label>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                    }}
+                >
+                    {isVoicesLoading && <Skeleton rows={6} height='300px' width='100%' animation />}
+                    {!isVoicesLoading &&
+                        (value?.voices ?? []).map(({ lang, voice }) => (
+                            <div className={styles.voiceSelector} key={lang}>
+                                <Select
+                                    size='compact'
+                                    clearable={false}
+                                    options={getLangOptions(lang)}
+                                    overrides={{
+                                        Root: {
+                                            style: {
+                                                width: '120px',
+                                                flexShrink: 0,
+                                            },
+                                        },
+                                    }}
+                                    onChange={({ option }) => handleChangeLang(lang, option?.id as LangCode)}
+                                    value={[{ id: lang }]}
+                                />
+                                <Select
+                                    size='compact'
+                                    options={getVoiceOptions(lang)}
+                                    overrides={{
+                                        Root: {
+                                            style: {
+                                                flexShrink: 1,
+                                                minWidth: '200px',
+                                            },
+                                        },
+                                    }}
+                                    value={[{ id: voice }]}
+                                    onChange={({ option }) => handleChangeVoice(lang, option?.id as string)}
+                                    clearable={false}
+                                    onBlur={onBlur}
+                                />
+                                <Button
+                                    shape='circle'
+                                    size='mini'
+                                    overrides={{
+                                        Root: {
+                                            style: {
+                                                flexShrink: 0,
+                                            },
+                                        },
+                                    }}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        handleDeleteLang(lang)
+                                    }}
+                                >
+                                    <RiDeleteBin5Line />
+                                </Button>
+                                <SpeakerButton
+                                    provider={value?.provider}
+                                    lang={lang}
+                                    voice={voice}
+                                    volume={value?.volume}
+                                    rate={value?.rate}
+                                />
+                            </div>
+                        ))}
+                </div>
                 <div
                     style={{
                         display: 'flex',
@@ -504,7 +604,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                             size='mini'
                             clearable={false}
                             options={getLangOptions('')}
-                            onChange={({ option }) => handleAddLang(option?.id as string)}
+                            onChange={({ option }) => handleAddLang(option?.id as LangCode)}
                         />
                     )}
                     <Button
@@ -1410,6 +1510,8 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     useEffect(() => {
         setPromotionShowed(true)
     }, [setPromotionShowed])
+
+    console.debug('render settings')
 
     return (
         <div

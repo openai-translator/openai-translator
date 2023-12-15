@@ -1,3 +1,5 @@
+import { langCode2TTSLang } from '.'
+import { getUniversalFetch } from '../universal-fetch'
 import { SpeakOptions } from './types'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -260,7 +262,17 @@ interface EdgeTTSOptions extends SpeakOptions {
     volume?: number
 }
 
-export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 100 }: EdgeTTSOptions) {
+export async function speak({
+    text,
+    lang: lang_,
+    onFinish,
+    voice,
+    rate = 1,
+    volume = 100,
+    signal,
+    onStartSpeaking,
+}: EdgeTTSOptions) {
+    const lang = langCode2TTSLang[lang_ ?? 'en'] ?? 'en-US'
     const connectId = uuidv4().replace(/-/g, '')
     const date = new Date().toString()
     const audioContext = new AudioContext()
@@ -268,10 +280,23 @@ export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 10
 
     const texts = splitTextByByteLength(
         escape(removeIncompatibleCharacters(text)),
-        calcMaxMesgSize(voice ?? languageToDefaultVoice[lang ?? 'en-US'], rate, volume)
+        calcMaxMesgSize(voice ?? languageToDefaultVoice[lang], rate, volume)
     )
 
     let stopped = false
+
+    signal.addEventListener(
+        'abort',
+        () => {
+            try {
+                stopped = true
+                audioBufferSource.stop()
+            } catch (e) {
+                // ignore
+            }
+        },
+        { once: true }
+    )
 
     for (const text of texts) {
         const ws = new WebSocket(`${wssURL}&ConnectionId=${connectId}`)
@@ -295,8 +320,21 @@ export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 10
             )
         })
 
+        signal.addEventListener(
+            'abort',
+            () => {
+                try {
+                    ws.close()
+                } catch (e) {
+                    // ignore
+                }
+            },
+            { once: true }
+        )
+
         let audioData = new ArrayBuffer(0)
         let downloadAudio = false
+        let startSpeaking = false
         ws.addEventListener('message', async (event) => {
             if (typeof event.data === 'string') {
                 const { headers } = getHeadersAndData(event.data)
@@ -313,6 +351,10 @@ export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 10
                         const buffer = await audioContext.decodeAudioData(audioData)
                         audioBufferSource.buffer = buffer
                         audioBufferSource.connect(audioContext.destination)
+                        if (!startSpeaking) {
+                            startSpeaking = true
+                            onStartSpeaking?.()
+                        }
                         audioBufferSource.start()
                         audioBufferSource.addEventListener('ended', () => {
                             onFinish?.()
@@ -339,17 +381,6 @@ export async function speak({ text, lang, onFinish, voice, rate = 1, volume = 10
             }
         })
     }
-
-    return {
-        stopSpeak: () => {
-            try {
-                stopped = true
-                audioBufferSource.stop()
-            } catch (e) {
-                // ignore
-            }
-        },
-    }
 }
 
 const voiceListURL =
@@ -365,8 +396,9 @@ interface EdgeVoice {
     Name: string
     SuggestedCodec: string
 }
-export async function getEdgeVoices() {
-    const response = await fetch(voiceListURL, {
+export async function fetchEdgeVoices() {
+    const fetcher = getUniversalFetch()
+    const response = await fetcher(voiceListURL, {
         headers: {
             'Authority': 'speech.platform.bing.com',
             'Sec-CH-UA': '" Not;A Brand";v="99", "Microsoft Edge";v="91", "Chromium";v="91"',

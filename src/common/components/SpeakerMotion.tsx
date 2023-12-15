@@ -1,18 +1,26 @@
 import React from 'react'
 import { createUseStyles } from 'react-jss'
 import { RxSpeakerLoud, RxSpeakerModerate, RxSpeakerQuiet } from 'react-icons/rx'
+import { IconBaseProps } from 'react-icons'
 
 const useStyles = createUseStyles({
     'speakerLoud': {
+        display: 'block',
         animation: '$speaker-loud-animation 1.3s linear infinite',
     },
     'speakerModerate': {
+        display: 'block',
         animation: '$speaker-moderate-animation 1.3s linear infinite',
         position: 'absolute',
+        left: 0,
+        top: 0,
     },
     'speakerQuiet': {
+        display: 'block',
         animation: '$speaker-quiet-animation 1.3s linear infinite',
         position: 'absolute',
+        left: 0,
+        top: 0,
     },
     '@keyframes speaker-loud-animation': {
         '0%': {
@@ -49,14 +57,20 @@ const useStyles = createUseStyles({
     },
 })
 
-export default function SpeakerMotion() {
+export default function SpeakerMotion({ style, ...props }: IconBaseProps) {
     const styles = useStyles()
 
     return (
-        <>
-            <RxSpeakerLoud className={styles.speakerLoud} size={13} />
-            <RxSpeakerModerate className={styles.speakerModerate} size={13} />
-            <RxSpeakerQuiet className={styles.speakerQuiet} size={13} />
-        </>
+        <div
+            style={{
+                position: 'relative',
+                display: 'inline-block',
+                ...style,
+            }}
+        >
+            <RxSpeakerLoud className={styles.speakerLoud} {...props} />
+            <RxSpeakerModerate className={styles.speakerModerate} {...props} />
+            <RxSpeakerQuiet className={styles.speakerQuiet} {...props} />
+        </div>
     )
 }
