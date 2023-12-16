@@ -12,7 +12,7 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Input } from 'baseui-sd/input'
 import { createForm } from './Form'
-import { Button } from 'baseui-sd/button'
+import { Button, ButtonProps } from 'baseui-sd/button'
 import { TranslateMode, APIModel } from '../translate'
 import { Select, Value, Option, SelectProps } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
@@ -264,7 +264,8 @@ const useTTSSettingsStyles = createUseStyles({
     }),
 })
 
-interface ISpeakerButtonProps {
+interface ISpeakerButtonProps extends ButtonProps {
+    iconSize?: number
     provider?: TTSProvider
     lang: LangCode
     voice: string
@@ -273,20 +274,23 @@ interface ISpeakerButtonProps {
     text?: string
 }
 
-function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISpeakerButtonProps) {
+function SpeakerButton({
+    iconSize = 13,
+    provider,
+    text: text_,
+    lang,
+    voice,
+    rate,
+    volume,
+    ...buttonProps
+}: ISpeakerButtonProps) {
     const text = text_ ?? ttsLangTestTextMap[lang]
 
     return (
         <Button
             shape='circle'
             size='mini'
-            overrides={{
-                Root: {
-                    style: {
-                        flexShrink: 0,
-                    },
-                },
-            }}
+            {...buttonProps}
             onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -294,7 +298,15 @@ function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISp
                 target.querySelector('div')?.click()
             }}
         >
-            <SpeakerIcon provider={provider} text={text} lang={lang} voice={voice} rate={rate} volume={volume} />
+            <SpeakerIcon
+                size={iconSize}
+                provider={provider}
+                text={text}
+                lang={lang}
+                voice={voice}
+                rate={rate}
+                volume={volume}
+            />
         </Button>
     )
 }
@@ -395,14 +407,17 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                             }}
                             key={sv.voiceURI}
                         >
-                            {sv.name}
                             <SpeakerButton
+                                shape='round'
+                                kind='secondary'
+                                iconSize={11}
                                 provider={value?.provider}
                                 lang={lang}
                                 voice={sv.voiceURI}
                                 volume={value?.volume}
                                 rate={value?.rate}
                             />
+                            {sv.name}
                         </div>
                     ),
                     lang: sv.lang,
@@ -574,7 +589,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                         overrides={{
                                             Root: {
                                                 style: {
-                                                    width: '120px',
+                                                    width: '115px',
                                                     flexShrink: 0,
                                                 },
                                             },
@@ -587,28 +602,10 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                         options={voiceOptions}
                                         placeholder={t('Please select a voice')}
                                         overrides={{
-                                            ControlContainer: {
-                                                style: {
-                                                    boxSizing: 'border-box',
-                                                    height: '32px',
-                                                },
-                                            },
-                                            InputContainer: {
-                                                style: {
-                                                    boxSizing: 'border-box',
-                                                    height: '32px',
-                                                },
-                                            },
-                                            ValueContainer: {
-                                                style: {
-                                                    paddingTop: '0px',
-                                                    paddingBottom: '0px',
-                                                },
-                                            },
                                             Root: {
                                                 style: {
                                                     flexShrink: 1,
-                                                    minWidth: '200px',
+                                                    minWidth: '215px',
                                                 },
                                             },
                                         }}
@@ -634,15 +631,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                             handleDeleteLang(lang)
                                         }}
                                     >
-                                        <RiDeleteBin5Line />
+                                        <RiDeleteBin5Line size={12} />
                                     </Button>
-                                    <SpeakerButton
-                                        provider={value?.provider}
-                                        lang={lang}
-                                        voice={voice}
-                                        volume={value?.volume}
-                                        rate={value?.rate}
-                                    />
                                 </div>
                             )
                         })}
@@ -1619,7 +1609,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                     position: isDesktopApp ? 'fixed' : undefined,
                     left: isDesktopApp ? 0 : undefined,
                     top: isDesktopApp ? 0 : undefined,
-                    zIndex: 1,
+                    zIndex: 1001,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2102,7 +2092,13 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='restorePreviousPosition' label={t('Fixed Position')}>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp ? 'block' : 'none',
+                            }}
+                            name='restorePreviousPosition'
+                            label={t('Fixed Position')}
+                        >
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
@@ -2115,7 +2111,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         )}
                         <FormItem
                             style={{
-                                display: isMacOS ? 'block' : 'none',
+                                display: isDesktopApp && isMacOS ? 'block' : 'none',
                             }}
                             name='hideTheIconInTheDock'
                             label={t('Hide the icon in the Dock bar')}
