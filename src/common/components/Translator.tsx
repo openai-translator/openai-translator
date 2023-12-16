@@ -22,7 +22,16 @@ import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, getAssetUrl, isUserscript, setSettings } from '../utils'
+import {
+    defaultAPIURL,
+    exportToCsv,
+    isDesktopApp,
+    isTauri,
+    getAssetUrl,
+    isUserscript,
+    setSettings,
+    isBrowserExtensionContentScript,
+} from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
@@ -2144,10 +2153,22 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         <Button
                             size='mini'
                             kind='tertiary'
-                            onClick={(e) => {
+                            overrides={{
+                                Root: {
+                                    style: {
+                                        zIndex: 1003,
+                                    },
+                                },
+                            }}
+                            onClick={async (e) => {
                                 e.stopPropagation()
                                 e.preventDefault()
-                                setShowSettings((s) => !s)
+                                if (isBrowserExtensionContentScript()) {
+                                    const browser = (await import('webextension-polyfill')).default
+                                    await browser.runtime.sendMessage({ type: 'openOptionsPage' })
+                                } else {
+                                    setShowSettings((s) => !s)
+                                }
                             }}
                         >
                             <div
@@ -2167,7 +2188,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             position: 'relative',
                                         }}
                                     >
-                                        <IoSettingsOutline size={15} />
+                                        <IoSettingsOutline
+                                            style={{
+                                                display: 'block',
+                                            }}
+                                            size={15}
+                                        />
                                         {promotion && !promotionShowed && (
                                             <div
                                                 style={{

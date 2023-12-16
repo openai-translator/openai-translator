@@ -121,7 +121,6 @@ export function ScreenshotWindow() {
                     const bottom = Math.floor(Math.max(mouseDownY, e.clientY) * dpi)
                     const width = right - left
                     const height = bottom - top
-                    console.log(left, top, width, height)
                     if (width <= 0 || height <= 0) {
                         await appWindow.close()
                     } else {

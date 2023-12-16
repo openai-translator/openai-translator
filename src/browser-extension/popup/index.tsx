@@ -20,7 +20,7 @@ function App() {
         <div
             style={{
                 position: 'relative',
-                minHeight: '100vh',
+                height: '100%',
                 background: theme.colors.backgroundPrimary,
             }}
             data-testid='popup-container'

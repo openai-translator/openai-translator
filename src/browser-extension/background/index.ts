@@ -132,13 +132,18 @@ browser.runtime.onMessage.addListener(async (request) => {
         case BackgroundEventNames.actionService:
             return await callMethod(request, actionInternalService)
         case BackgroundEventNames.getItem:
-            const value = localStorage.get(request.key)
-            return { value }
+            const resp = await browser.storage.local.get(request.key)
+            return {
+                value: resp[request.key],
+            }
         case BackgroundEventNames.setItem:
-            localStorage.set(request.key, request.value)
-            return
+            return await browser.storage.local.set({
+                [request.key]: request.value,
+            })
         case BackgroundEventNames.removeItem:
-            localStorage.remove(request.key)
+            return await browser.storage.local.remove(request.key)
+        case 'openOptionsPage':
+            browser.runtime.openOptionsPage()
             return
     }
 })

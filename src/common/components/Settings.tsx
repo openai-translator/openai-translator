@@ -410,7 +410,14 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                             <SpeakerButton
                                 shape='round'
                                 kind='secondary'
-                                iconSize={11}
+                                iconSize={12}
+                                overrides={{
+                                    Root: {
+                                        style: {
+                                            padding: '4px',
+                                        },
+                                    },
+                                }}
                                 provider={value?.provider}
                                 lang={lang}
                                 voice={sv.voiceURI}
@@ -1026,6 +1033,7 @@ const useStyles = createUseStyles({
     footer: (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
+                  zIndex: 1000,
                   color: props.theme.colors.contentSecondary,
                   position: 'fixed',
                   width: '100%',
@@ -1243,7 +1251,31 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               id: Provider
           }[])
         : ([
-              { label: 'OpenAI', id: 'OpenAI' },
+              {
+                  label: (
+                      <div
+                          style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 10,
+                          }}
+                      >
+                          OpenAI
+                          {hasPromotion && value !== 'OpenAI' && (
+                              <div
+                                  style={{
+                                      width: '0.45rem',
+                                      height: '0.45rem',
+                                      borderRadius: '50%',
+                                      backgroundColor: theme.colors.warning300,
+                                  }}
+                              />
+                          )}
+                      </div>
+                  ),
+                  id: 'OpenAI',
+              },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
@@ -1595,8 +1627,8 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     return (
         <div
             style={{
-                paddingTop: isDesktopApp ? '136px' : undefined,
-                paddingBottom: isDesktopApp ? '32px' : undefined,
+                paddingTop: utils.isBrowserExtensionOptions() ? undefined : '136px',
+                paddingBottom: utils.isBrowserExtensionOptions() ? undefined : '32px',
                 background: theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
                 maxHeight: utils.isUserscript() ? 'calc(100vh - 32px)' : undefined,
@@ -1606,9 +1638,9 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         >
             <nav
                 style={{
-                    position: isDesktopApp ? 'fixed' : undefined,
-                    left: isDesktopApp ? 0 : undefined,
-                    top: isDesktopApp ? 0 : undefined,
+                    position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
+                    left: 0,
+                    top: 0,
                     zIndex: 1001,
                     width: '100%',
                     display: 'flex',
@@ -1745,6 +1777,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                 form={form}
                 style={{
                     padding: '20px 25px',
+                    paddingBottom: utils.isBrowserExtensionOptions() ? 0 : undefined,
                 }}
                 onFinish={onSubmit}
                 initialValues={values}
@@ -2213,13 +2246,14 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                 </div>
                 <div
                     style={{
-                        position: 'fixed',
+                        position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
                         bottom: '7px',
                         right: '25px',
+                        paddingBottom: utils.isBrowserExtensionOptions() ? '10px' : undefined,
                         display: 'flex',
                         alignItems: 'center',
                         flexDirection: 'row',
-                        zIndex: '999',
+                        zIndex: 1000,
                         gap: 10,
                     }}
                 >

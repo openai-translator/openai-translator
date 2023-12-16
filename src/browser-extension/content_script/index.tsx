@@ -106,6 +106,9 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         ...preset(),
         insertionPoint: $popupCard.parentElement ?? undefined,
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__IS_OT_BROWSER_EXTENSION_CONTENT_SCRIPT__ = true
+    const isUserscript = utils.isUserscript()
     const JSS = JssProvider
     root = createRoot($popupCard)
     root.render(
@@ -118,7 +121,7 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                             engine={engine}
                             autoFocus={autoFocus}
                             showSettingsIcon
-                            defaultShowSettings
+                            defaultShowSettings={isUserscript}
                             showLogo={false}
                         />
                     </InnerContainer>

@@ -16,15 +16,19 @@ const useStyles = createUseStyles({
         display: 'flex',
         justifyContent: 'center',
         backgroundColor: props.theme.colors.backgroundSecondary,
+        height: '100%',
     }),
     container: {
         maxWidth: '768px',
+        height: '100%',
     },
 })
 
 const Options = () => {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__IS_OT_BROWSER_EXTENSION_OPTIONS__ = true
 
     return (
         <div className={styles.root}>
