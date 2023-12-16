@@ -101,6 +101,7 @@ const useStyles = createUseStyles({
         boxSizing: 'border-box',
     },
     'footer': (props: IThemedStyleProps) => ({
+        boxSizing: 'border-box',
         color: props.theme.colors.contentSecondary,
         position: 'fixed',
         width: '100%',

@@ -131,6 +131,15 @@ browser.runtime.onMessage.addListener(async (request) => {
             return await callMethod(request, vocabularyInternalService)
         case BackgroundEventNames.actionService:
             return await callMethod(request, actionInternalService)
+        case BackgroundEventNames.getItem:
+            const value = localStorage.get(request.key)
+            return { value }
+        case BackgroundEventNames.setItem:
+            localStorage.set(request.key, request.value)
+            return
+        case BackgroundEventNames.removeItem:
+            localStorage.remove(request.key)
+            return
     }
 })
 

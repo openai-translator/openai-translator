@@ -98,7 +98,6 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $popupCard = await createPopupCard()
     }
 
-    const isUserscript = utils.isUserscript()
     const engine = new Styletron({
         container: $popupCard.parentElement ?? undefined,
         prefix: `${PREFIX}-styletron-`,
@@ -118,8 +117,8 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                         <Translator
                             engine={engine}
                             autoFocus={autoFocus}
-                            showSettingsIcon={isUserscript ? true : false}
-                            defaultShowSettings={isUserscript ? true : false}
+                            showSettingsIcon
+                            defaultShowSettings
                             showLogo={false}
                         />
                     </InnerContainer>

@@ -23,7 +23,9 @@ export function usePromotionShowed(item?: IPromotionItem) {
     )
 
     useEffect(() => {
-        setPromotionShowed_(isPromotionItemShowed(item))
+        isPromotionItemShowed(item).then((showed) => {
+            setPromotionShowed_(showed)
+        })
     }, [item, setPromotionShowed_])
 
     return { promotionShowed, setPromotionShowed }

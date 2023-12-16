@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
+import { isDesktopApp, isUserscript } from '../utils'
+import { backgroundGetItem, backgroundRemoveItem, backgroundSetItem } from '../background/local-storage'
 
 export interface II18nPromotionContent {
     'en'?: string
@@ -67,23 +69,39 @@ export function isPromotionItemAvailable(item?: IPromotionItem) {
     return true
 }
 
-export function isPromotionItemShowed(item?: IPromotionItem) {
+function getPromotionItemShowedKey(item: IPromotionItem) {
+    return `promotion:${item.id}:showed`
+}
+
+export async function isPromotionItemShowed(item?: IPromotionItem): Promise<boolean> {
     if (!item) {
         return true
     }
-    return localStorage.getItem(`promotion:${item.id}:showed`) === 'true'
+    const key = getPromotionItemShowedKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        return localStorage.getItem(key) === 'true'
+    }
+    return (await backgroundGetItem(key)) === 'true'
 }
 
-export function setPromotionItemShowed(item?: IPromotionItem) {
+export async function setPromotionItemShowed(item?: IPromotionItem) {
     if (!item) {
         return
     }
-    localStorage.setItem(`promotion:${item.id}:showed`, 'true')
+    const key = getPromotionItemShowedKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        localStorage.setItem(key, 'true')
+    }
+    return await backgroundSetItem(key, 'true')
 }
 
-export function unsetPromotionItemShowed(item?: IPromotionItem) {
+export async function unsetPromotionItemShowed(item?: IPromotionItem) {
     if (!item) {
         return
     }
-    localStorage.removeItem(`promotion:${item.id}:showed`)
+    const key = getPromotionItemShowedKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        localStorage.removeItem(`promotion:${item.id}:showed`)
+    }
+    return await backgroundRemoveItem(key)
 }
