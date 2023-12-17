@@ -1,4 +1,4 @@
-import { computePosition, shift, flip, size, offset, type ReferenceElement } from '@floating-ui/dom'
+import { computePosition, shift, flip, offset, type ReferenceElement } from '@floating-ui/dom'
 import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import {
@@ -7,7 +7,6 @@ import {
     popupCardInnerContainerId,
     popupCardMaxWidth,
     popupCardMinHeight,
-    popupCardMinHeightAfterTranslation,
     popupCardMinWidth,
     popupCardOffset,
     zIndex,
@@ -48,18 +47,7 @@ export default function InnerContainer({ children, reference }: Props) {
         }
         const { x, y } = await computePosition(reference, draggableRef.current, {
             placement: 'bottom',
-            middleware: [
-                shift({ padding: documentPadding }),
-                offset(popupCardOffset),
-                flip(),
-                size({
-                    apply({ availableHeight, elements }) {
-                        Object.assign(elements.floating.style, {
-                            maxHeight: `${Math.max(popupCardMinHeightAfterTranslation, availableHeight)}px`,
-                        })
-                    },
-                }),
-            ],
+            middleware: [shift({ padding: documentPadding }), offset(popupCardOffset), flip()],
             strategy: 'fixed',
         })
 

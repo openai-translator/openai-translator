@@ -186,6 +186,20 @@ export const isTauri = () => {
     return window['__TAURI__' as any] !== undefined
 }
 
+export const isBrowserExtensionOptions = () => {
+    if (typeof window === 'undefined') {
+        return false
+    }
+    return window['__IS_OT_BROWSER_EXTENSION_OPTIONS__' as any] !== undefined
+}
+
+export const isBrowserExtensionContentScript = () => {
+    if (typeof window === 'undefined') {
+        return false
+    }
+    return window['__IS_OT_BROWSER_EXTENSION_CONTENT_SCRIPT__' as any] !== undefined
+}
+
 export const isDesktopApp = () => {
     return isElectron() || isTauri()
 }

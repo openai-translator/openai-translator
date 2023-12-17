@@ -98,7 +98,6 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         $popupCard = await createPopupCard()
     }
 
-    const isUserscript = utils.isUserscript()
     const engine = new Styletron({
         container: $popupCard.parentElement ?? undefined,
         prefix: `${PREFIX}-styletron-`,
@@ -107,6 +106,9 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
         ...preset(),
         insertionPoint: $popupCard.parentElement ?? undefined,
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__IS_OT_BROWSER_EXTENSION_CONTENT_SCRIPT__ = true
+    const isUserscript = utils.isUserscript()
     const JSS = JssProvider
     root = createRoot($popupCard)
     root.render(
@@ -118,8 +120,8 @@ async function showPopupCard(reference: ReferenceElement, text: string, autoFocu
                         <Translator
                             engine={engine}
                             autoFocus={autoFocus}
-                            showSettingsIcon={isUserscript ? true : false}
-                            defaultShowSettings={isUserscript ? true : false}
+                            showSettingsIcon
+                            defaultShowSettings={isUserscript}
                             showLogo={false}
                         />
                     </InnerContainer>

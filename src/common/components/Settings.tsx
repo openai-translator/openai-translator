@@ -12,9 +12,9 @@ import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
 import { Input } from 'baseui-sd/input'
 import { createForm } from './Form'
-import { Button } from 'baseui-sd/button'
+import { Button, ButtonProps } from 'baseui-sd/button'
 import { TranslateMode, APIModel } from '../translate'
-import { Select, Value, Option } from 'baseui-sd/select'
+import { Select, Value, Option, SelectProps } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
 import { LangCode, supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
@@ -127,11 +127,6 @@ interface AutoTranslateCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
     onBlur?: () => void
-}
-
-interface IProviderSelectorProps {
-    value?: Provider
-    onChange?: (value: Provider) => void
 }
 
 function TranslateModeSelector({ value, onChange, onBlur }: ITranslateModeSelectorProps) {
@@ -269,7 +264,8 @@ const useTTSSettingsStyles = createUseStyles({
     }),
 })
 
-interface ISpeakerButtonProps {
+interface ISpeakerButtonProps extends ButtonProps {
+    iconSize?: number
     provider?: TTSProvider
     lang: LangCode
     voice: string
@@ -278,20 +274,23 @@ interface ISpeakerButtonProps {
     text?: string
 }
 
-function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISpeakerButtonProps) {
+function SpeakerButton({
+    iconSize = 13,
+    provider,
+    text: text_,
+    lang,
+    voice,
+    rate,
+    volume,
+    ...buttonProps
+}: ISpeakerButtonProps) {
     const text = text_ ?? ttsLangTestTextMap[lang]
 
     return (
         <Button
             shape='circle'
             size='mini'
-            overrides={{
-                Root: {
-                    style: {
-                        flexShrink: 0,
-                    },
-                },
-            }}
+            {...buttonProps}
             onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -299,7 +298,15 @@ function SpeakerButton({ provider, text: text_, lang, voice, rate, volume }: ISp
                 target.querySelector('div')?.click()
             }}
         >
-            <SpeakerIcon provider={provider} text={text} lang={lang} voice={voice} rate={rate} volume={volume} />
+            <SpeakerIcon
+                size={iconSize}
+                provider={provider}
+                text={text}
+                lang={lang}
+                voice={voice}
+                rate={rate}
+                volume={volume}
+            />
         </Button>
     )
 }
@@ -400,14 +407,24 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                             }}
                             key={sv.voiceURI}
                         >
-                            {sv.name}
                             <SpeakerButton
+                                shape='round'
+                                kind='secondary'
+                                iconSize={12}
+                                overrides={{
+                                    Root: {
+                                        style: {
+                                            padding: '4px',
+                                        },
+                                    },
+                                }}
                                 provider={value?.provider}
                                 lang={lang}
                                 voice={sv.voiceURI}
                                 volume={value?.volume}
                                 rate={value?.rate}
                             />
+                            {sv.name}
                         </div>
                     ),
                     lang: sv.lang,
@@ -579,7 +596,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                         overrides={{
                                             Root: {
                                                 style: {
-                                                    width: '120px',
+                                                    width: '115px',
                                                     flexShrink: 0,
                                                 },
                                             },
@@ -592,28 +609,10 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                         options={voiceOptions}
                                         placeholder={t('Please select a voice')}
                                         overrides={{
-                                            ControlContainer: {
-                                                style: {
-                                                    boxSizing: 'border-box',
-                                                    height: '32px',
-                                                },
-                                            },
-                                            InputContainer: {
-                                                style: {
-                                                    boxSizing: 'border-box',
-                                                    height: '32px',
-                                                },
-                                            },
-                                            ValueContainer: {
-                                                style: {
-                                                    paddingTop: '0px',
-                                                    paddingBottom: '0px',
-                                                },
-                                            },
                                             Root: {
                                                 style: {
                                                     flexShrink: 1,
-                                                    minWidth: '200px',
+                                                    minWidth: '215px',
                                                 },
                                             },
                                         }}
@@ -639,15 +638,8 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                                             handleDeleteLang(lang)
                                         }}
                                     >
-                                        <RiDeleteBin5Line />
+                                        <RiDeleteBin5Line size={12} />
                                     </Button>
-                                    <SpeakerButton
-                                        provider={value?.provider}
-                                        lang={lang}
-                                        voice={voice}
-                                        volume={value?.volume}
-                                        rate={value?.rate}
-                                    />
                                 </div>
                             )
                         })}
@@ -1041,6 +1033,7 @@ const useStyles = createUseStyles({
     footer: (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
+                  zIndex: 1000,
                   color: props.theme.colors.contentSecondary,
                   position: 'fixed',
                   width: '100%',
@@ -1202,10 +1195,53 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
     )
 }
 
-function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
+interface IProviderSelectorProps {
+    value?: Provider
+    onChange?: (value: Provider) => void
+    hasPromotion?: boolean
+}
+
+function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorProps) {
+    const { theme } = useTheme()
+
+    let overrides: SelectProps['overrides'] = undefined
+    if (hasPromotion && value !== 'OpenAI') {
+        overrides = {
+            ControlContainer: {
+                style: {
+                    borderColor: theme.colors.warning300,
+                },
+            },
+        }
+    }
+
     const options = utils.isDesktopApp()
         ? ([
-              { label: 'OpenAI', id: 'OpenAI' },
+              {
+                  label: (
+                      <div
+                          style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 10,
+                          }}
+                      >
+                          OpenAI
+                          {hasPromotion && value !== 'OpenAI' && (
+                              <div
+                                  style={{
+                                      width: '0.45rem',
+                                      height: '0.45rem',
+                                      borderRadius: '50%',
+                                      backgroundColor: theme.colors.warning300,
+                                  }}
+                              />
+                          )}
+                      </div>
+                  ),
+                  id: 'OpenAI',
+              },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
@@ -1215,7 +1251,31 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
               id: Provider
           }[])
         : ([
-              { label: 'OpenAI', id: 'OpenAI' },
+              {
+                  label: (
+                      <div
+                          style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 10,
+                          }}
+                      >
+                          OpenAI
+                          {hasPromotion && value !== 'OpenAI' && (
+                              <div
+                                  style={{
+                                      width: '0.45rem',
+                                      height: '0.45rem',
+                                      borderRadius: '50%',
+                                      backgroundColor: theme.colors.warning300,
+                                  }}
+                              />
+                          )}
+                      </div>
+                  ),
+                  id: 'OpenAI',
+              },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
@@ -1227,6 +1287,7 @@ function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
 
     return (
         <Select
+            overrides={overrides}
             size='compact'
             searchable={false}
             clearable={false}
@@ -1318,36 +1379,8 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     const { t } = useTranslation()
 
     const [loading, setLoading] = useState(false)
-    const [values, setValues] = useState<ISettings>({
-        automaticCheckForUpdates: false,
-        apiKeys: '',
-        apiURL: utils.defaultAPIURL,
-        apiURLPath: utils.defaultAPIURLPath,
-        apiModel: utils.defaultAPIModel,
-        provider: utils.defaultProvider,
-        chatgptModel: utils.defaultChatGPTModel,
-        azureAPIKeys: '',
-        azureAPIURL: utils.defaultAPIURL,
-        azureAPIURLPath: utils.defaultAPIURLPath,
-        azureAPIModel: utils.defaultAPIModel,
-        miniMaxGroupID: '',
-        miniMaxAPIKey: '',
-        moonshotAPIKey: '',
-        moonshotAPIModel: '',
-        autoTranslate: utils.defaultAutoTranslate,
-        defaultTranslateMode: 'translate',
-        defaultTargetLanguage: utils.defaultTargetLanguage,
-        alwaysShowIcons: !isTauri,
-        hotkey: '',
-        displayWindowHotkey: '',
-        i18n: utils.defaulti18n,
-        restorePreviousPosition: false,
-        selectInputElementsText: utils.defaultSelectInputElementsText,
-        readSelectedWordsFromInputElementsText: utils.defaultReadSelectedWordsFromInputElementsText,
-        runAtStartup: false,
-        writingTargetLanguage: utils.defaultWritingTargetLanguage,
-        hideTheIconInTheDock: false,
-    })
+    const { settings, setSettings } = useSettings()
+    const [values, setValues] = useState<ISettings>(settings)
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
     const [form] = useForm()
@@ -1355,8 +1388,6 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
     useEffect(() => {
         form.setFieldsValue(values)
     }, [form, values])
-
-    const { settings, setSettings } = useSettings()
 
     useEffect(() => {
         if (settings) {
@@ -1575,19 +1606,29 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         return getPromotionItem(promotions?.openai_api_key)
     }, [promotions])
 
-    const { setPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+    const { promotionShowed, setPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+
+    const isOpenAI = values.provider === 'OpenAI'
 
     useEffect(() => {
-        setPromotionShowed(true)
-    }, [setPromotionShowed])
+        if (isOpenAI) {
+            setPromotionShowed(true)
+        }
+        // const timer = setTimeout(() => {
+        //     setPromotionShowed(true)
+        // }, 15000)
+        // return () => {
+        //     clearTimeout(timer)
+        // }
+    }, [setPromotionShowed, isOpenAI])
 
     console.debug('render settings')
 
     return (
         <div
             style={{
-                paddingTop: isDesktopApp ? '136px' : undefined,
-                paddingBottom: isDesktopApp ? '32px' : undefined,
+                paddingTop: utils.isBrowserExtensionOptions() ? undefined : '136px',
+                paddingBottom: utils.isBrowserExtensionOptions() ? undefined : '32px',
                 background: theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
                 maxHeight: utils.isUserscript() ? 'calc(100vh - 32px)' : undefined,
@@ -1597,10 +1638,10 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
         >
             <nav
                 style={{
-                    position: isDesktopApp ? 'fixed' : undefined,
-                    left: isDesktopApp ? 0 : undefined,
-                    top: isDesktopApp ? 0 : undefined,
-                    zIndex: 1,
+                    position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
+                    left: 0,
+                    top: 0,
+                    zIndex: 1001,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1736,6 +1777,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                 form={form}
                 style={{
                     padding: '20px 25px',
+                    paddingBottom: utils.isBrowserExtensionOptions() ? 0 : undefined,
                 }}
                 onFinish={onSubmit}
                 initialValues={values}
@@ -1750,8 +1792,33 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='i18n' label={t('i18n')}>
                             <Ii18nSelector onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='provider' label={t('Default service provider')} required>
-                            <ProviderSelector />
+                        <FormItem
+                            name='provider'
+                            label={
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: 10,
+                                    }}
+                                >
+                                    {t('Default service provider')}
+                                    {openaiAPIKeyPromotion !== undefined && !promotionShowed && (
+                                        <div
+                                            style={{
+                                                width: '0.45rem',
+                                                height: '0.45rem',
+                                                borderRadius: '50%',
+                                                backgroundColor: theme.colors.warning300,
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            }
+                            required
+                        >
+                            <ProviderSelector hasPromotion={openaiAPIKeyPromotion !== undefined && !promotionShowed} />
                         </FormItem>
                         <div
                             style={{
@@ -2058,7 +2125,13 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem name='restorePreviousPosition' label={t('Fixed Position')}>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp ? 'block' : 'none',
+                            }}
+                            name='restorePreviousPosition'
+                            label={t('Fixed Position')}
+                        >
                             <RestorePreviousPositionCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
@@ -2071,7 +2144,7 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                         )}
                         <FormItem
                             style={{
-                                display: isMacOS ? 'block' : 'none',
+                                display: isDesktopApp && isMacOS ? 'block' : 'none',
                             }}
                             name='hideTheIconInTheDock'
                             label={t('Hide the icon in the Dock bar')}
@@ -2173,13 +2246,14 @@ export function InnerSettings({ onSave, showFooter = false }: IInnerSettingsProp
                 </div>
                 <div
                     style={{
-                        position: 'fixed',
+                        position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
                         bottom: '7px',
                         right: '25px',
+                        paddingBottom: utils.isBrowserExtensionOptions() ? '10px' : undefined,
                         display: 'flex',
                         alignItems: 'center',
                         flexDirection: 'row',
-                        zIndex: '999',
+                        zIndex: 1000,
                         gap: 10,
                     }}
                 >

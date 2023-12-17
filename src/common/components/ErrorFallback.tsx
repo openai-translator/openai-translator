@@ -7,6 +7,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: { error: Error; res
             style={{
                 padding: '20px',
                 background: '#fff',
+                height: '100%',
             }}
         >
             <p

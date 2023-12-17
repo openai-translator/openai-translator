@@ -7,12 +7,22 @@
       html, body {
           margin: 0px;
           padding: 0px;
+          height: 100%;
       }
       body {
         position: relative;
         min-width: 700px;
         min-height: 600px;
         background: #000;
+      }
+      #root {
+        height: 100%;
+      }
+      [data-baseweb='tooltip'],
+      [data-baseweb='toaster'],
+      [data-baseweb='modal'],
+      [data-baseweb='popover'] {
+        z-index: 1000;
       }
     </style>
   </head>
