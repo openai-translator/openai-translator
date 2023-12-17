@@ -1610,27 +1610,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 if (actionID === '__manager__') {
                                                     if (isTauri()) {
                                                         const { invoke } = await import('@tauri-apps/api/primitives')
-                                                        if (!navigator.userAgent.includes('Windows')) {
-                                                            await invoke('show_action_manager_window')
-                                                        } else {
-                                                            const { LogicalSize, Window: WebviewWindow } = await import(
-                                                                '@tauri-apps/api/window'
-                                                            )
-                                                            const windowLabel = 'action_manager'
-                                                            let window = WebviewWindow.getByLabel(windowLabel)
-                                                            if (!window) {
-                                                                window = new WebviewWindow(windowLabel, {
-                                                                    url: 'src/tauri/index.html',
-                                                                    decorations: false,
-                                                                    visible: true,
-                                                                    focus: true,
-                                                                })
-                                                            }
-                                                            await window.setDecorations(false)
-                                                            await window.setSize(new LogicalSize(600, 770))
-                                                            await window.center()
-                                                            await window.show()
-                                                        }
+                                                        await invoke('show_action_manager_window')
                                                     } else {
                                                         setShowActionManager(true)
                                                     }
