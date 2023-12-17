@@ -1620,7 +1620,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             let window = WebviewWindow.getByLabel(windowLabel)
                                                             if (!window) {
                                                                 window = new WebviewWindow(windowLabel, {
-                                                                    url: 'src/tauri/action_manager.html',
+                                                                    url: 'src/tauri/index.html',
                                                                     decorations: false,
                                                                     visible: true,
                                                                     focus: true,
