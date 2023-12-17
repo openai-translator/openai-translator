@@ -1033,7 +1033,7 @@ const useStyles = createUseStyles({
     footer: (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
-                  zIndex: 1000,
+                  zIndex: 999,
                   color: props.theme.colors.contentSecondary,
                   position: 'fixed',
                   width: '100%',
