@@ -1,3 +1,4 @@
+use debug_print::debug_println;
 use futures_util::stream::{AbortHandle, Abortable};
 use futures_util::StreamExt;
 use reqwest::StatusCode;
@@ -80,7 +81,6 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         let chunk = item.map_err(|err| format!("failed to read response: {}", err))?;
         let chunk_str = String::from_utf8(chunk.to_vec())
             .map_err(|err| format!("failed to convert chunk to utf-8: {}", err))?;
-        use debug_print::debug_println;
         debug_println!("chunk: {}", chunk_str);
         app_handle
             .emit(
@@ -95,6 +95,7 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
             .unwrap();
     }
 
+    debug_println!("chunk done!");
     app_handle
         .emit(
             "fetch-stream-chunk",

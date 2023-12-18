@@ -51,6 +51,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     miniMaxAPIKey: 1,
     moonshotAPIKey: 1,
     moonshotAPIModel: 1,
+    geminiAPIKey: 1,
+    geminiAPIModel: 1,
     autoTranslate: 1,
     defaultTranslateMode: 1,
     defaultTargetLanguage: 1,
@@ -281,12 +283,64 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
     fetcher?: (input: string, options: RequestInit) => Promise<Response>
+    useJSONParser?: boolean
+}
+
+const responseLineRE = /^(\[|,)/
+
+function tryParse(currentText: string): {
+    parsedResponse: any
+} {
+    const match = currentText.match(responseLineRE)
+    if (!match) {
+        return {
+            parsedResponse: null,
+        }
+    }
+
+    let jsonText: string
+    if (match[1] === '[') {
+        jsonText = currentText + ']'
+    } else if (currentText.trimEnd().endsWith(']')) {
+        jsonText = '[' + currentText.slice(1)
+    } else {
+        jsonText = '[' + currentText.slice(1) + ']'
+    }
+
+    try {
+        const parsedResponse = JSON.parse(jsonText)
+        return {
+            parsedResponse,
+        }
+    } catch (e) {
+        throw new Error(`Error parsing JSON response: "${jsonText}"`)
+    }
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
-    const { onMessage, onError, onStatusCode, fetcher = getUniversalFetch(), ...fetchOptions } = options
+    const {
+        onMessage,
+        onError,
+        onStatusCode,
+        useJSONParser = false,
+        fetcher = getUniversalFetch(),
+        ...fetchOptions
+    } = options
 
-    const parser = createParser(async (event) => {
+    const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
+        if (done && !value) {
+            return
+        }
+
+        const { parsedResponse } = tryParse(value)
+        if (parsedResponse) {
+            for (const item of parsedResponse) {
+                await onMessage(JSON.stringify(item))
+            }
+        }
+    }
+
+    const sseParser = createParser(async (event) => {
         if (event.type === 'event') {
             await onMessage(event.data)
         }
@@ -321,7 +375,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                         resolve()
                         return
                     }
-                    parser.feed(payload.data)
+                    if (useJSONParser) {
+                        jsonParser({ value: payload.data, done: payload.done })
+                    } else {
+                        sseParser.feed(payload.data)
+                    }
                 }
             )
                 .then((cb) => {
@@ -361,7 +419,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 break
             }
             const str = new TextDecoder().decode(value)
-            parser.feed(str)
+            if (useJSONParser) {
+                jsonParser({ value: str, done })
+            } else {
+                sseParser.feed(str)
+            }
         }
     } finally {
         reader.releaseLock()

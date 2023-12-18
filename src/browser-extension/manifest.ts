@@ -64,6 +64,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             'https://api-edge.cognitive.microsofttranslator.com/',
             'https://*.microsoft.com/',
             'https://*.google.com/',
+            'https://*.googleapis.com/',
         ],
     }
 

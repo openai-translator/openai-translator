@@ -61,6 +61,8 @@ export interface ISettings {
     azureAPIModel: string
     miniMaxGroupID: string
     miniMaxAPIKey: string
+    geminiAPIKey: string
+    geminiAPIModel: string
     moonshotAPIKey: string
     moonshotAPIModel: string
     autoTranslate: boolean
