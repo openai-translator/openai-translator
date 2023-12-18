@@ -298,20 +298,22 @@ function tryParse(currentText: string): {
         }
     }
 
+    let jsonText: string
+    if (match[1] === '[') {
+        jsonText = currentText + ']'
+    } else if (currentText.trimEnd().endsWith(']')) {
+        jsonText = '[' + currentText.slice(1)
+    } else {
+        jsonText = '[' + currentText.slice(1) + ']'
+    }
+
     try {
-        let parsedResponse: any
-        if (match[1] === '[') {
-            parsedResponse = JSON.parse(currentText + ']')
-        } else if (currentText.trimEnd().endsWith(']')) {
-            parsedResponse = JSON.parse('[' + currentText.slice(1))
-        } else {
-            parsedResponse = JSON.parse('[' + currentText.slice(1) + ']')
-        }
+        const parsedResponse = JSON.parse(jsonText)
         return {
             parsedResponse,
         }
     } catch (e) {
-        throw new Error(`Error parsing JSON response: "{${match[2]}"`)
+        throw new Error(`Error parsing JSON response: "${jsonText}"`)
     }
 }
 
@@ -359,7 +361,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                     if (payload.id !== id) {
                         return
                     }
-                    if (!useJSONParser && payload.done) {
+                    if (payload.done) {
                         resolve()
                         return
                     }

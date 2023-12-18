@@ -83,22 +83,22 @@ export class Gemini implements IEngine {
                 try {
                     resp = JSON.parse(msg)
                 } catch (e) {
-                    req.onError(JSON.stringify(e))
                     hasError = true
                     finished = true
+                    req.onError(JSON.stringify(e))
                     return
                 }
                 if (!resp.candidates || resp.candidates.length === 0) {
-                    req.onError('no candidates')
                     hasError = true
                     finished = true
+                    req.onError('no candidates')
                     return
                 }
                 const targetTxt = resp.candidates[0].content.parts[0].text
                 await req.onMessage({ content: targetTxt, role: '' })
                 if (resp.candidates[0].finishReason !== 'STOP') {
-                    req.onFinished(resp.candidates[0].finishReason)
                     finished = true
+                    req.onFinished(resp.candidates[0].finishReason)
                     return
                 }
             },
