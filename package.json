@@ -103,7 +103,7 @@
     "@types/chrome": "0.0.242",
     "@types/common-tags": "^1.8.3",
     "@types/fs-extra": "^11.0.1",
-    "@types/lodash.debounce": "^4.0.7",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20.5.9",
     "@types/react": "^18.2.18",
     "@types/react-dom": "^18.2.7",

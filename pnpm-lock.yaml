@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -233,8 +233,8 @@ devDependencies:
     specifier: ^11.0.1
     version: 11.0.1
   '@types/lodash.debounce':
-    specifier: ^4.0.7
-    version: 4.0.7
+    specifier: ^4.0.9
+    version: 4.0.9
   '@types/node':
     specifier: ^20.5.9
     version: 20.5.9
@@ -1694,8 +1694,8 @@ packages:
       '@types/node': 20.5.9
     dev: true
 
-  /@types/lodash.debounce@4.0.7:
-    resolution: {integrity: sha512-X1T4wMZ+gT000M2/91SYj0d/7JfeNZ9PeeOldSNoE/lunLeQXKvkmIumI29IaKMotU/ln/McOIvgzZcQ/3TrSA==}
+  /@types/lodash.debounce@4.0.9:
+    resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
     dependencies:
       '@types/lodash': 4.14.195
     dev: true
