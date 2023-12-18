@@ -1,19 +1,12 @@
 import * as utils from '../../common/utils'
-import React from 'react'
 import icon from '../../common/assets/images/icon.png'
-import { popupCardID, popupCardMaxWidth, popupCardMinWidth, popupThumbID, zIndex } from './consts'
-import { Translator } from '../../common/components/Translator'
-import { calculateMaxXY, getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
-import { create } from 'jss'
-import preset from 'jss-preset-default'
-import { JssProvider, createGenerateId } from 'react-jss'
-import { Client as Styletron } from 'styletron-engine-atomic'
-import { createRoot, Root } from 'react-dom/client'
+import { popupThumbID, zIndex } from './consts'
+import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './utils'
+
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
-import { PREFIX } from '../../common/constants'
-let root: Root | null = null
-const generateId = createGenerateId()
+
+
 const hidePopupThumbTimer: number | null = null
 
 async function popupThumbClickHandler(event: MouseEvent) {
@@ -25,7 +18,7 @@ async function popupThumbClickHandler(event: MouseEvent) {
     }
     const x = $popupThumb.offsetLeft
     const y = $popupThumb.offsetTop
-    showPopupCard(x, y, $popupThumb.dataset['text'] || '')
+    sendText($popupThumb.dataset['text'] || '')
 }
 
 async function removeContainer() {
@@ -54,65 +47,13 @@ async function hidePopupCard() {
     removeContainer()
 }
 
-async function showPopupCard(x: number, y: number, text: string, autoFocus: boolean | undefined = false) {
+async function sendText(text: string) {
     const $popupThumb: HTMLDivElement | null = await queryPopupThumbElement()
     if ($popupThumb) {
         $popupThumb.style.display = 'none'
     }
-    let $popupCard: HTMLDivElement | null = await queryPopupCardElement()
-    if (!$popupCard) {
-        $popupCard = document.createElement('div')
-        $popupCard.id = popupCardID
-        $popupCard.style.position = 'absolute'
-        $popupCard.style.zIndex = zIndex
-        $popupCard.style.borderRadius = '4px'
-        $popupCard.style.boxShadow = '0 0 8px rgba(0,0,0,.3)'
-        $popupCard.style.minWidth = `${popupCardMinWidth}px`
-        $popupCard.style.maxWidth = `${popupCardMaxWidth}px`
-        $popupCard.style.lineHeight = '1.6'
-        $popupCard.style.fontSize = '13px'
-        $popupCard.style.color = '#333'
-        $popupCard.style.font =
-            '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji'
-        const $container = await getContainer()
-        $container.shadowRoot?.querySelector('div')?.appendChild($popupCard)
-    }
-    $popupCard.style.display = 'block'
-    $popupCard.style.width = 'auto'
-    $popupCard.style.height = 'auto'
-    $popupCard.style.opacity = '100'
-    const [maxX, maxY] = calculateMaxXY($popupCard)
-    $popupCard.style.left = `${Math.min(maxX, x)}px`
-    $popupCard.style.top = `${Math.min(maxY, y)}px`
-    const engine = new Styletron({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        container: $popupCard.parentElement as any,
-        prefix: `${PREFIX}-styletron-`,
-    })
-    const jss = create().setup({
-        ...preset(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        insertionPoint: $popupCard.parentElement as any,
-    })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const JSS = JssProvider as any
-    const isUserscript = utils.isUserscript()
-    root = createRoot($popupCard)
-    root.render(
-        <React.StrictMode>
-            <div>
-                <JSS jss={jss} generateId={generateId} classNamePrefix='__yetone-openai-translator-jss-'>
-                    <Translator
-                        text={text}
-                        engine={engine}
-                        autoFocus={autoFocus}
-                        showSettings={isUserscript ? true : false}
-                        defaultShowSettings={isUserscript ? true : false}
-                    />
-                </JSS>
-            </div>
-        </React.StrictMode>
-    )
+
+    chrome.runtime.sendMessage({ type: 'Text', text: text })
 }
 
 async function showPopupThumb(text: string, x: number, y: number) {
@@ -158,6 +99,7 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.top = `${y}px`
 }
 
+
 async function main() {
     const browser = await utils.getBrowser()
     let mousedownTarget: EventTarget | null
@@ -181,7 +123,7 @@ async function main() {
                 }
             } else {
                 if (settings.autoTranslate === true) {
-                    showPopupCard(event.pageX + 7, event.pageY + 7, text)
+                    sendText(text)
                 } else if (settings.alwaysShowIcons === true) {
                     showPopupThumb(text, event.pageX + 7, event.pageY + 7)
                 }
@@ -193,7 +135,7 @@ async function main() {
         if (request.type === 'open-translator') {
             if (window !== window.top) return
             const text = request.info.selectionText ?? ''
-            showPopupCard(lastMouseEvent?.pageX ?? 0 + 7, lastMouseEvent?.pageY ?? 0 + 7, text)
+            sendText(text)
         }
     })
 
@@ -225,13 +167,8 @@ export async function bindHotKey(hotkey_: string | undefined) {
             }
         }
         hidePopupCard()
-        // showPopupCard in center of screen
-        showPopupCard(
-            window.innerWidth / 2 + window.scrollX - 506 / 2,
-            window.innerHeight / 2 + window.scrollY - 226 / 2,
-            text,
-            true
-        )
+        // sendText in center of screen
+        sendText(text)
     })
 
     chrome.runtime.onMessage.addListener((request: any, sender, sendResponse) => {

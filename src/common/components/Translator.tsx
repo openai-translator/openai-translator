@@ -26,7 +26,7 @@ import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { addNewNote, isConnected } from '../anki/anki-connect'
 import icon from '../assets/images/icon.png'
-import actionsData from '../services/prompts.json';
+import actionsData from '../services/prompts.json'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
@@ -134,9 +134,9 @@ const useStyles = createUseStyles({
                   'flexDirection': 'row',
                   'cursor': 'move',
                   'alignItems': 'center',
-                  'padding': '8px 16px',
+                  'padding': '6px 14px',
                   'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                  'minWidth': '580px',
+                  'minWidth': '270px',
                   '-ms-user-select': 'none',
                   '-webkit-user-select': 'none',
                   'user-select': 'none',
@@ -385,7 +385,6 @@ const actionStrItems: Record<TranslateMode, IActionStrItem> = {
     },
 }
 
-
 export interface MovementXY {
     x: number
     y: number
@@ -445,6 +444,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
     const [showActionManager, setShowActionManager] = useState(false)
+
 
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
@@ -561,35 +561,24 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             if (!headerElem) {
                 return
             }
-            const logoTextElem = logoTextRef.current
-            if (!logoTextElem) {
-                return
-            }
             const activateActionElem = headerElem.querySelector('.__yetone-activate-action')
             if (hasActivateAction && !activateActionElem) {
                 return
             }
             const paddingWidth = 32
-            const logoWidth = 131
             const iconWidth = 32
             const iconWithTextWidth = activateActionElem ? activateActionElem.clientWidth : 105
             const iconGap = 5
             let count = Math.floor(
                 (headerWidth -
                     paddingWidth -
-                    logoWidth -
                     languagesSelectorWidth -
-                    10 -
+                    102 -
                     iconWithTextWidth * (hasActivateAction ? 1 : 0)) /
                     (iconGap + iconWidth)
             )
             count = hasActivateAction ? count + 1 : count
-            if (count <= 0) {
-                logoTextElem.style.display = 'none'
-            } else {
-                logoTextElem.style.display = 'flex'
-            }
-            setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
+            setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 10))
         }
 
         const timer = setTimeout(() => handleResize(), 300)
@@ -690,6 +679,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.addEventListener('blur', onBlur)
 
         return () => {
+            chrome.runtime.onMessage.removeListener(handleMessage);
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
@@ -708,9 +698,20 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
+
+    function handleRuntimeMessage(message, sender, sendResponse) {
+        if (message.type === "Text") {
+            const text = message.text;
+            setOriginalText(text);
+        }
+    }
+
+    chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+    
+    
     const webAPI = new WebAPI()
     useEffect(() => {
-        setOriginalText(props.text)
+        setOriginalText(props.text)     
     }, [props.text, props.uuid])
 
     useEffect(() => {
@@ -772,17 +773,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translatedLanguageDirection = useMemo(() => getLangConfig(sourceLang).direction, [sourceLang])
 
-
     const addToAnki = async (deckname: string, front: string, back: any) => {
         const connected = await isConnected()
-    
+
         if (connected) {
             try {
                 await addNewNote(deckname, front, back)
                 setActionStr('Note added successfully!')
             } catch (error) {
                 console.error('Error adding note:', error)
-                setErrorMessage( `Error: ${error}`)
+                setErrorMessage(`Error: ${error}`)
             }
         } else {
             console.log('Not connected')
@@ -1098,8 +1098,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [isOCRProcessing])
 
-
-
     const editableStopSpeakRef = useRef<() => void>(() => null)
     const translatedStopSpeakRef = useRef<() => void>(() => null)
     useEffect(() => {
@@ -1153,7 +1151,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 'yetone-dark': themeType === 'dark',
             })}
             style={{
-                minHeight:  '600px',
+                minHeight: '600px',
                 background: theme.colors.backgroundPrimary,
                 paddingBottom: showSettings ? '0px' : '30px',
             }}
@@ -1184,69 +1182,40 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cursor: isDesktopApp() ? 'default' : 'move',
                         }}
                     >
-                        <div data-tauri-drag-region className={styles.iconContainer}>
-                            <img data-tauri-drag-region className={styles.icon} src={icon} />
-                            <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
-                                GPT Tutor
-                            </div>
-                        </div>
-                        <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
-                            <div className={styles.from}>
-                                <Select
-                                    disabled={currentTranslateMode === 'explain-code'}
-                                    size='mini'
-                                    clearable={false}
-                                    options={sourceLangOptions}
-                                    value={[{ id: sourceLang }]}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                minWidth: '110px',
-                                            },
-                                        },
-                                    }}
-                                    onChange={({ value }) => {
-                                        const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
-                                        setSourceLang(langId as LangCode)
-                                    }}
-                                />
-                            </div>
-                            <div
-                                className={styles.arrow}
-                                onClick={() => {
-                                    setDetectedOriginalText(translatedText)
-                                    setSourceLang(targetLang ?? 'en')
-                                    setTargetLang(sourceLang)
-                                }}
-                            >
-                                <Tooltip content='Exchange' placement='top'>
-                                    <div>
-                                        <TbArrowsExchange />
-                                    </div>
-                                </Tooltip>
-                            </div>
-                            <div className={styles.to}>
-                                <Select
-                                    disabled={currentTranslateMode === 'polishing'}
-                                    size='mini'
-                                    clearable={false}
-                                    options={targetLangOptions}
-                                    value={[{ id: targetLang }]}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                minWidth: '110px',
-                                            },
-                                        },
-                                    }}
-                                    onChange={({ value }) => {
-                                        stopAutomaticallyChangeTargetLang.current = true
-                                        const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
-                                        setTargetLang(langId as LangCode)
-                                    }}
-                                />
-                            </div>
-                        </div>
+                        <Tooltip content={t('选择使用场景')} placement='bottom'>
+                <Select
+                size='mini'
+                    options={[
+                        ...Object.keys(actionGroups).map((key) => ({ id: key, label: key })),
+                        {
+                            id: 'unlock_features',
+                            label: (
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <AiOutlineLock style={{ marginRight: '5px' }} />
+                                    解锁更多功能
+                                </div>
+                            ),
+                        }, // 新增的选项
+                    ]}
+                    value={[{ id: selectedGroup }]}
+                    overrides={{
+                        Root: {
+                            style: {
+                                minWidth: '100px',
+                                width: '30%',
+                            },
+                        },
+                    }}
+                    onChange={({ value }) => {
+                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
+                        if (groupId === 'unlock_features') {
+                            window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank') // 打开新网页
+                        } else {
+                            setSelectedGroup(groupId as string)
+                        }
+                    }}
+                />
+            </Tooltip>
                         <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
                             {displayedActions?.map((action) => {
                                 return (
@@ -1293,7 +1262,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             {action.id === activateAction?.id && (
                                                 <div
                                                     style={{
-                                                        maxWidth: 100,
+                                                        maxWidth: 200,
                                                         whiteSpace: 'nowrap',
                                                         overflow: 'hidden',
                                                         textOverflow: 'ellipsis',
@@ -1474,8 +1443,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         setOriginalText(editableText)
                                                         const settings = await getSettings()
                                                         if (settings.apiModel.startsWith('gpt-4')) {
-                                                            document.dispatchEvent(tokenRegenerateEvent);
-                                                        }                     
+                                                            document.dispatchEvent(tokenRegenerateEvent)
+                                                        }
                                                     }
                                                 }
                                             }}
@@ -1530,8 +1499,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         setOriginalText(editableText)
                                                         const settings = await getSettings()
                                                         if (settings.apiModel.startsWith('gpt-4')) {
-                                                            document.dispatchEvent(tokenRegenerateEvent);
-                                                        }    
+                                                            document.dispatchEvent(tokenRegenerateEvent)
+                                                        }
                                                     }}
                                                     startEnhancer={<IoIosRocket size={13} />}
                                                     overrides={{
@@ -1651,7 +1620,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 ) : (
                                                     translatedLines.map((line, i) => {
                                                         return (
-                                                            
                                                             <p className={styles.paragraph} key={`p-${i}`}>
                                                                 {isWordMode && i === 0 ? (
                                                                     <div
@@ -1749,37 +1717,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     </Tooltip>
                 </div>
             )}
-
-<Tooltip content={t('选择使用场景')} placement='bottom'>
-    <Select
-        options={[
-            ...Object.keys(actionGroups).map((key) => ({ id: key, label: key })),
-            { id: 'unlock_features', label: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AiOutlineLock style={{ marginRight: '5px' }} />
-                    解锁更多功能
-                </div>
-            ) } // 新增的选项
-        ]}
-        value={[{ id: selectedGroup }]}
-        overrides={{
-            Root: {
-                style: {
-                    minWidth: '110px',
-                    width: '30%',
-                },
-            },
-        }}
-        onChange={({ value }) => {
-            const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0];
-            if (groupId === 'unlock_features') {
-                window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank'); // 打开新网页
-            } else {
-                setSelectedGroup(groupId as string);
-            }
-        }}
-    />
-</Tooltip>
 
             <Modal
                 isOpen={!isDesktopApp() && showActionManager}

@@ -140,3 +140,7 @@ browser.commands.onCommand.addListener(async (command) => {
     }
 })
 
+
+
+// background.js 或 service-worker.js
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error: any) => console.error(error))
