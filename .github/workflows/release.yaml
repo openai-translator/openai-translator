@@ -76,7 +76,7 @@ jobs:
       - name: build tauri renderer
         run: pnpm build-tauri-renderer
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: tauri-renderer
           path: dist/tauri/
