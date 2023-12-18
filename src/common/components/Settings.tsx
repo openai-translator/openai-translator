@@ -1242,6 +1242,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
                   ),
                   id: 'OpenAI',
               },
+              { label: 'Gemini', id: 'Gemini' },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
@@ -1277,10 +1278,10 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
                   id: 'OpenAI',
               },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
+              { label: 'Gemini', id: 'Gemini' },
               { label: 'Azure', id: 'Azure' },
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
-              { label: 'Gemini', id: 'Gemini' },
           ] as {
               label: string
               id: Provider

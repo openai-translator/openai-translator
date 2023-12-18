@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { getSettings } from '../utils'
+import { fetchSSE, getSettings } from '../utils'
 import { IEngine, IMessageRequest, IModel } from './interfaces'
 
 const SAFETY_SETTINGS = [
@@ -36,7 +36,7 @@ export class Gemini implements IEngine {
         const settings = await getSettings()
         const apiKey = settings.geminiAPIKey
         const model = settings.geminiAPIModel
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
             'Content-Type': 'application/json',
         }
@@ -69,19 +69,78 @@ export class Gemini implements IEngine {
             safetySettings: SAFETY_SETTINGS,
         }
 
-        const response = await fetch(url, {
+        let hasError = false
+        let finished = false
+        await fetchSSE(url, {
             method: 'POST',
             headers,
             body: JSON.stringify(body),
+            signal: req.signal,
+            useJSONParser: true,
+            onMessage: async (msg) => {
+                if (finished) return
+                let resp
+                try {
+                    resp = JSON.parse(msg)
+                } catch (e) {
+                    req.onError(JSON.stringify(e))
+                    hasError = true
+                    finished = true
+                    return
+                }
+                if (!resp.candidates || resp.candidates.length === 0) {
+                    req.onError('no candidates')
+                    hasError = true
+                    finished = true
+                    return
+                }
+                const targetTxt = resp.candidates[0].content.parts[0].text
+                await req.onMessage({ content: targetTxt, role: '' })
+                if (resp.candidates[0].finishReason !== 'STOP') {
+                    req.onFinished(resp.candidates[0].finishReason)
+                    finished = true
+                    return
+                }
+            },
+            onError: (err) => {
+                hasError = true
+                if (err instanceof Error) {
+                    req.onError(err.message)
+                    return
+                }
+                if (typeof err === 'string') {
+                    req.onError(err)
+                    return
+                }
+                if (typeof err === 'object') {
+                    const { detail } = err
+                    if (detail) {
+                        req.onError(detail)
+                        return
+                    }
+                }
+                const { error } = err
+                if (error instanceof Error) {
+                    req.onError(error.message)
+                    return
+                }
+                if (typeof error === 'object') {
+                    const { message } = error
+                    if (message) {
+                        if (typeof message === 'string') {
+                            req.onError(message)
+                        } else {
+                            req.onError(JSON.stringify(message))
+                        }
+                        return
+                    }
+                }
+                req.onError('Unknown error')
+            },
         })
 
-        const json = await response.json()
-
-        if (response.status !== 200) {
-            return req.onError(`${json.error.message}`)
+        if (!finished && !hasError) {
+            req.onFinished('stop')
         }
-        const targetTxt = json.candidates[0].content.parts[0].text
-        req.onMessage({ content: targetTxt, role: '' })
-        req.onFinished('stop')
     }
 }
