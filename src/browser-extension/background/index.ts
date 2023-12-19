@@ -4,6 +4,7 @@ import { BackgroundEventNames } from '../../common/background/eventnames'
 import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '../../common/background/fetch'
 import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
 import { actionInternalService } from '../../common/internal-services/action'
+import { optionsPagePromotionIDKey } from '../common'
 
 browser.contextMenus?.create(
     {
@@ -143,6 +144,8 @@ browser.runtime.onMessage.addListener(async (request) => {
         case BackgroundEventNames.removeItem:
             return await browser.storage.local.remove(request.key)
         case 'openOptionsPage':
+            await browser.storage.local.remove(optionsPagePromotionIDKey)
+            await browser.storage.local.set({ [optionsPagePromotionIDKey]: request.promotionID })
             browser.runtime.openOptionsPage()
             return
     }
