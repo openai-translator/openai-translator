@@ -80,6 +80,7 @@ import useSWR from 'swr'
 import { IPromotionResponse, fetchPromotions, getPromotionItem } from '../services/promotion'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
+import { engineIcons } from '../engines'
 
 const cache = new LRUCache({
     max: 500,
@@ -121,9 +122,24 @@ const useStyles = createUseStyles({
         paddingLeft: '6px',
         display: 'flex',
         alignItems: 'center',
+        gap: '10px',
         background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(10px)',
     }),
+    'poweredBy': (props: IThemedStyleProps) => ({
+        fontSize: props.theme.sizing.scale300,
+        color: props.theme.colors.contentInverseTertiary,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '4px',
+    }),
+    'brand': {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '3px',
+    },
     'popupCardHeaderContainer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
@@ -2193,6 +2209,20 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         </Button>
                     </Tooltip>
+                    {!showSettings && (
+                        <div className={styles.poweredBy}>
+                            Powered by{' '}
+                            <div className={styles.brand}>
+                                {React.createElement(engineIcons[settings.provider], {
+                                    size: 10,
+                                    style: {
+                                        marginBottom: 1,
+                                    },
+                                })}
+                                {settings.provider}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
             {enableVocabulary && (
