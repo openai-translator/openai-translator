@@ -291,10 +291,18 @@ function tryParse(currentText: string): {
     parsedResponse: any
 } {
     let jsonText: string
-    if (currentText.trimStart().startsWith('[')) {
-        jsonText = currentText + ']'
-    } else if (currentText.trimStart().startsWith(',')) {
-        jsonText = '[' + currentText.slice(1) + ']'
+    if (currentText.startsWith('[')) {
+        if (currentText.endsWith(']')) {
+            jsonText = currentText
+        } else {
+            jsonText = currentText + ']'
+        }
+    } else if (currentText.startsWith(',')) {
+        if (currentText.endsWith(']')) {
+            jsonText = '[' + currentText.slice(1)
+        } else {
+            jsonText = '[' + currentText.slice(1) + ']'
+        }
     } else {
         return {
             remainingText: currentText,
