@@ -1,3 +1,4 @@
+import { RiOpenaiFill } from 'react-icons/ri'
 import { Azure } from './azure'
 import { ChatGPT } from './chatgpt'
 import { Gemini } from './gemini'
@@ -5,8 +6,21 @@ import { IEngine } from './interfaces'
 import { MiniMax } from './minimax'
 import { Moonshot } from './moonshot'
 import { OpenAI } from './openai'
+import { IconType } from 'react-icons'
+import { VscAzureDevops } from 'react-icons/vsc'
+import { FaGoogle } from 'react-icons/fa'
+import { GiArtificialIntelligence } from 'react-icons/gi'
 
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'MiniMax' | 'Moonshot' | 'Gemini'
+
+export const engineIcons: Record<Provider, IconType> = {
+    OpenAI: RiOpenaiFill,
+    ChatGPT: RiOpenaiFill,
+    Azure: VscAzureDevops,
+    MiniMax: GiArtificialIntelligence,
+    Moonshot: GiArtificialIntelligence,
+    Gemini: FaGoogle,
+}
 
 export function getEngine(provider: Provider): IEngine {
     let engine: IEngine = new OpenAI()
