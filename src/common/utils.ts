@@ -286,34 +286,30 @@ interface FetchSSEOptions extends RequestInit {
     useJSONParser?: boolean
 }
 
-const responseLineRE = /^(\[|,)/
-
 function tryParse(currentText: string): {
+    remainingText: string
     parsedResponse: any
 } {
-    const match = currentText.match(responseLineRE)
-    if (!match) {
+    let jsonText: string
+    if (currentText.trimStart().startsWith('[')) {
+        jsonText = currentText + ']'
+    } else if (currentText.trimStart().startsWith(',')) {
+        jsonText = '[' + currentText.slice(1) + ']'
+    } else {
         return {
+            remainingText: currentText,
             parsedResponse: null,
         }
-    }
-
-    let jsonText: string
-    if (match[1] === '[') {
-        jsonText = currentText + ']'
-    } else if (currentText.trimEnd().endsWith(']')) {
-        jsonText = '[' + currentText.slice(1)
-    } else {
-        jsonText = '[' + currentText.slice(1) + ']'
     }
 
     try {
         const parsedResponse = JSON.parse(jsonText)
         return {
+            remainingText: '',
             parsedResponse,
         }
     } catch (e) {
-        throw new Error(`Error parsing JSON response: "${jsonText}"`)
+        throw new Error(`Invalid JSON: "${jsonText}"`)
     }
 }
 
@@ -327,13 +323,16 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         ...fetchOptions
     } = options
 
+    let currentText = ''
     const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
         }
 
-        const { parsedResponse } = tryParse(value)
+        currentText += value
+        const { parsedResponse, remainingText } = tryParse(currentText)
         if (parsedResponse) {
+            currentText = remainingText
             for (const item of parsedResponse) {
                 await onMessage(JSON.stringify(item))
             }

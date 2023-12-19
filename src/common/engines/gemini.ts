@@ -39,6 +39,8 @@ export class Gemini implements IEngine {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
             'Content-Type': 'application/json',
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
         }
         const body = {
             contents: [
@@ -58,15 +60,29 @@ export class Gemini implements IEngine {
                         },
                     ],
                 },
-                {
-                    role: 'user',
-                    parts:
-                        req.assistantPrompts?.map((prompt) => ({
-                            text: prompt,
-                        })) ?? [],
-                },
+                ...(req.assistantPrompts && req.assistantPrompts.length > 0
+                    ? [
+                          {
+                              role: 'user',
+                              parts: req.assistantPrompts.map((prompt) => ({
+                                  text: prompt,
+                              })),
+                          },
+                      ]
+                    : []),
             ],
             safetySettings: SAFETY_SETTINGS,
+        }
+
+        if (body.contents.length % 2 === 0) {
+            body.contents.push({
+                role: 'user',
+                parts: [
+                    {
+                        text: 'Ok.',
+                    },
+                ],
+            })
         }
 
         let hasError = false
@@ -113,9 +129,9 @@ export class Gemini implements IEngine {
                     return
                 }
                 if (typeof err === 'object') {
-                    const { detail } = err
-                    if (detail) {
-                        req.onError(detail)
+                    const item = err[0]
+                    if (item && item.error && item.error.message) {
+                        req.onError(item.error.message)
                         return
                     }
                 }
