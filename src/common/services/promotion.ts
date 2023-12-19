@@ -44,25 +44,42 @@ export async function fetchPromotions(): Promise<IPromotionResponse> {
     return resp.json()
 }
 
-export function getPromotionItem(items?: IPromotionItem[]) {
+export async function choicePromotionItem(items?: IPromotionItem[]) {
     if (!items) {
         return undefined
     }
 
-    return items.find(isPromotionItemAvailable)
+    const availablePromotions = await Promise.all(
+        items.filter(isPromotionItemAvailable).map(async (item) => {
+            return {
+                item,
+                showed: await isPromotionItemShowed(item),
+            }
+        })
+    )
+
+    const unshowedPromotions = availablePromotions.filter((item) => !item.showed)
+
+    const item = unshowedPromotions[Math.floor(Math.random() * unshowedPromotions.length)]?.item
+    if (item) {
+        return item
+    }
+
+    return availablePromotions[Math.floor(Math.random() * availablePromotions.length)]?.item
 }
 
 export function isPromotionItemAvailable(item?: IPromotionItem) {
     if (!item) {
         return false
     }
+    const now = dayjs()
     if (item.started_at) {
-        if (dayjs(item.started_at).isAfter(dayjs())) {
+        if (dayjs(item.started_at).isAfter(now)) {
             return false
         }
     }
     if (item.ended_at) {
-        if (dayjs(item.ended_at).isBefore(dayjs())) {
+        if (dayjs(item.ended_at).isBefore(now)) {
             return false
         }
     }
@@ -71,6 +88,25 @@ export function isPromotionItemAvailable(item?: IPromotionItem) {
 
 function getPromotionItemShowedKey(item: IPromotionItem) {
     return `promotion:${item.id}:showed`
+}
+
+const lastShowPromotionItemTimestampKey = 'promotion:last-show-timestamp'
+
+export async function checkShouldShowPromotionNotification() {
+    let timestamp: string | null
+    if (isDesktopApp() || isUserscript()) {
+        timestamp = localStorage.getItem(lastShowPromotionItemTimestampKey)
+    } else {
+        timestamp = await backgroundGetItem(lastShowPromotionItemTimestampKey)
+    }
+    if (!timestamp) {
+        return true
+    }
+    const lastShowDatetime = dayjs(timestamp)
+    if (dayjs().isAfter(lastShowDatetime.add(30, 'minutes'))) {
+        return true
+    }
+    return false
 }
 
 export async function isPromotionItemShowed(item?: IPromotionItem): Promise<boolean> {
@@ -91,8 +127,11 @@ export async function setPromotionItemShowed(item?: IPromotionItem) {
     const key = getPromotionItemShowedKey(item)
     if (isDesktopApp() || isUserscript()) {
         localStorage.setItem(key, 'true')
+        localStorage.setItem(lastShowPromotionItemTimestampKey, dayjs().toISOString())
+        return
     }
-    return await backgroundSetItem(key, 'true')
+    await backgroundSetItem(key, 'true')
+    await backgroundSetItem(lastShowPromotionItemTimestampKey, dayjs().toISOString())
 }
 
 export async function unsetPromotionItemShowed(item?: IPromotionItem) {

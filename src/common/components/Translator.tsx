@@ -77,7 +77,13 @@ import { getCurrent } from '@tauri-apps/api/window'
 import { useDeepCompareCallback } from 'use-deep-compare'
 import { useTranslatorStore } from '../store'
 import useSWR from 'swr'
-import { IPromotionResponse, fetchPromotions, getPromotionItem } from '../services/promotion'
+import {
+    IPromotionResponse,
+    checkShouldShowPromotionNotification,
+    fetchPromotions,
+    choicePromotionItem,
+    IPromotionItem,
+} from '../services/promotion'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
 import { engineIcons } from '../engines'
@@ -1436,11 +1442,46 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [refetchPromotions])
 
-    const promotion = useMemo(() => {
-        return getPromotionItem(promotions?.openai_api_key)
-    }, [promotions])
+    const [promotion, setPromotion] = useState<IPromotionItem>()
+
+    useEffect(() => {
+        choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+        if (!isTauri()) {
+            const timer = setInterval(() => {
+                choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+            }, 1000 * 60)
+            return () => {
+                clearInterval(timer)
+            }
+        }
+        let unlisten: (() => void) | undefined = undefined
+        const appWindow = getCurrent()
+        appWindow
+            .listen('tauri://focus', () => {
+                choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+        return () => {
+            unlisten?.()
+        }
+    }, [promotions?.openai_api_key])
 
     const { promotionShowed } = usePromotionShowed(promotion)
+
+    const [shouldShowPromotionNotification, setShouldShowPromotionNotification] = useState(false)
+
+    useEffect(() => {
+        checkShouldShowPromotionNotification().then(setShouldShowPromotionNotification)
+        const ms = 1000 * 60 * 5
+        const timer = setInterval(() => {
+            checkShouldShowPromotionNotification().then(setShouldShowPromotionNotification)
+        }, ms)
+        return () => {
+            clearInterval(timer)
+        }
+    }, [showSettings])
 
     return (
         <div
@@ -1459,6 +1500,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     onSave={(oldSettings) => {
                         props.onSettingsSave?.(oldSettings)
                     }}
+                    promotionID={promotion?.id}
                 />
             )}
             <div
@@ -2161,7 +2203,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 e.preventDefault()
                                 if (isBrowserExtensionContentScript()) {
                                     const browser = (await import('webextension-polyfill')).default
-                                    await browser.runtime.sendMessage({ type: 'openOptionsPage' })
+                                    await browser.runtime.sendMessage({
+                                        type: 'openOptionsPage',
+                                        promotionID: promotion?.id,
+                                    })
                                 } else {
                                     setShowSettings((s) => !s)
                                 }
@@ -2190,7 +2235,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }}
                                             size={15}
                                         />
-                                        {promotion && !promotionShowed && (
+                                        {shouldShowPromotionNotification && promotion && !promotionShowed && (
                                             <div
                                                 style={{
                                                     position: 'absolute',
