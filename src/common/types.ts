@@ -96,4 +96,5 @@ export interface ISettings {
     autoCollect?: boolean
     hideTheIconInTheDock?: boolean
     languageDetectionEngine?: LanguageDetectionEngine
+    autoHideWindowWhenOutOfFocus?: boolean
 }

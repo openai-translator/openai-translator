@@ -28,7 +28,7 @@ use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
 use crate::ocr::{cut_image, finish_ocr, ocr_command, screenshot};
 use crate::windows::{
-    get_translator_window_always_on_top, show_action_manager_window,
+    get_translator_window_always_on_top, hide_translator_window, show_action_manager_window,
     show_translator_window_command, show_translator_window_with_selected_text_command,
     show_updater_window, TRANSLATOR_WIN_NAME,
 };
@@ -410,6 +410,7 @@ fn main() {
             cut_image,
             finish_ocr,
             screenshot,
+            hide_translator_window,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
@@ -482,7 +483,7 @@ fn main() {
             {
                 tauri::AppHandle::hide(&app.app_handle()).unwrap();
             }
-            #[cfg(target_os = "windows")]
+            #[cfg(not(target_os = "macos"))]
             {
                 let window = app.get_window(label.as_str()).unwrap();
                 window.hide().unwrap();

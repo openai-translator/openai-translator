@@ -2220,6 +2220,15 @@ export function InnerSettings({ onSave, showFooter = false, promotionID }: IInne
                             style={{
                                 display: isDesktopApp ? 'block' : 'none',
                             }}
+                            name='autoHideWindowWhenOutOfFocus'
+                            label={t('Auto hide window when out of focus')}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp ? 'block' : 'none',
+                            }}
                             name='automaticCheckForUpdates'
                             label={t('Automatic check for updates')}
                         >

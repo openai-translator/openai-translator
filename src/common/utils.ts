@@ -76,6 +76,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     autoCollect: 1,
     hideTheIconInTheDock: 1,
     languageDetectionEngine: 1,
+    autoHideWindowWhenOutOfFocus: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

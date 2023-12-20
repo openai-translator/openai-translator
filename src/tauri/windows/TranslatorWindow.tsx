@@ -13,6 +13,8 @@ import { useSettings } from '../../common/hooks/useSettings'
 import { setupAnalysis } from '../../common/analysis'
 import { Window } from '../components/Window'
 import { setExternalOriginalText } from '../../common/store'
+import { getCurrent } from '@tauri-apps/api/window'
+import { usePinned } from '../../common/hooks/usePinned'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -162,6 +164,25 @@ export function TranslatorWindow() {
         })()
         return unlisten
     }, [])
+
+    const { pinned } = usePinned()
+
+    useEffect(() => {
+        const appWindow = getCurrent()
+        let unlisten: (() => void) | undefined = undefined
+        appWindow
+            .onFocusChanged(({ payload: focused }) => {
+                if (!pinned && !focused && settings.autoHideWindowWhenOutOfFocus) {
+                    invoke('hide_translator_window')
+                }
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+        return () => {
+            unlisten?.()
+        }
+    }, [pinned, settings.autoHideWindowWhenOutOfFocus])
 
     useEffect(() => {
         bindHotkey()

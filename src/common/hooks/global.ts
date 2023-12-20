@@ -5,5 +5,7 @@ const initialState = {
     collectedWordTotal: 0,
     themeType: 'light' as ThemeType,
     promotionShowed: true,
+    pinned: false,
 }
+
 export const { useGlobalState } = createGlobalState(initialState)
