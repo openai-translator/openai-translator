@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useGlobalState } from './global'
 import {
     IPromotionItem,
@@ -8,7 +8,8 @@ import {
 } from '../services/promotion'
 
 export function usePromotionShowed(item?: IPromotionItem) {
-    const [promotionShowed, setPromotionShowed_] = useGlobalState('promotionShowed')
+    const [promotionShowedMap, setPromotionShowedMap] = useGlobalState('promotionShowedMap')
+    const [promotionShowed, setPromotionShowed_] = useState(promotionShowedMap[item?.id ?? ''] ?? false)
 
     const setPromotionShowed = useCallback(
         (showed: boolean) => {
@@ -27,6 +28,18 @@ export function usePromotionShowed(item?: IPromotionItem) {
             setPromotionShowed_(showed)
         })
     }, [item, setPromotionShowed_])
+
+    useEffect(() => {
+        if (!item?.id) {
+            return
+        }
+        setPromotionShowedMap((map) => {
+            return {
+                ...map,
+                [item.id]: promotionShowed,
+            }
+        })
+    }, [item, promotionShowed, setPromotionShowedMap])
 
     return { promotionShowed, setPromotionShowed }
 }

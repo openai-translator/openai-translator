@@ -4,7 +4,7 @@ import { BackgroundEventNames } from '../../common/background/eventnames'
 import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '../../common/background/fetch'
 import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
 import { actionInternalService } from '../../common/internal-services/action'
-import { optionsPagePromotionIDKey } from '../common'
+import { optionsPageHeaderPromotionIDKey, optionsPageOpenaiAPIKeyPromotionIDKey } from '../common'
 
 browser.contextMenus?.create(
     {
@@ -144,8 +144,10 @@ browser.runtime.onMessage.addListener(async (request) => {
         case BackgroundEventNames.removeItem:
             return await browser.storage.local.remove(request.key)
         case 'openOptionsPage':
-            await browser.storage.local.remove(optionsPagePromotionIDKey)
-            await browser.storage.local.set({ [optionsPagePromotionIDKey]: request.promotionID })
+            await browser.storage.local.set({
+                [optionsPageOpenaiAPIKeyPromotionIDKey]: request.openaiAPIKeyPromotionID,
+            })
+            await browser.storage.local.set({ [optionsPageHeaderPromotionIDKey]: request.headerPromotionID })
             browser.runtime.openOptionsPage()
             return
     }

@@ -9,7 +9,7 @@ import { createUseStyles } from 'react-jss'
 import { IThemedStyleProps } from '../../common/types'
 import { useTheme } from '../../common/hooks/useTheme'
 import browser from 'webextension-polyfill'
-import { optionsPagePromotionIDKey } from '../common'
+import { optionsPageHeaderPromotionIDKey, optionsPageOpenaiAPIKeyPromotionIDKey } from '../common'
 
 const engine = new Styletron()
 
@@ -31,19 +31,31 @@ const Options = () => {
     const styles = useStyles({ theme, themeType })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).__IS_OT_BROWSER_EXTENSION_OPTIONS__ = true
-    const [promotionID, setPromotionID] = useState<string | undefined>(undefined)
+    const [openaiAPIKeyPromotionID, setOpenaiAPIKeyPromotionID] = useState<string>()
+    const [headerPromotionID, setHeaderPromotionID] = useState<string>()
 
     useEffect(() => {
-        browser.storage.local.get(optionsPagePromotionIDKey).then((resp) => {
-            setPromotionID(resp[optionsPagePromotionIDKey])
-            browser.storage.local.remove(optionsPagePromotionIDKey)
+        browser.storage.local.get(optionsPageOpenaiAPIKeyPromotionIDKey).then((resp) => {
+            setOpenaiAPIKeyPromotionID(resp[optionsPageOpenaiAPIKeyPromotionIDKey])
+            browser.storage.local.remove(optionsPageOpenaiAPIKeyPromotionIDKey)
+        })
+    }, [])
+
+    useEffect(() => {
+        browser.storage.local.get(optionsPageHeaderPromotionIDKey).then((resp) => {
+            setHeaderPromotionID(resp[optionsPageHeaderPromotionIDKey])
+            browser.storage.local.remove(optionsPageHeaderPromotionIDKey)
         })
     }, [])
 
     return (
         <div className={styles.root}>
             <div className={styles.container}>
-                <Settings engine={engine} promotionID={promotionID} />
+                <Settings
+                    engine={engine}
+                    openaiAPIKeyPromotionID={openaiAPIKeyPromotionID}
+                    headerPromotionID={headerPromotionID}
+                />
             </div>
         </div>
     )

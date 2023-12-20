@@ -4,7 +4,8 @@ import { ThemeType } from '../types'
 const initialState = {
     collectedWordTotal: 0,
     themeType: 'light' as ThemeType,
-    promotionShowed: true,
+    promotionShowedMap: {} as Record<string, boolean>,
+    promotionNeverDisplayMap: {} as Record<string, boolean>,
     pinned: false,
 }
 
