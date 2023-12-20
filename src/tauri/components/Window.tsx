@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { getCurrent } from '@tauri-apps/api/window'
 import { useTheme } from '../../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
@@ -14,6 +14,7 @@ import { IThemedStyleProps } from '../../common/types'
 import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/primitives'
 import { open } from '@tauri-apps/plugin-shell'
+import { usePinned } from '../../common/hooks/usePinned'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -68,8 +69,8 @@ export function InnerWindow(props: IWindowProps) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
     const isMacOS = navigator.userAgent.includes('Mac OS X')
-    const isLinux = navigator.userAgent.includes('Linux')
-    const [isPinned, setPinned] = useState(false)
+    const isWindows = navigator.userAgent.includes('Windows')
+    const { pinned, setPinned } = usePinned()
     const { i18n } = useTranslation()
     const { settings } = useSettings()
 
@@ -81,7 +82,7 @@ export function InnerWindow(props: IWindowProps) {
         invoke('get_translator_window_always_on_top').then((pinned: any) => {
             return setPinned(pinned)
         })
-    }, [props.isTranslatorWindow])
+    }, [props.isTranslatorWindow, setPinned])
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,16 +92,19 @@ export function InnerWindow(props: IWindowProps) {
         }
     }, [i18n, settings])
 
-    const handlePin = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const appWindow = getCurrent()
-        setPinned((prev) => {
-            const isPinned_ = !prev
-            appWindow.setAlwaysOnTop(isPinned_)
-            return isPinned_
-        })
-    }, [])
+    const handlePin = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            e.preventDefault()
+            e.stopPropagation()
+            const appWindow = getCurrent()
+            setPinned((prev) => {
+                const isPinned_ = !prev
+                appWindow.setAlwaysOnTop(isPinned_)
+                return isPinned_
+            })
+        },
+        [setPinned]
+    )
 
     const handleMinimize = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault()
@@ -128,10 +132,10 @@ export function InnerWindow(props: IWindowProps) {
         appWindow.hide()
     }, [])
 
-    let svgPathColor = themeType === 'dark' ? '#fff' : '#000'
+    let svgPathColor = theme.colors.contentSecondary
 
     if (props.windowsTitlebarDisableDarkMode) {
-        svgPathColor = '#000'
+        svgPathColor = '#555'
     }
 
     return (
@@ -155,11 +159,31 @@ export function InnerWindow(props: IWindowProps) {
             }}
         >
             <div className={styles.titlebar} data-tauri-drag-region>
-                {!isMacOS && !isLinux && (
+                {isMacOS && (
+                    <>
+                        <div className={styles.titlebarButton} onClick={handlePin}>
+                            <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 28 28'>
+                                {pinned ? (
+                                    <path
+                                        fill={svgPathColor}
+                                        fillRule='evenodd'
+                                        d='M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1l1-1v-7H19v-2c-1.66 0-3-1.34-3-3z'
+                                    />
+                                ) : (
+                                    <path
+                                        fill={svgPathColor}
+                                        d='M14 4v5c0 1.12.37 2.16 1 3H9c.65-.86 1-1.9 1-3V4h4m3-2H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1l1-1v-7H19v-2c-1.66 0-3-1.34-3-3V4h1c.55 0 1-.45 1-1s-.45-1-1-1z'
+                                    />
+                                )}
+                            </svg>
+                        </div>
+                    </>
+                )}
+                {isWindows && (
                     <>
                         <div className={styles.titlebarButton} onClick={handlePin}>
                             <svg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'>
-                                {isPinned ? (
+                                {pinned ? (
                                     <path
                                         fill={svgPathColor}
                                         fillRule='evenodd'

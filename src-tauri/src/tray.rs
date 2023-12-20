@@ -8,11 +8,18 @@ use crate::windows::{
 };
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::ClickType,
     Manager, Runtime,
 };
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub(crate) struct PinnedEventPayload {
+    pinned: bool,
+}
 
 pub static TRAY_EVENT_REGISTERED: AtomicBool = AtomicBool::new(false);
 
@@ -80,7 +87,11 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             window.hide().unwrap();
         }
         "pin" => {
-            set_translator_window_always_on_top();
+            let pinned = set_translator_window_always_on_top();
+            let handle = app.app_handle();
+            handle
+                .emit("pinned-from-tray", json!({ "pinned": pinned }))
+                .unwrap_or_default();
             create_tray(app).unwrap();
         }
         "quit" => app.exit(0),
@@ -97,6 +108,13 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         }
     });
     tray.set_show_menu_on_left_click(false)?;
+    let app_handle = app.app_handle();
+    let app_handle_clone = app.app_handle().clone();
+    app_handle.listen_global("pinned-from-window", move |msg| {
+        let payload: PinnedEventPayload = serde_json::from_str(&msg.payload()).unwrap();
+        ALWAYS_ON_TOP.store(payload.pinned, Ordering::Release);
+        create_tray(&app_handle_clone).unwrap();
+    });
 
     Ok(())
 }

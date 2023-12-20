@@ -141,6 +141,24 @@ pub async fn show_translator_window_with_selected_text_command() {
     utils::show();
 }
 
+#[tauri::command]
+pub async fn hide_translator_window() {
+    let handle = APP_HANDLE.get().unwrap();
+    match handle.get_window(TRANSLATOR_WIN_NAME) {
+        Some(window) => {
+            #[cfg(not(target_os = "macos"))]
+            {
+                window.hide().unwrap();
+            }
+            #[cfg(target_os = "macos")]
+            {
+                tauri::AppHandle::hide(&handle).unwrap();
+            }
+        }
+        None => {}
+    }
+}
+
 pub fn delete_thumb() {
     match APP_HANDLE.get() {
         Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
