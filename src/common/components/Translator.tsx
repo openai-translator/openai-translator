@@ -1442,13 +1442,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [refetchPromotions])
 
-    const [promotion, setPromotion] = useState<IPromotionItem>()
+    const [openaiAPIKeyPromotion, setOpenaiAPIKeyPromotion] = useState<IPromotionItem>()
+    const [settingsHeaderPromotion, setSettingsHeaderPromotion] = useState<IPromotionItem>()
 
     useEffect(() => {
-        choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+        choicePromotionItem(promotions?.openai_api_key).then(setOpenaiAPIKeyPromotion)
+        choicePromotionItem(promotions?.settings_header).then(setSettingsHeaderPromotion)
         if (!isTauri()) {
             const timer = setInterval(() => {
-                choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+                choicePromotionItem(promotions?.openai_api_key).then(setOpenaiAPIKeyPromotion)
+                choicePromotionItem(promotions?.settings_header).then(setSettingsHeaderPromotion)
             }, 1000 * 60)
             return () => {
                 clearInterval(timer)
@@ -1458,7 +1461,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         const appWindow = getCurrent()
         appWindow
             .listen('tauri://focus', () => {
-                choicePromotionItem(promotions?.openai_api_key).then(setPromotion)
+                choicePromotionItem(promotions?.openai_api_key).then(setOpenaiAPIKeyPromotion)
+                choicePromotionItem(promotions?.settings_header).then(setSettingsHeaderPromotion)
             })
             .then((cb) => {
                 unlisten = cb
@@ -1466,9 +1470,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             unlisten?.()
         }
-    }, [promotions?.openai_api_key])
+    }, [promotions?.openai_api_key, promotions?.settings_header])
 
-    const { promotionShowed } = usePromotionShowed(promotion)
+    const { promotionShowed: openaiAPIKeyPromotionShowed } = usePromotionShowed(openaiAPIKeyPromotion)
+    const { promotionShowed: settingsHeaderPromotionShowed } = usePromotionShowed(settingsHeaderPromotion)
 
     const [shouldShowPromotionNotification, setShouldShowPromotionNotification] = useState(false)
 
@@ -1500,7 +1505,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     onSave={(oldSettings) => {
                         props.onSettingsSave?.(oldSettings)
                     }}
-                    promotionID={promotion?.id}
+                    headerPromotionID={settingsHeaderPromotion?.id}
+                    openaiAPIKeyPromotionID={openaiAPIKeyPromotion?.id}
                 />
             )}
             <div
@@ -2205,7 +2211,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     const browser = (await import('webextension-polyfill')).default
                                     await browser.runtime.sendMessage({
                                         type: 'openOptionsPage',
-                                        promotionID: promotion?.id,
+                                        openaiAPIKeyPromotionID: openaiAPIKeyPromotion?.id,
+                                        headerPromotionID: settingsHeaderPromotion?.id,
                                     })
                                 } else {
                                     setShowSettings((s) => !s)
@@ -2235,19 +2242,23 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             }}
                                             size={15}
                                         />
-                                        {shouldShowPromotionNotification && promotion && !promotionShowed && (
-                                            <div
-                                                style={{
-                                                    position: 'absolute',
-                                                    width: '0.45rem',
-                                                    height: '0.45rem',
-                                                    top: '-4px',
-                                                    right: '-6px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: theme.colors.warning400,
-                                                }}
-                                            />
-                                        )}
+                                        {shouldShowPromotionNotification &&
+                                            (openaiAPIKeyPromotion || settingsHeaderPromotion) &&
+                                            (!openaiAPIKeyPromotionShowed || !settingsHeaderPromotionShowed) && (
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        width: '0.45rem',
+                                                        height: '0.45rem',
+                                                        top: '-4px',
+                                                        right: '-6px',
+                                                        borderRadius: '50%',
+                                                        backgroundColor: settingsHeaderPromotionShowed
+                                                            ? theme.colors.warning400
+                                                            : theme.colors.accent300,
+                                                    }}
+                                                />
+                                            )}
                                     </div>
                                 )}
                                 {showSettings ? t('Go back') : ''}

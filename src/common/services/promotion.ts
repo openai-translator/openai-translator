@@ -27,10 +27,12 @@ export interface IPromotionItem {
     started_at?: string
     ended_at?: string
     version_constraint?: string
+    can_never_display?: boolean
 }
 
 export interface IPromotionResponse {
     openai_api_key?: IPromotionItem[]
+    settings_header?: IPromotionItem[]
 }
 
 export async function fetchPromotions(): Promise<IPromotionResponse> {
@@ -90,6 +92,10 @@ function getPromotionItemShowedKey(item: IPromotionItem) {
     return `promotion:${item.id}:showed`
 }
 
+function getPromotionItemNeverDisplayKey(item: IPromotionItem) {
+    return `promotion:${item.id}:never_display`
+}
+
 const lastShowPromotionItemTimestampKey = 'promotion:last-show-timestamp'
 
 export async function checkShouldShowPromotionNotification() {
@@ -140,7 +146,43 @@ export async function unsetPromotionItemShowed(item?: IPromotionItem) {
     }
     const key = getPromotionItemShowedKey(item)
     if (isDesktopApp() || isUserscript()) {
-        localStorage.removeItem(`promotion:${item.id}:showed`)
+        localStorage.removeItem(key)
+        return
+    }
+    return await backgroundRemoveItem(key)
+}
+
+export async function isPromotionItemNeverDisplay(item?: IPromotionItem): Promise<boolean> {
+    if (!item) {
+        return true
+    }
+    const key = getPromotionItemNeverDisplayKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        return localStorage.getItem(key) === 'true'
+    }
+    return (await backgroundGetItem(key)) === 'true'
+}
+
+export async function setPromotionItemNeverDisplay(item?: IPromotionItem) {
+    if (!item) {
+        return
+    }
+    const key = getPromotionItemNeverDisplayKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        localStorage.setItem(key, 'true')
+        return
+    }
+    await backgroundSetItem(key, 'true')
+}
+
+export async function unsetPromotionItemNeverDisplay(item?: IPromotionItem) {
+    if (!item) {
+        return
+    }
+    const key = getPromotionItemNeverDisplayKey(item)
+    if (isDesktopApp() || isUserscript()) {
+        localStorage.removeItem(key)
+        return
     }
     return await backgroundRemoveItem(key)
 }
