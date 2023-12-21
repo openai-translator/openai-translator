@@ -1497,7 +1497,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
                 background: theme.colors.backgroundPrimary,
-                paddingBottom: showSettings ? '0px' : '30px',
+                paddingBottom: showSettings ? '0px' : '42px',
             }}
         >
             {showSettings && (
