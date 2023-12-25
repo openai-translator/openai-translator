@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -42,8 +42,8 @@ dependencies:
     specifier: ^6.9.10
     version: 6.9.10
   '@types/react-copy-to-clipboard':
-    specifier: ^5.0.4
-    version: 5.0.4
+    specifier: ^5.0.7
+    version: 5.0.7
   '@types/react-syntax-highlighter':
     specifier: ^15.5.7
     version: 15.5.7
@@ -1733,8 +1733,8 @@ packages:
     resolution: {integrity: sha512-3Gnx08Ns1sEoCrWssEgTSJs/rsT2vhGP+Ja9cnnk9k4ALxinORlQneLXFeFKOTJMOeZUFD1s7w+w2AphTpvzZw==}
     dev: false
 
-  /@types/react-copy-to-clipboard@5.0.4:
-    resolution: {integrity: sha512-otTJsJpofYAeaIeOwV5xBUGpo6exXG2HX7X4nseToCB2VgPEBxGBHCm/FecZ676doNR7HCSTVtmohxfG2b3/yQ==}
+  /@types/react-copy-to-clipboard@5.0.7:
+    resolution: {integrity: sha512-Gft19D+as4M+9Whq1oglhmK49vqPhcLzk8WfvfLvaYMIPYanyfLy0+CwFucMJfdKoSFyySPmkkWn8/E6voQXjQ==}
     dependencies:
       '@types/react': 18.2.18
     dev: false
