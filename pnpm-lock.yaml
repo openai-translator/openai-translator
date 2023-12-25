@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -245,8 +245,8 @@ devDependencies:
     specifier: ^18.2.7
     version: 18.2.7
   '@types/tampermonkey':
-    specifier: ^4.0.10
-    version: 4.0.10
+    specifier: ^5.0.2
+    version: 5.0.2
   '@types/underscore':
     specifier: ^1.11.6
     version: 1.11.6
@@ -1783,8 +1783,8 @@ packages:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
     dev: true
 
-  /@types/tampermonkey@4.0.10:
-    resolution: {integrity: sha512-E3SYtXgeXG/nnq6uAPiZh7i0XA8jLbtiXraxxHTnsSjzQcQMxWBzbcoGkHgiC+zbHXxxkynUT9zt85SpF8loNw==}
+  /@types/tampermonkey@5.0.2:
+    resolution: {integrity: sha512-keKnYemqWts68wO2+TBdEg84iQd5vymK5SEQGxitI9uOfOnjm/ZskBoK9ZH3mnSYp79HidZMA/Y7ODQtiA/VIg==}
     dev: true
 
   /@types/underscore@1.11.6:

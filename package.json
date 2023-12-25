@@ -107,7 +107,7 @@
     "@types/node": "^20.5.9",
     "@types/react": "^18.2.18",
     "@types/react-dom": "^18.2.7",
-    "@types/tampermonkey": "^4.0.10",
+    "@types/tampermonkey": "^5.0.2",
     "@types/underscore": "^1.11.6",
     "@types/uuid": "^9.0.2",
     "@types/webextension-polyfill": "^0.10.1",
