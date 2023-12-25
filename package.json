@@ -101,7 +101,7 @@
     "@samrum/vite-plugin-web-extension": "^5.0.0",
     "@tauri-apps/cli": "2.0.0-alpha.18",
     "@types/chrome": "0.0.242",
-    "@types/common-tags": "^1.8.3",
+    "@types/common-tags": "^1.8.4",
     "@types/fs-extra": "^11.0.1",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^20.5.9",

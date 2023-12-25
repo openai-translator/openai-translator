@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -227,8 +227,8 @@ devDependencies:
     specifier: 0.0.242
     version: 0.0.242
   '@types/common-tags':
-    specifier: ^1.8.3
-    version: 1.8.3
+    specifier: ^1.8.4
+    version: 1.8.4
   '@types/fs-extra':
     specifier: ^11.0.1
     version: 11.0.1
@@ -1611,8 +1611,8 @@ packages:
       '@types/har-format': 1.2.10
     dev: true
 
-  /@types/common-tags@1.8.3:
-    resolution: {integrity: sha512-v3smfzf7umSwpkJrmlUe+apSv6bVnrIFCeBeprnP4f8lIh6pECZxyD50e8yFwfouIt85TdxN5yXiFwS5fnsS3w==}
+  /@types/common-tags@1.8.4:
+    resolution: {integrity: sha512-S+1hLDJPjWNDhcGxsxEbepzaxWqURP/o+3cP4aa2w7yBXgdcmKGQtZzP8JbyfOd0m+33nh+8+kvxYE2UJtBDkg==}
     dev: true
 
   /@types/debug@4.1.8:
