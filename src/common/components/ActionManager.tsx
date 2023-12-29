@@ -16,10 +16,8 @@ import { Action } from '../internal-services/db'
 import { Modal, ModalBody, ModalButton, ModalFooter, ModalHeader } from 'baseui-sd/modal'
 import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
-import { isDesktopApp, exportToJson,jsonToActions} from '../utils'
+import { isDesktopApp, exportToJson, jsonToActions } from '../utils'
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md'
-
-
 
 const useStyles = createUseStyles({
     root: () => ({
@@ -172,43 +170,42 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
-            console.log('Handling file change');
-            
+            console.log('Handling file change')
+
             // 检查是否有文件被选中
             if (!event.target.files || event.target.files.length === 0) {
-                console.error('No file selected');
-                return; // 没有文件被选中时退出函数
+                console.error('No file selected')
+                return // 没有文件被选中时退出函数
             }
-    
-            const file = event.target.files[0];
-    
+
+            const file = event.target.files[0]
+
             if (!file) {
-                console.error('No file found');
-                return; // 文件对象为空时退出函数
+                console.error('No file found')
+                return // 文件对象为空时退出函数
             }
-    
+
             // 检查文件类型（可选）
             if (file.type !== 'application/json') {
-                console.error('Invalid file type:', file.type);
-                return; // 文件类型不匹配时退出函数
+                console.error('Invalid file type:', file.type)
+                return // 文件类型不匹配时退出函数
             }
-    
-            const importActions = await jsonToActions(file);
-    
+
+            const importActions = await jsonToActions(file)
+
             // 检查导入的数据是否有效
             if (!importActions || importActions.length === 0) {
-                console.error('No valid actions to import');
-                return; // 导入的数据为空或无效时退出函数
+                console.error('No valid actions to import')
+                return // 导入的数据为空或无效时退出函数
             }
-    
-            await actionService.bulkPut(importActions);
-    
-            refreshActions();
-        } catch (error) {
-            console.error('Error handling file change:', error);
-        }
-    };
 
+            await actionService.bulkPut(importActions)
+
+            refreshActions()
+        } catch (error) {
+            console.error('Error handling file change:', error)
+        }
+    }
 
     const ExportActions = async (group: string) => {
         try {
@@ -220,11 +217,6 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
             console.error(e)
         }
     }
-
-    
-    
-
-    
 
     return (
         <div

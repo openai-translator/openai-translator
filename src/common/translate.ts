@@ -9,7 +9,7 @@ import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { oneLine } from 'common-tags'
 import { getArkoseToken } from './arkose/index'
-export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
+export type TranslateMode = 'built-in' | 'translate' | 'explain-code'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
     | 'gpt-3.5-turbo'
@@ -82,7 +82,6 @@ async function updateTitleAndCheckId(
         })
     }
 }
-
 
 export const isAWord = (langCode: string, text: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

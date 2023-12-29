@@ -1,3 +1,4 @@
+
 [
   {
     "idx": 26,
@@ -9,6 +10,7 @@
     "group": "常用功能",
     "createdAt": "1702889507131",
     "updatedAt": "1702890680782",
+    "mode":"built-in",
     "id": 33
   },
   {
@@ -21,9 +23,8 @@
   "group": "英语单词学习",
   "createdAt": "1697508055963",
   "updatedAt": "1701147690797",
-  "field10": "",
-  "id": "26",
-  "field12": "",
+  "id": 26,
+  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -36,9 +37,8 @@
   "group": "英语单词学习",
   "createdAt": "1698701426330",
   "updatedAt": "1699484897933",
-  "field10": "",
-  "id": "29",
-  "field12": "",
+  "id": 29,
+  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -51,9 +51,8 @@
   "group": "英语单词学习",
   "createdAt": "1697395537594",
   "updatedAt": "1699039329783",
-  "field10": "",
-  "id": "28",
-  "field12": "",
+  "id": 28,
+  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -66,9 +65,8 @@
   "group": "英语单词学习",
   "createdAt": "1699551078340",
   "updatedAt": "1699551078340",
-  "field10": "",
-  "id": "1",
-  "field12": "",
+  "id": 1,
+  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 }
 ]

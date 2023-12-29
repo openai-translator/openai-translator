@@ -591,17 +591,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
-    const actionGroups = (actions || []).reduce((groups, action) => {
-        const group = action.group || 'English Learning'
-        if (!groups[group]) {
-            groups[group] = []
-        }
-        groups[group].push(action)
-        return groups
-    }, {})
+
+
+// 使用 reduce 方法创建分组
+    const actionGroups = actions?.reduce<Record<string, Action[]>>((groups, action) => {
+    const group = action.group || 'English Learning';
+    groups[group] = groups[group] || [];
+    groups[group].push(action);
+    return groups;
+}, {});
+
+    
+    
+    const promptsData = actionsData.map(item => ({
+        ...item,
+        outputRenderingFormat: item.outputRenderingFormat as 'text' | 'markdown' | 'latex' | undefined,
+        mode: item.mode as 'built-in'
+    }));
+
     useEffect(() => {
         if (!actions) {
-            actionService.bulkPut(actionsData)
+          
+            actionService.bulkPut(promptsData)
             setDisplayedActions([])
             setHiddenActions([])
             refreshActions()
@@ -1184,7 +1195,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 <Select
                 size='mini'
                     options={[
-                        ...Object.keys(actionGroups).map((key) => ({ id: key, label: key })),
+                                    ...Object.keys(actionGroups || {}).map((key) => ({ id: key, label: key })),
                         {
                             id: 'unlock_features',
                             label: (
@@ -1205,13 +1216,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         },
                     }}
                     onChange={({ value }) => {
-                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups)[0]
+                        // 如果 actionGroups 是 undefined，则使用空对象作为默认值
+                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups || {})[0];
+                    
                         if (groupId === 'unlock_features') {
-                            window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank') // 打开新网页
+                            window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank'); // 打开新网页
                         } else {
-                            setSelectedGroup(groupId as string)
+                            setSelectedGroup(groupId as string);
                         }
                     }}
+                    
                 />
             </Tooltip>
                         <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
@@ -1247,9 +1261,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     localStorage.setItem('savedAction', JSON.stringify(action))
                                                 } else {
                                                     localStorage.removeItem('savedAction')
-                                                }
-                                                if (action.mode === 'polishing') {
-                                                    setTargetLang(sourceLang)
                                                 }
                                             }}
                                         >
