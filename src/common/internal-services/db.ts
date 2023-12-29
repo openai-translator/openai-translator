@@ -13,7 +13,7 @@ export interface VocabularyItem {
 export type ActionOutputRenderingFormat = 'text' | 'markdown' | 'latex'
 
 export interface Action {
-    id?: string
+    id?: number
     idx: number
     mode?: TranslateMode
     name: string

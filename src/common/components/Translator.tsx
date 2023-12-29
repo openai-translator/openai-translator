@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
@@ -8,7 +8,6 @@ import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation, AiOutlineLock, AiOutlinePlusSquare } from 'react-icons/ai'
 import { IoSettingsOutline } from 'react-icons/io5'
-import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
@@ -25,7 +24,6 @@ import { InnerSettings } from './Settings'
 import { documentPadding } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { addNewNote, isConnected } from '../anki/anki-connect'
-import icon from '../assets/images/icon.png'
 import actionsData from '../services/prompts.json'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
@@ -679,7 +677,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.addEventListener('blur', onBlur)
 
         return () => {
-            chrome.runtime.onMessage.removeListener(handleMessage);
+            chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
@@ -699,7 +697,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
 
-    function handleRuntimeMessage(message, sender, sendResponse) {
+    function handleRuntimeMessage(message: { type: string; text: any }) {
         if (message.type === "Text") {
             const text = message.text;
             setOriginalText(text);
