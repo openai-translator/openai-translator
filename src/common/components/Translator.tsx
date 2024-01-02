@@ -53,6 +53,8 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
+import YouGlishComponent from '../youglish/youglish'
+
 const cache = new LRUCache({
     max: 500,
     maxSize: 5000,
@@ -443,7 +445,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [showActionManager, setShowActionManager] = useState(false)
 
-
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
@@ -592,26 +593,22 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
 
-
-// 使用 reduce 方法创建分组
+    // 使用 reduce 方法创建分组
     const actionGroups = actions?.reduce<Record<string, Action[]>>((groups, action) => {
-    const group = action.group || 'English Learning';
-    groups[group] = groups[group] || [];
-    groups[group].push(action);
-    return groups;
-}, {});
+        const group = action.group || 'English Learning'
+        groups[group] = groups[group] || []
+        groups[group].push(action)
+        return groups
+    }, {})
 
-    
-    
-    const promptsData = actionsData.map(item => ({
+    const promptsData = actionsData.map((item) => ({
         ...item,
         outputRenderingFormat: item.outputRenderingFormat as 'text' | 'markdown' | 'latex' | undefined,
-        mode: item.mode as 'built-in'
-    }));
+        mode: item.mode as 'built-in',
+    }))
 
     useEffect(() => {
         if (!actions) {
-          
             actionService.bulkPut(promptsData)
             setDisplayedActions([])
             setHiddenActions([])
@@ -688,7 +685,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.addEventListener('blur', onBlur)
 
         return () => {
-            chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+            chrome.runtime.onMessage.removeListener(handleRuntimeMessage)
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
@@ -700,6 +697,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
     const [isLoading, setIsLoading] = useState(false)
+    const [showYouGlish, setShowYouGlish] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
     const [originalText, setOriginalText] = useState(props.text)
@@ -709,18 +707,17 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isWordMode, setIsWordMode] = useState(false)
 
     function handleRuntimeMessage(message: { type: string; text: any }) {
-        if (message.type === "Text") {
-            const text = message.text;
-            setOriginalText(text);
+        if (message.type === 'Text') {
+            const text = message.text
+            setOriginalText(text)
         }
     }
 
-    chrome.runtime.onMessage.addListener(handleRuntimeMessage);
-    
-    
+    chrome.runtime.onMessage.addListener(handleRuntimeMessage)
+
     const webAPI = new WebAPI()
     useEffect(() => {
-        setOriginalText(props.text)     
+        setOriginalText(props.text)
     }, [props.text, props.uuid])
 
     useEffect(() => {
@@ -947,17 +944,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 return
             }
             setShowWordbookButtons(false)
-            const actionStrItem = currentTranslateMode
-                ? actionStrItems[currentTranslateMode]
-                : {
-                      beforeStr: 'Processing...',
-                      afterStr: 'Processed',
-                  }
             const beforeTranslate = () => {
-                let actionStr = actionStrItem.beforeStr
-                if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
-                    actionStr = 'Polishing...'
-                }
+                let actionStr = 'Processing...'
                 setActionStr(actionStr)
                 setTranslatedText('')
                 setErrorMessage('')
@@ -978,10 +966,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         })
                     }
                 } else {
-                    let actionStr = actionStrItem.afterStr
-                    if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
-                        actionStr = 'Polished'
-                    }
+                    let actionStr = 'Processed'
                     setActionStr(actionStr)
                 }
             }
@@ -1116,6 +1101,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [])
     const handleEditSpeakAction = async () => {
+        setShowYouGlish(true)
         if (isSpeakingEditableText) {
             editableStopSpeakRef.current()
             setIsSpeakingEditableText(false)
@@ -1192,42 +1178,41 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         }}
                     >
                         <Tooltip content={t('选择使用场景')} placement='bottom'>
-                <Select
-                size='mini'
-                    options={[
+                            <Select
+                                size='mini'
+                                options={[
                                     ...Object.keys(actionGroups || {}).map((key) => ({ id: key, label: key })),
-                        {
-                            id: 'unlock_features',
-                            label: (
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <AiOutlineLock style={{ marginRight: '5px' }} />
-                                    解锁更多功能
-                                </div>
-                            ),
-                        }, // 新增的选项
-                    ]}
-                    value={[{ id: selectedGroup }]}
-                    overrides={{
-                        Root: {
-                            style: {
-                                minWidth: '100px',
-                                width: '30%',
-                            },
-                        },
-                    }}
-                    onChange={({ value }) => {
-                        // 如果 actionGroups 是 undefined，则使用空对象作为默认值
-                        const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups || {})[0];
-                    
-                        if (groupId === 'unlock_features') {
-                            window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank'); // 打开新网页
-                        } else {
-                            setSelectedGroup(groupId as string);
-                        }
-                    }}
-                    
-                />
-            </Tooltip>
+                                    {
+                                        id: 'unlock_features',
+                                        label: (
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <AiOutlineLock style={{ marginRight: '5px' }} />
+                                                解锁更多功能
+                                            </div>
+                                        ),
+                                    }, // 新增的选项
+                                ]}
+                                value={[{ id: selectedGroup }]}
+                                overrides={{
+                                    Root: {
+                                        style: {
+                                            minWidth: '100px',
+                                            width: '30%',
+                                        },
+                                    },
+                                }}
+                                onChange={({ value }) => {
+                                    // 如果 actionGroups 是 undefined，则使用空对象作为默认值
+                                    const groupId = value.length > 0 ? value[0].id : Object.keys(actionGroups || {})[0]
+
+                                    if (groupId === 'unlock_features') {
+                                        window.open('https://chatgpt-tutor.vercel.app/docs/purchase', '_blank') // 打开新网页
+                                    } else {
+                                        setSelectedGroup(groupId as string)
+                                    }
+                                }}
+                            />
+                        </Tooltip>
                         <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
                             {displayedActions?.map((action) => {
                                 return (
@@ -1753,6 +1738,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 </ModalBody>
             </Modal>
             <Toaster />
+            {showYouGlish && (
+                      <YouGlishComponent query={editableText} triggerYouGlish={isSpeakingEditableText}
+                 />
+                                                  )}
         </div>
     )
 }

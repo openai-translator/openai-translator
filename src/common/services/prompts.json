@@ -10,7 +10,6 @@
     "group": "常用功能",
     "createdAt": "1702889507131",
     "updatedAt": "1702890680782",
-    "mode":"built-in",
     "id": 33
   },
   {
@@ -24,7 +23,6 @@
   "createdAt": "1697508055963",
   "updatedAt": "1701147690797",
   "id": 26,
-  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -38,7 +36,6 @@
   "createdAt": "1698701426330",
   "updatedAt": "1699484897933",
   "id": 29,
-  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -52,7 +49,6 @@
   "createdAt": "1697395537594",
   "updatedAt": "1699039329783",
   "id": 28,
-  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 },
 {
@@ -66,7 +62,6 @@
   "createdAt": "1699551078340",
   "updatedAt": "1699551078340",
   "id": 1,
-  "mode":"built-in",
   "outputRenderingFormat": "markdown"
 }
 ]
