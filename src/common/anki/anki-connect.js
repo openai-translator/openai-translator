@@ -447,8 +447,8 @@ export async function addNewNote(deckName, front, back) {
         deckName: deckName,
         modelName: '问答题',
         fields: {
-            正面: front,
-            背面: formattedBack,
+            Front: front,
+            Back: formattedBack,
         },
         options: {
             allowDuplicate: true,
