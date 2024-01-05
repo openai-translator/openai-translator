@@ -6,6 +6,7 @@ import ISO6391 from 'iso-639-1'
 import { LANG_CONFIGS, Config as OptionalLangConfig } from './data'
 import { oneLine } from 'common-tags'
 
+
 export type LangCode =
     | 'en'
     | 'en-US'
@@ -85,9 +86,10 @@ export const sourceLanguages = Object.entries(LANG_CONFIGS)
     .map(([code, config]) => [code, config.name] as [LangCode, string])
 export const targetLanguages = Object.entries(LANG_CONFIGS)
     .filter(([, config]) => config.isTarget !== false)
-    .map(([code, config]) => [code, config.name] as [LangCode, string])
-export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.name]))
-export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.name, code]))
+    .map(([code, config]) => [code, config.nameEn] as [LangCode, string])
+export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.nameEn]))
+export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.nameEn, code]))
+
 
 export function getLangName(langCode: string): string {
     const langName = ISO6391.getName(langCode)

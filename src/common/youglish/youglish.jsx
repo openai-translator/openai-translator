@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import YG from './widget.js'
 
-const YouGlishComponent = ({ query, triggerYouGlish }) => {
+const YouGlishComponent = ({ query, triggerYouGlish, language }) => {
     const [widget, setWidget] = useState(null)
-    const [language, setLanguage] = useState('english')
     const [currentTrack, setCurrentTrack] = useState(0)
     const [totalTracks, setTotalTracks] = useState(0)
     const [views, setViews] = useState(0)
 
-    const handleSearch = () => {
-        if (query) {
-            onYouglishAPIReady(query)
-        }
-    }
 
     const onYouglishAPIReady = (query) => {
         const newWidget = new YG.Widget('widget-1', {

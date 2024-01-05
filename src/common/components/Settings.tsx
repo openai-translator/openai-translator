@@ -47,6 +47,48 @@ const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     ]
 }, [] as Value)
 
+const specifiedLangCodes = [
+    'ar', // Arabic
+    'zh-Hans',
+    'zh-Hant', // Chinese (Simplified and Traditional)
+    'nl', // Dutch
+    'en',
+    'en-US',
+    'en-GB',
+    'en-CA',
+    'en-AU', // English (All variants)
+    'fr', // French
+    'de', // German
+    'el', // Greek
+    'he', // Hebrew
+    'it', // Italian
+    'ja', // Japanese
+    'ko', // Korean
+    'pl', // Polish
+    'pt', // Portuguese
+    'ru', // Russian
+    'es', // Spanish
+    'sv', // Swedish
+    'th', // Thai
+    'tr', // Turkish
+    'uk', // Ukrainian
+    'vi', // Vietnamese
+]
+
+const yourglishLangOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
+    if (specifiedLangCodes.includes(id)) {
+        return [
+            ...acc,
+            {
+                id,
+                label,
+            } as Option,
+        ];
+    }
+    return acc;
+}, [] as Value);
+
+
 interface ILanguageSelectorProps {
     value?: string
     onChange?: (value: string) => void
@@ -60,6 +102,22 @@ function LanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
             size='compact'
             clearable={false}
             options={langOptions}
+            value={value ? [{ id: value }] : []}
+            onChange={({ value }) => {
+                const selected = value[0]
+                onChange?.(selected?.id as string)
+            }}
+        />
+    )
+}
+
+function YouglishLanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
+    return (
+        <Select
+            onBlur={onBlur}
+            size='compact'
+            clearable={false}
+            options={yourglishLangOptions}
             value={value ? [{ id: value }] : []}
             onChange={({ value }) => {
                 const selected = value[0]
@@ -204,7 +262,6 @@ const useTTSSettingsStyles = createUseStyles({
         paddingLeft: '16px',
     }),
 })
-
 
 interface TTSVoicesSettingsProps {
     value?: ISettings['tts']
@@ -982,6 +1039,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         autoTranslate: utils.defaultAutoTranslate,
         chatContext: utils.defaultChatContext,
         defaultTranslateMode: 'translate',
+        defaultSourceLanguage: utils.defaultSourceLanguage,
         defaultTargetLanguage: utils.defaultTargetLanguage,
         alwaysShowIcons: !isTauri,
         hotkey: '',
@@ -1042,8 +1100,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             setPrevValues(values)
         }
     }, [prevValues, values])
-
-      
 
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
@@ -1231,6 +1287,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <RunAtStartupCheckbox onBlur={onBlur} />
                     </FormItem>
                 )}
+                <FormItem name='defaultSourceLanguage' label={t('Default Youglish Language')}>
+                    <YouglishLanguageSelector onBlur={onBlur} />
+                </FormItem>
                 <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>

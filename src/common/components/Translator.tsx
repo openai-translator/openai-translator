@@ -54,6 +54,7 @@ import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import YouGlishComponent from '../youglish/youglish'
+import { LANG_CONFIGS } from '../components/lang/data'
 
 const cache = new LRUCache({
     max: 500,
@@ -77,6 +78,7 @@ function genLangOptions(langs: [LangCode, string][]): Value {
 }
 const sourceLangOptions = genLangOptions(sourceLanguages)
 const targetLangOptions = genLangOptions(targetLanguages)
+
 
 const useStyles = createUseStyles({
     'popupCard': {
@@ -451,7 +453,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const isCompositing = useRef(false)
     const [selectedWord, setSelectedWord] = useState('')
     const highlightRef = useRef<HighlightInTextarea | null>(null)
-    const [showWordbookButtons, setShowWordbookButtons] = useState(false)
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
     useEffect(() => {
@@ -533,8 +534,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
-
-    const logoTextRef = useRef<HTMLDivElement>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
 
@@ -736,19 +735,18 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setIsLoading(false)
     }, [])
     const [sourceLang, setSourceLang] = useState<LangCode>('en')
-    const [targetLang, setTargetLang] = useState<LangCode>()
+    const [targetLang, setTargetLang] = useState<LangCode>('')
     const stopAutomaticallyChangeTargetLang = useRef(false)
-
     const settingsIsUndefined = settings === undefined
 
     useEffect(() => {
         if (settingsIsUndefined) {
             return
         }
+console.log(settings.defaultSourceLanguage);
+console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
 
         ;(async () => {
-            const sourceLang_ = await detectLang(originalText)
-            setSourceLang(sourceLang_)
             setTargetLang((targetLang_) => {
                 if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
                     return (
@@ -943,7 +941,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             if (!action) {
                 return
             }
-            setShowWordbookButtons(false)
             const beforeTranslate = () => {
                 let actionStr = 'Processing...'
                 setActionStr(actionStr)
@@ -1738,10 +1735,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 </ModalBody>
             </Modal>
             <Toaster />
-            {showYouGlish && (
-                      <YouGlishComponent query={editableText} triggerYouGlish={isSpeakingEditableText}
-                 />
-                                                  )}
+            <div>
+                {showYouGlish && (
+                    <YouGlishComponent
+                        query={editableText}
+                        triggerYouGlish={isSpeakingEditableText}
+                        language={LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English'}
+                    />
+                )}
+            </div>
         </div>
     )
 }
