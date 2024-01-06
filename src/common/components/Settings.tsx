@@ -51,13 +51,18 @@ const specifiedLangCodes = [
     'ar', // Arabic
     'zh-Hans',
     'zh-Hant', // Chinese (Simplified and Traditional)
+    'zh-sg',
     'nl', // Dutch
+    'nl-be',
     'en',
     'en-US',
     'en-GB',
     'en-CA',
     'en-AU', // English (All variants)
     'fr', // French
+    'fr-be',
+    'fr-qc',
+    'fr-ch',
     'de', // German
     'el', // Greek
     'he', // Hebrew
@@ -66,13 +71,20 @@ const specifiedLangCodes = [
     'ko', // Korean
     'pl', // Polish
     'pt', // Portuguese
+    'pt-br',
     'ru', // Russian
     'es', // Spanish
+    'es-la',
     'sv', // Swedish
     'th', // Thai
     'tr', // Turkish
     'uk', // Ukrainian
     'vi', // Vietnamese
+    'sign-us',
+    'sign-uk',
+    'sign-ie',
+    'sign-aus',
+    'sign-nz',
 ]
 
 const yourglishLangOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {

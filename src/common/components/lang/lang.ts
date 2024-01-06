@@ -15,7 +15,7 @@ export type LangCode =
     | 'en-AU'
     | 'zh-Hans'
     | 'zh-Hant'
-    | 'yue'
+    | 'zh-sg'
     | 'lzh'
     | 'jdbhw'
     | 'xdbhw'
@@ -23,21 +23,29 @@ export type LangCode =
     | 'ko'
     | 'ko-banmal'
     | 'fr'
+    | 'fr-qc'
+    | 'fr-be'
+    | 'fr-ch'
     | 'de'
     | 'es'
+    | 'es-la'
     | 'it'
     | 'ru'
     | 'pt'
+    | 'pt-br'
     | 'nl'
+    | 'nl-be'
     | 'pl'
     | 'ar'
     | 'af'
     | 'am'
     | 'az'
+    | 'asl'
     | 'be'
     | 'bg'
     | 'bn'
     | 'bs'
+    | 'bsl'
     | 'ca'
     | 'ceb'
     | 'co'
@@ -77,6 +85,11 @@ export type LangCode =
     | 'uk'
     | 'ur'
     | 'vi'
+    | 'sign-us'
+    | 'sign-uk'
+    | 'sign-aus'
+    | 'sign-nz'
+    | 'sign-ie'
 export type LanguageConfig = Required<OptionalLangConfig>
 export const supportedLanguages = Object.entries(LANG_CONFIGS).map(
     ([code, config]) => [code, config.name] as [LangCode, string]
@@ -86,9 +99,9 @@ export const sourceLanguages = Object.entries(LANG_CONFIGS)
     .map(([code, config]) => [code, config.name] as [LangCode, string])
 export const targetLanguages = Object.entries(LANG_CONFIGS)
     .filter(([, config]) => config.isTarget !== false)
-    .map(([code, config]) => [code, config.nameEn] as [LangCode, string])
-export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.nameEn]))
-export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.nameEn, code]))
+    .map(([code, config]) => [code, config.name] as [LangCode, string])
+export const langMap = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [code, config.name]))
+export const langMapReverse = new Map(Object.entries(LANG_CONFIGS).map(([code, config]) => [config.name, code]))
 
 
 export function getLangName(langCode: string): string {
@@ -122,6 +135,7 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
     const DEFAULT_CONFIG: LanguageConfig = {
         name: 'Unknown',
         nameEn: 'Unknown',
+        accent: 'Unknown',
         phoneticNotation: 'transcription',
         isSource: true,
         isTarget: true,

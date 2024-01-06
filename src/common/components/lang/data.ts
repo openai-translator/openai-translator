@@ -3,6 +3,7 @@ import { LangCode } from './lang'
 export interface Config {
     name: string
     nameEn: string
+    accent?: string
     isVariant?: boolean // whether the language is one of the variants of the language, default `false`
     isSource?: boolean // whether the language can be translated from, default `true`
     isTarget?: boolean // whether the language can be translated to, default `true`
@@ -28,29 +29,34 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     'en': {
         name: 'English',
         nameEn: 'English',
+        accent: 'uk',
         phoneticNotation: 'IPA',
     },
     'en-US': {
         name: 'American English',
-        nameEn: 'English (US)',
+        nameEn: 'English ',
+        accent: 'us',
         phoneticNotation: 'IPA',
         isSource: false,
     },
     'en-GB': {
         name: 'British English',
-        nameEn: 'English (UK)',
+        nameEn: 'English ',
+        accent: 'uk',
         phoneticNotation: 'IPA',
         isSource: false,
     },
     'en-CA': {
         name: 'Canadian English',
-        nameEn: 'English (Canada)',
+        nameEn: 'English ',
+        accent: 'ca',
         phoneticNotation: 'IPA',
         isSource: false,
     },
     'en-AU': {
         name: 'Australian English',
-        nameEn: 'English (Australia)',
+        nameEn: 'English ',
+        accent: 'aus',
         phoneticNotation: 'IPA',
         isSource: false,
     },
@@ -58,42 +64,27 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     // CJK
     // Chinese
     'zh-Hans': {
-        nameEn: 'Simplified Chinese',
+        nameEn: 'Chinese',
         name: '简体中文',
+        accent: 'cn',
         isVariant: true,
         phoneticNotation: 'Pinyin',
     },
     'zh-Hant': {
-        nameEn: 'Traditional Chinese',
+        nameEn: 'Chinese',
         name: '繁體中文',
+        accent: 'tw',
         isVariant: true,
         phoneticNotation: 'Bopomofo', // aka 注音
     },
-    'yue': {
-        nameEn: 'Cantonese',
-        name: '粤语',
+    'zh-sg': {
+        nameEn: 'Chinese',
+        name: '中文（新加坡）',
+        accent: 'sg',
         phoneticNotation: 'Jyutping',
         isSource: false,
     },
-    'lzh': {
-        nameEn: 'Classical Chinese',
-        name: '文言',
-        phoneticNotation: 'Pinyin',
-    },
-    'jdbhw': {
-        nameEn: 'Modern Standard Chinese',
-        name: '近代白话文',
-        phoneticNotation: 'Gwoyeu Romatzyh',
-        rolePrompt: '您是一位在中文系研究中文的资深学者',
-        isSource: false,
-    },
-    'xdbhw': {
-        nameEn: 'Contemporary Chinese',
-        name: '现代白话文',
-        phoneticNotation: 'Hanyu Pinyin',
-        rolePrompt: '您是一位在中文系研究中文的资深学者',
-        isSource: false,
-    },
+
 
     // Japanese
     'ja': {
@@ -124,6 +115,25 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     'fr': {
         nameEn: 'French',
         name: 'Français',
+        accent: '', 
+        phoneticNotation: 'IPA',
+    },
+    'fr-be': {
+        nameEn: 'French ',
+        name: 'Français (Belgique)',
+        accent: 'be', 
+        phoneticNotation: 'IPA',
+    },
+    'fr-qc': {
+        nameEn: 'French ',
+        name: 'Français (Québec)',
+        accent: 'qc', 
+        phoneticNotation: 'IPA',
+    },
+    'fr-ch': {
+        nameEn: 'French ',
+        name: 'Français (Suisse)',
+        accent: 'ch', 
         phoneticNotation: 'IPA',
     },
     'de': {
@@ -152,6 +162,12 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
     },
     'nl': {
         nameEn: 'Dutch',
+        accent: 'nl',
+        name: 'Nederlands',
+    },
+    'nl-be': {
+        nameEn: 'Dutch',
+        accent: 'be',
         name: 'Nederlands',
     },
     'pl': {
@@ -362,5 +378,32 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         nameEn: 'Vietnamese',
         name: 'Tiếng Việt',
         phoneticNotation: false,
+    },
+    'sign-us': {
+        nameEn: 'Sign Language',
+        name: 'American Sign Language',
+        accent: 'us',
+        phoneticNotation: false,
+    },
+    'sign-uk': {
+        nameEn: 'Sign Language',
+        name: 'British Sign Language',
+        accent: 'uk',
+        phoneticNotation: false,
+    },
+    'sign-ie': {
+        nameEn: 'Sign Language',
+        name: 'Irish Sign Language',
+        phoneticNotation: 'SignWriting',
+    },
+    'sign-nz': {
+        nameEn: 'Sign Language',
+        name: 'New Zealand Sign Language',
+        phoneticNotation: 'SignWriting',
+    },
+    'sign-aus': {
+        nameEn: 'Sign Language',
+        name: 'Australian Sign Language',
+        phoneticNotation: 'SignWriting',
     },
 }

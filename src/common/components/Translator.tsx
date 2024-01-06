@@ -14,6 +14,7 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { WebAPI, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { RiSpeakerFill } from 'react-icons/ri'
 import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
@@ -696,6 +697,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
     const [isLoading, setIsLoading] = useState(false)
+    const [newYouGlish, setNewYouGlish] = useState(false)
     const [showYouGlish, setShowYouGlish] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
@@ -704,6 +706,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
+    const [youGlishQuery, setYouGlishQuery] = useState(editableText);
+    const [youGlishLanguage, setYouGlishLanguage] = useState(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English');
+    const [youGlishAccent, setYouGlishAccent] = useState(LANG_CONFIGS[settings?.defaultSourceLanguage].accent || '');
+
 
     function handleRuntimeMessage(message: { type: string; text: any }) {
         if (message.type === 'Text') {
@@ -735,7 +741,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         setIsLoading(false)
     }, [])
     const [sourceLang, setSourceLang] = useState<LangCode>('en')
-    const [targetLang, setTargetLang] = useState<LangCode>('')
+    const [targetLang, setTargetLang] = useState<LangCode>()
     const stopAutomaticallyChangeTargetLang = useRef(false)
     const settingsIsUndefined = settings === undefined
 
@@ -743,14 +749,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (settingsIsUndefined) {
             return
         }
-console.log(settings.defaultSourceLanguage);
-console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
+
 
         ;(async () => {
             setTargetLang((targetLang_) => {
-                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang_ === targetLang_)) {
+                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang === targetLang_)) {
                     return (
-                        (sourceLang_ === 'zh-Hans' || sourceLang_ === 'zh-Hant'
+                        (sourceLang === 'zh-Hans' || sourceLang === 'zh-Hant'
                             ? 'en'
                             : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
                     )
@@ -759,7 +764,7 @@ console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
                     if (settings?.defaultTargetLanguage) {
                         return settings.defaultTargetLanguage as LangCode
                     }
-                    return sourceLang_
+                    return sourceLang
                 }
                 return targetLang_
             })
@@ -1098,7 +1103,6 @@ console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
         }
     }, [])
     const handleEditSpeakAction = async () => {
-        setShowYouGlish(true)
         if (isSpeakingEditableText) {
             editableStopSpeakRef.current()
             setIsSpeakingEditableText(false)
@@ -1112,6 +1116,18 @@ console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
         })
         editableStopSpeakRef.current = stopSpeak
     }
+
+    const handleYouglishSpeakAction =async() => {
+        setNewYouGlish(true)
+        if (!showYouGlish) {
+            setShowYouGlish(true)
+        }
+        else{
+            setShowYouGlish(false)
+        }
+    }
+
+
 
     const handleTranslatedSpeakAction = async () => {
         if (isSpeakingTranslatedText) {
@@ -1536,6 +1552,13 @@ console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
                                                 )}
                                             </div>
                                         </Tooltip>
+                                        <Tooltip content={t('On/Off Youglish')} placement='bottom'>
+                                            <div className={styles.actionButton} onClick={handleYouglishSpeakAction}>
+                                                (
+                                                    <RiSpeakerFill size={15} />
+                                                )
+                                            </div>
+                                        </Tooltip>
                                         <Tooltip content={t('Copy to clipboard')} placement='bottom'>
                                             <div className={styles.actionButton}>
                                                 <CopyButton text={editableText} styles={styles}></CopyButton>
@@ -1735,15 +1758,14 @@ console.log(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn);
                 </ModalBody>
             </Modal>
             <Toaster />
-            <div>
-                {showYouGlish && (
-                    <YouGlishComponent
-                        query={editableText}
-                        triggerYouGlish={isSpeakingEditableText}
-                        language={LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English'}
-                    />
-                )}
-            </div>
+            <div style={{ display: showYouGlish ? 'block' : 'none' }}>
+    <YouGlishComponent
+        query={editableText}
+        triggerYouGlish={showYouGlish}
+        language={LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English'}
+        accent={LANG_CONFIGS[settings?.defaultSourceLanguage].accent || ''}
+    />
+</div>
         </div>
     )
 }
