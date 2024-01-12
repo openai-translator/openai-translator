@@ -159,7 +159,7 @@ For details, see [Desktop Clip Extension](./CLIP-EXTENSIONS.md)
 
 ```ts
 const API_URL = `https://${resourceName}.openai.azure.com`
-const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
+const API_URL_PATH = `/openai/deployments/${deployName}/chat/completions?api-version=${apiVersion}`
 ```
 
 - resourceName: Your Azure OpenAI Service resource name.
