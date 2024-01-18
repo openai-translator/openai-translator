@@ -47,6 +47,8 @@ export interface IThemedStyleProps {
 
 export type LanguageDetectionEngine = 'google' | 'baidu' | 'bing' | 'local'
 
+export type ProxyProtocol = 'HTTP' | 'HTTPS'
+
 export interface ISettings {
     automaticCheckForUpdates: boolean
     apiKeys: string
@@ -97,4 +99,15 @@ export interface ISettings {
     hideTheIconInTheDock?: boolean
     languageDetectionEngine?: LanguageDetectionEngine
     autoHideWindowWhenOutOfFocus?: boolean
+    proxy?: {
+        enabled?: boolean
+        protocol?: ProxyProtocol
+        server?: string
+        port?: string
+        basicAuth?: {
+            username?: string
+            password?: string
+        }
+        noProxy?: string
+    }
 }
