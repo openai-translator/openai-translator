@@ -20,7 +20,7 @@ import { LangCode, supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { ISettings, IThemedStyleProps, LanguageDetectionEngine, ThemeType } from '../types'
+import { ISettings, IThemedStyleProps, LanguageDetectionEngine, ProxyProtocol, ThemeType } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IoCloseCircle, IoRefreshSharp, IoSettingsOutline } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
@@ -41,6 +41,7 @@ import { Provider, getEngine } from '../engines'
 import { IModel } from '../engines/interfaces'
 import { PiTextbox } from 'react-icons/pi'
 import { BsKeyboard } from 'react-icons/bs'
+import { TbCloudNetwork } from 'react-icons/tb'
 import { Cell, Grid } from 'baseui-sd/layout-grid'
 import {
     II18nPromotionContent,
@@ -61,6 +62,8 @@ import { SpeakerIcon } from './SpeakerIcon'
 import { RxSpeakerLoud } from 'react-icons/rx'
 import { Notification } from 'baseui-sd/notification'
 import { usePromotionNeverDisplay } from '../hooks/usePromotionNeverDisplay'
+import { Textarea } from 'baseui-sd/textarea'
+import { ProxyTester } from './ProxyTester'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -101,12 +104,6 @@ function LanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
     )
 }
 
-interface ITranslateModeSelectorProps {
-    value?: TranslateMode | 'nop'
-    onChange?: (value: TranslateMode | 'nop') => void
-    onBlur?: () => void
-}
-
 interface AlwaysShowIconsCheckboxProps {
     value?: boolean
     onChange?: (value: boolean) => void
@@ -126,9 +123,9 @@ function AlwaysShowIconsCheckbox({ value, onChange, onBlur }: AlwaysShowIconsChe
     )
 }
 
-interface AutoTranslateCheckboxProps {
-    value?: boolean
-    onChange?: (value: boolean) => void
+interface ITranslateModeSelectorProps {
+    value?: TranslateMode | 'nop'
+    onChange?: (value: TranslateMode | 'nop') => void
     onBlur?: () => void
 }
 
@@ -686,6 +683,42 @@ function TTSVoicesSettings({ value, onChange, onBlur }: ITTSVoicesSettingsProps)
                 </div>
             </div>
         </div>
+    )
+}
+
+interface IProxyProtocolProps {
+    value?: ProxyProtocol
+    onChange?: (value: ProxyProtocol) => void
+    onBlur?: () => void
+}
+
+function ProxyProtocolSelector({ value, onChange, onBlur }: IProxyProtocolProps) {
+    const options = [
+        { label: 'HTTP', id: 'HTTP' },
+        { label: 'HTTPS', id: 'HTTPS' },
+    ]
+
+    return (
+        <Select
+            size='compact'
+            onBlur={onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                value
+                    ? [
+                          {
+                              id: value,
+                              label: options.find((option) => option.id === value)?.label || 'HTTP',
+                          },
+                      ]
+                    : undefined
+            }
+            onChange={(params) => {
+                onChange?.(params.value[0].id as ProxyProtocol)
+            }}
+            options={options}
+        />
     )
 }
 
@@ -1521,7 +1554,7 @@ export function InnerSettings({
 
     const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false)
 
-    const [activeTab, setActiveTab] = useState(0)
+    const [activeTab, setActiveTab] = useState('general')
 
     const [isScrolled, setIsScrolled] = useState(window.scrollY > 0)
 
@@ -1789,20 +1822,32 @@ export function InnerSettings({
                     overrides={tabsOverrides}
                     activeKey={activeTab}
                     onChange={({ activeKey }) => {
-                        setActiveTab(parseInt(activeKey as string, 10))
+                        setActiveTab(activeKey as string)
                     }}
                     fill='fixed'
                     renderAll
                 >
                     <Tab
                         title={t('General')}
+                        key='general'
                         artwork={() => {
                             return <IoSettingsOutline size={14} />
                         }}
                         overrides={tabOverrides}
                     />
+                    {isTauri && (
+                        <Tab
+                            title={t('Proxy')}
+                            key='proxy'
+                            artwork={() => {
+                                return <TbCloudNetwork size={14} />
+                            }}
+                            overrides={tabOverrides}
+                        />
+                    )}
                     <Tab
                         title={t('TTS')}
+                        key='tts'
                         artwork={() => {
                             return <RxSpeakerLoud size={14} />
                         }}
@@ -1810,6 +1855,7 @@ export function InnerSettings({
                     />
                     <Tab
                         title={t('Writing')}
+                        key='writing'
                         artwork={() => {
                             return <PiTextbox size={14} />
                         }}
@@ -1817,6 +1863,7 @@ export function InnerSettings({
                     />
                     <Tab
                         title={t('Shortcuts')}
+                        key='shortcuts'
                         artwork={() => {
                             return <BsKeyboard size={14} />
                         }}
@@ -1912,7 +1959,7 @@ export function InnerSettings({
                 <div>
                     <div
                         style={{
-                            display: activeTab === 0 ? 'block' : 'none',
+                            display: activeTab === 'general' ? 'block' : 'none',
                         }}
                     >
                         <FormItem name='i18n' label={t('i18n')}>
@@ -2338,7 +2385,35 @@ export function InnerSettings({
                     </div>
                     <div
                         style={{
-                            display: activeTab === 1 ? 'block' : 'none',
+                            display: isTauri && activeTab === 'proxy' ? 'block' : 'none',
+                        }}
+                    >
+                        <FormItem name={['proxy', 'enabled']} label={t('Enabled')}>
+                            <MyCheckbox />
+                        </FormItem>
+                        <FormItem name={['proxy', 'protocol']} label={t('Protocol')}>
+                            <ProxyProtocolSelector />
+                        </FormItem>
+                        <FormItem name={['proxy', 'server']} label={t('Server')}>
+                            <Input size='compact' />
+                        </FormItem>
+                        <FormItem name={['proxy', 'port']} label={t('Port')}>
+                            <Input type='number' size='compact' />
+                        </FormItem>
+                        <FormItem name={['proxy', 'basicAuth', 'username']} label={t('Username')}>
+                            <Input size='compact' />
+                        </FormItem>
+                        <FormItem name={['proxy', 'basicAuth', 'password']} label={t('Password')}>
+                            <Input type='password' size='compact' />
+                        </FormItem>
+                        <FormItem name={['proxy', 'noProxy']} label={t('No proxy')}>
+                            <Textarea size='compact' />
+                        </FormItem>
+                        <ProxyTester proxy={values.proxy} />
+                    </div>
+                    <div
+                        style={{
+                            display: activeTab === 'tts' ? 'block' : 'none',
                         }}
                     >
                         <FormItem
@@ -2353,7 +2428,7 @@ export function InnerSettings({
                     </div>
                     <div
                         style={{
-                            display: activeTab === 2 ? 'block' : 'none',
+                            display: activeTab === 'writing' ? 'block' : 'none',
                         }}
                     >
                         <FormItem
@@ -2390,7 +2465,7 @@ export function InnerSettings({
                     </div>
                     <div
                         style={{
-                            display: activeTab === 3 ? 'block' : 'none',
+                            display: activeTab === 'shortcuts' ? 'block' : 'none',
                         }}
                     >
                         <FormItem name='hotkey' label={t('Hotkey')}>

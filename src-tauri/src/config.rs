@@ -7,6 +7,29 @@ use serde::{Deserialize, Serialize};
 use crate::APP_HANDLE;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ProxyProtocol {
+    HTTP,
+    HTTPS,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BasicAuth {
+    pub username: Option<String>,
+    pub password: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ProxyConfig {
+    pub enabled: Option<bool>,
+    pub protocol: Option<ProxyProtocol>,
+    pub server: Option<String>,
+    pub port: Option<String>,
+    pub basic_auth: Option<BasicAuth>,
+    pub no_proxy: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
@@ -18,6 +41,7 @@ pub struct Config {
     pub allow_using_clipboard_when_selected_text_not_available: Option<bool>,
     pub automatic_check_for_updates: Option<bool>,
     pub hide_the_icon_in_the_dock: Option<bool>,
+    pub proxy: Option<ProxyConfig>,
 }
 
 static CONFIG_CACHE: Mutex<Option<Config>> = Mutex::new(None);
@@ -28,6 +52,17 @@ pub fn get_config() -> Result<Config, Box<dyn std::error::Error>> {
 }
 
 pub fn get_config_by_app(app: &AppHandle) -> Result<Config, Box<dyn std::error::Error>> {
+    let conf = _get_config_by_app(app);
+    match conf {
+        Ok(conf) => Ok(conf),
+        Err(e) => {
+            println!("get config failed: {}", e);
+            Err(e)
+        }
+    }
+}
+
+pub fn _get_config_by_app(app: &AppHandle) -> Result<Config, Box<dyn std::error::Error>> {
     if let Some(config_cache) = &*CONFIG_CACHE.lock() {
         return Ok(config_cache.clone());
     }

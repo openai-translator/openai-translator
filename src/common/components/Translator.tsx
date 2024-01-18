@@ -17,7 +17,7 @@ import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode }
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxStop } from 'react-icons/rx'
-import { LuStars, LuStarOff } from 'react-icons/lu'
+import { LuStar, LuStarOff } from 'react-icons/lu'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -72,7 +72,7 @@ import { GlobalSuspense } from './GlobalSuspense'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import Toaster from './Toaster'
-import { readBinaryFile } from '@tauri-apps/plugin-fs'
+import { readFile } from '@tauri-apps/plugin-fs'
 import { getCurrent } from '@tauri-apps/api/window'
 import { useDeepCompareCallback } from 'use-deep-compare'
 import { useTranslatorStore } from '../store'
@@ -1211,7 +1211,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
                 const worker = createWorker()
 
-                const binaryFile = await readBinaryFile(filePath)
+                const binaryFile = await readFile(filePath)
 
                 const file = new Blob([binaryFile.buffer], {
                     type: `image/${fileExtension}`,
@@ -2153,7 +2153,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                             }}
                                                         >
                                                             {isAutoCollectOn ? (
-                                                                <LuStars size={15} />
+                                                                <LuStar size={15} />
                                                             ) : (
                                                                 <LuStarOff size={15} />
                                                             )}

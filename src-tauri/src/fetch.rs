@@ -1,7 +1,6 @@
 use debug_print::debug_println;
 use futures_util::stream::{AbortHandle, Abortable};
 use futures_util::StreamExt;
-use reqwest::StatusCode;
 use std::collections::HashMap;
 
 use reqwest::{
@@ -11,6 +10,7 @@ use reqwest::{
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
+use crate::config::{get_config, ProxyProtocol};
 use crate::APP_HANDLE;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -41,8 +41,41 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         headers.insert(key.parse::<HeaderName>().unwrap(), value.parse().unwrap());
     }
 
-    let client = Client::builder()
-        .default_headers(headers)
+    let mut client_builder = Client::builder().default_headers(headers);
+
+    if let Ok(config) = get_config() {
+        if let Some(proxy_config) = config.proxy {
+            if proxy_config.enabled.unwrap_or(false)
+                && proxy_config.protocol.is_some()
+                && proxy_config.server.is_some()
+                && proxy_config.port.is_some()
+            {
+                let proxy_url = format!(
+                    "{}:{}",
+                    proxy_config.server.unwrap_or_default(),
+                    proxy_config.port.unwrap_or_default()
+                );
+                let proxy_url = match proxy_config.protocol.unwrap() {
+                    ProxyProtocol::HTTP => format!("http://{}", proxy_url),
+                    ProxyProtocol::HTTPS => format!("https://{}", proxy_url),
+                };
+                let mut proxy = reqwest::Proxy::all(&proxy_url).unwrap();
+                if let Some(basic_auth) = proxy_config.basic_auth {
+                    let username = basic_auth.username.unwrap_or_default();
+                    if username.len() > 0 {
+                        proxy =
+                            proxy.basic_auth(&username, &basic_auth.password.unwrap_or_default());
+                    }
+                }
+                if let Some(no_proxy) = proxy_config.no_proxy {
+                    proxy = proxy.no_proxy(Some(reqwest::NoProxy::from_string(&no_proxy).unwrap()));
+                }
+                client_builder = client_builder.proxy(proxy);
+            }
+        }
+    }
+
+    let client = client_builder
         .build()
         .map_err(|err| format!("failed to generate client: {}", err))?;
 

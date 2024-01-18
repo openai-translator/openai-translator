@@ -18,26 +18,26 @@ dependencies:
     specifier: 2.0.0-alpha.11
     version: 2.0.0-alpha.11
   '@tauri-apps/plugin-autostart':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-autostart#v2
+    version: github.com/tauri-apps/tauri-plugin-autostart/48100715dc77c92c3656de1677593aa729967b89
   '@tauri-apps/plugin-fs':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-fs#v2
+    version: github.com/tauri-apps/tauri-plugin-fs/0ea45fffad28a68dd9c273a96d29c1d451b1269b
   '@tauri-apps/plugin-global-shortcut':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-global-shortcut#v2
+    version: github.com/tauri-apps/tauri-plugin-global-shortcut/2670f1c134b6aee9d1e24c2f202bcf3065d2e2e2
   '@tauri-apps/plugin-http':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-http#v2
+    version: github.com/tauri-apps/tauri-plugin-http/abeeedc1b24dd456a76aae6bc4f33d2ef3f72bbf
   '@tauri-apps/plugin-process':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-process#v2
+    version: github.com/tauri-apps/tauri-plugin-process/500c405e61eb95465358b66751bb94ede95f13ad
   '@tauri-apps/plugin-shell':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-shell#v2
+    version: github.com/tauri-apps/tauri-plugin-shell/2c06a153b42d44df4a040a1aae2406db9894c53a
   '@tauri-apps/plugin-updater':
-    specifier: 2.0.0-alpha.3
-    version: 2.0.0-alpha.3
+    specifier: github:tauri-apps/tauri-plugin-updater#v2
+    version: github.com/tauri-apps/tauri-plugin-updater/82e1a50e267f0352d4e114be5166fe76a6c7da81
   '@types/qs':
     specifier: ^6.9.10
     version: 6.9.10
@@ -128,6 +128,9 @@ dependencies:
   react-copy-to-clipboard:
     specifier: ^5.1.0
     version: 5.1.0(react@18.2.0)
+  react-country-flag:
+    specifier: ^3.1.0
+    version: 3.1.0(react@18.2.0)
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
@@ -148,7 +151,7 @@ dependencies:
     version: 2.1.0(react@18.2.0)
   react-hot-toast:
     specifier: ^2.4.1
-    version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
+    version: 2.4.1(csstype@3.1.3)(react-dom@18.2.0)(react@18.2.0)
   react-hotkeys-hook:
     specifier: ^4.4.1
     version: 4.4.1(react-dom@18.2.0)(react@18.2.0)
@@ -156,8 +159,8 @@ dependencies:
     specifier: ^13.0.3
     version: 13.0.3(i18next@23.4.4)(react-dom@18.2.0)(react@18.2.0)
   react-icons:
-    specifier: ^4.10.1
-    version: 4.10.1(react@18.2.0)
+    specifier: ^5.0.1
+    version: 5.0.1(react@18.2.0)
   react-jss:
     specifier: ^10.10.0
     version: 10.10.0(react@18.2.0)
@@ -185,9 +188,6 @@ dependencies:
   swr:
     specifier: ^2.2.0
     version: 2.2.0(react@18.2.0)
-  tauri-plugin-autostart-api:
-    specifier: github:tauri-apps/tauri-plugin-autostart#v1
-    version: github.com/tauri-apps/tauri-plugin-autostart/7404c3ccd2e45c642e3b876500ab79d88af85e4d
   tesseract.js:
     specifier: ^4.0.2
     version: 4.0.2(eslint@8.46.0)
@@ -634,6 +634,13 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.0
+    dev: false
+
+  /@babel/runtime@7.23.8:
+    resolution: {integrity: sha512-Y7KbAP984rn1VGMbGqKmBLio9V7y5Je9GvU4rQPCPinCyNfUcToxIXl06d59URp/F3LwinvODxab5N/G6qggkw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.1
     dev: false
 
   /@babel/template@7.21.9:
@@ -1190,7 +1197,7 @@ packages:
     peerDependencies:
       react: '>= 0.14.0'
     dependencies:
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.23.8
       highlight.js: 10.7.3
       lowlight: 1.20.0
       prismjs: 1.29.0
@@ -1414,13 +1421,13 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
-  /@tauri-apps/api@1.5.1:
-    resolution: {integrity: sha512-6unsZDOdlXTmauU3NhWhn+Cx0rODV+rvNvTdvolE5Kls5ybA6cqndQENDt1+FS0tF7ozCP66jwWoH6a5h90BrA==}
-    engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
-    dev: false
-
   /@tauri-apps/api@2.0.0-alpha.11:
     resolution: {integrity: sha512-aw7jic+MQAe/LH4fYhbd3bwx3YjXhDIwqKJIn5QO4yKmGdVURIhZSFcyeKkSe4P6Itdto0Pcz99vLfkgBwdQKw==}
+    engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
+    dev: false
+
+  /@tauri-apps/api@2.0.0-alpha.13:
+    resolution: {integrity: sha512-sGgCkFahF3OZAHoGN5Ozt9WK7wJlbVZSgWpPQKNag4nSOX1+Py6VDRTEWriiJHDiV+gg31CWHnNXRy6TFoZmdA==}
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
@@ -1531,48 +1538,6 @@ packages:
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-alpha.18
     dev: true
 
-  /@tauri-apps/plugin-autostart@2.0.0-alpha.3:
-    resolution: {integrity: sha512-FWXMun68YPs+czGj063B/R2ItK0lFAHz08GCY8Ez1v5qGfq48MqBVF6EB5AHqQ73Wyq3+RGgDTyxuRFzBnXr6A==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-fs@2.0.0-alpha.3:
-    resolution: {integrity: sha512-/itwHty0SMCgfT2TjM7T/zYixeoXWOMJSWGUc7HJCHYcMPpXxzq0HBn/w2f1O2/Td7naGiHEsIqBWHJmGdLZLA==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-global-shortcut@2.0.0-alpha.3:
-    resolution: {integrity: sha512-xu521LYHdY72WJmwRD7pq/vtrD03+Z7KoojJIE/zRrMp2y12IEO3P4uDrHGq8VCVDUezZSqkIbIT77PcF7gxiQ==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-http@2.0.0-alpha.3:
-    resolution: {integrity: sha512-d2pgHdJKokuBvBYA6wmvYdmV+6F6/yPw4PdGNsqmYhSDvb7e3MPKV5xxK8AlYMQz/kJf9jL1VnDwmgn6x4ZSqA==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-process@2.0.0-alpha.3:
-    resolution: {integrity: sha512-XfDBtjW5s584/OJvpaWo3EGtB/lRYltWUmdRotEs4CMWZRRidDfIWf39BWLEXOnik7aMZOA9LVURaTU2QHBy+g==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-shell@2.0.0-alpha.3:
-    resolution: {integrity: sha512-v4qLTE9DfzpYdcjZq3ASOC7gFtMtzIDWN5Bo2FheB+pHQvDRq8mrP8gTdkL4/9pQaOFlB0B+MKCwANYhD1jLEQ==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
-  /@tauri-apps/plugin-updater@2.0.0-alpha.3:
-    resolution: {integrity: sha512-ZMNOpMrBEMCSBmI5Re09mhEldiDmHZBWaFkLXbDo8rcSM8OH2WaUQMDc6kmsu4pWgE/gs7RlwULmf9h3UZ+wLQ==}
-    dependencies:
-      '@tauri-apps/api': 2.0.0-alpha.11
-    dev: false
-
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
@@ -1660,8 +1625,8 @@ packages:
       '@types/unist': 2.0.7
     dev: false
 
-  /@types/hast@2.3.8:
-    resolution: {integrity: sha512-aMIqAlFd2wTIDZuvLbhUT+TGvMxrNC8ECUIVtH6xxy0sQLs3iu6NO8Kp/VT5je7i5ufnebXzdV1dNDMnvaH6IQ==}
+  /@types/hast@2.3.9:
+    resolution: {integrity: sha512-pTHyNlaMD/oKJmS+ZZUyFUcsZeBZpC0lmGquw98CqRVNgAdJZJeD7GoeLiT6Xbx5rU9VCjSt0RwEvDgzh4obFw==}
     dependencies:
       '@types/unist': 2.0.10
     dev: false
@@ -2777,6 +2742,10 @@ packages:
 
   /csstype@3.1.2:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
+
+  /csstype@3.1.3:
+    resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+    dev: false
 
   /d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
@@ -4154,12 +4123,12 @@ packages:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
     dev: true
 
-  /goober@2.1.13(csstype@3.1.2):
+  /goober@2.1.13(csstype@3.1.3):
     resolution: {integrity: sha512-jFj3BQeleOoy7t93E9rZ2de+ScC4lQICLwiAQmKMg9F6roKGaLSHoCDYKkWlSafg138jejvq/mTdvmnwDQgqoQ==}
     peerDependencies:
       csstype: ^3.0.10
     dependencies:
-      csstype: 3.1.2
+      csstype: 3.1.3
     dev: false
 
   /gopd@1.0.1:
@@ -4234,7 +4203,7 @@ packages:
   /hast-util-parse-selector@3.1.1:
     resolution: {integrity: sha512-jdlwBjEexy1oGz0aJ2f4GKMaVKkA9jwjr4MjAAI22E5fM/TXVZHuS5OpONtdeIkRKqAaryQ2E9xNQxijoThSZA==}
     dependencies:
-      '@types/hast': 2.3.8
+      '@types/hast': 2.3.9
     dev: false
 
   /hast-util-whitespace@2.0.1:
@@ -4244,7 +4213,7 @@ packages:
   /hastscript@7.2.0:
     resolution: {integrity: sha512-TtYPq24IldU8iKoJQqvZOuhi5CyCQRAbvDOX0x1eW6rsHSxa/1i2CCiptNTotGHJ3VoHRGmqiv6/D3q113ikkw==}
     dependencies:
-      '@types/hast': 2.3.8
+      '@types/hast': 2.3.9
       comma-separated-tokens: 2.0.3
       hast-util-parse-selector: 3.1.1
       property-information: 6.4.0
@@ -5931,6 +5900,15 @@ packages:
       react: 18.2.0
     dev: false
 
+  /react-country-flag@3.1.0(react@18.2.0):
+    resolution: {integrity: sha512-JWQFw1efdv9sTC+TGQvTKXQg1NKbDU2mBiAiRWcKM9F1sK+/zjhP2yGmm8YDddWyZdXVkR8Md47rPMJmo4YO5g==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-display-name@0.2.5:
     resolution: {integrity: sha512-I+vcaK9t4+kypiSgaiVWAipqHRXYmZIuAiS8vzFvXHHXVigg/sMKwlRgLy6LH2i3rmP+0Vzfl5lFsFRwF1r3pg==}
     dev: false
@@ -6025,14 +6003,14 @@ packages:
       - immer
     dev: false
 
-  /react-hot-toast@2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0):
+  /react-hot-toast@2.4.1(csstype@3.1.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-j8z+cQbWIM5LY37pR6uZR6D4LfseplqnuAO4co4u8917hBUvXlEqyP1ZzqVLcqoyUesZZv/ImreoCeHVDpE5pQ==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
     dependencies:
-      goober: 2.1.13(csstype@3.1.2)
+      goober: 2.1.13(csstype@3.1.3)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     transitivePeerDependencies:
@@ -6069,8 +6047,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /react-icons@4.10.1(react@18.2.0):
-    resolution: {integrity: sha512-/ngzDP/77tlCfqthiiGNZeYFACw85fUjZtLbedmJ5DTlNDIwETxhwBzdOJ21zj4iJdvc0J3y7yOsX3PpxAJzrw==}
+  /react-icons@5.0.1(react@18.2.0):
+    resolution: {integrity: sha512-WqLZJ4bLzlhmsvme6iFdgO8gfZP17rfjYEJ2m9RsZjZ+cc4k1hTzknEz63YS1MeT50kVzoa1Nz36f4BEx+Wigw==}
     peerDependencies:
       react: '*'
     dependencies:
@@ -6322,7 +6300,7 @@ packages:
   /refractor@4.8.1:
     resolution: {integrity: sha512-/fk5sI0iTgFYlmVGYVew90AoYnNMP6pooClx/XKqyeeCQXrL0Kvgn8V0VEht5ccdljbzzF1i3Q213gcntkRExg==}
     dependencies:
-      '@types/hast': 2.3.8
+      '@types/hast': 2.3.9
       '@types/prismjs': 1.26.3
       hastscript: 7.2.0
       parse-entities: 4.0.1
@@ -6334,6 +6312,10 @@ packages:
 
   /regenerator-runtime@0.14.0:
     resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
+    dev: false
+
+  /regenerator-runtime@0.14.1:
+    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
     dev: false
 
   /regexp.prototype.flags@1.5.0:
@@ -7753,10 +7735,58 @@ packages:
       '@tauri-apps/api': 2.0.0-alpha.11
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-autostart/7404c3ccd2e45c642e3b876500ab79d88af85e4d:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/7404c3ccd2e45c642e3b876500ab79d88af85e4d}
-    name: tauri-plugin-autostart-api
-    version: 0.0.0
+  github.com/tauri-apps/tauri-plugin-autostart/48100715dc77c92c3656de1677593aa729967b89:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/48100715dc77c92c3656de1677593aa729967b89}
+    name: '@tauri-apps/plugin-autostart'
+    version: 2.0.0-alpha.5
     dependencies:
-      '@tauri-apps/api': 1.5.1
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-fs/0ea45fffad28a68dd9c273a96d29c1d451b1269b:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/0ea45fffad28a68dd9c273a96d29c1d451b1269b}
+    name: '@tauri-apps/plugin-fs'
+    version: 2.0.0-alpha.6
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-global-shortcut/2670f1c134b6aee9d1e24c2f202bcf3065d2e2e2:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/2670f1c134b6aee9d1e24c2f202bcf3065d2e2e2}
+    name: '@tauri-apps/plugin-global-shortcut'
+    version: 2.0.0-alpha.5
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-http/abeeedc1b24dd456a76aae6bc4f33d2ef3f72bbf:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/abeeedc1b24dd456a76aae6bc4f33d2ef3f72bbf}
+    name: '@tauri-apps/plugin-http'
+    version: 2.0.0-alpha.6
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-process/500c405e61eb95465358b66751bb94ede95f13ad:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/500c405e61eb95465358b66751bb94ede95f13ad}
+    name: '@tauri-apps/plugin-process'
+    version: 2.0.0-alpha.5
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-shell/2c06a153b42d44df4a040a1aae2406db9894c53a:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/2c06a153b42d44df4a040a1aae2406db9894c53a}
+    name: '@tauri-apps/plugin-shell'
+    version: 2.0.0-alpha.5
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
+    dev: false
+
+  github.com/tauri-apps/tauri-plugin-updater/82e1a50e267f0352d4e114be5166fe76a6c7da81:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/82e1a50e267f0352d4e114be5166fe76a6c7da81}
+    name: '@tauri-apps/plugin-updater'
+    version: 2.0.0-alpha.5
+    dependencies:
+      '@tauri-apps/api': 2.0.0-alpha.13
     dev: false
