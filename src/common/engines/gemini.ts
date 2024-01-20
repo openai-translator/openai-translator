@@ -4,7 +4,35 @@ import { IEngine, IMessageRequest, IModel } from './interfaces'
 
 const SAFETY_SETTINGS = [
     {
-        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        category: 'HARM_CATEGORY_UNSPECIFIED',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_DEROGATORY',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_TOXICITY',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_VIOLENCE',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_SEXUAL',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_MEDICAL',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_DANGEROUS',
+        threshold: 'BLOCK_NONE',
+    },
+    {
+        category: 'HARM_CATEGORY_HARASSMENT',
         threshold: 'BLOCK_NONE',
     },
     {
@@ -12,7 +40,7 @@ const SAFETY_SETTINGS = [
         threshold: 'BLOCK_NONE',
     },
     {
-        category: 'HARM_CATEGORY_HARASSMENT',
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
         threshold: 'BLOCK_NONE',
     },
     {
