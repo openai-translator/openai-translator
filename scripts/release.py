@@ -46,7 +46,7 @@ def create_new_tag():
     for line in release_note.split('\n'):
         line = line.strip().strip('"')
         t_, _, _ = line.partition(':')
-        if t_.lower() not in ('fix', 'feat', 'docs', 'refactor', 'optimize', 'enhance'):
+        if t_.lower() not in ('fix', 'feat', 'docs', 'refactor', 'optimize', 'enhance', 'openai'):
             continue
         if line in seen:
             continue
