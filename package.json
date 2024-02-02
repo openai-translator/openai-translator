@@ -1,6 +1,6 @@
 {
   "name": "gpt-tutor",
-  "version": "0.1.9.2",
+  "version": "0.1.9.4",
   "description": "gpt-tutor",
   "main": "index.js",
   "scripts": {

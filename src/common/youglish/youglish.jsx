@@ -16,17 +16,6 @@ const YouGlishComponent = ({ query, triggerYouGlish, language, accent }) => {
         setViews(0)
     }
 
-    const onCaptionConsumed = useCallback(() => {
-        setViews((v) => {
-            const newViews = v + 1
-            if (newViews < 3) {
-                widget.replay()
-            } else if (currentTrack < totalTracks) {
-                widget.next()
-            }
-            return newViews
-        })
-    }, [widget, currentTrack, totalTracks])
 
     const updateWidget = useCallback(
         (newQuery, newLanguage, newAccent) => {
@@ -41,22 +30,21 @@ const YouGlishComponent = ({ query, triggerYouGlish, language, accent }) => {
         if (query && language) {
             if (widget && triggerYouGlish) {
                 widget.fetch(query, language, accent)
-            } else {
+            } else if (!widget && triggerYouGlish) {
                 const newWidget = new YG.Widget('youglish-widget', {
                     width: 640,
                     components: 255,
                     events: {
                         onFetchDone: onFetchDone,
                         onVideoChange: onVideoChange,
-                        onCaptionConsumed: onCaptionConsumed,
                     },
                 })
                 setWidget(newWidget)
+            } else if (widget && !triggerYouGlish) {
+                setWidget(null)
             }
         }
-    }, [widget, query, language, accent, triggerYouGlish, onCaptionConsumed])
-
-
+    }, [widget, query, language, accent, triggerYouGlish])
 
     return <div id='youglish-widget' style={{ width: '640px', height: '360px' }}></div>
 }

@@ -27,7 +27,7 @@ interface BaseTranslateQuery {
     detectTo: LangCode
     mode?: Exclude<TranslateMode, 'big-bang'>
     action: Action
-    onMessage: (message: { content: string; role: string; isWordMode: boolean; isFullText?: boolean }) => void
+    onMessage: (message: { content: string; role: string; isFullText?: boolean }) => void
     onError: (error: string) => void
     onFinish: (reason: string) => void
     onStatusCode?: (statusCode: number) => void
@@ -248,7 +248,6 @@ export class WebAPI {
         const assistantPrompts: string[] = []
         let quoteProcessor: QuoteProcessor | undefined
         const settings = await utils.getSettings()
-        const isWordMode = false
 
         if (query.mode === 'big-bang') {
             rolePrompt = oneLine`
@@ -438,7 +437,7 @@ export class WebAPI {
                         if (quoteProcessor) {
                             textDelta = quoteProcessor.processText(textDelta)
                         }
-                        query.onMessage({ content: textDelta, role: '', isWordMode })
+                        query.onMessage({ content: textDelta, role: '' })
                         length = targetTxt.length
                     }
                 },
@@ -522,7 +521,7 @@ export class WebAPI {
                             targetTxt = quoteProcessor.processText(targetTxt)
                         }
 
-                        query.onMessage({ content: targetTxt, role: '', isWordMode })
+                        query.onMessage({ content: targetTxt, role: '' })
                     } else {
                         const { content = '', role } = choices[0].delta
 
@@ -532,7 +531,7 @@ export class WebAPI {
                             targetTxt = quoteProcessor.processText(targetTxt)
                         }
 
-                        query.onMessage({ content: targetTxt, role, isWordMode })
+                        query.onMessage({ content: targetTxt, role })
                     }
                 },
                 onError: (err) => {

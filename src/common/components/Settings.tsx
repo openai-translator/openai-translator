@@ -1086,6 +1086,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
     const onSubmit = useCallback(
         async (data: ISettings) => {
             if (data.apiModel === 'gpt-4') {
+                localStorage.setItem('apiModel', 'gpt-4')
                 document.dispatchEvent(tokenRegenerateEvent)
             }
             if (data.themeType) {

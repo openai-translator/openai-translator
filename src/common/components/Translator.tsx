@@ -431,7 +431,6 @@ const tokenRegenerateEvent = new Event('tokenRegenerate')
 export async function initArkosetoken() {
     const settings = await getSettings()
     if (settings.apiModel.startsWith('gpt-4')) {
-        localStorage.setItem('apiModel', 'gpt-4')
         document.dispatchEvent(tokenRegenerateEvent)
     } else if (localStorage.getItem('apiModel')) {
         localStorage.removeItem('apiModel')
@@ -705,10 +704,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
-    const [isWordMode, setIsWordMode] = useState(false)
-    const [youGlishQuery, setYouGlishQuery] = useState(editableText);
-    const [youGlishLanguage, setYouGlishLanguage] = useState(LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English');
-    const [youGlishAccent, setYouGlishAccent] = useState(LANG_CONFIGS[settings?.defaultSourceLanguage].accent || '');
+
 
 
     function handleRuntimeMessage(message: { type: string; text: any }) {
@@ -970,6 +966,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 } else {
                     let actionStr = 'Processed'
                     setActionStr(actionStr)
+                    if (settings.apiModel.startsWith('gpt-4')) {
+                        document.dispatchEvent(tokenRegenerateEvent)
+                    }
+                                                    
                 }
             }
             beforeTranslate()
@@ -1000,7 +1000,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         if (message.role) {
                             return
                         }
-                        setIsWordMode(message.isWordMode)
                         setTranslatedText((translatedText) => {
                             if (message.isFullText) {
                                 return message.content
@@ -1635,7 +1634,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     translatedLines.map((line, i) => {
                                                         return (
                                                             <p className={styles.paragraph} key={`p-${i}`}>
-                                                                {isWordMode && i === 0 ? (
+                                                                { i === 0 ? (
                                                                     <div
                                                                         style={{
                                                                             display: 'flex',
