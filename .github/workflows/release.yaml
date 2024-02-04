@@ -158,7 +158,7 @@ jobs:
           path: dist/tauri
 
       - name: Install Cargo Tauri for info
-        run: cargo install tauri-cli --version "^2.0.0-alpha"
+        run: cargo install tauri-cli --version "=2.0.0-alpha.21" --locked
 
       - name: Tauri info
         run: cargo tauri info
