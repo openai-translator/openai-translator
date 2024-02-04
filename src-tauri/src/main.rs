@@ -99,16 +99,20 @@ fn launch_ipc_server(server: &Server) {
 }
 
 fn bind_mouse_hook() {
-    let mut mouse_manager = Mouse::new();
-
     if !query_accessibility_permissions() {
         return;
     }
 
+    // Mouse event hook requires `sudo` permission on linux.
+    // Let's just skip it.
+    if cfg!(target_os = "linux") {
+        println!("mouse event hook skipped in linux!");
+        return;
+    }
+
+    let mut mouse_manager = Mouse::new();
+
     let hook_result = mouse_manager.hook(Box::new(|event| {
-        if cfg!(target_os = "linux") {
-            return;
-        }
         match event {
             mouce::common::MouseEvent::Press(mouce::common::MouseButton::Left) => {
                 let config = config::get_config().unwrap();

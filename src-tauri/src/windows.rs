@@ -293,7 +293,9 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
             .build()
             .unwrap();
 
-        set_shadow(&window, true).unwrap();
+        // NOTE: linux windows doesn't support set_shadow, let's print error and omit it.
+        let _ = set_shadow(&window, true)
+            .map_err(|err| println!("set shadow for windows failed: {err:?}"));
 
         post_process_window(&window);
 
