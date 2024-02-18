@@ -4,7 +4,6 @@ import { getUniversalFetch } from '../universal-fetch'
 import { IEngine, IMessageRequest, IModel } from './interfaces'
 import * as utils from '../utils'
 import { codeBlock } from 'common-tags'
-import { fetchSSE } from '../utils'
 
 export class ChatGPT implements IEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -109,88 +108,68 @@ export class ChatGPT implements IEngine {
             parent_message_id: uuidv4(),
             history_and_training_disabled: true,
         }
-        let finished = false
-        let length = 0
-        await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+        console.log('body: ', JSON.stringify(body, null, 2))
+
+        const conversationResp = await fetcher(`${utils.defaultChatGPTWebAPI}/conversation`, {
             method: 'POST',
             headers,
             body: JSON.stringify(body),
             signal: req.signal,
-            onStatusCode: (status) => {
-                req.onStatusCode?.(status)
-            },
-            onMessage: async (msg) => {
-                if (finished) return
-                let resp
-                try {
-                    resp = JSON.parse(msg)
-                    // eslint-disable-next-line no-empty
-                } catch {
-                    req.onFinished('stop')
-                    finished = true
-                    return
-                }
+        });
 
-                if (resp.is_completion) {
-                    req.onFinished('stop')
-                    finished = true
-                    return
-                }
+        if (conversationResp.status !== 200) {
+            // 处理错误情况
+            req.onError('Failed to start ChatGPT Web conversation.');
+            req.onStatusCode?.(conversationResp.status);
+            return;
+        }
 
-                if (!resp.message) {
-                    if (resp.error) {
-                        req.onError(`ChatGPT Web error: ${resp.error}`)
-                    }
-                    return
-                }
+        const conversationRespJson = await conversationResp.json();
+        const wssUrl = conversationRespJson.wss_url;
+        if (!wssUrl) {
+            req.onError('Failed to get WebSocket URL.');
+            return;
+        }
 
-                const { content, author } = resp.message
-                if (author.role === 'assistant') {
-                    const targetTxt = content.parts.join('')
-                    const textDelta = targetTxt.slice(length)
-                    length = targetTxt.length
-                    await req.onMessage({ content: textDelta, role: '' })
-                }
-            },
-            onError: (err) => {
-                if (err instanceof Error) {
-                    req.onError(err.message)
-                    return
-                }
-                if (typeof err === 'string') {
-                    req.onError(err)
-                    return
-                }
-                if (typeof err === 'object') {
-                    const { detail } = err
-                    if (detail) {
-                        const { message } = detail
-                        if (message) {
-                            req.onError(`ChatGPT Web: ${message}`)
-                            return
-                        }
-                    }
-                    req.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
-                    return
-                }
-                const { error } = err
-                if (error instanceof Error) {
-                    req.onError(error.message)
-                    return
-                }
-                if (typeof error === 'object') {
-                    const { message } = error
-                    if (message) {
-                        if (typeof message === 'string') {
-                            req.onError(message)
-                        } else {
-                            req.onError(JSON.stringify(message))
-                        }
-                        return
-                    }
-                }
-                req.onError('Unknown error')
-            },
-        })
+        const ws = new WebSocket(wssUrl);
+        
+        ws.onopen = () => {
+            // WebSocket 连接已开启，可以发送消息等操作
+            console.log('WebSocket opened...', wssUrl);
+        };
+
+        let lastContent = '';
+
+        ws.onmessage = async (event) => {
+            const msg = JSON.parse(event.data);
+            // 处理接收到的消息
+            if (msg.body && msg.body !== 'ZGF0YTogW0RPTkVdCgo=') {
+                // 通过base64解码 lastMsg.body
+                const lastMsgDataBody = atob(msg.body);
+                // 提取parts的内容，并使用unicode解码
+                const messageObj = JSON.parse(lastMsgDataBody.substring(6));
+                const parts = messageObj.message.content.parts;
+                console.log('received message: ', parts);
+                const content = parts.map((part: string) => {
+                    return unescape(part);
+                });
+                const contentStr = content[0];
+                await req.onMessage({ content: contentStr.substring(lastContent.length), role: '' })
+                lastContent = contentStr
+            } else {
+                await req.onFinished('stop')
+            }
+        };
+
+        ws.onerror = async (event) => {
+            // 处理错误情况
+            await req.onError('WebSocket error...');
+        };
+
+        ws.onclose = () => {
+            // WebSocket 连接已关闭
+            console.log('WebSocket closed...', wssUrl);
+        };
+        
     }
 }
