@@ -108,7 +108,7 @@ export class ChatGPT implements IEngine {
             parent_message_id: uuidv4(),
             history_and_training_disabled: true,
         }
-        console.log('body: ', JSON.stringify(body, null, 2))
+        // console.log('body: ', JSON.stringify(body, null, 2))
 
         const conversationResp = await fetcher(`${utils.defaultChatGPTWebAPI}/conversation`, {
             method: 'POST',
@@ -149,7 +149,7 @@ export class ChatGPT implements IEngine {
                 // 提取parts的内容，并使用unicode解码
                 const messageObj = JSON.parse(lastMsgDataBody.substring(6));
                 const parts = messageObj.message.content.parts;
-                console.log('received message: ', parts);
+                // console.log('received message: ', parts);
                 const content = parts.map((part: string) => {
                     return unescape(part);
                 });
@@ -157,7 +157,7 @@ export class ChatGPT implements IEngine {
                 await req.onMessage({ content: contentStr.substring(lastContent.length), role: '' })
                 lastContent = contentStr
             } else {
-                await req.onFinished('stop')
+                req.onFinished('stop')
             }
         };
 
