@@ -115,61 +115,61 @@ export class ChatGPT implements IEngine {
             headers,
             body: JSON.stringify(body),
             signal: req.signal,
-        });
+        })
 
         if (conversationResp.status !== 200) {
             // 处理错误情况
-            req.onError('Failed to start ChatGPT Web conversation.');
-            req.onStatusCode?.(conversationResp.status);
-            return;
+            req.onError('Failed to start ChatGPT Web conversation.')
+            req.onStatusCode?.(conversationResp.status)
+            return
         }
 
-        const conversationRespJson = await conversationResp.json();
-        const wssUrl = conversationRespJson.wss_url;
+        const conversationRespJson = await conversationResp.json()
+        const wssUrl = conversationRespJson.wss_url
         if (!wssUrl) {
-            req.onError('Failed to get WebSocket URL.');
-            return;
+            req.onError('Failed to get WebSocket URL.')
+            return
         }
 
-        const ws = new WebSocket(wssUrl);
+        const ws = new WebSocket(wssUrl)
         
         ws.onopen = () => {
             // WebSocket 连接已开启，可以发送消息等操作
-            console.log('WebSocket opened...', wssUrl);
-        };
+            console.log('WebSocket opened...', wssUrl)
+        }
 
-        let lastContent = '';
+        let lastContent = ''
 
         ws.onmessage = async (event) => {
-            const msg = JSON.parse(event.data);
+            const msg = JSON.parse(event.data)
             // 处理接收到的消息
             if (msg.body && msg.body !== 'ZGF0YTogW0RPTkVdCgo=') {
                 // 通过base64解码 lastMsg.body
-                const lastMsgDataBody = atob(msg.body);
+                const lastMsgDataBody = atob(msg.body)
                 // 提取parts的内容，并使用unicode解码
-                const messageObj = JSON.parse(lastMsgDataBody.substring(6));
-                const parts = messageObj.message.content.parts;
-                // console.log('received message: ', parts);
+                const messageObj = JSON.parse(lastMsgDataBody.substring(6))
+                const parts = messageObj.message.content.parts
+                // console.log('received message: ', parts)
                 const content = parts.map((part: string) => {
-                    return unescape(part);
-                });
-                const contentStr = content[0];
+                    return unescape(part)
+                })
+                const contentStr = content[0]
                 await req.onMessage({ content: contentStr.substring(lastContent.length), role: '' })
                 lastContent = contentStr
             } else {
                 req.onFinished('stop')
             }
-        };
+        }
 
         ws.onerror = async (event) => {
             // 处理错误情况
-            await req.onError('WebSocket error...');
-        };
+            await req.onError('WebSocket error...')
+        }
 
         ws.onclose = () => {
             // WebSocket 连接已关闭
-            console.log('WebSocket closed...', wssUrl);
-        };
+            console.log('WebSocket closed...', wssUrl)
+        }
         
     }
 }
