@@ -12,8 +12,6 @@ use serde_json::json;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use tauri_plugin_updater::UpdaterExt;
-#[cfg(not(target_os = "macos"))]
-use window_shadows::set_shadow;
 
 pub const TRANSLATOR_WIN_NAME: &str = "translator";
 pub const SETTINGS_WIN_NAME: &str = "settings";
@@ -22,19 +20,19 @@ pub const UPDATER_WIN_NAME: &str = "updater";
 pub const THUMB_WIN_NAME: &str = "thumb";
 pub const SCREENSHOT_WIN_NAME: &str = "screenshot";
 
-fn get_dummy_window() -> tauri::Window {
+fn get_dummy_window() -> tauri::WebviewWindow {
     let app_handle = APP_HANDLE.get().unwrap();
-    match app_handle.get_window("dummy") {
+    match app_handle.get_webview_window("dummy") {
         Some(window) => {
             debug_println!("Dummy window found!");
             window
         }
         None => {
             debug_println!("Create dummy window!");
-            tauri::WindowBuilder::new(
+            tauri::WebviewWindowBuilder::new(
                 app_handle,
                 "dummy",
-                tauri::WindowUrl::App("src/tauri/dummy.html".into()),
+                tauri::WebviewUrl::App("src/tauri/dummy.html".into()),
             )
             .title("Dummy")
             .visible(false)
@@ -90,7 +88,7 @@ pub fn get_mouse_location() -> Result<(i32, i32), String> {
 
 pub fn set_translator_window_always_on_top() -> bool {
     let handle = APP_HANDLE.get().unwrap();
-    let window = handle.get_window(TRANSLATOR_WIN_NAME).unwrap();
+    let window = handle.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
 
     let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
 
@@ -144,7 +142,7 @@ pub async fn show_translator_window_with_selected_text_command() {
 #[tauri::command]
 pub async fn hide_translator_window() {
     let handle = APP_HANDLE.get().unwrap();
-    match handle.get_window(TRANSLATOR_WIN_NAME) {
+    match handle.get_webview_window(TRANSLATOR_WIN_NAME) {
         Some(window) => {
             #[cfg(not(target_os = "macos"))]
             {
@@ -161,7 +159,7 @@ pub async fn hide_translator_window() {
 
 pub fn delete_thumb() {
     match APP_HANDLE.get() {
-        Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
+        Some(handle) => match handle.get_webview_window(THUMB_WIN_NAME) {
             Some(window) => {
                 window.close().unwrap();
             }
@@ -173,7 +171,7 @@ pub fn delete_thumb() {
 
 pub fn close_thumb() {
     match APP_HANDLE.get() {
-        Some(handle) => match handle.get_window(THUMB_WIN_NAME) {
+        Some(handle) => match handle.get_webview_window(THUMB_WIN_NAME) {
             Some(window) => {
                 window
                     .set_position(LogicalPosition::new(-100.0, -100.0))
@@ -192,10 +190,10 @@ pub fn show_thumb(x: i32, y: i32) {
     window.show().unwrap();
 }
 
-pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
+pub fn get_thumb_window(x: i32, y: i32) -> tauri::WebviewWindow {
     let handle = APP_HANDLE.get().unwrap();
     let position_offset = 7.0 as f64;
-    let window = match handle.get_window(THUMB_WIN_NAME) {
+    let window = match handle.get_webview_window(THUMB_WIN_NAME) {
         Some(window) => {
             debug_println!("Thumb window already exists");
             window.unminimize().unwrap();
@@ -204,10 +202,10 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
         }
         None => {
             debug_println!("Thumb window does not exist");
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 THUMB_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .fullscreen(false)
             .focused(false)
@@ -247,7 +245,9 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::Window {
     window
 }
 
-pub fn post_process_window(window: &tauri::Window) {
+pub fn post_process_window<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
+    window.set_visible_on_all_workspaces(true).unwrap();
+
     let _ = window.current_monitor();
 
     #[cfg(target_os = "macos")]
@@ -271,7 +271,9 @@ pub fn post_process_window(window: &tauri::Window) {
     }
 }
 
-pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
+pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
+    builder: tauri::WebviewWindowBuilder<'a, R, M>,
+) -> tauri::WebviewWindow<R> {
     #[cfg(target_os = "macos")]
     {
         let window = builder
@@ -290,12 +292,9 @@ pub fn build_window(builder: tauri::WindowBuilder) -> tauri::Window {
         let window = builder
             .transparent(true)
             .decorations(false)
+            .shadow(true)
             .build()
             .unwrap();
-
-        // NOTE: linux windows doesn't support set_shadow, let's print error and omit it.
-        let _ = set_shadow(&window, true)
-            .map_err(|err| println!("set shadow for windows failed: {err:?}"));
 
         post_process_window(&window);
 
@@ -312,7 +311,7 @@ pub fn show_translator_window(
     center: bool,
     to_mouse_position: bool,
     set_focus: bool,
-) -> tauri::Window {
+) -> tauri::WebviewWindow {
     let window = get_translator_window(center, to_mouse_position, set_focus);
     window.show().unwrap();
     window
@@ -322,10 +321,10 @@ pub fn get_translator_window(
     center: bool,
     to_mouse_position: bool,
     set_focus: bool,
-) -> tauri::Window {
+) -> tauri::WebviewWindow {
     let current_monitor = get_current_monitor();
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(TRANSLATOR_WIN_NAME) {
+    let window = match handle.get_webview_window(TRANSLATOR_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
             if set_focus {
@@ -334,10 +333,10 @@ pub fn get_translator_window(
             window
         }
         None => {
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 TRANSLATOR_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .title("OpenAI Translator")
             .fullscreen(false)
@@ -414,23 +413,23 @@ pub fn get_translator_window(
 #[tauri::command]
 pub async fn show_action_manager_window() {
     let window = get_action_manager_window();
+    window.center().unwrap();
     window.show().unwrap();
 }
 
-pub fn get_action_manager_window() -> tauri::Window {
+pub fn get_action_manager_window() -> tauri::WebviewWindow {
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(ACTION_MANAGER_WIN_NAME) {
+    let window = match handle.get_webview_window(ACTION_MANAGER_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
-            window.center().unwrap();
             window.set_focus().unwrap();
             window
         }
         None => {
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 ACTION_MANAGER_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .title("OpenAI Translator Action Manager")
             .fullscreen(false)
@@ -438,7 +437,6 @@ pub fn get_action_manager_window() -> tauri::Window {
             .min_inner_size(660.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
-            .center()
             .focused(true);
 
             return build_window(builder);
@@ -450,23 +448,23 @@ pub fn get_action_manager_window() -> tauri::Window {
 
 pub fn show_settings_window() {
     let window = get_settings_window();
+    window.center().unwrap();
     window.show().unwrap();
 }
 
-pub fn get_settings_window() -> tauri::Window {
+pub fn get_settings_window() -> tauri::WebviewWindow {
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(SETTINGS_WIN_NAME) {
+    let window = match handle.get_webview_window(SETTINGS_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
-            window.center().unwrap();
             window.set_focus().unwrap();
             window
         }
         None => {
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 SETTINGS_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .title("OpenAI Translator Settings")
             .fullscreen(false)
@@ -474,7 +472,6 @@ pub fn get_settings_window() -> tauri::Window {
             .min_inner_size(660.0, 600.0)
             .resizable(true)
             .skip_taskbar(true)
-            .center()
             .focused(true);
 
             return build_window(builder);
@@ -486,6 +483,7 @@ pub fn get_settings_window() -> tauri::Window {
 
 pub fn show_updater_window() {
     let window = get_updater_window();
+    window.center().unwrap();
     window.show().unwrap();
     let window_clone = window.clone();
     window.listen("check_update", move |event| {
@@ -527,20 +525,19 @@ pub fn show_updater_window() {
     });
 }
 
-pub fn get_updater_window() -> tauri::Window {
+pub fn get_updater_window() -> tauri::WebviewWindow {
     let handle = APP_HANDLE.get().unwrap();
-    let window = match handle.get_window(UPDATER_WIN_NAME) {
+    let window = match handle.get_webview_window(UPDATER_WIN_NAME) {
         Some(window) => {
             window.unminimize().unwrap();
-            window.center().unwrap();
             window.set_focus().unwrap();
             window
         }
         None => {
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 UPDATER_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .title("OpenAI Translator Updater")
             .fullscreen(false)
@@ -548,7 +545,6 @@ pub fn get_updater_window() -> tauri::Window {
             .min_inner_size(200.0, 200.0)
             .resizable(true)
             .skip_taskbar(true)
-            .center()
             .focused(true);
 
             return build_window(builder);
@@ -563,23 +559,23 @@ pub fn show_screenshot_window() {
     // window.show().unwrap();
 }
 
-pub fn get_screenshot_window() -> tauri::Window {
+pub fn get_screenshot_window() -> tauri::WebviewWindow {
     let handle = APP_HANDLE.get().unwrap();
     let current_monitor = get_current_monitor();
     let dpi = current_monitor.scale_factor();
     let physical_position = current_monitor.position();
     let position: tauri::LogicalPosition<f64> = physical_position.to_logical(dpi);
 
-    let window = match handle.get_window(SCREENSHOT_WIN_NAME) {
+    let window = match handle.get_webview_window(SCREENSHOT_WIN_NAME) {
         Some(window) => {
             window.set_focus().unwrap();
             window
         }
         None => {
-            let builder = tauri::WindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 SCREENSHOT_WIN_NAME,
-                tauri::WindowUrl::App("src/tauri/index.html".into()),
+                tauri::WebviewUrl::App("src/tauri/index.html".into()),
             )
             .title("OpenAI Translator Screenshot")
             .position(position.x, position.y)

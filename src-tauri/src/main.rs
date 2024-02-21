@@ -165,7 +165,7 @@ fn bind_mouse_hook() {
                     is_text_selected_event = true;
                 }
                 let is_click_on_thumb = match APP_HANDLE.get() {
-                    Some(handle) => match handle.get_window(windows::THUMB_WIN_NAME) {
+                    Some(handle) => match handle.get_webview_window(windows::THUMB_WIN_NAME) {
                         Some(window) => match window.outer_position() {
                             Ok(position) => {
                                 let scale_factor = window.scale_factor().unwrap_or(1.0);
@@ -338,7 +338,7 @@ fn main() {
                 window.show().unwrap();
             }
             if !query_accessibility_permissions() {
-                let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
+                let window = app.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
                 window.minimize().unwrap();
                 app.notification()
                     .builder()
@@ -489,7 +489,7 @@ fn main() {
             }
             #[cfg(not(target_os = "macos"))]
             {
-                let window = app.get_window(label.as_str()).unwrap();
+                let window = app.get_webview_window(label.as_str()).unwrap();
                 window.hide().unwrap();
             }
             api.prevent_close();

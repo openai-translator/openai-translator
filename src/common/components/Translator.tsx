@@ -73,7 +73,7 @@ import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import Toaster from './Toaster'
 import { readFile } from '@tauri-apps/plugin-fs'
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { useDeepCompareCallback } from 'use-deep-compare'
 import { useTranslatorStore } from '../store'
 import useSWR from 'swr'
@@ -1673,7 +1673,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 const actionID = item.id
                                                 if (actionID === '__manager__') {
                                                     if (isTauri()) {
-                                                        const { invoke } = await import('@tauri-apps/api/primitives')
+                                                        const { invoke } = await import('@tauri-apps/api/core')
                                                         await invoke('show_action_manager_window')
                                                     } else {
                                                         setShowActionManager(true)

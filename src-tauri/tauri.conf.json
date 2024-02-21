@@ -1,21 +1,14 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "productName": "OpenAI Translator",
+  "version": "0.1.0",
+  "identifier": "xyz.yetone.apps.openai-translator",
   "build": {
     "beforeDevCommand": "pnpm dev-tauri-renderer",
-    "devPath": "http://localhost:3333",
-    "distDir": "../dist/tauri",
-    "withGlobalTauri": true
-  },
-  "package": {
-    "productName": "OpenAI Translator",
-    "version": "0.1.0"
+    "devUrl": "http://localhost:3333",
+    "frontendDist": "../dist/tauri"
   },
   "plugins": {
-    "http": {
-      "all": true,
-      "request": true,
-      "scope": ["https://*", "http://*"]
-    },
     "fs": {
       "scope": {
         "allow": [
@@ -32,60 +25,60 @@
     "updater": {
       "endpoints": [
         "https://github.com/yetone/openai-translator/releases/latest/download/latest.json"
-      ]
+      ],
+      "active": true,
+      "windows": {
+        "installMode": "passive"
+      },
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3MzdGN0RCQjhGMkVENDEKUldSQjdmSzQyL2MzTjFaY0dIKzQzVnJYSjFwMlhFZmhjWmU5emZoVUt2OWExcVorbDRkK0NBaDMK"
     }
   },
-  "tauri": {
-    "bundle": {
-      "active": true,
-      "appimage": {
-        "bundleMediaFramework": true
-      },
-      "category": "DeveloperTool",
-      "copyright": "",
+  "bundle": {
+    "active": true,
+    "linux": {
       "deb": {
         "depends": [
           "xdotool"
         ]
       },
-      "externalBin": [],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "xyz.yetone.apps.openai-translator",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [
-        "resources/*"
-      ],
-      "shortDescription": "",
-      "targets": "all",
-      "updater": {
-        "active": true,
-        "windows": {
-          "installMode": "passive"
-        },
-        "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3MzdGN0RCQjhGMkVENDEKUldSQjdmSzQyL2MzTjFaY0dIKzQzVnJYSjFwMlhFZmhjWmU5emZoVUt2OWExcVorbDRkK0NBaDMK"
-      },
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "",
-        "webviewInstallMode": {
-          "type": "embedBootstrapper"
-        }
+      "appimage": {
+        "bundleMediaFramework": true
       }
     },
+    "category": "DeveloperTool",
+    "copyright": "",
+    "externalBin": [],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [
+      "resources/*"
+    ],
+    "shortDescription": "",
+    "targets": "all",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      }
+    }
+  },
+  "app": {
+    "withGlobalTauri": true,
     "security": {
       "csp": null,
       "assetProtocol": {

@@ -54,7 +54,7 @@ import {
 import useSWR from 'swr'
 import { Markdown } from './Markdown'
 import { open } from '@tauri-apps/plugin-shell'
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { trackEvent } from '@aptabase/tauri'
 import { Skeleton } from 'baseui-sd/skeleton'

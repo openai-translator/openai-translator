@@ -1,7 +1,8 @@
 import { trackEvent } from '@aptabase/tauri'
 import { appCacheDir, join } from '@tauri-apps/api/path'
-import { convertFileSrc, invoke } from '@tauri-apps/api/primitives'
-import { getCurrent, currentMonitor } from '@tauri-apps/api/window'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
+import { currentMonitor } from '@tauri-apps/api/window'
 import { useEffect, useRef, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 
