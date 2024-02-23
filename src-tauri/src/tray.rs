@@ -29,22 +29,27 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     if let Some(ocr_hotkey) = config.ocr_hotkey {
         ocr_text = format!("OCR ({})", ocr_hotkey);
     }
-    let check_for_updates_i =
-        MenuItem::with_id(app, "check_for_updates", "Check for Updates...", true, None);
+    let check_for_updates_i = MenuItem::with_id(
+        app,
+        "check_for_updates",
+        "Check for Updates...",
+        true,
+        None::<String>,
+    )?;
     if let Some(Some(_)) = *UPDATE_RESULT.lock() {
         check_for_updates_i
             .set_text("💡 New version available!")
             .unwrap();
     }
-    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None);
-    let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None);
-    let show_i = MenuItem::with_id(app, "show", "Show", true, None);
-    let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None);
-    let pin_i = MenuItem::with_id(app, "pin", "Pin", true, None);
+    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<String>)?;
+    let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None::<String>)?;
+    let show_i = MenuItem::with_id(app, "show", "Show", true, None::<String>)?;
+    let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None::<String>)?;
+    let pin_i = MenuItem::with_id(app, "pin", "Pin", true, None::<String>)?;
     if ALWAYS_ON_TOP.load(Ordering::Acquire) {
         pin_i.set_text("Unpin").unwrap();
     }
-    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None);
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<String>)?;
     let menu = Menu::with_items(
         app,
         &[
@@ -75,13 +80,13 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             ocr();
         }
         "show" => {
-            let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
+            let window = app.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
             window.set_focus().unwrap();
             window.unminimize().unwrap();
             window.show().unwrap();
         }
         "hide" => {
-            let window = app.get_window(TRANSLATOR_WIN_NAME).unwrap();
+            let window = app.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
             window.set_focus().unwrap();
             window.unminimize().unwrap();
             window.hide().unwrap();
@@ -100,7 +105,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     tray.on_tray_icon_event(|tray, event| {
         if event.click_type == ClickType::Left {
             let app = tray.app_handle();
-            if let Some(window) = app.get_window(TRANSLATOR_WIN_NAME) {
+            if let Some(window) = app.get_webview_window(TRANSLATOR_WIN_NAME) {
                 window.unminimize().unwrap();
                 let _ = window.show();
                 let _ = window.set_focus();
@@ -110,7 +115,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     tray.set_show_menu_on_left_click(false)?;
     let app_handle = app.app_handle();
     let app_handle_clone = app.app_handle().clone();
-    app_handle.listen_global("pinned-from-window", move |msg| {
+    app_handle.listen_any("pinned-from-window", move |msg| {
         let payload: PinnedEventPayload = serde_json::from_str(&msg.payload()).unwrap();
         ALWAYS_ON_TOP.store(payload.pinned, Ordering::Release);
         create_tray(&app_handle_clone).unwrap();

@@ -4,4 +4,4 @@ Readed = "Readed"
 Sie = "Sie"
 OT = "OT"
 [files]
-extend-exclude = ["public/*", "dist/*", "src/common/geo-data.ts", "pnpm-lock.yaml", "*.storyboard"]
+extend-exclude = ["public/*", "dist/*", "src/common/geo-data.ts", "pnpm-lock.yaml", "*.storyboard", "src-tauri/gen/*"]

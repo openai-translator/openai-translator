@@ -12,19 +12,18 @@ rust-version = "1.59"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-alpha", features = [] }
+tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.0.0-alpha", features = [ "protocol-asset", "icon-ico", "icon-png", "tray-icon"] }
-window-shadows = "0.2.1"
+tauri = { version = "2.0.0-beta", features = ["protocol-asset", "icon-ico", "icon-png", "tray-icon"] }
 once_cell = "1.17.1"
 clipboard = "0.5.0"
-enigo = {git = "https://github.com/enigo-rs/enigo"}
+enigo = {git = "https://github.com/enigo-rs/enigo", tag="v0.1.3"}
 mouse_position = "0.1.3"
 rdev = "0.5.2"
-tauri-plugin-single-instance = { git = "https://github.com/yetone/plugins-workspace", branch = "fix/single-instance" }
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 cpuid = "0.1.1"
 sysinfo = "0.28.3"

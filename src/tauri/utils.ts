@@ -1,5 +1,5 @@
 import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-shortcut'
-import { invoke } from '@tauri-apps/api/primitives'
+import { invoke } from '@tauri-apps/api/core'
 import { getSettings } from '../common/utils'
 
 export async function bindHotkey(oldHotKey?: string) {

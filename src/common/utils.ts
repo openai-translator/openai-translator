@@ -3,7 +3,7 @@ import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 import { v4 as uuidv4 } from 'uuid'
-import { invoke } from '@tauri-apps/api/primitives'
+import { invoke } from '@tauri-apps/api/core'
 import { listen, Event, emit } from '@tauri-apps/api/event'
 
 export const defaultAPIURL = 'https://api.openai.com'

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs'
-import { invoke } from '@tauri-apps/api/primitives'
+import { invoke } from '@tauri-apps/api/core'
 import { Proxy, ProxyConfig, fetch } from '@tauri-apps/plugin-http'
 import * as utils from '../utils'
 import { IBrowser, ISettings } from '../types'

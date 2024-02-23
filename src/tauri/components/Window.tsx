@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { useTheme } from '../../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../common/hooks/useSettings'
 import { IThemedStyleProps } from '../../common/types'
 import { createUseStyles } from 'react-jss'
-import { invoke } from '@tauri-apps/api/primitives'
+import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { usePinned } from '../../common/hooks/usePinned'
 
@@ -80,7 +80,7 @@ export function InnerWindow(props: IWindowProps) {
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         invoke('get_translator_window_always_on_top').then((pinned: any) => {
-            return setPinned(pinned)
+            return setPinned(() => pinned)
         })
     }, [props.isTranslatorWindow, setPinned])
 
