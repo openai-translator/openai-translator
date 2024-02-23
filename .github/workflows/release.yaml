@@ -128,7 +128,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           targets: ${{ matrix.config.rust_target }}
-          toolchain: nightly-2024-02-04
+          toolchain: nightly-2024-02-01
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
