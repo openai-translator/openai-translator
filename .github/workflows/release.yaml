@@ -128,7 +128,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           targets: ${{ matrix.config.rust_target }}
-          toolchain: nightly-2023-11-30
+          toolchain: nightly-2024-02-04
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -159,7 +159,7 @@ jobs:
           path: dist/tauri
 
       - name: Install Cargo Tauri for info
-        run: cargo install tauri-cli --version "^2.0.0-beta" --locked
+        run: cargo install tauri-cli --version "^2.0.0-alpha"
 
       - name: Tauri info
         run: cargo tauri info
