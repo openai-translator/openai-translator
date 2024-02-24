@@ -34,7 +34,7 @@ export class Gemini implements IEngine {
 
     async sendMessage(req: IMessageRequest): Promise<void> {
         const settings = await getSettings()
-        const apiKey = this.getAPIKey()
+        const apiKey = await this.getAPIKey()
         const model = settings.geminiAPIModel
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
