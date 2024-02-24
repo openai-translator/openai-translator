@@ -170,5 +170,10 @@
   "Time consumed": "Time consumed",
   "Custom": "Custom",
   "Custom Model Name": "Custom Model Name",
+  "Local": "Local",
+  "Local Model": "Local Model",
+  "to learn how to install and setup.": "to learn how to install and setup.",
+  "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:",
+  "Generally, there is no need to modify this item.": "Generally, there is no need to modify this item.",
   "If you find this tool helpful, you can buy me a cup of coffee.": "If you find this tool helpful, you can buy me a cup of coffee."
 }

@@ -170,5 +170,10 @@
   "Time consumed": "消費された時間",
   "Custom": "カスタム",
   "Custom Model Name": "カスタムモデル名",
+  "Local": "Local",
+  "Local Model": "ローカルモデル",
+  "to learn how to install and setup.": "インストールとセットアップ方法を学ぶ。",
+  "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "モデルは最初に`ollama pull`コマンドを使用してローカルにダウンロードする必要があります。このページからすべてのモデルを表示してください：",
+  "Generally, there is no need to modify this item.": "一般的に、この項目を変更する必要はありません。",
   "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

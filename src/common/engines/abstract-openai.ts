@@ -1,12 +1,9 @@
 /* eslint-disable camelcase */
 import { fetchSSE } from '../utils'
-import { IEngine, IMessageRequest, IModel } from './interfaces'
+import { AbstractEngine } from './abstract-engine'
+import { IMessageRequest, IModel } from './interfaces'
 
-export abstract class AbstractOpenAI implements IEngine {
-    supportCustomModel(): boolean {
-        return false
-    }
-
+export abstract class AbstractOpenAI extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return [
@@ -26,6 +23,10 @@ export abstract class AbstractOpenAI implements IEngine {
             { name: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
             { name: 'gpt-4-32k-0613', id: 'gpt-4-32k-0613' },
         ]
+    }
+
+    async getModel() {
+        return await this.getAPIModel()
     }
 
     abstract getAPIModel(): Promise<string>
