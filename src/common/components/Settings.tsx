@@ -64,6 +64,7 @@ import { Notification } from 'baseui-sd/notification'
 import { usePromotionNeverDisplay } from '../hooks/usePromotionNeverDisplay'
 import { Textarea } from 'baseui-sd/textarea'
 import { ProxyTester } from './ProxyTester'
+import { CUSTOM_MODEL_ID } from '../constants'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -800,8 +801,8 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
         ;(async () => {
             try {
                 const models = await engine.listModels(apiKey)
-                setOptions(
-                    models.map((model: IModel) => ({
+                setOptions([
+                    ...models.map((model: IModel) => ({
                         label: (
                             <div
                                 style={{
@@ -831,8 +832,16 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
                             </div>
                         ),
                         id: model.id,
-                    }))
-                )
+                    })),
+                    ...(engine.supportCustomModel()
+                        ? [
+                              {
+                                  id: CUSTOM_MODEL_ID,
+                                  label: t('Custom'),
+                              },
+                          ]
+                        : []),
+                ])
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (e: any) {
                 if (provider === 'ChatGPT' && e.message && e.message.includes('not login')) {
@@ -843,7 +852,7 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
                 setIsLoading(false)
             }
         })()
-    }, [apiKey, currentProvider, provider, refreshFlag, theme.colors.contentPrimary, theme.colors.contentTertiary])
+    }, [apiKey, currentProvider, provider, refreshFlag, t, theme.colors.contentPrimary, theme.colors.contentTertiary])
 
     return (
         <div>
@@ -1947,6 +1956,8 @@ export function InnerSettings({
                 </div>
             )}
             <Form
+                autoComplete='off'
+                autoCapitalize='off'
                 form={form}
                 style={{
                     padding: '20px 25px',
@@ -2112,6 +2123,19 @@ export function InnerSettings({
                             <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
                                 <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
                             </FormItem>
+                            <div
+                                style={{
+                                    display: values.apiModel === CUSTOM_MODEL_ID ? 'block' : 'none',
+                                }}
+                            >
+                                <FormItem
+                                    name='customModelName'
+                                    label={t('Custom Model Name')}
+                                    required={values.provider === 'OpenAI' && values.apiModel === CUSTOM_MODEL_ID}
+                                >
+                                    <Input autoComplete='off' size='compact' />
+                                </FormItem>
+                            </div>
                             <FormItem name='apiURL' label={t('API URL')} required={values.provider === 'OpenAI'}>
                                 <Input size='compact' onBlur={onBlur} />
                             </FormItem>

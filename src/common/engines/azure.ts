@@ -3,6 +3,10 @@ import { getSettings } from '../utils'
 import { AbstractOpenAI } from './abstract-openai'
 
 export class Azure extends AbstractOpenAI {
+    supportCustomModel(): boolean {
+        return false
+    }
+
     async isChatAPI(): Promise<boolean> {
         const settings = await getSettings()
         return !(settings.azureAPIURLPath && settings.azureAPIURLPath.indexOf('/chat/completions') < 0)

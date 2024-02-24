@@ -3,6 +3,10 @@ import { fetchSSE } from '../utils'
 import { IEngine, IMessageRequest, IModel } from './interfaces'
 
 export abstract class AbstractOpenAI implements IEngine {
+    supportCustomModel(): boolean {
+        return false
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return [

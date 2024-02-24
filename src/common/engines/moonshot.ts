@@ -3,6 +3,10 @@ import { AbstractOpenAI } from './abstract-openai'
 import { IModel } from './interfaces'
 
 export class Moonshot extends AbstractOpenAI {
+    supportCustomModel(): boolean {
+        return false
+    }
+
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         let apiKey = apiKey_
         if (!apiKey) {

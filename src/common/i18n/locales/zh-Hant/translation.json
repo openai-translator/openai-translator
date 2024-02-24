@@ -168,5 +168,7 @@
   "Your proxy is not working": "您的代理無法運作",
   "Location": "位置",
   "Time consumed": "耗時",
+  "Custom": "自定義",
+  "Custom Model Name": "自定義模型名稱",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您覺得這個工具有幫助，可以請我喝杯咖啡。"
 }

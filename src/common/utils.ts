@@ -78,6 +78,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     languageDetectionEngine: 1,
     autoHideWindowWhenOutOfFocus: 1,
     proxy: 1,
+    customModelName: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
