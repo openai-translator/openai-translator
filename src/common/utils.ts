@@ -49,6 +49,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     azureAPIModel: 1,
     miniMaxGroupID: 1,
     miniMaxAPIKey: 1,
+    miniMaxAPIModel: 1,
     moonshotAPIKey: 1,
     moonshotAPIModel: 1,
     geminiAPIKey: 1,
@@ -79,6 +80,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     autoHideWindowWhenOutOfFocus: 1,
     proxy: 1,
     customModelName: 1,
+    ollamaAPIURL: 1,
+    ollamaAPIModel: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -171,6 +174,12 @@ export async function getSettings(): Promise<ISettings> {
             },
             noProxy: 'localhost,127.0.0.1',
         }
+    }
+    if (!settings.ollamaAPIURL) {
+        settings.ollamaAPIURL = 'http://localhost:11434'
+    }
+    if (!settings.miniMaxAPIModel) {
+        settings.miniMaxAPIModel = 'abab5.5-chat'
     }
     return settings
 }

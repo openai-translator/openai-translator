@@ -1,16 +1,13 @@
 /* eslint-disable camelcase */
 import { v4 as uuidv4 } from 'uuid'
 import { getUniversalFetch } from '../universal-fetch'
-import { IEngine, IMessageRequest, IModel } from './interfaces'
+import { IMessageRequest, IModel } from './interfaces'
 import * as utils from '../utils'
 import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
+import { AbstractEngine } from './abstract-engine'
 
-export class ChatGPT implements IEngine {
-    supportCustomModel(): boolean {
-        return false
-    }
-
+export class ChatGPT extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         const fetcher = getUniversalFetch()
@@ -66,8 +63,13 @@ export class ChatGPT implements IEngine {
         }))
     }
 
-    async sendMessage(req: IMessageRequest): Promise<void> {
+    async getModel(): Promise<string> {
         const settings = await utils.getSettings()
+        return settings.chatgptModel
+    }
+
+    async sendMessage(req: IMessageRequest): Promise<void> {
+        const model = await this.getModel()
         const fetcher = getUniversalFetch()
         let resp: Response | null = null
         resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: req.signal })
@@ -109,7 +111,7 @@ export class ChatGPT implements IEngine {
                     },
                 },
             ],
-            model: settings.chatgptModel, // 'text-davinci-002-render-sha'
+            model, // 'text-davinci-002-render-sha'
             parent_message_id: uuidv4(),
             history_and_training_disabled: true,
         }

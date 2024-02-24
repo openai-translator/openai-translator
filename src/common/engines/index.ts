@@ -10,8 +10,9 @@ import { IconType } from 'react-icons'
 import { VscAzureDevops } from 'react-icons/vsc'
 import { FaGoogle } from 'react-icons/fa'
 import { GiArtificialIntelligence } from 'react-icons/gi'
+import { Ollama } from './ollama'
 
-export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'MiniMax' | 'Moonshot' | 'Gemini'
+export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'MiniMax' | 'Moonshot' | 'Gemini' | 'Ollama'
 
 export const engineIcons: Record<Provider, IconType> = {
     OpenAI: RiOpenaiFill,
@@ -20,6 +21,7 @@ export const engineIcons: Record<Provider, IconType> = {
     MiniMax: GiArtificialIntelligence,
     Moonshot: GiArtificialIntelligence,
     Gemini: FaGoogle,
+    Ollama: GiArtificialIntelligence,
 }
 
 export function getEngine(provider: Provider): IEngine {
@@ -39,6 +41,9 @@ export function getEngine(provider: Provider): IEngine {
             break
         case 'Gemini':
             engine = new Gemini()
+            break
+        case 'Ollama':
+            engine = new Ollama()
             break
     }
     return engine

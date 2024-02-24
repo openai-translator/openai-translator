@@ -1259,6 +1259,7 @@ interface IProviderSelectorProps {
 
 function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorProps) {
     const { theme } = useTheme()
+    const { t } = useTranslation()
 
     let overrides: SelectProps['overrides'] = undefined
     if (hasPromotion && value !== 'OpenAI') {
@@ -1298,6 +1299,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
                   ),
                   id: 'OpenAI',
               },
+              { label: `Ollama (${t('Local Model')})`, id: 'Ollama' },
               { label: 'Gemini', id: 'Gemini' },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
@@ -1767,7 +1769,7 @@ export function InnerSettings({
                     position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
                     left: 0,
                     top: 0,
-                    zIndex: 1001,
+                    zIndex: 999,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2001,11 +2003,65 @@ export function InnerSettings({
                                 </div>
                             }
                             required
+                            caption={
+                                values.provider === 'Ollama' ? (
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href='https://github.com/ollama/ollama#ollama'
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            Ollama Homepage
+                                        </a>{' '}
+                                        {t('to learn how to install and setup.')}
+                                    </div>
+                                ) : undefined
+                            }
                         >
                             <ProviderSelector
                                 hasPromotion={openaiAPIKeyPromotion !== undefined && !openaiAPIKeyPromotionShowed}
                             />
                         </FormItem>
+                        <div
+                            style={{
+                                display: values.provider === 'Ollama' ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                name='ollamaAPIURL'
+                                label={t('API URL')}
+                                required={values.provider === 'Ollama'}
+                                caption={t('Generally, there is no need to modify this item.')}
+                            >
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='ollamaAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'Ollama'}
+                                caption={
+                                    <div>
+                                        <div>
+                                            {t(
+                                                'Model needs to first use the `ollama pull` command to download locally, please view all models from this page:'
+                                            )}{' '}
+                                            <a
+                                                target='_blank'
+                                                href='https://github.com/ollama/ollama#model-library'
+                                                rel='noreferrer'
+                                                style={linkStyle}
+                                            >
+                                                Model Library
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <APIModelSelector provider='Ollama' currentProvider={values.provider} onBlur={onBlur} />
+                            </FormItem>
+                        </div>
                         <div
                             style={{
                                 display: values.provider === 'Gemini' ? 'block' : 'none',
@@ -2256,6 +2312,18 @@ export function InnerSettings({
                                 }
                             >
                                 <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='miniMaxAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'MiniMax'}
+                            >
+                                <APIModelSelector
+                                    provider='MiniMax'
+                                    currentProvider={values.provider}
+                                    onBlur={onBlur}
+                                    apiKey={values.miniMaxAPIKey}
+                                />
                             </FormItem>
                         </div>
                         <div
