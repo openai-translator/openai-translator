@@ -168,5 +168,7 @@
   "Your proxy is not working": "あなたのプロキシは動作していません",
   "Location": "ロケーション",
   "Time consumed": "消費された時間",
+  "Custom": "カスタム",
+  "Custom Model Name": "カスタムモデル名",
   "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

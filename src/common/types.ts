@@ -110,4 +110,5 @@ export interface ISettings {
         }
         noProxy?: string
     }
+    customModelName?: string
 }

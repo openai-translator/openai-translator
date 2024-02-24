@@ -7,6 +7,10 @@ import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 
 export class ChatGPT implements IEngine {
+    supportCustomModel(): boolean {
+        return false
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         const fetcher = getUniversalFetch()

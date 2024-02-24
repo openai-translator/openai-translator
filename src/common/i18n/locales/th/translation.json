@@ -167,5 +167,7 @@
   "Your proxy is not working": "พร็อกซีของคุณไม่ทำงาน",
   "Location": "ที่ตั้ง",
   "Time consumed": "เวลาที่ใช้",
+  "Custom": "กำหนดเอง",
+  "Custom Model Name": "ชื่อโมเดลที่กำหนดเอง",
   "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }
