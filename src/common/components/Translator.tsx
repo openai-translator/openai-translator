@@ -1556,6 +1556,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         setTranslateDeps((v) => {
                                             return {
                                                 ...v,
+                                                text: editableText,
                                                 sourceLang: langId as LangCode,
                                             }
                                         })
@@ -1603,6 +1604,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         setTranslateDeps((v) => {
                                             return {
                                                 ...v,
+                                                text: editableText,
                                                 targetLang: langId as LangCode,
                                             }
                                         })
