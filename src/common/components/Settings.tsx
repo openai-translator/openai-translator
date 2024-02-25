@@ -2049,11 +2049,11 @@ export function InnerSettings({
                                             )}{' '}
                                             <a
                                                 target='_blank'
-                                                href='https://github.com/ollama/ollama#model-library'
+                                                href='https://ollama.com/library'
                                                 rel='noreferrer'
                                                 style={linkStyle}
                                             >
-                                                Model Library
+                                                Models
                                             </a>
                                         </div>
                                     </div>
