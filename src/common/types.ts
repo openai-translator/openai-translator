@@ -114,4 +114,5 @@ export interface ISettings {
     customModelName?: string
     ollamaAPIURL: string
     ollamaAPIModel: string
+    ollamaCustomModelName: string
 }

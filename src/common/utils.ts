@@ -82,6 +82,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     customModelName: 1,
     ollamaAPIURL: 1,
     ollamaAPIModel: 1,
+    ollamaCustomModelName: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
