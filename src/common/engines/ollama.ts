@@ -1,8 +1,13 @@
+import { CUSTOM_MODEL_ID } from '../constants'
 import { getSettings } from '../utils'
 import { AbstractOpenAI } from './abstract-openai'
 import { IModel } from './interfaces'
 
 export class Ollama extends AbstractOpenAI {
+    supportCustomModel(): boolean {
+        return true
+    }
+
     isLocal() {
         return true
     }
@@ -30,6 +35,9 @@ export class Ollama extends AbstractOpenAI {
 
     async getAPIModel(): Promise<string> {
         const settings = await getSettings()
+        if (settings.ollamaAPIModel === CUSTOM_MODEL_ID) {
+            return settings.ollamaCustomModelName
+        }
         return settings.ollamaAPIModel
     }
 

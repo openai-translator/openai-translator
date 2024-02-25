@@ -2061,6 +2061,19 @@ export function InnerSettings({
                             >
                                 <APIModelSelector provider='Ollama' currentProvider={values.provider} onBlur={onBlur} />
                             </FormItem>
+                            <div
+                                style={{
+                                    display: values.ollamaAPIModel === CUSTOM_MODEL_ID ? 'block' : 'none',
+                                }}
+                            >
+                                <FormItem
+                                    name='ollamaCustomModelName'
+                                    label={t('Custom Model Name')}
+                                    required={values.provider === 'Ollama' && values.ollamaAPIModel === CUSTOM_MODEL_ID}
+                                >
+                                    <Input autoComplete='off' size='compact' />
+                                </FormItem>
+                            </div>
                         </div>
                         <div
                             style={{
