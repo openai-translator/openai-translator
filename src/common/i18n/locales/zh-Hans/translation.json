@@ -168,5 +168,12 @@
   "Your proxy is not working": "您的代理不工作",
   "Location": "位置",
   "Time consumed": "耗时",
+  "Custom": "自定义",
+  "Custom Model Name": "自定义模型名称",
+  "Local": "本地",
+  "Local Model": "本地模型",
+  "to learn how to install and setup.": "学习如何安装和设置。",
+  "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "模型需要首先使用 `ollama pull` 命令下载到本地，请从此页面查看所有模型：",
+  "Generally, there is no need to modify this item.": "一般情况下，无需修改此项。",
   "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }

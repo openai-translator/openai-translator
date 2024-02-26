@@ -101,7 +101,7 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
     let app_handle = APP_HANDLE.get().unwrap();
     let (abort_handle, abort_registration) = AbortHandle::new_pair();
     let cloned_id = id.clone();
-    let listen_id = app_handle.listen_global("abort-fetch-stream", move |msg| {
+    let listen_id = app_handle.listen_any("abort-fetch-stream", move |msg| {
         let payload: AbortEventPayload = serde_json::from_str(&msg.payload()).unwrap();
         if payload.id == cloned_id {
             abort_handle.abort();

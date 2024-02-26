@@ -29,7 +29,7 @@
     "@aptabase/tauri": "github:aptabase/tauri-plugin-aptabase#v2",
     "@floating-ui/dom": "^1.5.1",
     "@sentry/react": "^7.61.0",
-    "@tauri-apps/api": "2.0.0-alpha.11",
+    "@tauri-apps/api": "2.0.0-beta.2",
     "@tauri-apps/plugin-autostart": "github:tauri-apps/tauri-plugin-autostart#v2",
     "@tauri-apps/plugin-fs": "github:tauri-apps/tauri-plugin-fs#v2",
     "@tauri-apps/plugin-global-shortcut": "github:tauri-apps/tauri-plugin-global-shortcut#v2",
@@ -99,7 +99,7 @@
   "devDependencies": {
     "@playwright/test": "^1.34.3",
     "@samrum/vite-plugin-web-extension": "^5.0.0",
-    "@tauri-apps/cli": "2.0.0-alpha.18",
+    "@tauri-apps/cli": "2.0.0-beta.3",
     "@types/chrome": "0.0.242",
     "@types/common-tags": "^1.8.3",
     "@types/fs-extra": "^11.0.1",

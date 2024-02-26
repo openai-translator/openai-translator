@@ -167,5 +167,12 @@
   "Your proxy is not working": "พร็อกซีของคุณไม่ทำงาน",
   "Location": "ที่ตั้ง",
   "Time consumed": "เวลาที่ใช้",
+  "Custom": "กำหนดเอง",
+  "Custom Model Name": "ชื่อโมเดลที่กำหนดเอง",
+  "Local": "Local",
+  "Local Model": "โมเดล Local",
+  "to learn how to install and setup.": "เพื่อเรียนรู้วิธีการติดตั้งและตั้งค่า",
+  "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "โมเดลต้องใช้คำสั่ง `ollama pull` ก่อนที่จะดาวน์โหลดไปยังเครื่องที่ตั้งอยู่ โปรดดูโมเดลทั้งหมดจากหน้านี้:",
+  "Generally, there is no need to modify this item.": "โดยทั่วไปไม่จำเป็นต้องแก้ไขรายการนี้",
   "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

@@ -21,6 +21,9 @@ export interface IMessageRequest {
 }
 
 export interface IEngine {
+    isLocal(): boolean
+    supportCustomModel(): boolean
+    getModel(): Promise<string>
     listModels(apiKey: string | undefined): Promise<IModel[]>
     sendMessage(req: IMessageRequest): Promise<void>
 }

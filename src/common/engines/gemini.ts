@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { fetchSSE, getSettings } from '../utils'
-import { IEngine, IMessageRequest, IModel } from './interfaces'
+import { AbstractEngine } from './abstract-engine'
+import { IMessageRequest, IModel } from './interfaces'
 
 const SAFETY_SETTINGS = [
     {
@@ -21,7 +22,7 @@ const SAFETY_SETTINGS = [
     },
 ]
 
-export class Gemini implements IEngine {
+export class Gemini extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return [
@@ -32,10 +33,15 @@ export class Gemini implements IEngine {
         ]
     }
 
+    async getModel() {
+        const settings = await getSettings()
+        return settings.geminiAPIModel
+    }
+
     async sendMessage(req: IMessageRequest): Promise<void> {
         const settings = await getSettings()
-        const apiKey = await this.getAPIKey()
-        const model = settings.geminiAPIModel
+        const apiKey = settings.geminiAPIKey
+        const model = await this.getModel()
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
             'Content-Type': 'application/json',

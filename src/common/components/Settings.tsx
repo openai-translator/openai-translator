@@ -54,7 +54,7 @@ import {
 import useSWR from 'swr'
 import { Markdown } from './Markdown'
 import { open } from '@tauri-apps/plugin-shell'
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { trackEvent } from '@aptabase/tauri'
 import { Skeleton } from 'baseui-sd/skeleton'
@@ -64,6 +64,7 @@ import { Notification } from 'baseui-sd/notification'
 import { usePromotionNeverDisplay } from '../hooks/usePromotionNeverDisplay'
 import { Textarea } from 'baseui-sd/textarea'
 import { ProxyTester } from './ProxyTester'
+import { CUSTOM_MODEL_ID } from '../constants'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -800,8 +801,8 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
         ;(async () => {
             try {
                 const models = await engine.listModels(apiKey)
-                setOptions(
-                    models.map((model: IModel) => ({
+                setOptions([
+                    ...models.map((model: IModel) => ({
                         label: (
                             <div
                                 style={{
@@ -831,8 +832,16 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
                             </div>
                         ),
                         id: model.id,
-                    }))
-                )
+                    })),
+                    ...(engine.supportCustomModel()
+                        ? [
+                              {
+                                  id: CUSTOM_MODEL_ID,
+                                  label: t('Custom'),
+                              },
+                          ]
+                        : []),
+                ])
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (e: any) {
                 if (provider === 'ChatGPT' && e.message && e.message.includes('not login')) {
@@ -843,7 +852,7 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
                 setIsLoading(false)
             }
         })()
-    }, [apiKey, currentProvider, provider, refreshFlag, theme.colors.contentPrimary, theme.colors.contentTertiary])
+    }, [apiKey, currentProvider, provider, refreshFlag, t, theme.colors.contentPrimary, theme.colors.contentTertiary])
 
     return (
         <div>
@@ -1250,6 +1259,7 @@ interface IProviderSelectorProps {
 
 function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorProps) {
     const { theme } = useTheme()
+    const { t } = useTranslation()
 
     let overrides: SelectProps['overrides'] = undefined
     if (hasPromotion && value !== 'OpenAI') {
@@ -1289,6 +1299,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
                   ),
                   id: 'OpenAI',
               },
+              { label: `Ollama (${t('Local Model')})`, id: 'Ollama' },
               { label: 'Gemini', id: 'Gemini' },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
@@ -1758,7 +1769,7 @@ export function InnerSettings({
                     position: utils.isBrowserExtensionOptions() ? 'sticky' : 'fixed',
                     left: 0,
                     top: 0,
-                    zIndex: 1001,
+                    zIndex: 999,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1947,6 +1958,8 @@ export function InnerSettings({
                 </div>
             )}
             <Form
+                autoComplete='off'
+                autoCapitalize='off'
                 form={form}
                 style={{
                     padding: '20px 25px',
@@ -1990,11 +2003,78 @@ export function InnerSettings({
                                 </div>
                             }
                             required
+                            caption={
+                                values.provider === 'Ollama' ? (
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href='https://github.com/ollama/ollama#ollama'
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            Ollama Homepage
+                                        </a>{' '}
+                                        {t('to learn how to install and setup.')}
+                                    </div>
+                                ) : undefined
+                            }
                         >
                             <ProviderSelector
                                 hasPromotion={openaiAPIKeyPromotion !== undefined && !openaiAPIKeyPromotionShowed}
                             />
                         </FormItem>
+                        <div
+                            style={{
+                                display: values.provider === 'Ollama' ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                name='ollamaAPIURL'
+                                label={t('API URL')}
+                                required={values.provider === 'Ollama'}
+                                caption={t('Generally, there is no need to modify this item.')}
+                            >
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='ollamaAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'Ollama'}
+                                caption={
+                                    <div>
+                                        <div>
+                                            {t(
+                                                'Model needs to first use the `ollama pull` command to download locally, please view all models from this page:'
+                                            )}{' '}
+                                            <a
+                                                target='_blank'
+                                                href='https://ollama.com/library'
+                                                rel='noreferrer'
+                                                style={linkStyle}
+                                            >
+                                                Models
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <APIModelSelector provider='Ollama' currentProvider={values.provider} onBlur={onBlur} />
+                            </FormItem>
+                            <div
+                                style={{
+                                    display: values.ollamaAPIModel === CUSTOM_MODEL_ID ? 'block' : 'none',
+                                }}
+                            >
+                                <FormItem
+                                    name='ollamaCustomModelName'
+                                    label={t('Custom Model Name')}
+                                    required={values.provider === 'Ollama' && values.ollamaAPIModel === CUSTOM_MODEL_ID}
+                                >
+                                    <Input autoComplete='off' size='compact' />
+                                </FormItem>
+                            </div>
+                        </div>
                         <div
                             style={{
                                 display: values.provider === 'Gemini' ? 'block' : 'none',
@@ -2112,6 +2192,19 @@ export function InnerSettings({
                             <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
                                 <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
                             </FormItem>
+                            <div
+                                style={{
+                                    display: values.apiModel === CUSTOM_MODEL_ID ? 'block' : 'none',
+                                }}
+                            >
+                                <FormItem
+                                    name='customModelName'
+                                    label={t('Custom Model Name')}
+                                    required={values.provider === 'OpenAI' && values.apiModel === CUSTOM_MODEL_ID}
+                                >
+                                    <Input autoComplete='off' size='compact' />
+                                </FormItem>
+                            </div>
                             <FormItem name='apiURL' label={t('API URL')} required={values.provider === 'OpenAI'}>
                                 <Input size='compact' onBlur={onBlur} />
                             </FormItem>
@@ -2232,6 +2325,18 @@ export function InnerSettings({
                                 }
                             >
                                 <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='miniMaxAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'MiniMax'}
+                            >
+                                <APIModelSelector
+                                    provider='MiniMax'
+                                    currentProvider={values.provider}
+                                    onBlur={onBlur}
+                                    apiKey={values.miniMaxAPIKey}
+                                />
                             </FormItem>
                         </div>
                         <div

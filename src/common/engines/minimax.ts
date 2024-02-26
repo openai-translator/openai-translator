@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 import { fetchSSE, getSettings } from '../utils'
-import { IEngine, IMessageRequest, IModel } from './interfaces'
+import { AbstractEngine } from './abstract-engine'
+import { IMessageRequest, IModel } from './interfaces'
 
-export class MiniMax implements IEngine {
+export class MiniMax extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return [
@@ -13,8 +14,14 @@ export class MiniMax implements IEngine {
         ]
     }
 
+    async getModel(): Promise<string> {
+        const settings = await getSettings()
+        return settings.miniMaxAPIModel
+    }
+
     async sendMessage(req: IMessageRequest): Promise<void> {
         const settings = await getSettings()
+        const model = await this.getModel()
         const apiKey = settings.miniMaxAPIKey
         const url = `https://api.minimax.chat/v1/text/chatcompletion_pro?GroupId=${settings.miniMaxGroupID}`
         const headers = {
@@ -22,7 +29,7 @@ export class MiniMax implements IEngine {
             'Authorization': `Bearer ${apiKey}`,
         }
         const body = {
-            model: 'abab5.5-chat',
+            model,
             tokens_to_generate: 1024,
             temperature: 0.9,
             top_p: 0.95,

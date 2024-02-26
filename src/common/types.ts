@@ -63,6 +63,7 @@ export interface ISettings {
     azureAPIModel: string
     miniMaxGroupID: string
     miniMaxAPIKey: string
+    miniMaxAPIModel: string
     geminiAPIKey: string
     geminiAPIModel: string
     moonshotAPIKey: string
@@ -110,4 +111,8 @@ export interface ISettings {
         }
         noProxy?: string
     }
+    customModelName?: string
+    ollamaAPIURL: string
+    ollamaAPIModel: string
+    ollamaCustomModelName: string
 }
