@@ -157,7 +157,7 @@
 
 ```ts
 const API_URL = `https://${resourceName}.openai.azure.com`
-const API_URL_PATH = `/openai/deployments/${deployName}/completions?api-version=${apiVersion}`
+const API_URL_PATH = `/openai/deployments/${deployName}/chat/completions?api-version=${apiVersion}`
 ```
 
 - resourceName: 你的 Azure OpenAI Service 资源名称。
