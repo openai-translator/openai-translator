@@ -36,6 +36,7 @@ tauri-plugin-updater = { git = "https://github.com/tauri-apps/plugins-workspace"
 tauri-plugin-process = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-fs = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-shell = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
+tauri-plugin-os = "2.0.0-beta.1"
 whatlang = "0.16.2"
 arboard = "3.2.0"
 tiny_http = "0.12.0"

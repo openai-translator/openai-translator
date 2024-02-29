@@ -333,6 +333,8 @@ pub fn get_translator_window(
             window
         }
         None => {
+            let config = config::get_config_by_app(handle).unwrap();
+
             let builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 TRANSLATOR_WIN_NAME,
@@ -343,7 +345,7 @@ pub fn get_translator_window(
             .inner_size(620.0, 700.0)
             .min_inner_size(540.0, 600.0)
             .resizable(true)
-            .skip_taskbar(true)
+            .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(false))
             .focused(false);
 
             build_window(builder)
