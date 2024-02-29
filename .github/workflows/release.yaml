@@ -157,11 +157,11 @@ jobs:
           name: tauri-renderer
           path: dist/tauri
 
-      # - name: Install Cargo Tauri for info
-      #   run: cargo install tauri-cli --version "^2.0.0-beta"
-      #
-      # - name: Tauri info
-      #   run: cargo tauri info
+      - name: Install Cargo Tauri for info
+        run: cargo install tauri-cli --version "=2.0.0-beta.3" --locked
+
+      - name: Tauri info
+        run: cargo tauri info
 
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
