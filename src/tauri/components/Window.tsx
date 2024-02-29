@@ -65,6 +65,27 @@ const useStyles = createUseStyles({
     }),
 })
 
+interface ITitlebarContainerProps {
+    children: React.ReactNode
+    windowsTitlebarDisableDarkMode?: boolean
+}
+
+export function TitlebarContainer(props: ITitlebarContainerProps) {
+    const { theme, themeType } = useTheme()
+    const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
+    const isMacOS = navigator.userAgent.includes('Mac OS X')
+
+    if (isMacOS) {
+        return (
+            <div className={styles.titlebar} data-tauri-drag-region>
+                {props.children}
+            </div>
+        )
+    }
+
+    return <div className={styles.titlebar}>{props.children}</div>
+}
+
 export function InnerWindow(props: IWindowProps) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
@@ -158,7 +179,7 @@ export function InnerWindow(props: IWindowProps) {
                 }
             }}
         >
-            <div className={styles.titlebar}>
+            <TitlebarContainer windowsTitlebarDisableDarkMode={props.windowsTitlebarDisableDarkMode}>
                 {isMacOS && (
                     <>
                         <div className={styles.titlebarButton} onClick={handlePin}>
@@ -217,7 +238,7 @@ export function InnerWindow(props: IWindowProps) {
                         </div>
                     </>
                 )}
-            </div>
+            </TitlebarContainer>
             {props.children}
         </div>
     )
