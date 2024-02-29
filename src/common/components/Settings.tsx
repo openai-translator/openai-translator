@@ -2453,10 +2453,10 @@ export function InnerSettings({
                         )}
                         <FormItem
                             style={{
-                                display: isDesktopApp && isMacOS ? 'block' : 'none',
+                                display: isDesktopApp ? 'block' : 'none',
                             }}
                             name='hideTheIconInTheDock'
-                            label={t('Hide the icon in the Dock bar')}
+                            label={isMacOS ? t('Hide the icon in the Dock bar') : t('Hide the icon in the taskbar')}
                         >
                             <MyCheckbox onBlur={onBlur} />
                         </FormItem>

@@ -158,7 +158,7 @@ export function InnerWindow(props: IWindowProps) {
                 }
             }}
         >
-            <div className={styles.titlebar} data-tauri-drag-region>
+            <div className={styles.titlebar}>
                 {isMacOS && (
                     <>
                         <div className={styles.titlebarButton} onClick={handlePin}>
