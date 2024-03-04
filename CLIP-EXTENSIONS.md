@@ -43,6 +43,16 @@ Usually the clipboard is used to get the selected text, but this can cause bugs 
 * 2. Download [openai-translator.pbar](https://github.com/openai-translator/openai-translator/releases/latest/download/openai-translator.pbar)
 * 3. Double-click the downloaded openai-translator.pbar to install it
 * 4. Enable OpenAI Translator in SnipDo's settings page
+    <p align="center">
+        <img width="200" src="https://github.com/openai-translator/openai-translator/assets/1206493/09d66943-06db-4ba7-b217-a434c33cc8aa" />
+    </p>
+
+    Suggest to only keep OpenAI Translator:
+  
+    <p align="center">    
+        <img width="600" src="https://github.com/openai-translator/openai-translator/assets/1206493/76b619d9-e63d-4d67-a32c-a0d2d6923558" />
+    </p>
+    
 * 5. The effect is as follows
 
     <p align="center">

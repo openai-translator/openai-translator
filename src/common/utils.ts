@@ -177,7 +177,7 @@ export async function getSettings(): Promise<ISettings> {
         }
     }
     if (!settings.ollamaAPIURL) {
-        settings.ollamaAPIURL = 'http://localhost:11434'
+        settings.ollamaAPIURL = 'http://127.0.0.1:11434'
     }
     if (!settings.miniMaxAPIModel) {
         settings.miniMaxAPIModel = 'abab5.5-chat'
