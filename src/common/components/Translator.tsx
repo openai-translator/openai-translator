@@ -1071,7 +1071,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
+            const cachedKey = `translate:${settings?.provider ?? ''}:${engineModel ?? ''}:${action.id}:${
                 action.rolePrompt
             }:${action.commandPrompt}:${
                 action.outputRenderingFormat
@@ -1136,7 +1136,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateDeps, settings?.provider, settings?.apiModel, translationFlag, startLoading, stopLoading, t]
+        [translateDeps, settings?.provider, engineModel, translationFlag, startLoading, stopLoading, t]
     )
 
     const translateControllerRef = useRef<AbortController | null>(null)
@@ -1173,6 +1173,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
         if (settings.provider === 'Moonshot' && !settings.moonshotAPIKey) {
+            setShowSettings(true)
+            return
+        }
+        if (settings.provider === 'Groq' && !settings.groqAPIKey) {
             setShowSettings(true)
             return
         }
