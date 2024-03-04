@@ -112,6 +112,12 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                     return
                 }
 
+                const { x_groq } = resp
+
+                if (x_groq && x_groq.error) {
+                    req.onError?.(x_groq.error)
+                }
+
                 const { choices } = resp
                 if (!choices || choices.length === 0) {
                     return
