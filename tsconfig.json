@@ -18,7 +18,10 @@
         "jsx": "react-jsx",
         "typeRoots": ["node_modules/@types/", "node_modules"],
         "resolveJsonModule": true,
-        "types": ["vite/client", "chrome", "tampermonkey"]
+        "types": ["vite-plugin-svgr/client", "vite/client", "chrome", "tampermonkey"],
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src", "src-tauri", "vite.config*.ts", ".eslintrc.js", "playwright.config.ts", "e2e"]
 }

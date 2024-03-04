@@ -2282,9 +2282,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             <div className={styles.brand}>
                                 {React.createElement(engineIcons[settings.provider], {
                                     size: 10,
-                                    style: {
-                                        marginBottom: 1,
-                                    },
                                 })}
                                 {settings.provider}
                             </div>

@@ -11,7 +11,7 @@ export class ChatGPT extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         const fetcher = getUniversalFetch()
-        const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, {
+        const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSessionAPIURL, {
             cache: 'no-cache',
             headers: {
                 'User-Agent':
@@ -72,7 +72,7 @@ export class ChatGPT extends AbstractEngine {
         const model = await this.getModel()
         const fetcher = getUniversalFetch()
         let resp: Response | null = null
-        resp = await fetcher(utils.defaultChatGPTAPIAuthSession, { signal: req.signal })
+        resp = await fetcher(utils.defaultChatGPTAPIAuthSessionAPIURL, { signal: req.signal })
         if (resp.status !== 200) {
             try {
                 const respJsn = await resp.json()

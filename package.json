@@ -139,6 +139,7 @@
     "vite": "^4.3.9",
     "vite-plugin-dynamic-import": "^1.4.1",
     "vite-plugin-monkey": "^3.5.0",
+    "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^0.34.3",
     "webextension-polyfill": "^0.10.0"

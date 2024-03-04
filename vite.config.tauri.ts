@@ -1,10 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import svgr from 'vite-plugin-svgr'
+import { fileURLToPath, URL } from 'url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [tsconfigPaths(), react()],
+    plugins: [tsconfigPaths(), react(), svgr()],
+    resolve: {
+        alias: [{ find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) }],
+    },
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
     // prevent vite from obscuring rust errors
     clearScreen: false,

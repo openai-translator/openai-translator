@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import monkey, { cdn } from 'vite-plugin-monkey'
 import { visualizer } from 'rollup-plugin-visualizer'
+import svgr from 'vite-plugin-svgr'
+import { fileURLToPath, URL } from 'url'
 import { version, license, name } from './package.json'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -11,6 +13,7 @@ export default defineConfig({
     plugins: [
         tsconfigPaths(),
         react(),
+        svgr(),
         monkey({
             entry: 'src/browser-extension/content_script/index.tsx',
             userscript: {
@@ -36,6 +39,9 @@ export default defineConfig({
         }),
         visualizer({ filename: 'dist/stats.html' }),
     ],
+    resolve: {
+        alias: [{ find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) }],
+    },
     build: {
         minify: !isDev,
         sourcemap: isDev,
