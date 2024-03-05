@@ -120,4 +120,9 @@ export interface ISettings {
     groqAPIModel: string
     groqAPIKey: string
     groqCustomModelName: string
+    claudeAPIURL: string
+    claudeAPIURLPath: string
+    claudeAPIModel: string
+    claudeAPIKey: string
+    claudeCustomModelName: string
 }
