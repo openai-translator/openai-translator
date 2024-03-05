@@ -197,11 +197,14 @@ export function TranslatorWindow() {
         setIsSettingsOpen(isShow)
     }, [])
 
+    const isMacOS = navigator.userAgent.includes('Mac OS X')
+
     return (
         <Window isTranslatorWindow windowsTitlebarDisableDarkMode={isSettingsOpen}>
             <Translator
                 uuid={uuid}
                 engine={engine}
+                showLogo={isMacOS}
                 showSettingsIcon
                 showSettings={showSettings}
                 autoFocus
