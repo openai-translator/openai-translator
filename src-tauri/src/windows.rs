@@ -291,8 +291,8 @@ pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
     {
         let window = builder
             .transparent(true)
-            .decorations(false)
-            .shadow(true)
+            .decorations(true)
+            // .shadow(true)
             .build()
             .unwrap();
 

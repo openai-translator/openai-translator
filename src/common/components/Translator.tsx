@@ -155,7 +155,7 @@ const useStyles = createUseStyles({
                   'top': 0,
                   'width': '100%',
                   'boxSizing': 'border-box',
-                  'padding': '30px 16px 8px',
+                  'padding': navigator.userAgent.includes('Mac OS X') ? '30px 16px 8px' : '8px 16px',
                   'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
                   'display': 'flex',
                   'flexDirection': 'row',
@@ -1537,7 +1537,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             boxShadow: isDesktopApp() && !isScrolledToTop ? theme.lighting.shadow600 : undefined,
                         }}
                     >
-                        {showLogo && <LogoWithText ref={logoWithTextRef} />}
+                        {showLogo ? (
+                            <LogoWithText ref={logoWithTextRef} />
+                        ) : (
+                            <div style={{ flexShrink: 0, marginRight: 'auto' }} />
+                        )}
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
                             <div className={styles.from}>
                                 <Select
