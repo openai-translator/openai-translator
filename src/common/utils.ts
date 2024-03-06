@@ -11,7 +11,7 @@ export const defaultAPIURLPath = '/v1/chat/completions'
 export const defaultProvider = 'OpenAI'
 export const defaultAPIModel = 'gpt-3.5-turbo'
 
-export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
+export const defaultChatGPTAPIAuthSessionAPIURL = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 export const defaultChatGPTModel = 'text-davinci-002-render-sha'
 
@@ -83,6 +83,16 @@ const settingKeys: Record<keyof ISettings, number> = {
     ollamaAPIURL: 1,
     ollamaAPIModel: 1,
     ollamaCustomModelName: 1,
+    groqAPIURL: 1,
+    groqAPIURLPath: 1,
+    groqAPIModel: 1,
+    groqAPIKey: 1,
+    groqCustomModelName: 1,
+    claudeAPIURL: 1,
+    claudeAPIURLPath: 1,
+    claudeAPIModel: 1,
+    claudeAPIKey: 1,
+    claudeCustomModelName: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -181,6 +191,18 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.miniMaxAPIModel) {
         settings.miniMaxAPIModel = 'abab5.5-chat'
+    }
+    if (!settings.groqAPIURL) {
+        settings.groqAPIURL = 'https://api.groq.com'
+    }
+    if (!settings.groqAPIURLPath) {
+        settings.groqAPIURLPath = '/openai/v1/chat/completions'
+    }
+    if (!settings.claudeAPIURL) {
+        settings.claudeAPIURL = 'https://api.anthropic.com'
+    }
+    if (!settings.claudeAPIURLPath) {
+        settings.claudeAPIURLPath = '/v1/messages'
     }
     return settings
 }

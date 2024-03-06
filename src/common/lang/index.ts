@@ -381,7 +381,7 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
         },
         genCommandPrompt: (sourceLanguageConfig: LanguageConfig) =>
             oneLine`
-            Translate the following text from ${sourceLanguageConfig.name} to ${config.name} without the style of machine translation. (If there are no Emojis in the original text, please don't output them.)`,
+            Translate the following text from ${sourceLanguageConfig.name} to ${config.name} without the style of machine translation.`,
     }
     return { ...DEFAULT_CONFIG, ...config }
 }
