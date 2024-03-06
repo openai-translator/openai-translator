@@ -14,10 +14,10 @@ export class Claude extends AbstractEngine {
         return [
             { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
             { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
-            { id: 'claude-3-haiku-undefined', name: 'Claude 3 Haiku' },
+            { id: 'claude-3-haiku-20240229', name: 'Claude 3 Haiku' },
             { id: 'phi', name: 'Phi-2' },
             { id: 'claude-2.1', name: 'Claude 2.1' },
-            { id: 'claude-2.0', name: 'Claude 2	' },
+            { id: 'claude-2.0', name: 'Claude 2.0' },
             { id: 'claude-instant-1.2', name: 'Claude Instant 1.2' },
         ]
     }
@@ -54,7 +54,7 @@ export class Claude extends AbstractEngine {
         const settings = await getSettings()
         const model = await this.getModel()
         const apiKey = await this.getAPIKey()
-        const url = await `${this.getAPIURL}${this.getAPIURLPath}`
+        const url = await this.getAPIURL() + await this.getAPIURLPath()
         const headers = {
             'Content-Type': 'application/json',
             'x-api-key': `${apiKey}`,
@@ -65,12 +65,13 @@ export class Claude extends AbstractEngine {
             max_tokens: 1024,
             temperature: 0,
             top_p: 0.95,
-            stream: true,
+            stream: true, 
+            system: req.rolePrompt,      
             messages: [
-                {"role": "user", "content": req.rolePrompt},
                 {"role": "user", "content": req.commandPrompt}
             ]
         }
+
         let finished = false
         await fetchSSE(url, {
             method: 'POST',
@@ -79,49 +80,42 @@ export class Claude extends AbstractEngine {
             signal: req.signal,
             onMessage: async (msg) => {
                 if (finished) return
-                let resp
-                let eventType
-                try {
-                    let eventType = ""
-                    if (msg.startsWith('event:')) {
-                        eventType = msg.split(':')[1].trim()
-                        return 
-                    }else if (msg.startsWith('data:')){
-                        const data = msg.split(':')[1].trim()
-                        resp = JSON.parse(data)
-                    }else{
-                        // msg is not a valid SSE message
-                        return
-                    }
-                    
-                    // eslint-disable-next-line no-empty, @typescript-eslint/no-explicit-any
-                } catch (e: any) {
-                    // avoid `Unexpected token 'D', "[DONE]" is not valid JSON`
-                    req.onError?.(e?.message ?? 'Cannot parse response JSON')
 
+                let resp
+                try {
+                    resp = JSON.parse(msg)
+                } catch (e: any) {             
+                    req.onError?.(e?.message ?? msg + 'Cannot parse response JSON')
                     req.onFinished('stop')
                     finished = true
                     return
                 }
 
-                const { delta } = resp
+                const { type:msgType,delta } = resp
+                
                 if (!delta) {
                     return
                 }
-                const { stop_reason: finishReason } = delta
-                if (finishReason) {
-                    req.onFinished(finishReason)
+                
+
+                console.debug(msgType)
+                if (msgType === 'message_delta') {
+                    const {stop_reason : stopReason = ''}  = delta
+                    if (stopReason === 'end_turn'){
+                        req.onFinished('stop')
+                        finished = true
+                        return
+                    }
+                }else if (msgType == 'message_stop'){
+                    req.onFinished('stop')
                     finished = true
                     return
                 }
-
-                let targetTxt = ''
-                let responseType = ''
-                let role = 'assistant'
-                const { text = '', type='text' } = delta['text']
-                targetTxt = text
-                responseType = type 
-                await req.onMessage({ content: targetTxt, role })
+                else if (msgType === 'content_block_delta' && delta) {
+                    const targetTxt = delta['text']
+                    const role = 'assistant'
+                    await req.onMessage({ content: targetTxt, role })
+                }
             },
             onError: (err) => {
                 if (err instanceof Error) {

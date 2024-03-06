@@ -164,6 +164,15 @@ const API_URL_PATH = `/openai/deployments/${deployName}/chat/completions?api-ver
 - deployName: 你的 Azure OpenAI Service 模型部署名称，更改部署名称以切换模型。
 - api-version: 2023-05-15，或者更新的版本。
 
+## 配置 Claude Service
+
+```ts
+const API_URL = `https://api.anthropic.com`
+const API_URL_PATH = `/v1/messages`
+```
+
+- Model Name: 支持 Claude 3 Opus/Sonnet/Claude 2.1/Claude 2.0 [详细介绍](https://www.anthropic.com/claude)
+
 # License
 
 [LICENSE](./LICENSE)
