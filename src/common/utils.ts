@@ -88,6 +88,11 @@ const settingKeys: Record<keyof ISettings, number> = {
     groqAPIModel: 1,
     groqAPIKey: 1,
     groqCustomModelName: 1,
+    claudeAPIURL: 1,
+    claudeAPIURLPath: 1,
+    claudeAPIModel: 1,
+    claudeAPIKey: 1,
+    claudeModelName: 1
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -192,6 +197,12 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.groqAPIURLPath) {
         settings.groqAPIURLPath = '/openai/v1/chat/completions'
+    }
+    if (!settings.claudeAPIURL) {
+        settings.claudeAPIURL = 'https://api.anthropic.com'
+    }
+    if (!settings.claudeAPIURLPath) {
+        settings.claudeAPIURLPath = '/v1/messages'
     }
     return settings
 }

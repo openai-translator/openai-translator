@@ -1345,6 +1345,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
+              { label: 'Claude', id: 'Claude' },
           ] as {
               label: string
               id: Provider
@@ -1357,6 +1358,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
+              { label: 'Claude', id: 'Claude' },
           ] as {
               label: string
               id: Provider
@@ -2156,6 +2158,70 @@ export function InnerSettings({
                                 name='groqAPIURLPath'
                                 label={t('API URL Path')}
                                 required={values.provider === 'Groq'}
+                                caption={t('Generally, there is no need to modify this item.')}
+                            >
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                        </div>
+                        <div
+                            style={{
+                                display: values.provider === 'Claude' ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                required={values.provider === 'Claude'}
+                                name='claudeAPIKey'
+                                label='Claude API Key'
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href='https://console.anthropic.com/settings/keys'
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            anthropic
+                                        </a>{' '}
+                                        {t('to get your API Key.')}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem name='claudeAPIModel' label={t('API Model')} required={values.provider === 'Claude'}>
+                                <APIModelSelector
+                                    provider='Claude'
+                                    currentProvider={values.provider}
+                                    apiKey={values.claudeAPIKey}
+                                    onBlur={onBlur}
+                                />
+                            </FormItem>
+                            <div
+                                style={{
+                                    display: values.claudeAPIModel === CUSTOM_MODEL_ID ? 'block' : 'none',
+                                }}
+                            >
+                                <FormItem
+                                    name='claudeModelName'
+                                    label={t('Claude Model Name')}
+                                    required={values.provider === 'Claude' && values.claudeAPIModel === CUSTOM_MODEL_ID}
+                                >
+                                    <Input autoComplete='off' size='compact' />
+                                </FormItem>
+                            </div>
+                            <FormItem
+                                name='claudeAPIURL'
+                                label={t('API URL')}
+                                required={values.provider === 'Claude'}
+                                caption={t('Generally, there is no need to modify this item.')}
+                            >
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='claudeAPIURLPath'
+                                label={t('API URL Path')}
+                                required={values.provider === 'Claude'}
                                 caption={t('Generally, there is no need to modify this item.')}
                             >
                                 <Input size='compact' onBlur={onBlur} />

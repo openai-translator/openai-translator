@@ -1180,6 +1180,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             setShowSettings(true)
             return
         }
+        if (settings.provider === 'Claude' && !settings.claudeAPIKey) {
+            setShowSettings(true)
+            return
+        }
     }, [props.defaultShowSettings, settings])
 
     const [isOCRProcessing, setIsOCRProcessing] = useState(false)
