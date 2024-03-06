@@ -51,8 +51,24 @@ export class Claude extends AbstractEngine {
                 },
                 {
                     role: 'assistant',
-                    content: 'Ok, I will do that.',
+                    content: `Yes, that's me.`,
                 },
+                ...(req.assistantPrompts?.reduce(
+                    (acc, cur) => {
+                        return [
+                            ...acc,
+                            {
+                                role: 'user',
+                                content: cur,
+                            },
+                            {
+                                role: 'assistant',
+                                content: 'I understand, I will strictly do as you said.',
+                            },
+                        ]
+                    },
+                    [] as { role: string; content: string }[]
+                ) ?? []),
                 {
                     role: 'user',
                     content: req.commandPrompt,

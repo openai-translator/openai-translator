@@ -76,19 +76,38 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                     role: 'system',
                     content: req.rolePrompt,
                 },
-                ...(req.assistantPrompts?.map((prompt) => {
-                    return {
-                        role: 'user',
-                        content: prompt,
-                    }
-                }) ?? []),
+                {
+                    role: 'assistant',
+                    content: `Yes, that's me.`,
+                },
+                ...(req.assistantPrompts?.reduce(
+                    (acc, cur) => {
+                        return [
+                            ...acc,
+                            {
+                                role: 'user',
+                                content: cur,
+                            },
+                            {
+                                role: 'assistant',
+                                content: 'I understand, I will strictly do as you said.',
+                            },
+                        ]
+                    },
+                    [] as { role: string; content: string }[]
+                ) ?? []),
                 {
                     role: 'user',
                     content: req.commandPrompt,
                 },
+                {
+                    role: 'assistant',
+                    content: 'Ok, the result is:\n',
+                },
             ]
             body['messages'] = messages
         }
+
         let finished = false // finished can be called twice because event.data is 1. "finish_reason":"stop"; 2. [DONE]
         await fetchSSE(url, {
             method: 'POST',
@@ -122,6 +141,7 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 if (!choices || choices.length === 0) {
                     return
                 }
+
                 const { finish_reason: finishReason } = choices[0]
                 if (finishReason) {
                     req.onFinished(finishReason)
@@ -130,18 +150,18 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 }
 
                 let targetTxt = ''
+                let role = ''
                 if (!isChatAPI) {
                     // It's used for Azure OpenAI Service's legacy parameters.
                     targetTxt = choices[0].text
-
-                    await req.onMessage({ content: targetTxt, role: '' })
                 } else {
-                    const { content = '', role } = choices[0].delta
+                    const { content = '', role: role_ } = choices[0].delta
 
                     targetTxt = content
-
-                    await req.onMessage({ content: targetTxt, role })
+                    role = role_
                 }
+
+                await req.onMessage({ content: targetTxt, role })
             },
             onError: (err) => {
                 if (err instanceof Error) {
