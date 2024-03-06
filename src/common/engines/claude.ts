@@ -89,6 +89,9 @@ export class Claude extends AbstractEngine {
                     }else if (msg.startsWith('data:')){
                         const data = msg.split(':')[1].trim()
                         resp = JSON.parse(data)
+                    }else{
+                        // msg is not a valid SSE message
+                        return
                     }
                     
                     // eslint-disable-next-line no-empty, @typescript-eslint/no-explicit-any
