@@ -54,7 +54,7 @@ export class Gemini extends AbstractEngine {
                     role: 'user',
                     parts: [
                         {
-                            text: 'Hello.',
+                            text: req.rolePrompt,
                         },
                     ],
                 },
@@ -62,15 +62,7 @@ export class Gemini extends AbstractEngine {
                     role: 'model',
                     parts: [
                         {
-                            text: req.rolePrompt,
-                        },
-                    ],
-                },
-                {
-                    role: 'user',
-                    parts: [
-                        {
-                            text: req.commandPrompt,
+                            text: `Yes, that's me.`,
                         },
                     ],
                 },
@@ -81,14 +73,6 @@ export class Gemini extends AbstractEngine {
         if (req.assistantPrompts) {
             req.assistantPrompts.forEach((prompt) => {
                 body.contents.push({
-                    role: 'model',
-                    parts: [
-                        {
-                            text: 'Ok.',
-                        },
-                    ],
-                })
-                body.contents.push({
                     role: 'user',
                     parts: [
                         {
@@ -96,8 +80,27 @@ export class Gemini extends AbstractEngine {
                         },
                     ],
                 })
+                body.contents.push({
+                    role: 'model',
+                    parts: [
+                        {
+                            text: 'I understand, I will strictly do as you said.',
+                        },
+                    ],
+                })
             })
         }
+
+        body.contents = body.contents.concat([
+            {
+                role: 'user',
+                parts: [
+                    {
+                        text: req.commandPrompt,
+                    },
+                ],
+            },
+        ])
 
         let hasError = false
         let finished = false
