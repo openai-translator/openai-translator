@@ -39,8 +39,7 @@ export class Gemini extends AbstractEngine {
     }
 
     async sendMessage(req: IMessageRequest): Promise<void> {
-        const settings = await getSettings()
-        const apiKey = settings.geminiAPIKey
+        const apiKey = await this.getAPIKey()
         const model = await this.getModel()
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
@@ -175,5 +174,12 @@ export class Gemini extends AbstractEngine {
         if (!finished && !hasError) {
             req.onFinished('stop')
         }
+    }
+
+    async getAPIKey(): Promise<string> {
+        const settings = await getSettings()
+        const apiKeys = (settings.geminiAPIKey ?? '').split(',').map((s) => s.trim())
+        const apiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
+        return apiKey
     }
 }
