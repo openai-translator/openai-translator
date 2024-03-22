@@ -51,7 +51,7 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 8.6.0
 
@@ -111,7 +111,7 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 8.6.0
 
@@ -242,7 +242,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 8.6.0
 
