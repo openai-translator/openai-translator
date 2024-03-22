@@ -53,6 +53,8 @@ export interface ISettings {
     chatContext: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string
+    defaultSourceLanguage: string
+    defaultYouglishLanguage: string
     alwaysShowIcons: boolean
     hotkey?: string
     ocrHotkey?: string

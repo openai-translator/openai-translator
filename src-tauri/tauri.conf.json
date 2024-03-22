@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "OpenAI Translator",
-    "version": "0.1.9.4"
+    "version": "0.1.9.7"
   },
   "tauri": {
     "allowlist": {

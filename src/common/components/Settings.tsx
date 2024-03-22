@@ -1051,6 +1051,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         autoTranslate: utils.defaultAutoTranslate,
         chatContext: utils.defaultChatContext,
         defaultTranslateMode: 'translate',
+        defaultYouglishLanguage: utils.defaultYouglishLanguage,
         defaultSourceLanguage: utils.defaultSourceLanguage,
         defaultTargetLanguage: utils.defaultTargetLanguage,
         alwaysShowIcons: !isTauri,
@@ -1300,10 +1301,13 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         <RunAtStartupCheckbox onBlur={onBlur} />
                     </FormItem>
                 )}
-                <FormItem name='defaultSourceLanguage' label={t('Default Youglish Language')}>
+                <FormItem name='defaultYouglishLanguage' label={t('Youglish Language')}>
                     <YouglishLanguageSelector onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
+                <FormItem name='defaultSourceLanguage' label={t('The Language You Want To Study')}>
+                    <LanguageSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='defaultTargetLanguage' label={t('The Language You are Using')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>

@@ -15,6 +15,7 @@ export const defaultChatContext = true
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultSourceLanguage = 'en'
+export const defaultYouglishLanguage = 'en'
 export const defaultSelectInputElementsText = true
 export const defaulti18n = 'en'
 
@@ -36,6 +37,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     defaultTranslateMode: 1,
     defaultSourceLanguage: 1,
     defaultTargetLanguage: 1,
+    defaultYouglishLanguage:1,
     alwaysShowIcons: 1,
     hotkey: 1,
     ocrHotkey: 1,
@@ -83,6 +85,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.defaultTargetLanguage) {
         settings.defaultTargetLanguage = defaultTargetLanguage
+    }
+    if (!settings.defaultYouglishLanguage) {
+        settings.defaultYouglishLanguage = defaultYouglishLanguage
     }
     if (settings.alwaysShowIcons === undefined || settings.alwaysShowIcons === null) {
         settings.alwaysShowIcons = !isTauri()

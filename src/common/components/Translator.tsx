@@ -80,7 +80,6 @@ function genLangOptions(langs: [LangCode, string][]): Value {
 const sourceLangOptions = genLangOptions(sourceLanguages)
 const targetLangOptions = genLangOptions(targetLanguages)
 
-
 const useStyles = createUseStyles({
     'popupCard': {
         height: '100%',
@@ -455,6 +454,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const highlightRef = useRef<HighlightInTextarea | null>(null)
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
+
+
+
+
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (settings?.i18n !== (i18n as any).language) {
@@ -684,13 +687,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editor.addEventListener('blur', onBlur)
 
         return () => {
-            chrome.runtime.onMessage.removeListener(handleRuntimeMessage)
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
             editor.removeEventListener('blur', onBlur)
         }
     }, [isTranslate])
+
+    useEffect(() => {
+        const handleRuntimeMessage = (message) => {
+            if (message.type === 'Text') {
+                const text = message.text
+                setOriginalText(text)
+            }
+        }
+
+        chrome.runtime.onMessage.addListener(handleRuntimeMessage)
+
+        // 清理函数
+        return () => {
+            chrome.runtime.onMessage.removeListener(handleRuntimeMessage)
+        }
+    }, [props.text, props.uuid])
 
     const { theme, themeType } = useTheme()
 
@@ -704,19 +722,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
-
-
-
-    function handleRuntimeMessage(message: { type: string; text: any }) {
-        if (message.type === 'Text') {
-            const text = message.text
-            setOriginalText(text)
-        }
-    }
-
-    chrome.runtime.onMessage.addListener(handleRuntimeMessage)
-
     const webAPI = new WebAPI()
+
+
     useEffect(() => {
         setOriginalText(props.text)
     }, [props.text, props.uuid])
@@ -738,6 +746,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [])
     const [sourceLang, setSourceLang] = useState<LangCode>('en')
     const [targetLang, setTargetLang] = useState<LangCode>()
+    const [youglishLang, setYouglishLang] = useState<LangCode>('en')
     const stopAutomaticallyChangeTargetLang = useRef(false)
     const settingsIsUndefined = settings === undefined
 
@@ -746,28 +755,38 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
 
-
         ;(async () => {
-            setTargetLang((targetLang_) => {
-                if (isTranslate && (!stopAutomaticallyChangeTargetLang.current || sourceLang === targetLang_)) {
-                    return (
-                        (sourceLang === 'zh-Hans' || sourceLang === 'zh-Hant'
-                            ? 'en'
-                            : (settings?.defaultTargetLanguage as LangCode | undefined)) ?? 'en'
-                    )
-                }
-                if (!targetLang_) {
+            setTargetLang(() => {
                     if (settings?.defaultTargetLanguage) {
                         return settings.defaultTargetLanguage as LangCode
                     }
-                    return sourceLang
-                }
-                return targetLang_
+                    else{
+                        return 'en'
+                    }
+            })
+            setSourceLang(() => {
+                    if (settings?.defaultTargetLanguage) {
+                        return settings.defaultSourceLanguage as LangCode
+                    }
+                    else{
+                        return 'zh-Hans'
+                    }
+            })
+            setYouglishLang(() => {
+                    if (settings?.defaultTargetLanguage) {
+                        return settings.defaultYouglishLanguage as LangCode
+                    }
+                    else{
+                        return 'en'
+                    }
             })
             setDetectedOriginalText(originalText)
         })()
-    }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, props.uuid])
+    }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, settings?.defaultSourceLanguage, settings?.defaultYouglishLanguage, props.uuid])
 
+
+
+    
     const [actionStr, setActionStr] = useState('')
 
     useEffect(() => {
@@ -790,7 +809,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 setErrorMessage(`Error: ${error}`)
             }
         } else {
-            console.log('Not connected')
+            console.debug('Not connected')
             setErrorMessage('Not connected to Anki!')
         }
     }
@@ -969,7 +988,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     if (settings.apiModel.startsWith('gpt-4')) {
                         document.dispatchEvent(tokenRegenerateEvent)
                     }
-                                                    
                 }
             }
             beforeTranslate()
@@ -996,8 +1014,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     onStatusCode: (statusCode) => {
                         setIsNotLogin(statusCode === 401 || statusCode === 403)
                     },
-                    onMessage: (message) => {
-                        if (message.role) {
+                    onMessage: async (message) => {
+                        if (!message.content) {
                             return
                         }
                         setTranslatedText((translatedText) => {
@@ -1014,14 +1032,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             cache.set(cachedKey, result)
                             return result
                         })
-                        chrome.runtime.sendMessage({ type: 'refreshPage' })
                     },
                     onError: (error) => {
                         setActionStr('Error')
                         setErrorMessage(error)
                     },
                 })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any  
             } catch (error: any) {
                 // if error is a AbortError then ignore this error
                 if (error.name === 'AbortError') {
@@ -1116,17 +1133,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         editableStopSpeakRef.current = stopSpeak
     }
 
-    const handleYouglishSpeakAction =async() => {
+    const handleYouglishSpeakAction = async () => {
         setNewYouGlish(true)
         if (!showYouGlish) {
             setShowYouGlish(true)
-        }
-        else{
+        } else {
             setShowYouGlish(false)
         }
     }
-
-
 
     const handleTranslatedSpeakAction = async () => {
         if (isSpeakingTranslatedText) {
@@ -1496,7 +1510,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     size='mini'
                                                     onClick={async (e) => {
                                                         e.preventDefault()
-                                                        e.stopPropagation()
+                                                        e.stopPropagation()                                                      
                                                         if (!activateAction) {
                                                             setActivateAction(
                                                                 actions?.find((action) => action.mode === 'translate')
@@ -1554,8 +1568,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         <Tooltip content={t('On/Off Youglish')} placement='bottom'>
                                             <div className={styles.actionButton} onClick={handleYouglishSpeakAction}>
                                                 (
-                                                    <RiSpeakerFill size={15} />
-                                                )
+                                                <RiSpeakerFill size={15} />)
                                             </div>
                                         </Tooltip>
                                         <Tooltip content={t('Copy to clipboard')} placement='bottom'>
@@ -1634,7 +1647,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     translatedLines.map((line, i) => {
                                                         return (
                                                             <p className={styles.paragraph} key={`p-${i}`}>
-                                                                { i === 0 ? (
+                                                                {i === 0 ? (
                                                                     <div
                                                                         style={{
                                                                             display: 'flex',
@@ -1758,13 +1771,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             </Modal>
             <Toaster />
             <div style={{ display: showYouGlish ? 'block' : 'none' }}>
-    <YouGlishComponent
-        query={editableText}
-        triggerYouGlish={showYouGlish}
-        language={LANG_CONFIGS[settings?.defaultSourceLanguage].nameEn || 'English'}
-        accent={LANG_CONFIGS[settings?.defaultSourceLanguage].accent || ''}
-    />
-</div>
+                <YouGlishComponent
+                    query={editableText}
+                    triggerYouGlish={showYouGlish}
+                    language={LANG_CONFIGS[youglishLang].nameEn }
+                    accent={LANG_CONFIGS[youglishLang].accent}
+                />
+            </div>
         </div>
     )
 }
