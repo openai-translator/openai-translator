@@ -57,6 +57,12 @@ interface FetcherOptions {
     body: string
 }
 
+interface ConversationContext {
+    conversationId: string
+    lastMessageId: string
+    responseMode: string
+  }
+
 async function updateTitleAndCheckId(
     conversationId: string | undefined,
     fetcher: (url: string, options: FetcherOptions) => Promise<Response>,
@@ -81,17 +87,6 @@ async function updateTitleAndCheckId(
             body: JSON.stringify({ title: newTitle }),
         })
     }
-}
-
-export const isAWord = (langCode: string, text: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { Segmenter } = Intl as any
-    if (!Segmenter) {
-        return false
-    }
-    const segmenter = new Segmenter(langCode, { granularity: 'word' })
-    const iterator = segmenter.segment(text)[Symbol.iterator]()
-    return iterator.next().value?.segment === text
 }
 
 export class QuoteProcessor {
@@ -238,8 +233,15 @@ function getlastMessageId() {
     })
 }
 
+async function getUserFeatures(accessToken: string) {
+    // Logic to get user features based on access token
+    console.log('Access token:', accessToken)
+}
+
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 export class WebAPI {
+    private responseMode?: string
+    private conversationContext?: ConversationContext
     async translate(query: TranslateQuery) {
         const fetcher = getUniversalFetch()
         let rolePrompt = ''
@@ -308,11 +310,14 @@ export class WebAPI {
         }
 
         let apiKey = ''
+        let requestId = ''
+        const arkoseToken = localStorage.getItem('arkose') || JSON.stringify(await getArkoseToken())
         if (settings.provider !== 'ChatGPT') {
             apiKey = await utils.getApiKey()
         }
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
+            'Openai-Sentinel-Arkose-Token': arkoseToken,
         }
 
         let isChatAPI = true
@@ -339,10 +344,9 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
-            let arkoseToken: string | null = null
-            // 优先通过存储在本地存储中的token，无法获取时调用函数生成。
-            if (settings.apiModel.startsWith('gpt-4')) {
-                arkoseToken = localStorage.getItem('arkose') || (await getArkoseToken())
+            if (!this.responseMode) {
+                const features = await getUserFeatures(apiKey)
+                this.responseMode = features.includes('shared_websocket') ? 'websocket' : 'sse'
             }
             body = {
                 action: 'next',
@@ -363,6 +367,15 @@ export class WebAPI {
                 conversation_id: (await getConversationId()) || undefined,
                 parent_message_id: (await getlastMessageId()) || uuidv4(),
                 arkose_token: arkoseToken,
+                conversation_mode: {
+                    kind: 'primary_assistant',
+                },
+                history_and_training_disabled: false,
+                force_paragen: false,
+                force_rate_limit: false,
+                suggestions: [],
+                websocket_request_id: requestId,
+                force_paragen_model_slug: ,
                 timezone_offset_min: -480, // adjust this to the correct timezone
             }
         } else {
@@ -405,78 +418,124 @@ export class WebAPI {
         if (settings.provider === 'ChatGPT') {
             const conversationId = JSON.stringify(await getConversationId()) || undefined
             let length = 0
-            await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(body),
-                signal: query.signal,
-                onStatusCode: (status) => {
-                    query.onStatusCode?.(status)
-                },
-                onMessage: (msg) => {
-                    let resp
-                    try {
-                        resp = JSON.parse(msg)
-                        chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
-                        if (!conversationId) {
-                            chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
-                        }
-                    } catch {
-                        query.onFinish('stop')
-                        return
-                    }
-                    const { finish_details: finishDetails } = resp.message
-                    if (finishDetails) {
-                        query.onFinish(finishDetails.type)
-                        return
-                    }
-                    const { content, author } = resp.message
-                    if (author.role === 'assistant') {
-                        const targetTxt = content.parts.join('')
-                        let textDelta = targetTxt.slice(length)
-                        if (quoteProcessor) {
-                            textDelta = quoteProcessor.processText(textDelta)
-                        }
-                        query.onMessage({ content: textDelta, role: '' })
-                        length = targetTxt.length
-                    }
-                },
-                onError: (err) => {
-                    if (err instanceof Error) {
-                        query.onError(err.message)
-                        return
-                    }
-                    if (typeof err === 'string') {
-                        query.onError(err)
-                        return
-                    }
-                    if (typeof err === 'object') {
-                        const { detail } = err
-                        if (detail) {
-                            const { message } = detail
-                            if (message) {
-                                query.onError(`ChatGPT Web: ${message}`)
+            switch (this.responseMode) {
+                case 'sse':
+                    await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(body),
+                        signal: query.signal,
+                        onStatusCode: (status) => {
+                            query.onStatusCode?.(status)
+                        },
+                        onMessage: (msg) => {
+                            let resp
+                            try {
+                                resp = JSON.parse(msg)
+                                chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
+                                if (!conversationId) {
+                                    chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })
+                                }
+                            } catch {
+                                query.onFinish('stop')
                                 return
                             }
-                        }
-                        query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
-                        return
+                            const { finish_details: finishDetails } = resp.message
+                            if (finishDetails) {
+                                query.onFinish(finishDetails.type)
+                                return
+                            }
+                            const { content, author } = resp.message
+                            if (author.role === 'assistant') {
+                                const targetTxt = content.parts.join('')
+                                let textDelta = targetTxt.slice(length)
+                                if (quoteProcessor) {
+                                    textDelta = quoteProcessor.processText(textDelta)
+                                }
+                                query.onMessage({ content: textDelta, role: '' })
+                                length = targetTxt.length
+                            }
+                        },
+                        onError: (err) => {
+                            if (err instanceof Error) {
+                                query.onError(err.message)
+                                return
+                            }
+                            if (typeof err === 'string') {
+                                query.onError(err)
+                                return
+                            }
+                            if (typeof err === 'object') {
+                                const { detail } = err
+                                if (detail) {
+                                    const { message } = detail
+                                    if (message) {
+                                        query.onError(`ChatGPT Web: ${message}`)
+                                        return
+                                    }
+                                }
+                                query.onError(`ChatGPT Web: ${JSON.stringify(err)}`)
+                                return
+                            }
+                            const { error } = err
+                            if (error instanceof Error) {
+                                query.onError(error.message)
+                                return
+                            }
+                            if (typeof error === 'object') {
+                                const { message } = error
+                                if (message) {
+                                    query.onError(message)
+                                    return
+                                }
+                            }
+                            query.onError('Unknown error')
+                        },
+                    })
+                case 'websocket':
+                    if (!this.conversationContext.websocketClient) {
+                        const { websocketUrl } = await registerWebsocket(apiKey);
+                    const websocketClient = new WebsocketClient(websocketUrl);
+                    await websocketClient.start();
+                    this.conversationContext.websocketClient = websocketClient;
+                
+            
+                const websocketRequestId = generateRequestId();
+                const unsubscribe = this.subscribeWebsocket(websocketRequestId, (event) => {
+                    if (["DONE", "ERROR"].includes(event.type)) {
+                        unsubscribe();
                     }
-                    const { error } = err
-                    if (error instanceof Error) {
-                        query.onError(error.message)
-                        return
+                    if (event.type === "DONE" && isFirstMessage) {
+                        this.generateChatTitle();
                     }
-                    if (typeof error === 'object') {
-                        const { message } = error
-                        if (message) {
-                            query.onError(message)
-                            return
-                        }
-                    }
-                    query.onError('Unknown error')
-                },
-            })
+                    message.onEvent(event);
+                });
+            
+                if (message.signal) {
+                    message.signal.addEventListener("abort", unsubscribe);
+                }
+            
+                const postResponse = await this.postMessage(message, websocketRequestId).catch(error => {
+                    unsubscribe();
+                    throw error;
+                });
+            
+                if (!postResponse.ok) {
+                    unsubscribe();
+                    const errorData = await postResponse.json();
+                    throw new Error(`${postResponse.status} ${JSON.stringify(errorData)}`);
+                }
+                else{
+                    console.log('websocketClient have been initialized');
+                    
+                }
+                        
+              }
+                    
+            }
+                
+            
+
             //  set title
             if (settings.chatContext === false) {
                 await fetcher(`${utils.defaultChatGPTWebAPI}/conversation/${conversationId}`, {
