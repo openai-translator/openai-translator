@@ -398,21 +398,7 @@ interface EdgeVoice {
 }
 export async function fetchEdgeVoices() {
     const fetcher = getUniversalFetch()
-    const response = await fetcher(voiceListURL, {
-        headers: {
-            'Authority': 'speech.platform.bing.com',
-            'Sec-CH-UA': '" Not;A Brand";v="99", "Microsoft Edge";v="91", "Chromium";v="91"',
-            'Sec-CH-UA-Mobile': '?0',
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
-            'Accept': '*/*',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Dest': 'empty',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'en-US,en;q=0.9',
-        },
-    })
+    const response = await fetcher(voiceListURL, {})
     const voices: EdgeVoice[] = await response.json()
     return voices.map((voice) => ({
         name: voice.FriendlyName,
