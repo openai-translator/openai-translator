@@ -86,7 +86,7 @@ import {
 } from '../services/promotion'
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
-import { Provider, engineIcons, getEngine } from '../engines'
+import { engineIcons, getEngine } from '../engines'
 
 const cache = new LRUCache({
     max: 500,
@@ -523,20 +523,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [i18n, settings.i18n])
 
+    const [engineModel, setEngineModel] = useState<string>()
     useEffect(() => {
         if (!settings) {
             return
         }
         const engine = getEngine(settings.provider)
-        engine.getModel().then((model) => {
-            setTranslateDeps((prev) => {
-                return {
-                    ...prev,
-                    provider: settings.provider,
-                    engineModel: model,
-                }
-            })
-        })
+        engine.getModel().then(setEngineModel)
     }, [settings])
 
     const [autoFocus, setAutoFocus] = useState(false)
@@ -784,15 +777,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         targetLang?: LangCode
         text: string
         action?: Action
-        provider?: Provider
-        engineModel?: string
     }>({
         sourceLang: undefined,
         targetLang: undefined,
         text: '',
         action: undefined,
-        provider: undefined,
-        engineModel: undefined,
     })
 
     const getTranslateDeps = useCallback(
@@ -1082,9 +1071,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${translateDeps.provider ?? ''}:${translateDeps.engineModel ?? ''}:${
-                action.id
-            }:${action.rolePrompt}:${action.commandPrompt}:${
+            const cachedKey = `translate:${settings?.provider ?? ''}:${engineModel ?? ''}:${action.id}:${
+                action.rolePrompt
+            }:${action.commandPrompt}:${
                 action.outputRenderingFormat
             }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
             const cachedValue = cache.get(cachedKey)
@@ -1147,7 +1136,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         },
-        [translateDeps, translationFlag, startLoading, stopLoading, t]
+        [translateDeps, settings?.provider, engineModel, translationFlag, startLoading, stopLoading, t]
     )
 
     const translateControllerRef = useRef<AbortController | null>(null)
@@ -2309,7 +2298,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 })}
                                 {settings.provider}
                             </div>
-                            {translateDeps.engineModel && ` ${translateDeps.engineModel}`}
+                            {engineModel && ` ${engineModel}`}
                         </div>
                     )}
                 </div>
