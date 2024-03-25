@@ -425,16 +425,7 @@ export function Translator(props: ITranslatorProps) {
     )
 }
 
-const tokenRegenerateEvent = new Event('tokenRegenerate')
 
-export async function initArkosetoken() {
-    const settings = await getSettings()
-    if (settings.apiModel.startsWith('gpt-4')) {
-        document.dispatchEvent(tokenRegenerateEvent)
-    } else if (localStorage.getItem('apiModel')) {
-        localStorage.removeItem('apiModel')
-    }
-}
 
 function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
@@ -455,7 +446,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
 
+    const tokenRegenerateEvent = new Event('tokenRegenerate')
 
+    export async function initArkosetoken() {
+        if (settings.apiModel.startsWith('gpt-4')) {
+            document.dispatchEvent(tokenRegenerateEvent)
+        } else if (localStorage.getItem('apiModel')) {
+            localStorage.removeItem('apiModel')
+        }
+    }
 
 
     useEffect(() => {

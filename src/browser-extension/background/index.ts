@@ -4,8 +4,47 @@ import { BackgroundEventNames } from '../../common/background/eventnames'
 import { BackgroundFetchRequestMessage, BackgroundFetchResponseMessage } from '../../common/background/fetch'
 import { vocabularyInternalService } from '../../common/internal-services/vocabulary'
 import { actionInternalService } from '../../common/internal-services/action'
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app'
+import { getFirestore, collection, getDocs, query, where, DocumentData } from 'firebase/firestore';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-browser.contextMenus.create(
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: 'AIzaSyByHatBXjUmc2_ACN7mIOA2EWE_uwGoR00',
+    authDomain: 'gpt-tutor-6347c.firebaseapp.com',
+    databaseURL: 'https://gpt-tutor-6347c-default-rtdb.europe-west1.firebasedatabase.app',
+    projectId: 'gpt-tutor-6347c',
+    storageBucket: 'gpt-tutor-6347c.appspot.com',
+    messagingSenderId: '310403142777',
+    appId: '1:310403142777:web:2fdc9cf1173298232470a8',
+    measurementId: 'G-NXCPHVK0J2',
+}
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig)
+export const db = getFirestore()
+
+export const getUserData = async (userId: string) => {
+    try {
+        const q = query(collection(db, 'usersData'), where('userId', '==', userId))
+        const querySnapshot = await getDocs(q)
+        const data: DocumentData[] = []
+        querySnapshot.forEach((doc) => {
+            data.push(doc.data())
+        })
+        return data
+    } catch (error: unknown) {
+        console.error('Error fetching user data: ', error.message)
+        throw error
+    }
+}
+
+
+
+browser.contextMenus?.create(
     {
         id: 'open-translator',
         type: 'normal',
@@ -17,7 +56,7 @@ browser.contextMenus.create(
     }
 )
 
-browser.contextMenus.onClicked.addListener(async function (info) {
+browser.contextMenus?.onClicked.addListener(async function (info) {
     const [tab] = await chrome.tabs.query({ active: true })
     tab.id &&
         browser.tabs.sendMessage(tab.id, {
@@ -129,7 +168,7 @@ browser.runtime.onMessage.addListener(async (request) => {
     }
 })
 
-browser.commands.onCommand.addListener(async (command) => {
+browser?.commands?.onCommand.addListener(async (command) => {
     switch (command) {
         case 'open-popup': {
             await browser.windows.create({
@@ -141,6 +180,5 @@ browser.commands.onCommand.addListener(async (command) => {
 })
 
 
-
 // background.js 或 service-worker.js
-chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error: any) => console.error(error))
+chrome?.sidePanel?.setPanelBehavior({ openPanelOnActionClick: true }).catch((error: any) => console.error(error))

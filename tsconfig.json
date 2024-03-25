@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
         "strict": true,
-        "lib": ["DOM", "DOM.Iterable", "es2015"],
+        "lib": ["DOM", "DOM.Iterable", "esnext"],
         "allowJs": true,
         "useDefineForClassFields": true,
-        "module": "commonjs",
+        "module": "esnext",
         "target": "es2015",
         "skipLibCheck": true,
         "esModuleInterop": true,

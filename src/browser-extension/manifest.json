@@ -57,7 +57,8 @@
         "https://*.openai.azure.com/",
         "https://*.ingest.sentry.io/",
         "*://speech.platform.bing.com/",
-        "https://*.google-analytics.com/"
+        "https://*.google-analytics.com/",
+        "https://exotic-bullfrog-36.clerk.accounts.dev/*"
     ],
     "web_accessible_resources": [
         {

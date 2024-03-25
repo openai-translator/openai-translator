@@ -17,6 +17,7 @@ interface IRuntimeOnMessage {
     removeListener(callback: (message: any, sender: any, sendResponse: any) => void): void
 }
 
+
 interface IRuntime {
     onMessage: IRuntimeOnMessage
     sendMessage(message: any): void
