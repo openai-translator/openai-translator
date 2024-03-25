@@ -13,6 +13,7 @@ export const defaultAPIModel = 'gpt-3.5-turbo'
 
 export const defaultChatGPTAPIAuthSessionAPIURL = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
+export const defaultGeminiAPIURL= 'https://generativelanguage.googleapis.com'
 export const defaultChatGPTModel = 'text-davinci-002-render-sha'
 
 export const defaultAutoTranslate = false
@@ -52,6 +53,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     miniMaxAPIModel: 1,
     moonshotAPIKey: 1,
     moonshotAPIModel: 1,
+    geminiAPIURL: 1,
     geminiAPIKey: 1,
     geminiAPIModel: 1,
     autoTranslate: 1,
@@ -203,6 +205,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.claudeAPIURLPath) {
         settings.claudeAPIURLPath = '/v1/messages'
+    }
+    if(settings.geminiAPIURL === undefined || settings.geminiAPIURL === null){
+        settings.geminiAPIURL = defaultGeminiAPIURL
     }
     return settings
 }
