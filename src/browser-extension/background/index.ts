@@ -7,6 +7,7 @@ import { actionInternalService } from '../../common/internal-services/action'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, getDocs, query, where, DocumentData } from 'firebase/firestore'
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -62,6 +63,44 @@ browser.contextMenus?.onClicked.addListener(async function (info) {
             info,
         })
 })
+
+try {
+    chrome.webRequest.onBeforeRequest.addListener(
+        (details) => {
+            if (!details) {
+                return
+            }
+            const chatgptArkoseReqParams = 'cgb=vhwi'
+            if (details.url.includes('/public_key') && !details.url.includes(chatgptArkoseReqParams)) {
+                const formData = new URLSearchParams()
+                if (details.requestBody?.formData) {
+                    // 检查formData是否存在
+                    for (const k in details.requestBody.formData) {
+                        formData.append(k, details.requestBody.formData[k])
+                    }
+                }
+
+                let formString = formData.toString()
+                if (!formString && details.requestBody?.raw?.[0]?.bytes) {
+                    // 检查raw和bytes是否存在
+                    const decoder = new TextDecoder('utf-8')
+                    formString = decoder.decode(new Uint8Array(details.requestBody.raw[0].bytes))
+                }
+
+                console.log('Arkose req url and form saved in localStorage', details.url, formData)
+                localStorage.setItem('chatgptArkoseReqUrl', details.url)
+                localStorage.setItem('chatgptArkoseReqForm', formString.toString())
+            }
+        },
+        {
+            urls: ['https://*.openai.com/*'],
+            types: ['xmlhttprequest'],
+        },
+        ['requestBody']
+    )
+} catch (error) {
+    console.error('Error setting up webRequest listener:', error)
+}
 
 async function fetchWithStream(
     port: browser.Runtime.Port,

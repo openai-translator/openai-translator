@@ -55,6 +55,7 @@
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "katex": "^0.16.7",
+    "lodash-es": "^4.17.21",
     "lru-cache": "^8.0.0",
     "postcss": "^8.4.35",
     "rc-field-form": "^1.27.4",

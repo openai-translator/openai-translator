@@ -5,7 +5,23 @@ import { getContainer, queryPopupCardElement, queryPopupThumbElement } from './u
 
 import hotkeys from 'hotkeys-js'
 import '../../common/i18n.js'
+import Browser from 'webextension-polyfill'
+import { setupProxyExecutor } from '../../common/services/proxy-fetch'
 
+function injectTip() {
+    const div = document.createElement('div')
+    div.innerText = 'Please keep this tab open, now you can go back to ChatHub'
+    div.style.position = 'fixed'
+    // put the div at right top of page
+    div.style.top = '0'
+    div.style.right = '0'
+    div.style.zIndex = '50'
+    div.style.padding = '10px'
+    div.style.margin = '10px'
+    div.style.border = '1px solid'
+    div.style.color = 'red'
+    document.body.appendChild(div)
+}
 
 const hidePopupThumbTimer: number | null = null
 
@@ -99,11 +115,21 @@ async function showPopupThumb(text: string, x: number, y: number) {
     $popupThumb.style.top = `${y}px`
 }
 
-
 async function main() {
     const browser = await utils.getBrowser()
     let mousedownTarget: EventTarget | null
     let lastMouseEvent: MouseEvent | undefined
+
+    Browser.runtime.onMessage.addListener(async (message) => {
+        if (message === 'url') {
+            return location.href
+        }
+    })
+    if ((window as any).__NEXT_DATA__) {
+        if (await Browser.runtime.sendMessage({ event: 'PROXY_TAB_READY' })) {
+            injectTip()
+        }
+    }
 
     document.addEventListener('mouseup', async (event: MouseEvent) => {
         lastMouseEvent = event
@@ -150,6 +176,41 @@ async function main() {
     await bindHotKey(settings.hotkey)
 }
 
+const config = {
+    chatgptArkoseReqUrl: localStorage.getItem('chatgptArkoseReqUrl') || '',
+    chatgptArkoseReqParams: 'cgb=vhwi',
+    chatgptArkoseReqForm: localStorage.getItem('chatgptArkoseReqForm') || '',
+}
+
+export async function getArkoseToken() {
+    console.log('getArkoseToken', config)
+    if (!config.chatgptArkoseReqUrl)
+        throw new Error(
+            'Please login at https://chat.openai.com first' +
+                '\n\n' +
+                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+        )
+    const arkoseToken = await fetch(config.chatgptArkoseReqUrl + '?' + config.chatgptArkoseReqParams, {
+        method: 'POST',
+        body: config.chatgptArkoseReqForm,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+    })
+        .then((resp) => resp.json())
+        .then((resp) => resp.token)
+        .catch(() => null)
+    if (!arkoseToken)
+        throw new Error(
+            'Failed to get arkose token.' +
+                '\n\n' +
+                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+        )
+    console.log(arkoseToken)
+
+    return arkoseToken
+}
+
 export async function bindHotKey(hotkey_: string | undefined) {
     const hotkey = hotkey_?.trim().replace(/-/g, '+')
 
@@ -187,4 +248,5 @@ export async function bindHotKey(hotkey_: string | undefined) {
         return true // 必须返回true
     })
 }
+setupProxyExecutor()
 main()

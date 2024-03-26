@@ -17,7 +17,6 @@ interface IRuntimeOnMessage {
     removeListener(callback: (message: any, sender: any, sendResponse: any) => void): void
 }
 
-
 interface IRuntime {
     onMessage: IRuntimeOnMessage
     sendMessage(message: any): void
@@ -44,6 +43,8 @@ export interface IThemedStyleProps {
 }
 
 export interface ISettings {
+    chatgptArkoseReqUrl: string
+    chatgptArkoseReqForm: string
     [x: string]: any
     apiKeys: string
     apiURL: string
@@ -76,3 +77,65 @@ export interface ISettings {
     disableCollectingStatistics?: boolean
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
 }
+
+export type RequestInitSubset = {
+    method?: string
+    body?: BodyInit | null | undefined
+    headers?: Record<string, string>
+    signal?: AbortSignal
+}
+
+export interface ProxyFetchRequestMessage {
+    url: string
+    options?: RequestInitSubset
+}
+
+export interface ProxyFetchResponseMetadata {
+    status?: number
+    statusText?: string
+    headers?: Record<string, string>
+}
+
+export interface ProxyFetchResponseMetadataMessage {
+    type: 'PROXY_RESPONSE_METADATA'
+    metadata: ProxyFetchResponseMetadata
+}
+
+export type ProxyFetchResponseBodyChunkMessage = {
+    type: 'PROXY_RESPONSE_BODY_CHUNK'
+} & ({ done: true } | { done: false; value: string })
+
+interface FetcherOptions {
+    method: string
+    headers: Record<string, string>
+    body: string
+}
+
+export type ResponsePayload = {
+    conversation_id: string
+    message: {
+        id: string
+        author: { role: 'assistant' | 'tool' | 'user' }
+        content: ResponseContent
+        recipient: 'all' | string
+    }
+    error: null
+}
+
+export type ResponseContent =
+    | {
+          content_type: 'text'
+          parts: string[]
+      }
+    | {
+          content_type: 'code'
+          text: string
+      }
+    | {
+          content_type: 'tether_browsing_display'
+          result: string
+      }
+    | {
+          content_type: 'multimodal_text'
+          parts: ({ content_type: 'image_asset_pointer' } & ImageContent)[]
+      }

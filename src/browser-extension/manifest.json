@@ -38,7 +38,7 @@
     },
     
 
-    "permissions": ["storage", "contextMenus", "sidePanel"],
+    "permissions": ["storage", "contextMenus", "sidePanel","webRequest"],
 
     "commands": {
         "open-popup": {

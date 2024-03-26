@@ -1043,6 +1043,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<ISettings>({
+        chatgptArkoseReqUrl: '',
+        chatgptArkoseReqForm: '',
         apiKeys: '',
         apiURL: utils.defaultAPIURL,
         apiURLPath: utils.defaultAPIURLPath,
