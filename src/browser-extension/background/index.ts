@@ -7,6 +7,7 @@ import { actionInternalService } from '../../common/internal-services/action'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, getDocs, query, where, DocumentData } from 'firebase/firestore'
+import { setUserConfig } from '../../common/utils'
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -87,9 +88,15 @@ try {
                     formString = decoder.decode(new Uint8Array(details.requestBody.raw[0].bytes))
                 }
 
-                console.log('Arkose req url and form saved in localStorage', details.url, formData)
-                localStorage.setItem('chatgptArkoseReqUrl', details.url)
-                localStorage.setItem('chatgptArkoseReqForm', formString.toString())
+                console.log('Arkose req url and form saved in localStorage', details.url, formString)
+                setUserConfig({
+                    chatgptArkoseReqUrl: details.url,
+                    chatgptArkoseReqForm:
+                        formData.toString() ||
+                        new TextDecoder('utf-8').decode(new Uint8Array(details.requestBody.raw[0].bytes)),
+                }).then(() => {
+                    console.log('Arkose req url and form saved')
+                })
             }
         },
         {

@@ -3,8 +3,7 @@ import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
-import { streamAsyncIterable } from './services/stream-async-iterable'
-import { isEmpty } from 'lodash-es'
+import Browser from 'webextension-polyfill'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -39,7 +38,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     defaultTranslateMode: 1,
     defaultSourceLanguage: 1,
     defaultTargetLanguage: 1,
-    defaultYouglishLanguage: 1,
+    defaultYouglishLanguage:1,
     alwaysShowIcons: 1,
     hotkey: 1,
     ocrHotkey: 1,
@@ -167,6 +166,7 @@ export const isUsingOpenAIOfficial = async () => {
     return settings.provider === 'ChatGPT' || (await isUsingOpenAIOfficialAPIEndpoint())
 }
 
+
 export async function exportToJson<T extends Action>(filename: string, rows: T[]) {
     if (!rows.length) return
     filename += '.json'
@@ -191,64 +191,78 @@ export async function exportToJson<T extends Action>(filename: string, rows: T[]
     }
 }
 
+
+
+
+
 export async function jsonToActions(file: File): Promise<Action[]> {
     try {
-        console.log('Starting jsonToActions function')
+        console.log('Starting jsonToActions function');
 
         // 读取文件内容
-        console.log('Reading file content')
-        const fileContent = await file.text()
-        console.log('File content:', fileContent.substring(0, 100)) // 显示前100字符，以避免太长
+        console.log('Reading file content');
+        const fileContent = await file.text();
+        console.log('File content:', fileContent.substring(0, 100)); // 显示前100字符，以避免太长
 
         // 解析JSON数据
-        console.log('Parsing JSON data')
-        const parsedData = JSON.parse(fileContent)
-        console.log('Parsed data:', parsedData.slice(0, 5)) // 显示前5条数据
+        console.log('Parsing JSON data');
+        const parsedData = JSON.parse(fileContent);
+        console.log('Parsed data:', parsedData.slice(0, 5)); // 显示前5条数据
 
         // 简单验证以检查parsedData是否为动作数组
         if (!Array.isArray(parsedData)) {
-            throw new Error('Invalid file format: Expected an array of actions')
+            throw new Error('Invalid file format: Expected an array of actions');
         }
 
-        console.log('Returning parsed data')
-        return parsedData
+        console.log('Returning parsed data');
+        return parsedData;
     } catch (error) {
-        console.error('Error importing actions:', error)
-        return []
+        console.error('Error importing actions:', error);
+        return [];
     }
 }
 
-interface SSEOptions {
+
+export async function setUserConfig(value: Record<string, any>) {
+    await Browser.storage.local.set(value)
+}
+
+interface FetchSSEOptions extends RequestInit {
     onMessage(data: string): void
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
+    fetcher?: (input: string, options: RequestInit) => Promise<Response>
 }
 
-const statusTextMap = new Map([
-    [400, 'Bad Request'],
-    [401, 'Unauthorized'],
-    [403, 'Forbidden'],
-    [429, 'Too Many Requests'],
-])
+export async function fetchSSE(input: string, options: FetchSSEOptions) {
+    const { onMessage, onError, onStatusCode, fetcher = getUniversalFetch(), ...fetchOptions } = options
 
-export async function parseSSE(resp: Response, onMessage: (message: string) => void) {
-    if (!resp.ok) {
-        const error = await resp.json().catch(() => ({}))
-        if (!isEmpty(error)) {
-            throw new Error(JSON.stringify(error))
-        }
-        const statusText = resp.statusText || statusTextMap.get(resp.status) || ''
-        throw new Error(`${resp.status} ${statusText}`)
+    const resp = await fetcher(input, fetchOptions)
+    onStatusCode?.(resp.status)
+    if (resp.status !== 200) {
+        onError(await resp.json())
+        return
     }
+
     const parser = createParser((event) => {
         if (event.type === 'event') {
             onMessage(event.data)
         }
     })
-    const decoder = new TextDecoder()
-    for await (const chunk of streamAsyncIterable(resp.body!)) {
-        const str = decoder.decode(chunk)
-        parser.feed(str)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const reader = resp.body!.getReader()
+    try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+                break
+            }
+            const str = new TextDecoder().decode(value)
+            parser.feed(str)
+        }
+    } finally {
+        reader.releaseLock()
     }
 }
