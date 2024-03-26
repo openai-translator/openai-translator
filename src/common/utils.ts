@@ -206,7 +206,7 @@ export async function getSettings(): Promise<ISettings> {
     if (!settings.claudeAPIURLPath) {
         settings.claudeAPIURLPath = '/v1/messages'
     }
-    if(settings.geminiAPIURL === undefined || settings.geminiAPIURL === null){
+    if (settings.geminiAPIURL === undefined || settings.geminiAPIURL === null) {
         settings.geminiAPIURL = defaultGeminiAPIURL
     }
     return settings
