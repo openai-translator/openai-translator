@@ -83,7 +83,6 @@ async function updateTitleAndCheckId(
     }
 }
 
-
 export class QuoteProcessor {
     private quote: string
     public quoteStart: string
@@ -228,6 +227,24 @@ function getlastMessageId() {
     })
 }
 
+async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body: any) {
+    return fetch(`https://chat.openai.com/backend-api${endpoint}`, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+}
+
+async function getChatRequirements(token: string) {
+    const response = await callBackendAPIWithToken(token, 'POST', '/sentinel/chat-requirements', {
+        conversation_mode_kind: 'primary_assistant',
+    })
+    return response.json()
+}
+
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 export class WebAPI {
     async translate(query: TranslateQuery) {
@@ -304,7 +321,6 @@ export class WebAPI {
         }
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            'Openai-Sentinel-Arkose-Token': arkoseToken,
         }
 
         let isChatAPI = true
@@ -357,6 +373,7 @@ export class WebAPI {
                 force_paragen_model_slug: '',
                 force_rate_limit: false,
                 suggestions: [],
+                websocket_request_id: uuidv4(),
             }
         } else {
             const messages = [
@@ -388,6 +405,7 @@ export class WebAPI {
             case 'OpenAI':
             case 'ChatGPT':
                 headers['Authorization'] = `Bearer ${apiKey}`
+                headers['Openai-Sentinel-Arkose-Token'] = arkoseToken
                 break
 
             case 'Azure':
@@ -397,6 +415,8 @@ export class WebAPI {
 
         if (settings.provider === 'ChatGPT') {
             const conversationId = JSON.stringify(await getConversationId()) || undefined
+            const requirement = await getChatRequirements(apiKey)
+            headers['Openai-Sentinel-Chat-Requirements-Token'] = requirement.token
             let length = 0
             await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
                 method: 'POST',
@@ -410,6 +430,7 @@ export class WebAPI {
                     let resp
                     try {
                         resp = JSON.parse(msg)
+                        console.log('chatgpt sse message', resp)
                         chrome.storage.local.set({ lastMessageId: { value: resp.message.id } })
                         if (!conversationId) {
                             chrome.storage.local.set({ conversationId: { value: resp.conversation_id } })

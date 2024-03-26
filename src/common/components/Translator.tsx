@@ -446,9 +446,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
 
-    const tokenRegenerateEvent = new Event('tokenRegenerate')
 
-    export async function initArkosetoken() {
+
+    async function initArkosetoken() {
         if (settings.apiModel.startsWith('gpt-4')) {
             document.dispatchEvent(tokenRegenerateEvent)
         } else if (localStorage.getItem('apiModel')) {

@@ -6,7 +6,7 @@ import { vocabularyInternalService } from '../../common/internal-services/vocabu
 import { actionInternalService } from '../../common/internal-services/action'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, query, where, DocumentData } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, where, DocumentData } from 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -42,13 +42,11 @@ export const getUserData = async (userId: string) => {
     }
 }
 
-
-
 browser.contextMenus?.create(
     {
-        id: 'open-translator',
+        id: 'gpt-tutor',
         type: 'normal',
-        title: 'OpenAI Translator',
+        title: 'GPT Tutor',
         contexts: ['page', 'selection'],
     },
     () => {
@@ -71,6 +69,7 @@ async function fetchWithStream(
     signal: AbortSignal
 ) {
     if (!message.details) {
+        console.error('fetchWithStream: No fetch details provided')
         throw new Error('No fetch details')
     }
 
@@ -80,6 +79,7 @@ async function fetchWithStream(
     try {
         response = await fetch(url, { ...options, signal })
     } catch (error) {
+        console.error('fetchWithStream: Fetch failed', error)
         if (error instanceof Error) {
             const { message, name } = error
             port.postMessage({
@@ -101,6 +101,7 @@ async function fetchWithStream(
 
     const reader = response?.body?.getReader()
     if (!reader) {
+        console.error('fetchWithStream: Response body reader not available')
         port.postMessage(responseSend)
         return
     }
@@ -119,7 +120,7 @@ async function fetchWithStream(
             })
         }
     } catch (error) {
-        console.log(error)
+        console.error('fetchWithStream: Error while reading the response stream', error)
     } finally {
         port.disconnect()
         reader.releaseLock()
@@ -135,14 +136,21 @@ browser.runtime.onConnect.addListener(async function (port) {
             port.onMessage.addListener(function (message: BackgroundFetchRequestMessage) {
                 switch (message.type) {
                     case 'abort':
+                        console.log('fetchWithStream: Abort signal received')
                         controller.abort()
                         break
                     case 'open':
-                        fetchWithStream(port, message, signal)
+                        fetchWithStream(port, message, signal).catch((error) =>
+                            console.error('fetchWithStream: Error in fetchWithStream', error)
+                        )
                         break
+                    default:
+                        console.error('fetchWithStream: Unknown message type received', message.type)
                 }
             })
             return
+        default:
+            console.error('fetchWithStream: Connected to an unknown port', port.name)
     }
 })
 
@@ -178,7 +186,6 @@ browser?.commands?.onCommand.addListener(async (command) => {
         }
     }
 })
-
 
 // background.js 或 service-worker.js
 chrome?.sidePanel?.setPanelBehavior({ openPanelOnActionClick: true }).catch((error: any) => console.error(error))
