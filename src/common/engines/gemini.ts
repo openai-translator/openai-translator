@@ -41,8 +41,9 @@ export class Gemini extends AbstractEngine {
     async sendMessage(req: IMessageRequest): Promise<void> {
         const settings = await getSettings()
         const apiKey = settings.geminiAPIKey
+        const geminiAPIURL = settings.geminiAPIURL
         const model = await this.getModel()
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
+        const url = `${geminiAPIURL}/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
         const headers = {
             'Content-Type': 'application/json',
             'User-Agent':
