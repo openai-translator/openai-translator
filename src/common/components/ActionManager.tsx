@@ -27,7 +27,7 @@ const useStyles = createUseStyles({
         justifyContent: 'center',
         padding: isDesktopApp() ? '40px 20px 20px 20px' : 0,
         boxSizing: 'border-box',
-        width: isDesktopApp() ? '100%' : '600px',
+        width: isDesktopApp() ? '100%' : '300px',
     }),
     header: (props: IThemedStyleProps) => ({
         width: '100%',
@@ -124,7 +124,7 @@ const useStyles = createUseStyles({
             'display': '-webkit-box',
             'overflow': 'hidden',
             'lineHeight': '1.5',
-            'maxWidth': '400px',
+            'maxWidth': '12px',
             'textOverflow': 'ellipsis',
             '-webkit-line-clamp': 2,
             '-webkit-box-orient': 'vertical',
@@ -328,10 +328,6 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                                                         {t('built-in')}
                                                     </div>
                                                 )}
-                                            </div>
-                                            <div className={styles.prompts}>
-                                                <div>{action.rolePrompt}</div>
-                                                <div>{action.commandPrompt}</div>
                                             </div>
                                             <div className={styles.metadata}>
                                                 <div>

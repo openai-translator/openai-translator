@@ -1126,7 +1126,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 paddingTop: isDesktopApp ? '98px' : undefined,
                 paddingBottom: isDesktopApp ? '32px' : undefined,
                 background: theme.colors.backgroundPrimary,
-                minWidth: isDesktopApp ? 450 : 400,
+                minWidth: isDesktopApp ? 450 : 360,
             }}
             data-testid='settings-container'
         >
@@ -1286,23 +1286,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 >
                     <MyCheckbox onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='chatContext' label={t('Save Conversation')}>
-                    <ChatContextCheckbox onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='autoTranslate' label={t('Auto Translate')}>
-                    <AutoTranslateCheckbox onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
-                    <RestorePreviousPositionCheckbox onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
-                    <SelectInputElementsCheckbox onBlur={onBlur} />
-                </FormItem>
-                {isTauri && (
-                    <FormItem name='runAtStartup' label={t('Run at Startup')}>
-                        <RunAtStartupCheckbox onBlur={onBlur} />
-                    </FormItem>
-                )}
                 <FormItem name='defaultYouglishLanguage' label={t('Youglish Language')}>
                     <YouglishLanguageSelector onBlur={onBlur} />
                 </FormItem>
@@ -1312,20 +1295,11 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='defaultTargetLanguage' label={t('The Language You are Using')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='themeType' label={t('Theme')}>
-                    <ThemeTypeSelector onBlur={onBlur} />
-                </FormItem>
                 <FormItem name='i18n' label={t('i18n')}>
                     <Ii18nSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='tts' label={t('TTS')}>
                     <TTSVoicesSettings onBlur={onBlur} />
-                </FormItem>
-                <FormItem name='hotkey' label={t('Hotkey')}>
-                    <HotkeyRecorder onBlur={onBlur} testId='hotkey-recorder' />
-                </FormItem>
-                <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
-                    <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
                 </FormItem>
                 <FormItem
                     style={{

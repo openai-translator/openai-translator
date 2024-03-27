@@ -7,6 +7,7 @@ import { BaseProvider } from 'baseui-sd'
 import { Textarea } from 'baseui-sd/textarea'
 import { createUseStyles } from 'react-jss'
 import { AiOutlineTranslation, AiOutlineLock, AiOutlinePlusSquare } from 'react-icons/ai'
+import { GoSignOut } from 'react-icons/go'
 import { IoSettingsOutline } from 'react-icons/io5'
 import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
@@ -56,7 +57,7 @@ import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
 import YouGlishComponent from '../youglish/youglish'
 import { LANG_CONFIGS } from '../components/lang/data'
-
+import { useClerk } from '@clerk/chrome-extension'
 const cache = new LRUCache({
     max: 500,
     maxSize: 5000,
@@ -425,8 +426,6 @@ export function Translator(props: ITranslatorProps) {
     )
 }
 
-
-
 function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
@@ -446,8 +445,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const { t, i18n } = useTranslation()
     const { settings } = useSettings()
 
-
-
     async function initArkosetoken() {
         if (settings.apiModel.startsWith('gpt-4')) {
             document.dispatchEvent(tokenRegenerateEvent)
@@ -455,7 +452,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             localStorage.removeItem('apiModel')
         }
     }
-
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -554,6 +550,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const scrollYRef = useRef<number>(0)
 
     const hasActivateAction = activateAction !== undefined
+
+    const clerk = useClerk()
 
     useLayoutEffect(() => {
         const handleResize = () => {
@@ -723,7 +721,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const webAPI = new WebAPI()
 
-
     useEffect(() => {
         setOriginalText(props.text)
     }, [props.text, props.uuid])
@@ -756,36 +753,38 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
         ;(async () => {
             setTargetLang(() => {
-                    if (settings?.defaultTargetLanguage) {
-                        return settings.defaultTargetLanguage as LangCode
-                    }
-                    else{
-                        return 'en'
-                    }
+                if (settings?.defaultTargetLanguage) {
+                    return settings.defaultTargetLanguage as LangCode
+                } else {
+                    return 'en'
+                }
             })
             setSourceLang(() => {
-                    if (settings?.defaultTargetLanguage) {
-                        return settings.defaultSourceLanguage as LangCode
-                    }
-                    else{
-                        return 'zh-Hans'
-                    }
+                if (settings?.defaultTargetLanguage) {
+                    return settings.defaultSourceLanguage as LangCode
+                } else {
+                    return 'zh-Hans'
+                }
             })
             setYouglishLang(() => {
-                    if (settings?.defaultTargetLanguage) {
-                        return settings.defaultYouglishLanguage as LangCode
-                    }
-                    else{
-                        return 'en'
-                    }
+                if (settings?.defaultTargetLanguage) {
+                    return settings.defaultYouglishLanguage as LangCode
+                } else {
+                    return 'en'
+                }
             })
             setDetectedOriginalText(originalText)
         })()
-    }, [originalText, isTranslate, settingsIsUndefined, settings?.defaultTargetLanguage, settings?.defaultSourceLanguage, settings?.defaultYouglishLanguage, props.uuid])
+    }, [
+        originalText,
+        isTranslate,
+        settingsIsUndefined,
+        settings?.defaultTargetLanguage,
+        settings?.defaultSourceLanguage,
+        settings?.defaultYouglishLanguage,
+        props.uuid,
+    ])
 
-
-
-    
     const [actionStr, setActionStr] = useState('')
 
     useEffect(() => {
@@ -958,7 +957,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             const action = await actionService.get(activateAction?.id)
             activatedActionName = action.name
-            console.log('activatedActionName', activatedActionName)
             if (!action) {
                 return
             }
@@ -1040,7 +1038,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         setErrorMessage(error)
                     },
                 })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any  
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 // if error is a AbortError then ignore this error
                 if (error.name === 'AbortError') {
@@ -1161,11 +1159,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [conversationIds, setConversationIds] = useState([])
 
-    const handleConversationClick = () => {
-        chrome.storage.local.remove('conversationId', function () {
-            setActionStr('ConversationId added successfully!')
-        })
-    }
+    
 
     const tokenRegenerateEvent = new Event('tokenRegenerate')
     return (
@@ -1512,7 +1506,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     size='mini'
                                                     onClick={async (e) => {
                                                         e.preventDefault()
-                                                        e.stopPropagation()                                                      
+                                                        e.stopPropagation()
                                                         if (!activateAction) {
                                                             setActivateAction(
                                                                 actions?.find((action) => action.mode === 'translate')
@@ -1549,9 +1543,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </Dropzone>
                             <div className={styles.actionButtonsContainer}>
                                 <>
-                                    <StatefulTooltip content={t('Add new conversation')} showArrow placement='top'>
-                                        <div className={styles.actionButton} onClick={() => handleConversationClick()}>
-                                            <AiOutlinePlusSquare size={15} />
+                                    <StatefulTooltip content={t('Sign out')} showArrow placement='top'>
+                                        <div className={styles.actionButton} onClick={() => clerk.signOut()}>
+                                            <GoSignOut size={20} />
                                         </div>
                                     </StatefulTooltip>
                                 </>
@@ -1776,7 +1770,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 <YouGlishComponent
                     query={editableText}
                     triggerYouGlish={showYouGlish}
-                    language={LANG_CONFIGS[youglishLang].nameEn }
+                    language={LANG_CONFIGS[youglishLang].nameEn}
                     accent={LANG_CONFIGS[youglishLang].accent}
                 />
             </div>

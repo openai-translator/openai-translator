@@ -306,7 +306,6 @@ async function getChatRequirements(token: string) {
 async function resetConversation() {
     // 删除保存在 chrome.storage.local 中的上下文
     chrome.storage.local.remove(['conversationId', 'lastMessageId'], () => {
-        console.log('reset conversation')
     })
 }
 
@@ -318,7 +317,6 @@ export class WebAPI {
 
 
     saveConversationContext(name: string, conversationContext: { conversationId: string; lastMessageId: string }) {
-        console.log('wait to complette')
         //  使用 chrome.storage.local.set() 保存上下文
         // 保存的键为action.name，然后保存对话ID
         chrome.storage.local.set({
@@ -388,7 +386,6 @@ export class WebAPI {
             console.debug('targetLang', targetLangName)
             const targetLangConfig = getLangConfig(targetLangCode)
             const sourceLangConfig = getLangConfig(sourceLangCode)
-            console.log('Source language is', sourceLangConfig)
             rolePrompt = targetLangConfig.rolePrompt
 
             switch (query.action.mode) {
@@ -462,8 +459,6 @@ export class WebAPI {
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
             const lastConversationId = await this.getConversationId(query.activatedActionName)
-            console.log('lastConversationId', lastConversationId)
-            console.log('activatedActionName', query.activatedActionName)
             body = {
                 action: 'next',
                 messages: [

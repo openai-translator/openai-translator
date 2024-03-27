@@ -102,5 +102,20 @@
   "represents the target language": "代表目标语言",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "代表原始文本，通常不需要在提示词中使用，因为它会自动注入",
   "Output rendering format": "输出渲染格式",
-  "disable collecting statistics": "禁用统计"
+  "disable collecting statistics": "禁用统计",
+  "On/off Youglish": "开/关 Youglish",
+  "Sign out": "退出登录",
+  "Youglish Language":"设置Youglish的使用语言",
+  "The Language You Want To Study":"您想学习的语言",
+  "The Language You are Using":"您正在使用的语言",
+  "Learn": "学习",
+  "Youglish": "Youglish",
+  "Youglish is a free service that helps you learn foreign languages.": "Youglish 是一个免费的服务，帮助您学习外语。",
+  "Sign in": "登录",
+  "Sign up": "注册",
+  "Sign in with Google": "使用 Google 登录",
+  "Sign in with Apple": "使用 Apple 登录",
+  "Sign in with WeChat": "使用微信登录",
+  "Sign in with GitHub": "使用 GitHub 登录",
+  "Sign in with Discord": "使用 Discord 登录"
 }
