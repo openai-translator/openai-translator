@@ -952,11 +952,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isNotLogin, setIsNotLogin] = useState(false)
 
     const translateText = useCallback(
-        async (text: string, selectedWord: string, signal: AbortSignal) => {
+        async (text: string, activatedActionName: string, selectedWord: string, signal: AbortSignal) => {
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
                 return
             }
             const action = await actionService.get(activateAction?.id)
+            activatedActionName = action.name
+            console.log('activatedActionName', activatedActionName)
             if (!action) {
                 return
             }
@@ -1004,6 +1006,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             let isStopped = false
             try {
                 await webAPI.translate({
+                    activatedActionName,
                     action,
                     signal,
                     text,

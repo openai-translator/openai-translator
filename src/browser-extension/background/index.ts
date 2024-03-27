@@ -88,7 +88,6 @@ try {
                     formString = decoder.decode(new Uint8Array(details.requestBody.raw[0].bytes))
                 }
 
-                console.log('Arkose req url and form saved in localStorage', details.url, formString)
                 setUserConfig({
                     chatgptArkoseReqUrl: details.url,
                     chatgptArkoseReqForm:

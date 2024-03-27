@@ -26,6 +26,7 @@ export type APIModel =
     | string
 
 interface BaseTranslateQuery {
+    activatedActionName: string
     text: string
     selectedWord: string
     detectFrom: LangCode
@@ -238,7 +239,7 @@ export class QuoteProcessor {
 interface ConversationContext {
     conversationId: string
     lastMessageId: string
-  }
+}
 
 function getConversationId() {
     return new Promise(function (resolve) {
@@ -257,7 +258,6 @@ function getlastMessageId() {
         })
     })
 }
-
 
 export async function getArkoseToken() {
     const config = await Browser.storage.local.get(['chatgptArkoseReqUrl', 'chatgptArkoseReqForm'])
@@ -303,28 +303,63 @@ async function getChatRequirements(token: string) {
     return response.json()
 }
 
+async function resetConversation() {
+    // 删除保存在 chrome.storage.local 中的上下文
+    chrome.storage.local.remove(['conversationId', 'lastMessageId'], () => {
+        console.log('reset conversation')
+    })
+}
+
 const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 export class WebAPI {
-    requester: Requester
     private conversationContext?: ConversationContext
-    constructor() {
-        this.requester = globalFetchRequester
-        proxyFetchRequester.findExistingProxyTab().then((tab) => {
-            console.log('findExistingProxyTab', tab)
-            if (tab) {
-                this.switchRequester(proxyFetchRequester)
-            }
+
+
+
+
+    saveConversationContext(name: string, conversationContext: { conversationId: string; lastMessageId: string }) {
+        console.log('wait to complette')
+        //  使用 chrome.storage.local.set() 保存上下文
+        // 保存的键为action.name，然后保存对话ID
+        chrome.storage.local.set({
+            [`${name}.conversationId`]: {
+                value: conversationContext.conversationId,
+            },
+            [`${name}.lastMessageId`]: {
+                value: conversationContext.lastMessageId,
+            },
         })
     }
 
-    switchRequester(newRequester: Requester) {
-        console.debug('client switchRequester', newRequester)
-        this.requester = newRequester
+    getConversationContext(name: string) {
+        return new Promise(function (resolve) {
+            chrome.storage.local.get([`${name}.conversationId`, `${name}.lastMessageId`], function (result) {
+                const conversationId = result[`${name}.conversationId`]?.value
+                const lastMessageId = result[`${name}.lastMessageId`]?.value
+                resolve({ conversationId, lastMessageId })
+            })
+        })
     }
 
-    async fetch(url: string, options?: RequestInitSubset): Promise<Response> {
-        return this.requester.fetch(url, options)
+    getConversationId(name: string) {
+        return new Promise(function (resolve) {
+            chrome.storage.local.get([`${name}.conversationId`], function (result) {
+                const conversationId = result[`${name}.conversationId`]?.value
+                resolve(conversationId)
+            })
+        })
     }
+
+    getLastMessageId(name: string) {
+        return new Promise(function (resolve) {
+            chrome.storage.local.get([`${name}.lastMessageId`], function (result) {
+                const lastMessageId = result[`${name}.lastMessageId`]?.value
+                resolve(lastMessageId)
+            })
+        })
+    }
+
+
     async translate(query: TranslateQuery) {
         const fetcher = getUniversalFetch()
         let rolePrompt = ''
@@ -396,7 +431,7 @@ export class WebAPI {
         let arkoseToken = ''
         if (settings.provider !== 'ChatGPT') {
             apiKey = await utils.getApiKey()
-            arkose = await ArkoseToken()
+            const arkose = await ArkoseToken()
         }
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
@@ -426,6 +461,9 @@ export class WebAPI {
             }
             const respJson = await resp?.json()
             apiKey = respJson.accessToken
+            const lastConversationId = await this.getConversationId(query.activatedActionName)
+            console.log('lastConversationId', lastConversationId)
+            console.log('activatedActionName', query.activatedActionName)
             body = {
                 action: 'next',
                 messages: [
@@ -442,7 +480,7 @@ export class WebAPI {
                     },
                 ],
                 model: settings.apiModel, // 'text-davinci-002-render-sha'
-                conversation_id: this.conversationContext?.conversationId || undefined,
+                conversation_id: lastConversationId || undefined,
                 parent_message_id: this.conversationContext?.lastMessageId || uuidv4(),
                 conversation_mode: {
                     kind: 'primary_assistant',
@@ -493,7 +531,6 @@ export class WebAPI {
         }
 
         if (settings.provider === 'ChatGPT') {
-            
             const requirement = await getChatRequirements(apiKey)
             headers['Openai-Sentinel-Chat-Requirements-Token'] = requirement.token
 
@@ -510,10 +547,14 @@ export class WebAPI {
                     let resp
                     try {
                         resp = JSON.parse(msg)
-                        console.log('chatgpt sse message', resp)
-                        
-                        this.conversationContext = { conversationId: resp.conversation_id, lastMessageId: resp.message.id }
-                        
+                        this.saveConversationContext(query.activatedActionName, {
+                            conversationId: resp.conversation_id,
+                            lastMessageId: resp.message.id,
+                        })
+                        this.conversationContext = {
+                            conversationId: resp.conversation_id,
+                            lastMessageId: resp.message.id,
+                        }
                     } catch {
                         query.onFinish('stop')
                         return
