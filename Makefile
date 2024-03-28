@@ -10,8 +10,8 @@ change-package-version:
 	sed -i -e "s/\"version\": \".*\"/\"version\": \"$(VERSION)\"/" package.json
 
 build-browser-extension: change-package-version
-	pnpm vite build -c vite.config.chromium.ts && zip -r ../chromium.zip .
-	pnpm vite build -c vite.config.firefox.ts && zip -r ../firefox.zip .
+	pnpm vite build -c vite.config.chromium.ts
+	pnpm vite build -c vite.config.firefox.ts
 	cd dist/browser-extension/chromium 
 	cd dist/browser-extension/firefox 
 
