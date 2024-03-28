@@ -7,6 +7,7 @@ import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { ArkoseToken } from '../arkose'
+import Browser from 'webextension-polyfill'
 
 
 export async function getArkoseToken() {
