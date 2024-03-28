@@ -39,7 +39,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             service_worker: 'src/browser-extension/background/index.ts',
         },
 
-        permissions: ['storage', 'contextMenus','webRequest'],
+        permissions: ['storage', 'contextMenus', 'webRequest'],
 
         commands: {
             'open-popup': {
@@ -66,16 +66,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             'https://*.google.com/',
             'https://*.googleapis.com/',
         ],
-
-        "web_accessible_resources": [
-            {
-                "resources": ["js/v2/35536E1E-65B4-4D96-9D97-6ADB7EFF8147/api.js"],
-                "matches": ["<all_urls>"]
-            }
-        ],
     }
-
-   
 
     if (browser === 'firefox') {
         manifest.browser_specific_settings = {
