@@ -6,6 +6,7 @@ import * as utils from '../utils'
 import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
+import { ArkoseToken } from '../arkose'
 import Browser from 'webextension-polyfill'
 
 
@@ -135,6 +136,7 @@ export class ChatGPT extends AbstractEngine {
         }
         const respJson = await resp?.json()
         const apiKey = respJson.accessToken
+        const initializeArkoseToken =  await ArkoseToken()
         const arkoseToken = await getArkoseToken()
         const requirements = await getChatRequirements(apiKey)
         const requirementstoken = requirements.token
