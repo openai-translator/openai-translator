@@ -7,6 +7,52 @@ import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 
+export async function getArkoseToken() {
+    const Browser = await require('webextension-polyfill')
+    const config = await Browser.storage.local.get(['chatgptArkoseReqUrl', 'chatgptArkoseReqForm'])
+    const arkoseToken = await getUniversalFetch()(
+        'https://tcr9i.chat.openai.com/fc/gt2/public_key/35536E1E-65B4-4D96-9D97-6ADB7EFF8147',
+        {
+            method: 'POST',
+            body: config.chatgptArkoseReqForm,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Origin': 'https://tcr9i.chat.openai.com',
+                'Referer': 'https://tcr9i.chat.openai.com/v2/2.4.4/enforcement.f73f1debe050b423e0e5cd1845b2430a.html',
+            },
+        }
+    )
+        .then((resp) => resp.json())
+        .then((resp) => resp.token)
+        .catch(() => null)
+    if (!arkoseToken)
+        throw new Error(
+            'Failed to get arkose token.' +
+                '\n\n' +
+                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+        )
+    return arkoseToken
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body: any) {
+    return fetch(`https://chat.openai.com/backend-api${endpoint}`, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+}
+
+async function getChatRequirements(accessToken: string) {
+    const response = await callBackendAPIWithToken(accessToken, 'POST', '/sentinel/chat-requirements', {
+        conversation_mode_kind: 'primary_assistant',
+    })
+    return response.json()
+}
+
 export class ChatGPT extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
@@ -89,9 +135,14 @@ export class ChatGPT extends AbstractEngine {
         }
         const respJson = await resp?.json()
         const apiKey = respJson.accessToken
+        const arkoseToken = await getArkoseToken()
+        const requirements = await getChatRequirements(apiKey)
+        const requirementstoken = requirements.token
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
+            'Openai-Sentinel-Arkose-Token': arkoseToken,
+            'Openai-Sentinel-Chat-Requirements-Token': requirementstoken,
         }
         const body = {
             action: 'next',
@@ -113,7 +164,14 @@ export class ChatGPT extends AbstractEngine {
             ],
             model, // 'text-davinci-002-render-sha'
             parent_message_id: uuidv4(),
-            history_and_training_disabled: true,
+            conversation_mode: {
+                kind: 'primary_assistant',
+            },
+            history_and_training_disabled: false,
+            force_paragen: false,
+            force_paragen_model_slug: '',
+            force_rate_limit: false,
+            suggestions: [],
         }
         let finished = false
         let length = 0
