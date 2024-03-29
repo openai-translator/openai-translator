@@ -64,7 +64,7 @@ export interface ISettings {
     miniMaxGroupID: string
     miniMaxAPIKey: string
     miniMaxAPIModel: string
-    geminiAPIURL:string
+    geminiAPIURL: string
     geminiAPIKey: string
     geminiAPIModel: string
     moonshotAPIKey: string
