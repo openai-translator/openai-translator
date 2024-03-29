@@ -6,9 +6,9 @@ import * as utils from '../utils'
 import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
-import Browser from 'webextension-polyfill'
 
 export async function getArkoseToken() {
+    const Browser = await require('webextension-polyfill')
     const config = await Browser.storage.local.get(['chatgptArkoseReqUrl', 'chatgptArkoseReqForm'])
     const arkoseToken = await getUniversalFetch()(
         'https://tcr9i.chat.openai.com/fc/gt2/public_key/35536E1E-65B4-4D96-9D97-6ADB7EFF8147',
@@ -34,6 +34,7 @@ export async function getArkoseToken() {
     return arkoseToken
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body: any) {
     return fetch(`https://chat.openai.com/backend-api${endpoint}`, {
         method: method,
