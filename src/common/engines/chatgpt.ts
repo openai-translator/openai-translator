@@ -8,7 +8,6 @@ import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import Browser from 'webextension-polyfill'
 
-
 export async function getArkoseToken() {
     const config = await Browser.storage.local.get(['chatgptArkoseReqUrl', 'chatgptArkoseReqForm'])
     const arkoseToken = await getUniversalFetch()(
@@ -141,8 +140,8 @@ export class ChatGPT extends AbstractEngine {
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
-            'Openai-Sentinel-Arkose-Token' : arkoseToken,
-            'Openai-Sentinel-Chat-Requirements-Token' : requirementstoken
+            'Openai-Sentinel-Arkose-Token': arkoseToken,
+            'Openai-Sentinel-Chat-Requirements-Token': requirementstoken,
         }
         const body = {
             action: 'next',
