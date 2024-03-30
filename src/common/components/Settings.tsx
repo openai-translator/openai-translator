@@ -2237,6 +2237,9 @@ export function InnerSettings({
                                 display: values.provider === 'Gemini' ? 'block' : 'none',
                             }}
                         >
+                            <FormItem name='geminiAPIURL' label={t('API URL')} required={values.provider === 'Gemini'}>
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
                             <FormItem
                                 required={values.provider === 'Gemini'}
                                 name='geminiAPIKey'
