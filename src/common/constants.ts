@@ -29,3 +29,4 @@ export const builtinActionModes: { name: string; mode: Exclude<TranslateMode, 'b
         icon: 'MdCode',
     },
 ]
+export const chatgptArkoseReqParams = 'cgb=vhwi'
