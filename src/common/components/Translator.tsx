@@ -1056,7 +1056,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             const afterTranslate = (reason: string) => {
                 stopLoading()
-                if (reason !== 'stop' && reason !== "eos") {
+                if (reason !== 'stop' && reason !== 'eos') {
                     if (reason === 'length' || reason === 'max_tokens') {
                         toast(t('Chars Limited'), {
                             duration: 5000,
