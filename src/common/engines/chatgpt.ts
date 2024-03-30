@@ -6,37 +6,48 @@ import * as utils from '../utils'
 import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
+import { chatgptArkoseReqParams } from '../constants'
+
+export const keyChatgptArkoseReqUrl = 'chatgptArkoseReqUrl'
+export const keyChatgptArkoseReqForm = 'chatgptArkoseReqForm'
 
 export async function getArkoseToken() {
-    const Browser = await require('webextension-polyfill')
-    const config = await Browser.storage.local.get(['chatgptArkoseReqUrl', 'chatgptArkoseReqForm'])
-    const arkoseToken = await getUniversalFetch()(
-        'https://tcr9i.chat.openai.com/fc/gt2/public_key/35536E1E-65B4-4D96-9D97-6ADB7EFF8147',
-        {
-            method: 'POST',
-            body: config.chatgptArkoseReqForm,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Origin': 'https://tcr9i.chat.openai.com',
-                'Referer': 'https://tcr9i.chat.openai.com/v2/2.4.4/enforcement.f73f1debe050b423e0e5cd1845b2430a.html',
-            },
-        }
-    )
-        .then((resp) => resp.json())
-        .then((resp) => resp.token)
-        .catch(() => null)
-    if (!arkoseToken)
+    const browser = (await import('webextension-polyfill')).default
+    const config = await browser.storage.local.get([keyChatgptArkoseReqUrl, keyChatgptArkoseReqForm])
+    if (!config[keyChatgptArkoseReqUrl] || !config[keyChatgptArkoseReqForm]) {
         throw new Error(
             'Failed to get arkose token.' +
                 '\n\n' +
                 "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
         )
+    }
+    const fetcher = getUniversalFetch()
+    const arkoseToken = await fetcher(config[keyChatgptArkoseReqUrl] + '?' + chatgptArkoseReqParams, {
+        method: 'POST',
+        body: config[keyChatgptArkoseReqForm],
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Origin': 'https://tcr9i.chat.openai.com',
+            'Referer': 'https://tcr9i.chat.openai.com/v2/2.4.4/enforcement.f73f1debe050b423e0e5cd1845b2430a.html',
+        },
+    })
+        .then((resp) => resp.json())
+        .then((resp) => resp.token)
+        .catch(() => null)
+    if (!arkoseToken) {
+        throw new Error(
+            'Failed to get arkose token.' +
+                '\n\n' +
+                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+        )
+    }
     return arkoseToken
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body: any) {
-    return fetch(`https://chat.openai.com/backend-api${endpoint}`, {
+    const fetcher = getUniversalFetch()
+    return fetcher(`https://chat.openai.com/backend-api${endpoint}`, {
         method: method,
         headers: {
             'Content-Type': 'application/json',
