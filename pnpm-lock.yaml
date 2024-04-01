@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -344,8 +344,8 @@ devDependencies:
     specifier: ^4.2.0
     version: 4.2.0(typescript@5.1.6)(vite@4.3.9)
   vite-tsconfig-paths:
-    specifier: ^4.2.0
-    version: 4.2.0(typescript@5.1.6)(vite@4.3.9)
+    specifier: ^4.3.2
+    version: 4.3.2(typescript@5.1.6)(vite@4.3.9)
   vitest:
     specifier: ^0.34.3
     version: 0.34.3(jsdom@22.1.0)
@@ -7240,12 +7240,12 @@ packages:
     resolution: {integrity: sha512-Z86EW+fFFh/IFB1fqQ3/+7Zpf9t2ebOAxNI/V6Wo7r5gqiqtxmgTlQ1qbqQcjLKYeSHPTsEmvlJUDg/EuL0uHQ==}
     dev: false
 
-  /tsconfck@2.1.1(typescript@5.1.6):
-    resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
-    engines: {node: ^14.13.1 || ^16 || >=18}
+  /tsconfck@3.0.3(typescript@5.1.6):
+    resolution: {integrity: sha512-4t0noZX9t6GcPTfBAbIbbIU4pfpCwh0ueq3S4O/5qXI1VwK1outmxhe9dOiEWqMz3MW2LKgDTpqWV+37IWuVbA==}
+    engines: {node: ^18 || >=20}
     hasBin: true
     peerDependencies:
-      typescript: ^4.3.5 || ^5.0.0
+      typescript: ^5.0.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -7584,8 +7584,8 @@ packages:
       - typescript
     dev: true
 
-  /vite-tsconfig-paths@4.2.0(typescript@5.1.6)(vite@4.3.9):
-    resolution: {integrity: sha512-jGpus0eUy5qbbMVGiTxCL1iB9ZGN6Bd37VGLJU39kTDD6ZfULTTb1bcc5IeTWqWJKiWV5YihCaibeASPiGi8kw==}
+  /vite-tsconfig-paths@4.3.2(typescript@5.1.6)(vite@4.3.9):
+    resolution: {integrity: sha512-0Vd/a6po6Q+86rPlntHye7F31zA2URZMbH8M3saAZ/xR9QoGN/L21bxEGfXdWmFdNkqPpRdxFT7nmNe12e9/uA==}
     peerDependencies:
       vite: '*'
     peerDependenciesMeta:
@@ -7594,7 +7594,7 @@ packages:
     dependencies:
       debug: 4.3.4
       globrex: 0.1.2
-      tsconfck: 2.1.1(typescript@5.1.6)
+      tsconfck: 3.0.3(typescript@5.1.6)
       vite: 4.3.9(@types/node@20.5.9)
     transitivePeerDependencies:
       - supports-color
