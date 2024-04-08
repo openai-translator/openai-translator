@@ -28,15 +28,6 @@ export class Azure extends AbstractOpenAI {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async getBaseRequestBody(): Promise<Record<string, any>> {
-        const body = await super.getBaseRequestBody()
-        return {
-            ...body,
-            max_tokens: 4096,
-        }
-    }
-
     async getAPIURL(): Promise<string> {
         const settings = await getSettings()
         return settings.azureAPIURL

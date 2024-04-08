@@ -48,10 +48,13 @@ export abstract class AbstractOpenAI extends AbstractEngine {
         return true
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async getBaseRequestBody(): Promise<Record<string, any>> {
+    async sendMessage(req: IMessageRequest): Promise<void> {
         const model = await this.getAPIModel()
-        return {
+        const url = `${await this.getAPIURL()}${await this.getAPIURLPath()}`
+        const headers = await this.getHeaders()
+        const isChatAPI = await this.isChatAPI()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const body: Record<string, any> = {
             model,
             temperature: 0,
             top_p: 1,
@@ -59,13 +62,6 @@ export abstract class AbstractOpenAI extends AbstractEngine {
             presence_penalty: 1,
             stream: true,
         }
-    }
-
-    async sendMessage(req: IMessageRequest): Promise<void> {
-        const url = `${await this.getAPIURL()}${await this.getAPIURLPath()}`
-        const headers = await this.getHeaders()
-        const isChatAPI = await this.isChatAPI()
-        const body = await this.getBaseRequestBody()
         if (!isChatAPI) {
             // Azure OpenAI Service supports multiple API.
             // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
