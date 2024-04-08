@@ -61,7 +61,7 @@
     "katex": "^0.16.8",
     "lodash.debounce": "^4.0.8",
     "lru-cache": "^10.0.1",
-    "prism-react-renderer": "^2.3.0",
+    "prism-react-renderer": "^2.3.1",
     "qs": "^6.11.2",
     "rc-field-form": "^1.36.0",
     "react": "^18.2.0",

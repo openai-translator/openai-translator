@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -111,8 +111,8 @@ dependencies:
     specifier: ^10.0.1
     version: 10.0.1
   prism-react-renderer:
-    specifier: ^2.3.0
-    version: 2.3.0(react@18.2.0)
+    specifier: ^2.3.1
+    version: 2.3.1(react@18.2.0)
   qs:
     specifier: ^6.11.2
     version: 6.11.2
@@ -124,7 +124,7 @@ dependencies:
     version: 18.2.0
   react-code-block:
     specifier: ^1.0.0
-    version: 1.0.0(prism-react-renderer@2.3.0)(react-dom@18.2.0)(react@18.2.0)
+    version: 1.0.0(prism-react-renderer@2.3.1)(react-dom@18.2.0)(react@18.2.0)
   react-copy-to-clipboard:
     specifier: ^5.1.0
     version: 5.1.0(react@18.2.0)
@@ -5980,8 +5980,8 @@ packages:
       react-is: 18.2.0
     dev: true
 
-  /prism-react-renderer@2.3.0(react@18.2.0):
-    resolution: {integrity: sha512-UYRg2TkVIaI6tRVHC5OJ4/BxqPUxJkJvq/odLT/ykpt1zGYXooNperUxQcCvi87LyRnR4nCh81ceOA+e7nrydg==}
+  /prism-react-renderer@2.3.1(react@18.2.0):
+    resolution: {integrity: sha512-Rdf+HzBLR7KYjzpJ1rSoxT9ioO85nZngQEoFIhL07XhtJHlCU3SOz0GJ6+qvMyQe0Se+BV3qpe6Yd/NmQF5Juw==}
     peerDependencies:
       react: '>=16.0.0'
     dependencies:
@@ -6098,14 +6098,14 @@ packages:
       react: 18.2.0
     dev: false
 
-  /react-code-block@1.0.0(prism-react-renderer@2.3.0)(react-dom@18.2.0)(react@18.2.0):
+  /react-code-block@1.0.0(prism-react-renderer@2.3.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-/u9QspD0qhZNKbW1+Nek42//LwrekrFjHi4Fk1Dv7L8oz3X4FRXO/oUh119OrUlA0vybDjcXJPj3xJ1mZXV/rw==}
     peerDependencies:
       prism-react-renderer: ^2
       react: ^18
       react-dom: ^18
     dependencies:
-      prism-react-renderer: 2.3.0(react@18.2.0)
+      prism-react-renderer: 2.3.1(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
