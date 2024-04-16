@@ -21,6 +21,7 @@ export interface IMessageRequest {
 }
 
 export interface IEngine {
+    checkLogin: () => Promise<boolean>
     isLocal(): boolean
     supportCustomModel(): boolean
     getModel(): Promise<string>

@@ -1,6 +1,9 @@
 import { IEngine, IMessageRequest, IModel } from './interfaces'
 
 export abstract class AbstractEngine implements IEngine {
+    async checkLogin(): Promise<boolean> {
+        return true
+    }
     isLocal() {
         return false
     }

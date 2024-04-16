@@ -126,4 +126,6 @@ export interface ISettings {
     claudeAPIModel: string
     claudeAPIKey: string
     claudeCustomModelName: string
+    kimiAccessToken: string
+    kimiRefreshToken: string
 }

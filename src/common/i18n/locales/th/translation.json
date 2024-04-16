@@ -173,5 +173,9 @@
     "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "โมเดลต้องใช้คำสั่ง `ollama pull` ก่อนที่จะดาวน์โหลดไปยังเครื่องที่ตั้งอยู่ โปรดดูโมเดลทั้งหมดจากหน้านี้:",
     "Generally, there is no need to modify this item.": "โดยทั่วไปไม่จำเป็นต้องแก้ไขรายการนี้",
     "Hide the icon in the taskbar": "ซ่อนไอคอนในแถบงาน",
+    "Please login to Kimi Web": "โปรดเข้าสู่ระบบ Kimi Web",
+    "Free": "ฟรี",
+    "to get your refresh_token.": "เพื่อรับ refresh_token ของคุณ",
+    "to get your access_token.": "เพื่อรับ access_token ของคุณ",
     "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

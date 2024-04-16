@@ -16,9 +16,21 @@ import { MoonshotIcon } from '@/common/components/icons/MoonshotIcon'
 import { ClaudeIcon } from '@/common/components/icons/ClaudeIcon'
 import { Groq } from './groq'
 import { GroqIcon } from '@/common/components/icons/GroqIcon'
+import { KimiIcon } from '@/common/components/icons/KimiIcon'
 import { Claude } from './claude'
+import { Kimi } from './kimi'
 
-export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure' | 'MiniMax' | 'Moonshot' | 'Gemini' | 'Ollama' | 'Groq' | 'Claude'
+export type Provider =
+    | 'OpenAI'
+    | 'ChatGPT'
+    | 'Azure'
+    | 'MiniMax'
+    | 'Moonshot'
+    | 'Gemini'
+    | 'Ollama'
+    | 'Groq'
+    | 'Claude'
+    | 'Kimi'
 
 export const engineIcons: Record<Provider, IconType> = {
     OpenAI: RiOpenaiFill,
@@ -30,6 +42,7 @@ export const engineIcons: Record<Provider, IconType> = {
     Ollama: OllamaIcon,
     Groq: GroqIcon,
     Claude: ClaudeIcon,
+    Kimi: KimiIcon,
 }
 
 export const providerToEngine: Record<Provider, { new (): IEngine }> = {
@@ -42,6 +55,7 @@ export const providerToEngine: Record<Provider, { new (): IEngine }> = {
     Ollama: Ollama,
     Groq: Groq,
     Claude: Claude,
+    Kimi: Kimi,
 }
 
 export function getEngine(provider: Provider): IEngine {

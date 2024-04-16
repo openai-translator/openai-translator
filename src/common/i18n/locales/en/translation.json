@@ -174,5 +174,9 @@
     "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:",
     "Generally, there is no need to modify this item.": "Generally, there is no need to modify this item.",
     "Hide the icon in the taskbar": "Hide the icon in the taskbar",
+    "Please login to Kimi Web": "Please login to Kimi Web",
+    "Free": "Free",
+    "to get your refresh_token.": "to get your refresh_token.",
+    "to get your access_token.": "to get your access_token.",
     "If you find this tool helpful, you can buy me a cup of coffee.": "If you find this tool helpful, you can buy me a cup of coffee."
 }

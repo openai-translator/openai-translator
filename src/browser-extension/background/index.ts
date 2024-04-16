@@ -7,6 +7,7 @@ import { actionInternalService } from '../../common/internal-services/action'
 import { optionsPageHeaderPromotionIDKey, optionsPageOpenaiAPIKeyPromotionIDKey } from '../common'
 import { chatgptArkoseReqParams } from '@/common/constants'
 import { keyChatgptArkoseReqForm, keyChatgptArkoseReqUrl } from '@/common/engines/chatgpt'
+import { keyKimiAccessToken } from '@/common/engines/kimi'
 
 browser.contextMenus?.create(
     {
@@ -194,6 +195,28 @@ try {
             types: ['xmlhttprequest'],
         },
         ['requestBody']
+    )
+
+    browser.webRequest.onBeforeSendHeaders.addListener(
+        (details) => {
+            if (details.url.includes('/api/user')) {
+                const headers = details.requestHeaders || []
+                const authorization = headers.find((h) => h.name === 'Authorization')?.value || ''
+                const accessToken = authorization.split(' ')[1]
+                browser.storage.local
+                    .set({
+                        [keyKimiAccessToken]: accessToken,
+                    })
+                    .then(() => {
+                        console.log('Kimi access_token saved')
+                    })
+            }
+        },
+        {
+            urls: ['https://*.moonshot.cn/*'],
+            types: ['xmlhttprequest'],
+        },
+        ['requestHeaders']
     )
 } catch (error) {
     console.error('Error adding webRequest listener', error)

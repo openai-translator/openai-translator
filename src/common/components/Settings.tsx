@@ -1339,6 +1339,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
     const options = utils.isDesktopApp()
         ? ([
               { label: 'OpenAI', id: 'OpenAI' },
+              { label: `Kimi (${t('Free')})`, id: 'Kimi' },
               { label: `Ollama (${t('Local Model')})`, id: 'Ollama' },
               { label: 'Gemini', id: 'Gemini' },
               // { label: 'ChatGPT (Web)', id: 'ChatGPT' },
@@ -1353,6 +1354,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
           }[])
         : ([
               { label: 'OpenAI', id: 'OpenAI' },
+              { label: `Kimi (${t('Free')})`, id: 'Kimi' },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Gemini', id: 'Gemini' },
               { label: 'Azure', id: 'Azure' },
@@ -2230,6 +2232,62 @@ export function InnerSettings({
                                 caption={t('Generally, there is no need to modify this item.')}
                             >
                                 <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                        </div>
+                        <div
+                            style={{
+                                display: values.provider === 'Kimi' && utils.isDesktopApp() ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                required={values.provider === 'Kimi' && utils.isDesktopApp()}
+                                name='kimiRefreshToken'
+                                label='Kimi Refresh Token'
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href={
+                                                values?.i18n?.toLowerCase().includes('zh')
+                                                    ? 'https://github.com/openai-translator/openai-translator/blob/main/docs/kimi-cn.md'
+                                                    : 'https://github.com/openai-translator/openai-translator/blob/main/docs/kimi.md'
+                                            }
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            Tutorial
+                                        </a>{' '}
+                                        {t('to get your refresh_token.')}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                required={values.provider === 'Kimi' && utils.isDesktopApp()}
+                                name='kimiAccessToken'
+                                label='Kimi Access Token'
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href={
+                                                values?.i18n?.toLowerCase().includes('zh')
+                                                    ? 'https://github.com/openai-translator/openai-translator/blob/main/docs/kimi-cn.md'
+                                                    : 'https://github.com/openai-translator/openai-translator/blob/main/docs/kimi.md'
+                                            }
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            Tutorial
+                                        </a>{' '}
+                                        {t('to get your access_token.')}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                             </FormItem>
                         </div>
                         <div

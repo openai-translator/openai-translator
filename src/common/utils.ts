@@ -95,6 +95,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     claudeAPIModel: 1,
     claudeAPIKey: 1,
     claudeCustomModelName: 1,
+    kimiRefreshToken: 1,
+    kimiAccessToken: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
