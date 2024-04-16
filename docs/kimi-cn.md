@@ -5,7 +5,7 @@
 
   去 [Kimi 官网](https://kimi.moonshot.cn) 登录
 
-2. 根据视频流程获取 access token 作为 API Key 填入设置框中
+2. 根据视频流程获取 `access token` 作为 API Key 填入设置框中
 
   https://github.com/openai-translator/openai-translator/assets/1206493/e3221bc9-ebf3-47f2-b6a2-65c007bc46c9
 
