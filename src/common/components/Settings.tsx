@@ -845,7 +845,11 @@ function APIModelSelector({ currentProvider, provider, apiKey, value, onChange, 
                 ])
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (e: any) {
-                if (provider === 'ChatGPT' && e.message && e.message.includes('not login')) {
+                if (
+                    provider === 'ChatGPT' &&
+                    e.message &&
+                    (e.message.includes('not login') || e.message.includes('Forbidden'))
+                ) {
                     setIsChatGPTNotLogin(true)
                 }
                 setErrMsg(e.message)

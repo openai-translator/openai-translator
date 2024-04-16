@@ -2062,14 +2062,40 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                     </div>
                                 )}
                                 {errorMessage ? (
-                                    <div className={styles.errorMessage}>
-                                        <span>{errorMessage}</span>
-                                        <Tooltip content={t('Retry')} placement='bottom'>
-                                            <div onClick={() => forceTranslate()} className={styles.actionButton}>
-                                                <RxReload size={15} />
+                                    <>
+                                        <div className={styles.errorMessage}>
+                                            <span>{errorMessage}</span>
+                                            <Tooltip content={t('Retry')} placement='bottom'>
+                                                <div onClick={() => forceTranslate()} className={styles.actionButton}>
+                                                    <RxReload size={15} />
+                                                </div>
+                                            </Tooltip>
+                                        </div>
+                                        {settings.provider === 'ChatGPT' && (
+                                            <div
+                                                style={{
+                                                    color: theme.colors.contentPrimary,
+                                                }}
+                                            >
+                                                {t('Go to the')}{' '}
+                                                <a
+                                                    target='_blank'
+                                                    href={
+                                                        settings?.i18n?.toLowerCase().includes('zh')
+                                                            ? 'https://github.com/openai-translator/openai-translator/blob/main/docs/chatgpt-cn.md'
+                                                            : 'https://github.com/openai-translator/openai-translator/blob/main/docs/chatgpt.md'
+                                                    }
+                                                    rel='noreferrer'
+                                                    style={{
+                                                        color: theme.colors.contentSecondary,
+                                                    }}
+                                                >
+                                                    FAQ Page
+                                                </a>{' '}
+                                                {t('to get the solutions.')}
                                             </div>
-                                        </Tooltip>
-                                    </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <div
                                         style={{
