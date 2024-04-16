@@ -128,8 +128,10 @@ export class ChatGPT extends AbstractEngine {
     async sendMessage(req: IMessageRequest): Promise<void> {
         const model = await this.getModel()
         const fetcher = getUniversalFetch()
+        req.onStatusCode?.(200)
         let resp: Response | null = null
         resp = await fetcher(utils.defaultChatGPTAPIAuthSessionAPIURL, { signal: req.signal })
+        req.onStatusCode?.(resp.status)
         if (resp.status !== 200) {
             try {
                 const respJsn = await resp.json()
@@ -141,7 +143,6 @@ export class ChatGPT extends AbstractEngine {
             } catch {
                 req.onError('Failed to fetch ChatGPT Web accessToken.')
             }
-            req.onStatusCode?.(resp.status)
             return
         }
         const respJson = await resp?.json()

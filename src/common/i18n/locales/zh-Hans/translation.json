@@ -174,5 +174,10 @@
     "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "模型需要首先使用 `ollama pull` 命令下载到本地，请从此页面查看所有模型：",
     "Generally, there is no need to modify this item.": "一般情况下，无需修改此项。",
     "Hide the icon in the taskbar": "隐藏任务栏中的图标",
+    "Please login to Kimi Web": "请登录 Kimi Web",
+    "Free": "免费",
+    "to get your refresh_token.": "获取您的 refresh_token。",
+    "to get your access_token.": "获取您的 access_token。",
+    "to get the solutions.": "获取解决方案。",
     "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }

@@ -174,5 +174,10 @@
     "Model needs to first use the `ollama pull` command to download locally, please view all models from this page:": "モデルは最初に`ollama pull`コマンドを使用してローカルにダウンロードする必要があります。このページからすべてのモデルを表示してください：",
     "Generally, there is no need to modify this item.": "一般的に、この項目を変更する必要はありません。",
     "Hide the icon in the taskbar": "タスクバーのアイコンを非表示にする",
+    "Please login to Kimi Web": "Kimi Webにログインしてください",
+    "Free": "無料",
+    "to get your refresh_token.": "あなたのrefresh_tokenを取得する。",
+    "to get your access_token.": "あなたのaccess_tokenを取得する。",
+    "to get the solutions.": "ソリューションを取得する。",
     "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }
