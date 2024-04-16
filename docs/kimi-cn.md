@@ -5,8 +5,8 @@
 
   去 [Kimi 官网](https://kimi.moonshot.cn) 登录
 
-2. 根据视频流程获取 `access token` 作为 API Key 填入设置框中
+2. 根据下面视频教程获取 `refresh_token` 和 `access_token` 填入设置框中，千万别填反了！！！！！！！！！！！！！！
 
-  https://github.com/openai-translator/openai-translator/assets/1206493/e3221bc9-ebf3-47f2-b6a2-65c007bc46c9
+  https://github.com/openai-translator/openai-translator/assets/1206493/bd5d13aa-9469-4075-bbae-f490cd6667cd
 
-  ![settings](https://github.com/openai-translator/openai-translator/assets/1206493/05ae9463-4777-4c91-8188-bebc545b487e)
+  ![settings](https://github.com/openai-translator/openai-translator/assets/1206493/d04a46c5-68c6-44bb-b230-ba8b072fd23d)
