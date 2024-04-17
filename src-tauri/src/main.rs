@@ -12,6 +12,7 @@ mod utils;
 mod windows;
 mod writing;
 
+use debug_print::debug_println;
 use config::get_config;
 use parking_lot::Mutex;
 use serde_json::json;
@@ -211,8 +212,8 @@ fn bind_mouse_hook() {
                     },
                     None => false,
                 };
-                // println!("is_text_selected_event: {}", is_text_selected_event);
-                // println!("is_click_on_thumb: {}", is_click_on_thumb);
+                debug_println!("is_text_selected_event: {}", is_text_selected_event);
+                debug_println!("is_click_on_thumb: {}", is_click_on_thumb);
                 if !is_text_selected_event && !is_click_on_thumb {
                     windows::close_thumb();
                     // println!("not text selected event");
