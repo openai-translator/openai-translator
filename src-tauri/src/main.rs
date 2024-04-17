@@ -12,8 +12,8 @@ mod utils;
 mod windows;
 mod writing;
 
-use debug_print::debug_println;
 use config::get_config;
+use debug_print::debug_println;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::env;
