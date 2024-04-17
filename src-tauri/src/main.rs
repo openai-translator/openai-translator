@@ -249,17 +249,7 @@ fn bind_mouse_hook() {
                     if !selected_text.is_empty() {
                         let window = windows::show_translator_window(false, true, false);
                         utils::send_text(selected_text);
-                        if cfg!(target_os = "windows") {
-                            window.set_always_on_top(true).unwrap();
-                            let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
-                            if !always_on_top {
-                                std::thread::spawn(move || {
-                                    window.set_always_on_top(false).unwrap();
-                                });
-                            }
-                        } else {
-                            window.set_focus().unwrap();
-                        }
+                        window.set_focus().unwrap();
                     }
                 }
             }
