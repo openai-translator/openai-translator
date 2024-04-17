@@ -40,6 +40,9 @@ export class Kimi extends AbstractEngine {
             accessToken = config[keyKimiAccessToken]
         }
 
+        // generate traffic id like clg4susodhsh25d6vdhv
+        const trafficID = Array.from({ length: 20 }, () => Math.floor(Math.random() * 36).toString(36)).join('')
+
         return {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
@@ -47,7 +50,7 @@ export class Kimi extends AbstractEngine {
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
             'Origin': 'https://kimi.moonshot.cn',
             'Referer': 'https://kimi.moonshot.cn/',
-            'X-Traffic-Id': 'clg4susodhsh25d6vdhv',
+            'X-Traffic-Id': trafficID,
         }
     }
 
