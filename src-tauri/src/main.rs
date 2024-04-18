@@ -13,6 +13,7 @@ mod windows;
 mod writing;
 
 use config::get_config;
+use debug_print::debug_println;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::env;
@@ -211,8 +212,8 @@ fn bind_mouse_hook() {
                     },
                     None => false,
                 };
-                // println!("is_text_selected_event: {}", is_text_selected_event);
-                // println!("is_click_on_thumb: {}", is_click_on_thumb);
+                debug_println!("is_text_selected_event: {}", is_text_selected_event);
+                debug_println!("is_click_on_thumb: {}", is_click_on_thumb);
                 if !is_text_selected_event && !is_click_on_thumb {
                     windows::close_thumb();
                     // println!("not text selected event");
@@ -248,17 +249,7 @@ fn bind_mouse_hook() {
                     if !selected_text.is_empty() {
                         let window = windows::show_translator_window(false, true, false);
                         utils::send_text(selected_text);
-                        if cfg!(target_os = "windows") {
-                            window.set_always_on_top(true).unwrap();
-                            let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
-                            if !always_on_top {
-                                std::thread::spawn(move || {
-                                    window.set_always_on_top(false).unwrap();
-                                });
-                            }
-                        } else {
-                            window.set_focus().unwrap();
-                        }
+                        window.set_focus().unwrap();
                     }
                 }
             }

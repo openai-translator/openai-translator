@@ -65,6 +65,7 @@ import { usePromotionNeverDisplay } from '../hooks/usePromotionNeverDisplay'
 import { Textarea } from 'baseui-sd/textarea'
 import { ProxyTester } from './ProxyTester'
 import { CUSTOM_MODEL_ID } from '../constants'
+import { isMacOS, isWindows } from '../utils'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -1554,8 +1555,6 @@ export function InnerSettings({
     }, [prevValues, values])
 
     const isDesktopApp = utils.isDesktopApp()
-    const isMacOS = navigator.userAgent.includes('Mac OS X')
-    const isWindows = navigator.userAgent.includes('Windows')
 
     const styles = useStyles({ theme, themeType, isDesktopApp })
 

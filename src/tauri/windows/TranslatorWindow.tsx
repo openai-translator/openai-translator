@@ -15,6 +15,7 @@ import { setExternalOriginalText } from '../../common/store'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { usePinned } from '../../common/hooks/usePinned'
 import { useMemoWindow } from '../../common/hooks/useMemoWindow'
+import { isMacOS } from '@/common/utils'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -152,7 +153,7 @@ export function TranslatorWindow() {
         return () => {
             unlisten?.()
         }
-    }, [settings?.writingTargetLanguage])
+    }, [settings.writingTargetLanguage])
 
     useEffect(() => {
         let unlisten
@@ -196,8 +197,6 @@ export function TranslatorWindow() {
     const onSettingsShow = useCallback((isShow: boolean) => {
         setIsSettingsOpen(isShow)
     }, [])
-
-    const isMacOS = navigator.userAgent.includes('Mac OS X')
 
     return (
         <Window isTranslatorWindow windowsTitlebarDisableDarkMode={isSettingsOpen}>
