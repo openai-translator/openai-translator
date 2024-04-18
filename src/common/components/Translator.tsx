@@ -640,7 +640,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             setActivateAction(action)
         }
-    }, [settings?.defaultTranslateMode])
+    }, [settings.defaultTranslateMode])
 
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
@@ -789,7 +789,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
     const [isAutoCollectOn, setIsAutoCollectOn] = useState(
-        settings?.autoCollect === undefined ? false : settings.autoCollect
+        settings.autoCollect === undefined ? false : settings.autoCollect
     )
 
     const [translateDeps, setTranslateDeps] = useState<{
@@ -1361,7 +1361,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         console.debug('speak selected word', selectedWord)
         editableTextSpeakingIconRef.current?.click()
-    }, [selectedWord, settings?.readSelectedWordsFromInputElementsText])
+    }, [selectedWord, settings.readSelectedWordsFromInputElementsText])
 
     const enableVocabulary = !isUserscript()
 

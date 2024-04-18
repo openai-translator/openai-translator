@@ -22,6 +22,9 @@ import { isDesktopApp, isTauri } from '../utils'
 import { vocabularyService } from '../services/vocabulary'
 import { VocabularyItem } from '../internal-services/db'
 import { trackEvent } from '@aptabase/tauri'
+import { SpeakerIcon } from './SpeakerIcon'
+import { useSettings } from '../hooks/useSettings'
+import { LangCode, detectLang } from '../lang'
 
 const RANDOM_SIZE = 10
 const MAX_WORDS = 50
@@ -165,6 +168,8 @@ const Vocabulary = (props: IVocabularyProps) => {
 
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
+    const { settings } = useSettings()
+    const editableTextSpeakingIconRef = useRef<HTMLDivElement>(null)
 
     const [words, setWords] = useState<VocabularyItem[]>([])
     const [selectedWord, setSelectedWord] = useState<VocabularyItem>()
@@ -203,6 +208,17 @@ const Vocabulary = (props: IVocabularyProps) => {
     const [article, setArticle] = useState<string>('')
     const articleTxt = useRef<string>('')
     const descriptionLines = useMemo(() => selectedWord?.description.split('\n') ?? [], [selectedWord?.description])
+    const wordLanguage = useMemo(() => {
+        if (!selectedWord?.word) return 'en' // 默认返回 'en'，表示英语
+
+        let sourceLang: LangCode = 'en' // 初始化 sourceLang 为英语
+        // 异步获取语言信息，将结果赋值给 sourceLang
+        detectLang(selectedWord?.word ?? '').then((lang: LangCode) => {
+            sourceLang = lang
+        })
+        return sourceLang // 返回 sourceLang，这是一个同步的值
+    }, [selectedWord])
+    console.log('wordLanguage: ', wordLanguage)
     const articleUsedWord = useRef<string[]>()
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
@@ -358,7 +374,9 @@ const Vocabulary = (props: IVocabularyProps) => {
                                       key={index}
                                       size='mini'
                                       kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
-                                      onClick={() => setSelectedWord(item)}
+                                      onClick={() => {
+                                          setSelectedWord(item)
+                                      }}
                                   >
                                       {item.word}
                                   </Button>
@@ -417,6 +435,20 @@ const Vocabulary = (props: IVocabularyProps) => {
                             }}
                         >
                             {selectedWord.word}
+                            <Tooltip content={t('Speak')} placement='bottom'>
+                                <div className={styles.actionButton}>
+                                    <SpeakerIcon
+                                        size={15}
+                                        divRef={editableTextSpeakingIconRef}
+                                        provider={settings.tts?.provider}
+                                        text={selectedWord?.word}
+                                        lang={wordLanguage}
+                                        voice={settings.tts?.voices?.find((item) => item.lang === sourceLang)?.voice}
+                                        rate={settings.tts?.rate}
+                                        volume={settings.tts?.volume}
+                                    />
+                                </div>
+                            </Tooltip>
                             <StatefulTooltip
                                 content={isCollectedWord ? t('Remove from collection') : t('Add to collection')}
                                 showArrow
@@ -428,6 +460,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                             </StatefulTooltip>
                         </div>
                     )}
+
                     {descriptionLines.length > 0 && descriptionLines.map((line, idx) => <p key={idx}>{line}</p>)}
                     {selectedWord?.reviewCount && <p>{`[${t('review count')}] ${selectedWord?.reviewCount}`}</p>}
                     {selectedWord?.updatedAt && (
