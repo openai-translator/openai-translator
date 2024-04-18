@@ -18,7 +18,7 @@
     "test:e2e": "playwright test",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --cache",
     "lint:fix": "eslint --fix \"src/**/*.{ts,tsx}\"",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./.prettierrc --cache"
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./..prettierrc.js --cache"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
@@ -26,7 +26,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint \"src/**/*.{ts,tsx}\" --cache",
-      "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./.prettierrc --cache"
+      "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./..prettierrc.js --cache"
     ]
   },
   "author": "",
