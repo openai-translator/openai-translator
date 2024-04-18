@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import React from 'react'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { TranslatorWindow } from './windows/TranslatorWindow'
 import { SettingsWindow } from './windows/SettingsWindow'

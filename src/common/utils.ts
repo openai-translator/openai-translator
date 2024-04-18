@@ -498,3 +498,4 @@ export function getAssetUrl(asset: string) {
     }
     return new URL(asset, import.meta.url).href
 }
+export const isMacOS = navigator.userAgent.includes('Mac OS X')
