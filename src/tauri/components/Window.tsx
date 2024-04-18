@@ -15,6 +15,7 @@ import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { usePinned } from '../../common/hooks/usePinned'
+import { isMacOS } from '@/common/utils'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -73,7 +74,6 @@ interface ITitlebarContainerProps {
 export function TitlebarContainer(props: ITitlebarContainerProps) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
-    const isMacOS = navigator.userAgent.includes('Mac OS X')
 
     if (isMacOS) {
         return (
@@ -89,7 +89,7 @@ export function TitlebarContainer(props: ITitlebarContainerProps) {
 export function InnerWindow(props: IWindowProps) {
     const { theme, themeType } = useTheme()
     const styles = useStyles({ theme, themeType, windowsTitlebarDisableDarkMode: props.windowsTitlebarDisableDarkMode })
-    const isMacOS = navigator.userAgent.includes('Mac OS X')
+
     const { pinned, setPinned } = usePinned()
     const { i18n } = useTranslation()
     const { settings } = useSettings()
