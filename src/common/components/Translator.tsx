@@ -416,7 +416,7 @@ const useStyles = createUseStyles({
       '&::-webkit-scrollbar': {
         display: 'none',
       },
-      mask: 'linear-gradient(180deg, #0000 58px, #000f 72px, #000f calc(100% - 50px), #0000 calc(100% - 40px));'
+      mask: 'linear-gradient(180deg, #0000 58px, #000f 72px, #000f calc(100% - 60px), #0000 calc(100% - 40px));'
     },
 })
 
