@@ -2320,11 +2320,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     className={styles.footer}
                     style={{
                         boxShadow: isScrolledToBottom ? undefined : theme.lighting.shadow700,
-                        background: isScrolledToBottom
-                            ? undefined
-                            : themeType === 'dark'
+                        background: settings.enableMica && themeType === 'dark'
                             ? 'rgba(31, 31, 31, 0.5)'
-                            : undefined,
+                            : (isScrolledToBottom
+                                ? undefined
+                                : themeType === 'dark'
+                                ? 'rgba(31, 31, 31, 0.5)'
+                                : undefined),
                     }}
                 >
                     <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>
