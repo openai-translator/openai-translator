@@ -209,16 +209,14 @@ const Vocabulary = (props: IVocabularyProps) => {
     const articleTxt = useRef<string>('')
     const descriptionLines = useMemo(() => selectedWord?.description.split('\n') ?? [], [selectedWord?.description])
     const wordLanguage = useMemo(() => {
-        if (!selectedWord?.word) return 'en' // 默认返回 'en'，表示英语
-
-        let sourceLang: LangCode = 'en' // 初始化 sourceLang 为英语
-        // 异步获取语言信息，将结果赋值给 sourceLang
+        if (!selectedWord?.word) return 'en'
+        let sourceLang: LangCode = 'en'
         detectLang(selectedWord?.word ?? '').then((lang: LangCode) => {
             sourceLang = lang
         })
-        return sourceLang // 返回 sourceLang，这是一个同步的值
+        return sourceLang
     }, [selectedWord])
-    console.log('wordLanguage: ', wordLanguage)
+
     const articleUsedWord = useRef<string[]>()
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
@@ -443,7 +441,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                                         provider={settings.tts?.provider}
                                         text={selectedWord?.word}
                                         lang={wordLanguage}
-                                        voice={settings.tts?.voices?.find((item) => item.lang === sourceLang)?.voice}
+                                        voice={settings.tts?.voices?.find((item) => item.lang === wordLanguage)?.voice}
                                         rate={settings.tts?.rate}
                                         volume={settings.tts?.volume}
                                     />
