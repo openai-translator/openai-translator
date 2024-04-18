@@ -48,6 +48,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     azureAPIURL: 1,
     azureAPIURLPath: 1,
     azureAPIModel: 1,
+    enableMica: 1,
     miniMaxGroupID: 1,
     miniMaxAPIKey: 1,
     miniMaxAPIModel: 1,
@@ -173,6 +174,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.automaticCheckForUpdates === undefined || settings.automaticCheckForUpdates === null) {
         settings.automaticCheckForUpdates = true
+    }
+    if (settings.enableMica === undefined || settings.enableMica === null) {
+        settings.enableMica = false
     }
     if (!settings.languageDetectionEngine) {
         settings.languageDetectionEngine = 'baidu'

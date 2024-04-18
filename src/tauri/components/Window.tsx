@@ -1,5 +1,6 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
+import { Effect } from '@tauri-apps/api/window'
 import { useTheme } from '../../common/hooks/useTheme'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -94,6 +95,20 @@ export function InnerWindow(props: IWindowProps) {
     const { i18n } = useTranslation()
     const { settings } = useSettings()
 
+    const [mica, setMica] = useState(false)
+    useEffect(() => {
+      const appWindow = getCurrent()
+      if (settings.enableMica) {
+        //  TODO: It currently seems that the light/dark mode of the mica cannot be manually adjusted.
+        // link: https://beta.tauri.app/references/v2/js/core/namespacewindow/#mica
+        appWindow.setEffects({ effects: [Effect.Mica] })
+        setMica(true)
+      } else {
+        appWindow.clearEffects()
+        setMica(false)
+      }
+    }, [settings.enableMica, settings.themeType])
+
     useEffect(() => {
         if (!props.isTranslatorWindow) {
             return
@@ -136,7 +151,7 @@ export function InnerWindow(props: IWindowProps) {
         <div
             style={{
                 position: 'relative',
-                background: theme.colors.backgroundPrimary,
+                background: mica ? 'transparent' : theme.colors.backgroundPrimary,
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
                 minHeight: '100vh',
             }}

@@ -406,6 +406,18 @@ const useStyles = createUseStyles({
     'flexPlaceHolder': {
         marginRight: 'auto',
     },
+    'popupCardContentContainerMica': {
+      height: '100vh',
+      boxSizing: 'border-box',
+      overflow: 'auto',
+      paddingTop: '78px !important',
+      paddingBottom: '42px',
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      },
+      mask: 'linear-gradient(180deg, #0000 58px, #000f 72px, #000f calc(100% - 50px), #0000 calc(100% - 40px));'
+    },
 })
 
 interface IActionStrItem {
@@ -1520,8 +1532,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             ref={containerRef}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
-                background: theme.colors.backgroundPrimary,
-                paddingBottom: showSettings ? '0px' : '42px',
+                background: 'transparent',
+                paddingBottom: showSettings || settings.enableMica ? '0px' : '42px',
             }}
         >
             {showSettings && (
@@ -1546,6 +1558,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         style={{
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                             boxShadow: isDesktopApp() && !isScrolledToTop ? theme.lighting.shadow600 : undefined,
+                            background: settings.enableMica ? 'transparent' : ''
                         }}
                     >
                         {showLogo ? (
@@ -1767,7 +1780,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         )}
                     </div>
-                    <div className={styles.popupCardContentContainer}>
+                    <div
+                      className={clsx(styles.popupCardContentContainer, settings.enableMica && styles.popupCardContentContainerMica)}
+                    >
                         {settings?.apiURL === defaultAPIURL && (
                             <div>
                                 <IpLocationNotification showSettings={showSettings} />
@@ -1834,7 +1849,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         fontSize: '15px !important',
                                                         width: '100%',
                                                         borderRadius: '0px',
+                                                        background: settings.enableMica ? 'transparent !important' : undefined,
+                                                        borderWidth: settings.enableMica ? '1px' : undefined,
                                                     },
+                                                },
+                                                InputContainer: {
+                                                  style: settings.enableMica ? ({ $theme, $isFocused }) => ({
+                                                    background: ($isFocused ? $theme.colors.backgroundSecondary : $theme.colors.backgroundTertiary) + '80',
+                                                  }) : null,
                                                 },
                                                 Input: {
                                                     style: {

@@ -138,6 +138,8 @@
     "The update content:": "更新内容：",
     "Close": "关闭",
     "Automatic check for updates": "自动检查更新",
+    "Enable mica (Experimental)": "启用云母材质（实验性）",
+    "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.": "**仅限Win11。如果启用了 mica 效果，务必将`主题`设置为`跟随系统`，因为目前无法手动在 mica 的浅色和暗色主题之间切换。",
     "Display window Hotkey": "显示窗口快捷键",
     "Hide the icon in the Dock bar": "隐藏 Dock 栏中的图标",
     "Disagree": "不同意",

@@ -137,6 +137,8 @@
     "The update content:": "เนื้อหาการอัปเดต:",
     "Close": "ปิด",
     "Automatic check for updates": "ตรวจสอบการอัปเดตอัตโนมัติ",
+    "Enable mica (Experimental)": "มิกาทดลอง (ทดลอง)",
+    "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.": "สำหรับวินโดวส์ 11 เท่านั้น หากเปิดใช้งานเอฟเฟกต์มิกา จะจำเป็นต้องตั้งค่า `Theme` เป็น `Follow the system` เนื่องจากปัจจุบันยังไม่สามารถสลับระหว่างธีมแสงและธีมมืดของมิกาได้ด้วยตนเอง",
     "Display window Hotkey": "แสดงหน้าต่าง Hotkey",
     "Hide the icon in the Dock bar": "ซ่อนไอคอนในแถบแอปพลิเคชัน",
     "Disagree": "ไม่เห็นด้วย",

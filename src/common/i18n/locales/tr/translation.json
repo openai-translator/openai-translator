@@ -138,6 +138,8 @@
     "The update content:": "Güncelleme içeriği:",
     "Close": "Kapat",
     "Automatic check for updates": "Güncellemeleri otomatik kontrol et",
+    "Enable mica (Experimental)": "Deneysel mika (Deneysel)",
+    "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.": "Win11'e özel. Eğer mica etkisi etkinse, `Tema` ayarını `Sistem izlemesi` olarak belirlemek önemlidir, çünkü şu anda mica'nın açık ve koyu temaları arasında elle geçiş yapmak mümkün değildir.",
     "Display window Hotkey": "Ekran penceresi Kısayol Tuşu",
     "Hide the icon in the Dock bar": "Rıhtım çubuğundaki simgeyi gizle",
     "Disagree": "Katılmıyorum",

@@ -138,6 +138,8 @@
     "The update content:": "更新内容：",
     "Close": "閉じる",
     "Automatic check for updates": "自動更新チェック",
+    "Enable mica (Experimental)": "実験的なマカ（実験的）",
+    "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.": "Win11専用です。ミカ効果が有効になっている場合は、手動でミカのライトテーマとダークテーマを切り替えることができないため、`テーマ`を`システムに従う`に設定することが不可欠です。",
     "Display window Hotkey": "ウィンドウホットキーを表示",
     "Hide the icon in the Dock bar": "Dockバーのアイコンを非表示にする",
     "Disagree": "同意しない",

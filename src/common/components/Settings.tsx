@@ -1555,6 +1555,7 @@ export function InnerSettings({
 
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
+    const isWindows = navigator.userAgent.includes('Windows')
 
     const styles = useStyles({ theme, themeType, isDesktopApp })
 
@@ -2697,6 +2698,18 @@ export function InnerSettings({
                             }}
                             name='automaticCheckForUpdates'
                             label={t('Automatic check for updates')}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem
+                            style={{
+                                display: isDesktopApp && isWindows ? 'block' : 'none',
+                            }}
+                            name='enableMica'
+                            label={t('Enable mica (Experimental)')}
+                            caption={t(
+                              '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
+                            )}
                         >
                             <MyCheckbox onBlur={onBlur} />
                         </FormItem>
