@@ -410,7 +410,7 @@ const useStyles = createUseStyles({
         'height': '100vh',
         'boxSizing': 'border-box',
         'overflow': 'auto',
-        'paddingTop': '78px !important',
+        'paddingTop': '58px !important',
         'paddingBottom': '42px',
         'scrollbarWidth': 'none',
         '&::-webkit-scrollbar': {
