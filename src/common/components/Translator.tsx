@@ -2055,6 +2055,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 className={styles.actionButton}
                                                 onClick={() => {
                                                     setEditableText('')
+                                                    setTranslatedText('')
+                                                    setTranslateDeps((v) => {
+                                                        return {
+                                                            ...v,
+                                                            text: '',
+                                                        }
+                                                    })
                                                     editorRef.current?.focus()
                                                 }}
                                             >
