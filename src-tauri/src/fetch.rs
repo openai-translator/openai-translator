@@ -114,7 +114,7 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
         let chunk = item.map_err(|err| format!("failed to read response: {}", err))?;
         let chunk_str = String::from_utf8(chunk.to_vec())
             .map_err(|err| format!("failed to convert chunk to utf-8: {}", err))?;
-        debug_println!("chunk: {}", chunk_str);
+        // debug_println!("chunk: {}", chunk_str);
         app_handle
             .emit(
                 "fetch-stream-chunk",
