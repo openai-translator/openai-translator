@@ -2707,7 +2707,7 @@ export function InnerSettings({
                             name='enableMica'
                             label={t('Enable mica (Experimental)')}
                             caption={t(
-                              '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
+                                '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
                             )}
                         >
                             <MyCheckbox onBlur={onBlur} />

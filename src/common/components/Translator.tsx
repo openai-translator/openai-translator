@@ -407,16 +407,16 @@ const useStyles = createUseStyles({
         marginRight: 'auto',
     },
     'popupCardContentContainerMica': {
-      height: '100vh',
-      boxSizing: 'border-box',
-      overflow: 'auto',
-      paddingTop: '78px !important',
-      paddingBottom: '42px',
-      scrollbarWidth: 'none',
-      '&::-webkit-scrollbar': {
-        display: 'none',
-      },
-      mask: 'linear-gradient(180deg, #0000 58px, #000f 72px, #000f calc(100% - 60px), #0000 calc(100% - 40px));'
+        'height': '100vh',
+        'boxSizing': 'border-box',
+        'overflow': 'auto',
+        'paddingTop': '78px !important',
+        'paddingBottom': '42px',
+        'scrollbarWidth': 'none',
+        '&::-webkit-scrollbar': {
+            display: 'none',
+        },
+        'mask': 'linear-gradient(180deg, #0000 58px, #000f 72px, #000f calc(100% - 60px), #0000 calc(100% - 40px));',
     },
 })
 
@@ -1558,7 +1558,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         style={{
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                             boxShadow: isDesktopApp() && !isScrolledToTop ? theme.lighting.shadow600 : undefined,
-                            background: settings.enableMica ? 'transparent' : ''
+                            background: settings.enableMica ? 'transparent' : '',
                         }}
                     >
                         {showLogo ? (
@@ -1781,7 +1781,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         )}
                     </div>
                     <div
-                      className={clsx(styles.popupCardContentContainer, settings.enableMica && styles.popupCardContentContainerMica)}
+                        className={clsx(
+                            styles.popupCardContentContainer,
+                            settings.enableMica && styles.popupCardContentContainerMica
+                        )}
                     >
                         {settings?.apiURL === defaultAPIURL && (
                             <div>
@@ -1849,14 +1852,21 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         fontSize: '15px !important',
                                                         width: '100%',
                                                         borderRadius: '0px',
-                                                        background: settings.enableMica ? 'transparent !important' : undefined,
+                                                        background: settings.enableMica
+                                                            ? 'transparent !important'
+                                                            : undefined,
                                                         borderWidth: settings.enableMica ? '1px' : undefined,
                                                     },
                                                 },
                                                 InputContainer: {
-                                                  style: settings.enableMica ? ({ $theme, $isFocused }) => ({
-                                                    background: ($isFocused ? $theme.colors.backgroundSecondary : $theme.colors.backgroundTertiary) + '80',
-                                                  }) : null,
+                                                    style: settings.enableMica
+                                                        ? ({ $theme, $isFocused }) => ({
+                                                              background:
+                                                                  ($isFocused
+                                                                      ? $theme.colors.backgroundSecondary
+                                                                      : $theme.colors.backgroundTertiary) + '80',
+                                                          })
+                                                        : null,
                                                 },
                                                 Input: {
                                                     style: {
@@ -2320,13 +2330,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     className={styles.footer}
                     style={{
                         boxShadow: isScrolledToBottom ? undefined : theme.lighting.shadow700,
-                        background: settings.enableMica && themeType === 'dark'
-                            ? 'rgba(31, 31, 31, 0.5)'
-                            : (isScrolledToBottom
+                        background:
+                            settings.enableMica && themeType === 'dark'
+                                ? 'rgba(31, 31, 31, 0.5)'
+                                : isScrolledToBottom
                                 ? undefined
                                 : themeType === 'dark'
                                 ? 'rgba(31, 31, 31, 0.5)'
-                                : undefined),
+                                : undefined,
                     }}
                 >
                     <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>

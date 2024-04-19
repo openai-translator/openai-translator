@@ -97,16 +97,16 @@ export function InnerWindow(props: IWindowProps) {
 
     const [mica, setMica] = useState(false)
     useEffect(() => {
-      const appWindow = getCurrent()
-      if (settings.enableMica) {
-        //  TODO: It currently seems that the light/dark mode of the mica cannot be manually adjusted.
-        // link: https://beta.tauri.app/references/v2/js/core/namespacewindow/#mica
-        appWindow.setEffects({ effects: [Effect.Mica] })
-        setMica(true)
-      } else {
-        appWindow.clearEffects()
-        setMica(false)
-      }
+        const appWindow = getCurrent()
+        if (settings.enableMica) {
+            //  TODO: It currently seems that the light/dark mode of the mica cannot be manually adjusted.
+            // link: https://beta.tauri.app/references/v2/js/core/namespacewindow/#mica
+            appWindow.setEffects({ effects: [Effect.Mica] })
+            setMica(true)
+        } else {
+            appWindow.clearEffects()
+            setMica(false)
+        }
     }, [settings.enableMica, settings.themeType])
 
     useEffect(() => {
