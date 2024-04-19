@@ -2613,6 +2613,18 @@ export function InnerSettings({
                             <ThemeTypeSelector onBlur={onBlur} />
                         </FormItem>
                         <FormItem
+                            style={{
+                                display: isDesktopApp && isWindows ? 'block' : 'none',
+                            }}
+                            name='enableMica'
+                            label={t('Enable mica (Experimental)')}
+                            caption={t(
+                                '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
+                            )}
+                        >
+                            <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem
                             name='alwaysShowIcons'
                             label={t('Show icon when text is selected')}
                             caption={
@@ -2697,18 +2709,6 @@ export function InnerSettings({
                             }}
                             name='automaticCheckForUpdates'
                             label={t('Automatic check for updates')}
-                        >
-                            <MyCheckbox onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem
-                            style={{
-                                display: isDesktopApp && isWindows ? 'block' : 'none',
-                            }}
-                            name='enableMica'
-                            label={t('Enable mica (Experimental)')}
-                            caption={t(
-                                '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
-                            )}
                         >
                             <MyCheckbox onBlur={onBlur} />
                         </FormItem>
