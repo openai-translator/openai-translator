@@ -2,6 +2,7 @@
   "name": "openai-translator",
   "version": "0.1.0",
   "description": "openai-translator",
+  "packageManager": "pnpm@9.0.1",
   "main": "index.js",
   "scripts": {
     "prepare": "pnpm exec simple-git-hooks",

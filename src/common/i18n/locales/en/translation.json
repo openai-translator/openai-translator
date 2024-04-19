@@ -138,6 +138,8 @@
     "The update content:": "The update content:",
     "Close": "Close",
     "Automatic check for updates": "Automatic check for updates",
+    "Enable mica (Experimental)": "Experimental mica (Experimental)",
+    "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.": "**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.",
     "Display window Hotkey": "Display window Hotkey",
     "Hide the icon in the Dock bar": "Hide the icon in the Dock bar",
     "Disagree": "Disagree",
