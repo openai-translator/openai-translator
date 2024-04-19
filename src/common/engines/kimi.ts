@@ -71,8 +71,6 @@ export class Kimi extends AbstractEngine {
             }),
         })
 
-        req.onStatusCode?.(createChatResp.status)
-
         if (createChatResp.status === 401) {
             if (isDesktopApp() && settings.kimiRefreshToken) {
                 headers['Authorization'] = `Bearer ${settings.kimiRefreshToken}`
@@ -106,6 +104,7 @@ export class Kimi extends AbstractEngine {
                     return
                 }
             } else {
+                req.onStatusCode?.(createChatResp.status)
                 const jsn = (await createChatResp.json()) as {
                     message: string
                 }
