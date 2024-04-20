@@ -202,7 +202,7 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::WebviewWindow {
         }
         None => {
             debug_println!("Thumb window does not exist");
-            let builder = tauri::WebviewWindowBuilder::new(
+            let mut builder = tauri::WebviewWindowBuilder::new(
                 handle,
                 THUMB_WIN_NAME,
                 tauri::WebviewUrl::App("src/tauri/index.html".into()),
@@ -219,6 +219,11 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::WebviewWindow {
             .maximizable(false)
             .closable(false)
             .decorations(false);
+
+            #[cfg(target_os = "windows")]
+            {
+                builder = builder.shadow(false);
+            }
 
             let window = builder.build().unwrap();
             #[cfg(target_os = "windows")]
