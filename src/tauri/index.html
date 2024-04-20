@@ -28,8 +28,37 @@
             /*     } */
             /* } */
 
+            /* custom scrollbar */
             *::-webkit-scrollbar {
                 display: none;
+            }
+
+            textarea::-webkit-scrollbar {
+                display: block;
+                width: 20px;
+            }
+
+            textarea::-webkit-scrollbar-corner {
+                display: none;
+            }
+
+            textarea::-webkit-scrollbar-button {
+                display: none;
+            }
+
+            textarea::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+
+            textarea::-webkit-scrollbar-thumb {
+                background-color: #d6dee1;
+                border-radius: 20px;
+                border: 6px solid transparent;
+                background-clip: content-box;
+            }
+
+            textarea::-webkit-scrollbar-thumb:hover {
+                background-color: #a8bbbf;
             }
 
             *, a, button {
