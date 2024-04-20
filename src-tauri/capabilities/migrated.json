@@ -118,6 +118,7 @@
       "fs:scope-appdata",
       "fs:scope-applocaldata",
       "fs:scope-applog",
+      "fs:scope-desktop",
       "fs:allow-read-file",
       "fs:allow-write-file",
       "fs:allow-read-dir",
