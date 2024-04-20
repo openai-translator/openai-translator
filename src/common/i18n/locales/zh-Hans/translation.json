@@ -177,9 +177,12 @@
     "Generally, there is no need to modify this item.": "一般情况下，无需修改此项。",
     "Hide the icon in the taskbar": "隐藏任务栏中的图标",
     "Please login to Kimi Web": "请登录 Kimi Web",
+    "Please login to ChatGLM Web": "请登录智谱清言 Web",
     "Free": "免费",
     "to get your refresh_token.": "获取您的 refresh_token。",
     "to get your access_token.": "获取您的 access_token。",
+    "to get your token.": "获取您的 token。",
     "to get the solutions.": "获取解决方案。",
+    "ChatGLM": "智谱清言",
     "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }

@@ -177,9 +177,12 @@
     "Generally, there is no need to modify this item.": "Genel olarak, bu öğeyi değiştirmeye gerek yoktur.",
     "Hide the icon in the taskbar": "Görev çubuğundaki simgeyi gizle",
     "Please login to Kimi Web": "Lütfen Kimi Web'e giriş yapın",
+    "Please login to ChatGLM Web": "Lütfen ChatGLM Web'e giriş yapın",
     "Free": "Ücretsiz",
     "to get your refresh_token.": "yenileme belirtecinizi almak için.",
     "to get your access_token.": "erişim belirtecinizi almak için.",
+    "to get your token.": "belirtecinizi almak için.",
     "to get the solutions.": "çözümleri almak için.",
+    "ChatGLM": "ChatGLM",
     "If you find this tool helpful, you can buy me a cup of coffee.": "Bu aracı faydalı bulursanız bana bir fincan kahve ısmarlayabilirsiniz."
 }

@@ -129,4 +129,6 @@ export interface ISettings {
     claudeCustomModelName: string
     kimiAccessToken: string
     kimiRefreshToken: string
+    chatglmAccessToken: string
+    chatglmRefreshToken: string
 }
