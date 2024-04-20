@@ -1532,7 +1532,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             ref={containerRef}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
-                background: 'transparent',
+                background: isDesktopApp() ? 'transparent' : theme.colors.backgroundPrimary,
                 paddingBottom: showSettings || settings.enableMica ? '0px' : '42px',
             }}
         >
