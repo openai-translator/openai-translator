@@ -184,5 +184,10 @@
     "to get your token.": "あなたのtokenを取得する。",
     "to get the solutions.": "ソリューションを取得する。",
     "ChatGLM": "ChatGLM",
+    "Font size": "フォントサイズ",
+    "Font family": "フォントファミリー",
+    "UI font size": "UIフォントサイズ",
+    "UI font family": "UIフォントファミリー",
+    "Icon size": "アイコンサイズ",
     "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

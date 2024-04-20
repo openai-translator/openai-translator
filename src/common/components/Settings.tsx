@@ -66,6 +66,7 @@ import { Textarea } from 'baseui-sd/textarea'
 import { ProxyTester } from './ProxyTester'
 import { CUSTOM_MODEL_ID } from '../constants'
 import { isMacOS, isWindows } from '../utils'
+import NumberInput from './NumberInput'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -2681,6 +2682,9 @@ export function InnerSettings({
                             )}
                         >
                             <MyCheckbox onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem name='fontSize' label={t('Font size')}>
+                            <NumberInput />
                         </FormItem>
                         <FormItem
                             name='alwaysShowIcons'
