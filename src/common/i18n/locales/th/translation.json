@@ -183,5 +183,10 @@
     "to get your token.": "เพื่อรับ token ของคุณ",
     "to get the solutions.": "เพื่อรับการแก้ปัญหา",
     "ChatGLM": "ChatGLM",
+    "Font size": "ขนาดฟอนต์",
+    "Font family": "ฟอนต์ที่ใช้",
+    "UI font size": "ขนาดฟอนต์ UI",
+    "UI font family": "ฟอนต์ UI",
+    "Icon size": "ขนาดไอคอน",
     "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

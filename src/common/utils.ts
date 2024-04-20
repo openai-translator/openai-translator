@@ -100,6 +100,9 @@ const settingKeys: Record<keyof ISettings, number> = {
     kimiAccessToken: 1,
     chatglmAccessToken: 1,
     chatglmRefreshToken: 1,
+    fontSize: 1,
+    uiFontSize: 1,
+    iconSize: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -216,6 +219,15 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.geminiAPIURL === undefined || settings.geminiAPIURL === null) {
         settings.geminiAPIURL = defaultGeminiAPIURL
+    }
+    if (settings.fontSize === undefined || settings.fontSize === null) {
+        settings.fontSize = 15
+    }
+    if (settings.uiFontSize === undefined || settings.uiFontSize === null) {
+        settings.uiFontSize = 12
+    }
+    if (settings.iconSize === undefined || settings.iconSize === null) {
+        settings.iconSize = 15
     }
     return settings
 }

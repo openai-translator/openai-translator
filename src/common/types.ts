@@ -131,4 +131,7 @@ export interface ISettings {
     kimiRefreshToken: string
     chatglmAccessToken: string
     chatglmRefreshToken: string
+    fontSize: number
+    uiFontSize: number
+    iconSize: number
 }

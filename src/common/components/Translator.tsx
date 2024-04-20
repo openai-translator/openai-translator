@@ -298,7 +298,6 @@ const useStyles = createUseStyles({
         },
     },
     'popupCardTranslatedContentContainer': (props: IThemedStyleProps) => ({
-        'fontSize': '15px',
         'marginTop': '-14px',
         'display': 'flex',
         'overflowY': 'auto',
@@ -1849,7 +1848,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
-                                                        fontSize: '15px !important',
+                                                        fontSize: `${settings.fontSize}px !important`,
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                         background: settings.enableMica
@@ -1870,7 +1869,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 },
                                                 Input: {
                                                     style: {
-                                                        fontSize: '15px !important',
+                                                        fontSize: `${settings.fontSize}px !important`,
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
@@ -2144,6 +2143,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         <div
                                             ref={translatedContentRef}
                                             className={styles.popupCardTranslatedContentContainer}
+                                            style={{
+                                                fontSize: settings.fontSize,
+                                            }}
                                         >
                                             <div>
                                                 {currentTranslateMode === 'explain-code' ||
