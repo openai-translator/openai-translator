@@ -4,6 +4,12 @@ import { fetchSSE, getSettings, isDesktopApp } from '@/common/utils'
 import { AbstractEngine } from '@/common/engines/abstract-engine'
 import { IModel, IMessageRequest } from '@/common/engines/interfaces'
 import qs from 'qs'
+import { LRUCache } from 'lru-cache'
+
+const cache = new LRUCache<string, string>({
+    max: 100,
+    ttl: 1000 * 60 * 60,
+})
 
 export const keyChatGLMAccessToken = 'chatglm-access-token'
 export const keyChatGLMRefreshToken = 'chatglm-refresh-token'
@@ -43,39 +49,46 @@ export class ChatGLM extends AbstractEngine {
 
         const assistantID = '65940acff94777010aa6b796'
         const conversationTitle = 'OpenAI Translator'
-        let conversationID = ''
+        const conversationIDCacheKey = `chatglm-conversation-id-${assistantID}`
+        let conversationID = cache.get(conversationIDCacheKey) || ''
+
+        if (conversationID) {
+            console.log('Using cached conversation ID:', conversationID)
+        }
 
         req.onStatusCode?.(200)
 
         const headers = await this.getHeaders()
 
-        const conversationListResp = await fetcher(
-            `https://chatglm.cn/chatglm/backend-api/assistant/conversation/list?${qs.stringify({
-                assistant_id: assistantID,
-                page: 1,
-                page_size: 25,
-            })}`,
-            {
-                method: 'GET',
-                headers,
+        if (!conversationID) {
+            const conversationListResp = await fetcher(
+                `https://chatglm.cn/chatglm/backend-api/assistant/conversation/list?${qs.stringify({
+                    assistant_id: assistantID,
+                    page: 1,
+                    page_size: 25,
+                })}`,
+                {
+                    method: 'GET',
+                    headers,
+                }
+            )
+
+            req.onStatusCode?.(conversationListResp.status)
+
+            if (!conversationListResp.ok) {
+                const jsn = await conversationListResp.json()
+                req.onError?.(jsn.message ?? jsn.msg ?? 'unknown error')
+                return
             }
-        )
 
-        req.onStatusCode?.(conversationListResp.status)
+            const conversationList = await conversationListResp.json()
 
-        if (!conversationListResp.ok) {
-            const jsn = await conversationListResp.json()
-            req.onError?.(jsn.message ?? jsn.msg ?? 'unknown error')
-            return
+            const conversation = conversationList.result.conversation_list.find(
+                (c: { id: string; title: string }) => c.title === conversationTitle
+            )
+
+            conversationID = conversation?.id
         }
-
-        const conversationList = await conversationListResp.json()
-
-        const conversation = conversationList.result.conversation_list.find(
-            (c: { id: string; title: string }) => c.title === conversationTitle
-        )
-
-        conversationID = conversation?.id
 
         if (!conversationID) {
             try {
@@ -127,6 +140,8 @@ export class ChatGLM extends AbstractEngine {
             req.onError?.('Failed to create conversation')
             return
         }
+
+        cache.set(conversationIDCacheKey, conversationID)
 
         let hasError = false
         let finished = false
@@ -185,6 +200,7 @@ export class ChatGLM extends AbstractEngine {
                 })
             },
             onError: (err) => {
+                console.error('err', err)
                 hasError = true
                 if (err instanceof Error) {
                     req.onError(err.message)
