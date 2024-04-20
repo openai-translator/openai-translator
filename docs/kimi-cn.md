@@ -1,5 +1,5 @@
-如何获取 Kimi API key
-======================
+如何获取 Kimi refresh_token 和 access_token
+==========================================
 
 1. 去 [Kimi 官网](https://kimi.moonshot.cn) 登录
 
