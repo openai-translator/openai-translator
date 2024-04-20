@@ -98,6 +98,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     claudeCustomModelName: 1,
     kimiRefreshToken: 1,
     kimiAccessToken: 1,
+    chatglmAccessToken: 1,
+    chatglmRefreshToken: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {
@@ -419,6 +421,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
             options.signal?.addEventListener('abort', () => {
                 unlisten?.()
                 emit('abort-fetch-stream', { id })
+                resolve()
             })
             listen(
                 'fetch-stream-chunk',

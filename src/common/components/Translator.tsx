@@ -1116,7 +1116,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     detectFrom: sourceLang,
                     detectTo: targetLang,
                     onStatusCode: (statusCode) => {
-                        setIsNotLogin(statusCode === 401 || statusCode === 403)
+                        setIsNotLogin(statusCode === 401 || statusCode === 403 || statusCode === 422)
                     },
                     onMessage: async (message) => {
                         if (!message.content) {
@@ -2315,6 +2315,49 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 <span>{t('Please login to Kimi Web')}: </span>
                                                 <a
                                                     href='https://kimi.moonshot.cn/'
+                                                    target='_blank'
+                                                    rel='noreferrer'
+                                                    style={{
+                                                        color: theme.colors.contentSecondary,
+                                                    }}
+                                                >
+                                                    Login
+                                                </a>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                                {isNotLogin && settings?.provider === 'ChatGLM' && (
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            color: theme.colors.contentPrimary,
+                                        }}
+                                    >
+                                        {isDesktopApp() ? (
+                                            <>
+                                                {t('Go to the')}{' '}
+                                                <a
+                                                    target='_blank'
+                                                    href={
+                                                        settings?.i18n?.toLowerCase().includes('zh')
+                                                            ? 'https://github.com/openai-translator/openai-translator/blob/main/docs/chatglm-cn.md'
+                                                            : 'https://github.com/openai-translator/openai-translator/blob/main/docs/chatglm.md'
+                                                    }
+                                                    rel='noreferrer'
+                                                    style={{
+                                                        color: theme.colors.contentSecondary,
+                                                    }}
+                                                >
+                                                    Tutorial
+                                                </a>{' '}
+                                                {t('to get your API Key.')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>{t('Please login to ChatGLM Web')}: </span>
+                                                <a
+                                                    href='https://chatglm.cn/'
                                                     target='_blank'
                                                     rel='noreferrer'
                                                     style={{

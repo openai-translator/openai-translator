@@ -176,9 +176,12 @@
     "Generally, there is no need to modify this item.": "โดยทั่วไปไม่จำเป็นต้องแก้ไขรายการนี้",
     "Hide the icon in the taskbar": "ซ่อนไอคอนในแถบงาน",
     "Please login to Kimi Web": "โปรดเข้าสู่ระบบ Kimi Web",
+    "Please login to ChatGLM Web": "โปรดเข้าสู่ระบบ ChatGLM Web",
     "Free": "ฟรี",
     "to get your refresh_token.": "เพื่อรับ refresh_token ของคุณ",
     "to get your access_token.": "เพื่อรับ access_token ของคุณ",
+    "to get your token.": "เพื่อรับ token ของคุณ",
     "to get the solutions.": "เพื่อรับการแก้ปัญหา",
+    "ChatGLM": "ChatGLM",
     "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

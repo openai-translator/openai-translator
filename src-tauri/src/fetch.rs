@@ -104,7 +104,10 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
     let listen_id = app_handle.listen_any("abort-fetch-stream", move |msg| {
         let payload: AbortEventPayload = serde_json::from_str(&msg.payload()).unwrap();
         if payload.id == cloned_id {
+            debug_println!("aborting fetch stream: {}", payload.id);
             abort_handle.abort();
+        } else {
+            debug_println!("ignoring abort event for: {}", payload.id);
         }
     });
 
