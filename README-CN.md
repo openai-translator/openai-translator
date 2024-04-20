@@ -162,7 +162,7 @@ const API_URL_PATH = `/openai/deployments/${deployName}/chat/completions?api-ver
 
 - resourceName: 你的 Azure OpenAI Service 资源名称。
 - deployName: 你的 Azure OpenAI Service 模型部署名称，更改部署名称以切换模型。
-- api-version: 2023-05-15，或者更新的版本。
+- api-version: 2023-05-15，或者更新的版本。（受支持的API version列表可以在[Azure官方文档](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#completions)查找）
 
 # License
 
