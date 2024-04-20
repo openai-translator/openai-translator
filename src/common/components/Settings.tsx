@@ -1791,7 +1791,7 @@ export function InnerSettings({
             style={{
                 paddingTop: utils.isBrowserExtensionOptions() ? undefined : '136px',
                 paddingBottom: utils.isBrowserExtensionOptions() ? undefined : '32px',
-                background: theme.colors.backgroundPrimary,
+                background: isDesktopApp ? 'transparent' : theme.colors.backgroundPrimary,
                 minWidth: isDesktopApp ? 450 : 400,
                 maxHeight: utils.isUserscript() ? 'calc(100vh - 32px)' : undefined,
                 overflow: utils.isUserscript() ? 'auto' : undefined,
