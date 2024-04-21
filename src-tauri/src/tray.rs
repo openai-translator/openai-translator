@@ -63,7 +63,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         ],
     )?;
 
-    let tray = app.tray().unwrap();
+    let tray = app.tray_by_id("tray").unwrap();
     tray.set_menu(Some(menu.clone()))?;
     if TRAY_EVENT_REGISTERED.load(Ordering::Acquire) {
         return Ok(());
