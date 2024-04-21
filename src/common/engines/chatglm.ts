@@ -1,15 +1,9 @@
 /* eslint-disable camelcase */
 import { getUniversalFetch } from '@/common/universal-fetch'
-import { fetchSSE, getSettings, isDesktopApp } from '@/common/utils'
+import { fetchSSE, getSettings, isDesktopApp, setSettings } from '@/common/utils'
 import { AbstractEngine } from '@/common/engines/abstract-engine'
 import { IModel, IMessageRequest } from '@/common/engines/interfaces'
 import qs from 'qs'
-import { LRUCache } from 'lru-cache'
-
-const cache = new LRUCache<string, string>({
-    max: 100,
-    ttl: 1000 * 60 * 60,
-})
 
 export const keyChatGLMAccessToken = 'chatglm-access-token'
 export const keyChatGLMRefreshToken = 'chatglm-refresh-token'
@@ -44,51 +38,78 @@ export class ChatGLM extends AbstractEngine {
         }
     }
 
+    async refreshAccessToken(onStatusCode: ((statusCode: number) => void) | undefined) {
+        const settings = await getSettings()
+
+        const headers = await this.getHeaders()
+
+        const fetcher = getUniversalFetch()
+
+        headers['Authorization'] = `Bearer ${settings.chatglmRefreshToken}`
+        const refreshResp = await fetcher('https://chatglm.cn/chatglm/backend-api/v1/user/refresh', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({}),
+        })
+        onStatusCode?.(refreshResp.status)
+        if (refreshResp.status === 200) {
+            const data = await refreshResp.json()
+            if (data.message !== 'success') {
+                throw new Error('Failed to refresh ChatGLM access token: ' + data.message)
+            }
+            await setSettings({
+                ...settings,
+                chatglmAccessToken: data.result.accessToken,
+            })
+        } else {
+            throw new Error('Failed to refresh ChatGLM access token: ' + refreshResp.statusText)
+        }
+    }
+
     async sendMessage(req: IMessageRequest): Promise<void> {
+        const settings = await getSettings()
+        const refreshToken = settings.chatglmRefreshToken
         const fetcher = getUniversalFetch()
 
         const assistantID = '65940acff94777010aa6b796'
         const conversationTitle = 'OpenAI Translator'
-        const conversationIDCacheKey = `chatglm-conversation-id-${assistantID}`
-        let conversationID = cache.get(conversationIDCacheKey) || ''
-
-        if (conversationID) {
-            console.log('Using cached conversation ID:', conversationID)
-        }
 
         req.onStatusCode?.(200)
 
         const headers = await this.getHeaders()
 
-        if (!conversationID) {
-            const conversationListResp = await fetcher(
-                `https://chatglm.cn/chatglm/backend-api/assistant/conversation/list?${qs.stringify({
-                    assistant_id: assistantID,
-                    page: 1,
-                    page_size: 25,
-                })}`,
-                {
-                    method: 'GET',
-                    headers,
-                }
-            )
-
-            req.onStatusCode?.(conversationListResp.status)
-
-            if (!conversationListResp.ok) {
-                const jsn = await conversationListResp.json()
-                req.onError?.(jsn.message ?? jsn.msg ?? 'unknown error')
-                return
+        const conversationListResp = await fetcher(
+            `https://chatglm.cn/chatglm/backend-api/assistant/conversation/list?${qs.stringify({
+                assistant_id: assistantID,
+                page: 1,
+                page_size: 25,
+            })}`,
+            {
+                method: 'GET',
+                headers,
             }
+        )
 
-            const conversationList = await conversationListResp.json()
+        req.onStatusCode?.(conversationListResp.status)
 
-            const conversation = conversationList.result.conversation_list.find(
-                (c: { id: string; title: string }) => c.title === conversationTitle
-            )
-
-            conversationID = conversation?.id
+        if ((conversationListResp.status === 401 || conversationListResp.status === 422) && refreshToken) {
+            await this.refreshAccessToken(req.onStatusCode)
+            return await this.sendMessage(req)
         }
+
+        if (!conversationListResp.ok) {
+            const jsn = await conversationListResp.json()
+            req.onError?.(jsn.message ?? jsn.msg ?? 'unknown error')
+            return
+        }
+
+        const conversationList = await conversationListResp.json()
+
+        const conversation = conversationList.result.conversation_list.find(
+            (c: { id: string; title: string }) => c.title === conversationTitle
+        )
+
+        let conversationID = conversation?.id
 
         if (!conversationID) {
             try {
@@ -140,8 +161,6 @@ export class ChatGLM extends AbstractEngine {
             req.onError?.('Failed to create conversation')
             return
         }
-
-        cache.set(conversationIDCacheKey, conversationID)
 
         let hasError = false
         let finished = false
