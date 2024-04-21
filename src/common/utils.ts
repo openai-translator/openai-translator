@@ -428,13 +428,23 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
 
     if (isTauri()) {
         const id = uuidv4()
-        let unlisten: (() => void) | undefined = undefined
+        const unlistens: Array<() => void> = []
+        const unlisten = () => {
+            unlistens.forEach((unlisten) => unlisten())
+        }
         return await new Promise<void>((resolve, reject) => {
             options.signal?.addEventListener('abort', () => {
                 unlisten?.()
                 emit('abort-fetch-stream', { id })
                 resolve()
             })
+            listen('fetch-stream-status-code', (event: Event<{ id: string; status: number }>) => {
+                if (event.payload.id === id) {
+                    onStatusCode?.(event.payload.status)
+                }
+            })
+                .then((unlisten) => unlistens.push(unlisten))
+                .catch((e) => reject(e))
             listen(
                 'fetch-stream-chunk',
                 (event: Event<{ id: string; data: string; done: boolean; status: number }>) => {
@@ -464,7 +474,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 }
             )
                 .then((cb) => {
-                    unlisten = cb
+                    unlistens.push(cb)
                 })
                 .catch((e) => {
                     reject(e)

@@ -29,6 +29,12 @@ pub(crate) struct StreamChunk {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub(crate) struct StreamStatusCode {
+    id: String,
+    status: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub(crate) struct AbortEventPayload {
     id: String,
 }
@@ -96,9 +102,19 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
 
     let status = resp.status();
 
+    let app_handle = APP_HANDLE.get().unwrap();
+    app_handle
+        .emit(
+            "fetch-stream-status-code",
+            StreamStatusCode {
+                id: id.clone(),
+                status: status.as_u16(),
+            },
+        )
+        .unwrap();
+
     let stream = resp.bytes_stream();
 
-    let app_handle = APP_HANDLE.get().unwrap();
     let (abort_handle, abort_registration) = AbortHandle::new_pair();
     let cloned_id = id.clone();
     let listen_id = app_handle.listen_any("abort-fetch-stream", move |msg| {
