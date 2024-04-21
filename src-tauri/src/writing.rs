@@ -35,6 +35,7 @@ static INCREMENTAL_ACTIONS: Mutex<Vec<IncrementalAction>> = Mutex::new(Vec::new(
 
 #[tauri::command]
 pub fn writing_command() {
+    debug_println!("[writing] trigger");
     let is_writing = IS_WRITING.lock();
     if *is_writing {
         return;
@@ -74,13 +75,13 @@ pub fn writing_command() {
         *previous_translated_text = content;
         return;
     }
-    debug_println!("content: {:?}", content.chars());
+    debug_println!("[writing] content: {:?}", content.chars());
     debug_println!(
-        "previous_translated_text: {:?}",
+        "[writing] previous_translated_text: {:?}",
         previous_translated_text.chars()
     );
     let changeset = diff_chars(Algorithm::Myers, &*previous_translated_text, &content);
-    debug_println!("changeset: {:?}", changeset);
+    debug_println!("[writing] changeset: {:?}", changeset);
     let modifications_count = changeset
         .iter()
         .filter(|(change_tag, _)| match change_tag {

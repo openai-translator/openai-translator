@@ -47,7 +47,9 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.writingHotkey) return
+    await unregister(settings.writingHotkey)
     await register(settings.writingHotkey, () => {
+        console.log('fuck')
         invoke('writing_command')
     }).then(() => {
         console.log('writing hotkey registered')

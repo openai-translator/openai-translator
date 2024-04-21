@@ -89,6 +89,7 @@
       }
     },
     "trayIcon": {
+      "id": "tray",
       "iconAsTemplate": true,
       "iconPath": "icons/favicon.ico"
     },
