@@ -354,11 +354,6 @@ pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
 
     use crate::config::get_config;
 
-    if !is_valid_selected_frame()? {
-        debug_println!("No valid selected frame");
-        return Ok(String::new());
-    }
-
     match get_selected_text_by_ax() {
         Ok(text) => Ok(text),
         Err(err) => {
