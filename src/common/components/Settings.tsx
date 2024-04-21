@@ -2542,6 +2542,9 @@ export function InnerSettings({
                             >
                                 <Input size='compact' />
                             </FormItem>
+                            <FormItem name='azMaxWords' label='Max Tokens' required={values.provider === 'Azure'}>
+                                <NumberInput size='compact' />
+                            </FormItem>
                         </div>
                         <div
                             style={{

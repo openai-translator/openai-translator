@@ -48,6 +48,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     azureAPIURL: 1,
     azureAPIURLPath: 1,
     azureAPIModel: 1,
+    azMaxWords: 1,
     enableMica: 1,
     miniMaxGroupID: 1,
     miniMaxAPIKey: 1,
@@ -228,6 +229,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.iconSize === undefined || settings.iconSize === null) {
         settings.iconSize = 15
+    }
+    if (settings.azMaxWords === undefined || settings.azMaxWords === null) {
+        settings.azMaxWords = 1024
     }
     return settings
 }
