@@ -210,13 +210,25 @@ export class ChatGLM extends AbstractEngine {
                     }
                     return
                 }
-                resp.parts.forEach((part: { content: { text: string }[] }) => {
-                    part.content.forEach(async (content: { text: string }) => {
-                        const textDelta = content.text.slice(length)
-                        length = content.text.length
-                        await req.onMessage({ content: textDelta, role: '' })
-                    })
-                })
+                resp.parts.forEach(
+                    (part: {
+                        content: { text: string }[]
+                        status: string
+                        error?: { intervene_type?: string; intervene_text?: string }
+                    }) => {
+                        if (part.status === 'intervene') {
+                            hasError = true
+                            finished = true
+                            req.onError('ChatGLM: ' + part.error?.intervene_text)
+                            return
+                        }
+                        part.content.forEach(async (content: { text: string }) => {
+                            const textDelta = content.text.slice(length)
+                            length = content.text.length
+                            await req.onMessage({ content: textDelta, role: '' })
+                        })
+                    }
+                )
             },
             onError: (err) => {
                 console.error('err', err)
