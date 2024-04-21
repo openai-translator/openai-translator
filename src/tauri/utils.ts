@@ -8,6 +8,7 @@ export async function bindHotkey(oldHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.hotkey) return
+    await unregister(settings.hotkey)
     await register(settings.hotkey, () => {
         invoke('show_translator_window_with_selected_text_command')
     }).then(() => {
@@ -21,6 +22,7 @@ export async function bindDisplayWindowHotkey(oldHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.displayWindowHotkey) return
+    await unregister(settings.displayWindowHotkey)
     await register(settings.displayWindowHotkey, () => {
         invoke('show_translator_window_command')
     }).then(() => {
@@ -34,6 +36,7 @@ export async function bindOCRHotkey(oldOCRHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.ocrHotkey) return
+    await unregister(settings.ocrHotkey)
     await register(settings.ocrHotkey, () => {
         invoke('ocr_command')
     }).then(() => {
@@ -49,7 +52,6 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
     if (!settings.writingHotkey) return
     await unregister(settings.writingHotkey)
     await register(settings.writingHotkey, () => {
-        console.log('fuck')
         invoke('writing_command')
     }).then(() => {
         console.log('writing hotkey registered')
