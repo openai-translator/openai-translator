@@ -227,10 +227,18 @@ fn bind_mouse_hook() {
 
                 if !is_click_on_thumb {
                     if RELEASE_THREAD_ID.is_locked() {
-                        // println!("release thread is locked");
                         return;
                     }
                     std::thread::spawn(move || {
+                        #[cfg(target_os = "macos")]
+                        {
+                            if !utils::is_valid_selected_frame().unwrap_or(false) {
+                                debug_println!("No valid selected frame");
+                                windows::close_thumb();
+                                return;
+                            }
+                        }
+
                         let _lock = RELEASE_THREAD_ID.lock();
                         let selected_text = utils::get_selected_text().unwrap_or_default();
                         if !selected_text.is_empty() {
@@ -239,7 +247,6 @@ fn bind_mouse_hook() {
                             }
                             windows::show_thumb(x, y);
                         } else {
-                            // println!("selected text is empty");
                             windows::close_thumb();
                         }
                     });
