@@ -57,7 +57,7 @@ objc = "0.2.7"
 macos-accessibility-client = "0.0.1"
 core-foundation = "0.9.3"
 core-graphics = "0.22.3"
-accessibility = { git = "https://github.com/Hupka/accessibility", branch = "master" }
+accessibility = { git = "https://github.com/yetone/accessibility", branch = "sync" }
 accessibility-sys = "0.1.3"
 
 [target.'cfg(windows)'.dependencies]
