@@ -36,14 +36,43 @@ export interface IPromotionResponse {
 }
 
 export async function fetchPromotions(): Promise<IPromotionResponse> {
-    const resp = await fetch(
-        `https://raw.githubusercontent.com/yetone/openai-translator-configs/main/promotions.json?ts=${Date.now()}`,
-        { cache: 'no-cache' }
-    )
-    if (!resp.ok) {
-        throw new Error(resp.statusText)
+    try {
+        const resp = await fetch(
+            `https://raw.githubusercontent.com/yetone/openai-translator-configs/main/promotions.json?ts=${Date.now()}`,
+            { cache: 'no-cache' }
+        )
+        if (!resp.ok) {
+            throw new Error(resp.statusText)
+        }
+        return resp.json()
+    } catch (error) {
+        console.error('Error fetching promotions: ', error)
+
+        return {
+            openai_api_key: [
+                {
+                    id: '3',
+                    promotion: {
+                        content: {
+                            'zh-Hans':
+                                '推荐 [Aihubmix](https://sourl.cn/RCXQLM) 的 OpenAI API 密钥，速度飞快，经济实惠，1 美元 OpenAI API 额度只需人民币 4.2 元。',
+                        },
+                        format: 'markdown',
+                        fallback_language: 'zh-Hans',
+                    },
+                    disclaimer: {
+                        content: {
+                            'zh-Hans':
+                                '免责声明：这是一个合作推广，虽然此 OpenAI API 密钥在推广前已经经过本软件的全面测试，但是由于本软件推荐的 OpenAI API 密钥由第三方平台 [Aihubmix](https://sourl.cn/RCXQLM) 提供，所以本软件不对密钥的有效性和安全性负责，请自行承担购买和使用密钥的风险。',
+                        },
+                        format: 'markdown',
+                        fallback_language: 'zh-Hans',
+                    },
+                    started_at: '2023-12-11T00:00:00+08:00',
+                },
+            ],
+        }
     }
-    return resp.json()
 }
 
 export async function choicePromotionItem(items?: IPromotionItem[]) {
