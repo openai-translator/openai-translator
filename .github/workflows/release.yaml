@@ -170,6 +170,7 @@ jobs:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           releaseBody: ${{ needs.create-release.outputs.release_body }}
           tauriScript: cargo tauri
+          updaterJsonPreferNsis: true
 
       - name: Build Tauri App (macOS aarch64)
         uses: tauri-apps/tauri-action@v0
@@ -181,6 +182,7 @@ jobs:
           releaseBody: ${{ needs.create-release.outputs.release_body }}
           args: --target aarch64-apple-darwin
           tauriScript: cargo tauri
+          updaterJsonPreferNsis: true
 
   build-clip-extension:
     runs-on: ubuntu-22.04
