@@ -24,8 +24,8 @@ dependencies:
     specifier: github:tauri-apps/tauri-plugin-fs#v2
     version: github.com/tauri-apps/tauri-plugin-fs/aca99d64d39b155088b06cb57d3d0302c1178065
   '@tauri-apps/plugin-global-shortcut':
-    specifier: github:tauri-apps/tauri-plugin-global-shortcut#v2
-    version: github.com/tauri-apps/tauri-plugin-global-shortcut/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37
+    specifier: github:tauri-apps/tauri-plugin-global-shortcut#beff8c971a9a5d6e1e3c52b1943fcb11c104f5a1
+    version: github.com/tauri-apps/tauri-plugin-global-shortcut/beff8c971a9a5d6e1e3c52b1943fcb11c104f5a1
   '@tauri-apps/plugin-http':
     specifier: github:tauri-apps/tauri-plugin-http#v2
     version: github.com/tauri-apps/tauri-plugin-http/65b360f8257f86d82588afba0e7ea9332abd7ca5
@@ -1563,6 +1563,11 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
+  /@tauri-apps/api@2.0.0-beta.2:
+    resolution: {integrity: sha512-4r1r6kgttzIWxJ3HxkZQH+b7EiUtKhdUCPbi0KSalD+2T3j6klw+v8VyxhKwEdjM/eo60NE+J33v1E/Urq8puw==}
+    engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
+    dev: false
+
   /@tauri-apps/api@2.0.0-beta.3:
     resolution: {integrity: sha512-gDSJzKpBs6efXw2ZWqjl9QVNImY5GR5qygXqB7JK4y7prcQInxnTj2ARFR0vD4wuzkrUHGrlIKraiJJPHWJ9vg==}
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
@@ -1774,7 +1779,7 @@ packages:
   /@types/hast@2.3.5:
     resolution: {integrity: sha512-SvQi0L/lNpThgPoleH53cdjB3y9zpLlVjRbqB3rH8hx1jiRSBGAhyjV3H+URFjNVRqt2EdYNrbZE5IsGlNfpRg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /@types/http-cache-semantics@4.0.1:
@@ -1818,7 +1823,7 @@ packages:
   /@types/mdast@3.0.11:
     resolution: {integrity: sha512-Y/uImid8aAwrEA24/1tcRZwpxX3pIFTSilcNDKSPn+Y2iDywSEachzRuvgAYYLR3wpGXAsMbv5lvKLDZLeYPAw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /@types/ms@0.7.31:
@@ -2924,7 +2929,7 @@ packages:
   /css-jss@10.10.0:
     resolution: {integrity: sha512-YyMIS/LsSKEGXEaVJdjonWe18p4vXLo8CMA4FrW/kcaEyqdIGKCFXao31gbJddXEdIxSXFFURWrenBJPlKTgAA==}
     dependencies:
-      '@babel/runtime': 7.21.5
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       jss-preset-default: 10.10.0
     dev: false
@@ -2940,7 +2945,7 @@ packages:
   /css-vendor@2.0.8:
     resolution: {integrity: sha512-x9Aq0XTInxrkuFeHKbYC7zWY8ai7qJ04Kxd9MnvbC1uO5DagxoHQjm4JvG+vCdXOoFtCjbL2XSZfxmoYa9uQVQ==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       is-in-browser: 1.1.3
     dev: false
 
@@ -5047,7 +5052,7 @@ packages:
   /jss-plugin-camel-case@10.10.0:
     resolution: {integrity: sha512-z+HETfj5IYgFxh1wJnUAU8jByI48ED+v0fuTuhKrPR+pRBYS2EDwbusU8aFOpCdYhtRc9zhN+PJ7iNE8pAWyPw==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       hyphenate-style-name: 1.0.4
       jss: 10.10.0
     dev: false
@@ -5055,7 +5060,7 @@ packages:
   /jss-plugin-compose@10.10.0:
     resolution: {integrity: sha512-F5kgtWpI2XfZ3Z8eP78tZEYFdgTIbpA/TMuX3a8vwrNolYtN1N4qJR/Ob0LAsqIwCMLojtxN7c7Oo/+Vz6THow==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5063,21 +5068,21 @@ packages:
   /jss-plugin-default-unit@10.10.0:
     resolution: {integrity: sha512-SvpajxIECi4JDUbGLefvNckmI+c2VWmP43qnEy/0eiwzRUsafg5DVSIWSzZe4d2vFX1u9nRDP46WCFV/PXVBGQ==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-expand@10.10.0:
     resolution: {integrity: sha512-ymT62W2OyDxBxr7A6JR87vVX9vTq2ep5jZLIdUSusfBIEENLdkkc0lL/Xaq8W9s3opUq7R0sZQpzRWELrfVYzA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-extend@10.10.0:
     resolution: {integrity: sha512-sKYrcMfr4xxigmIwqTjxNcHwXJIfvhvjTNxF+Tbc1NmNdyspGW47Ey6sGH8BcQ4FFQhLXctpWCQSpDwdNmXSwg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5085,14 +5090,14 @@ packages:
   /jss-plugin-global@10.10.0:
     resolution: {integrity: sha512-icXEYbMufiNuWfuazLeN+BNJO16Ge88OcXU5ZDC2vLqElmMybA31Wi7lZ3lf+vgufRocvPj8443irhYRgWxP+A==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-nested@10.10.0:
     resolution: {integrity: sha512-9R4JHxxGgiZhurDo3q7LdIiDEgtA1bTGzAbhSPyIOWb7ZubrjQe8acwhEQ6OEKydzpl8XHMtTnEwHXCARLYqYA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5100,14 +5105,14 @@ packages:
   /jss-plugin-props-sort@10.10.0:
     resolution: {integrity: sha512-5VNJvQJbnq/vRfje6uZLe/FyaOpzP/IH1LP+0fr88QamVrGJa0hpRRyAa0ea4U/3LcorJfBFVyC4yN2QC73lJg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-rule-value-function@10.10.0:
     resolution: {integrity: sha512-uEFJFgaCtkXeIPgki8ICw3Y7VMkL9GEan6SqmT9tqpwM+/t+hxfMUdU4wQ0MtOiMNWhwnckBV0IebrKcZM9C0g==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5115,7 +5120,7 @@ packages:
   /jss-plugin-rule-value-observable@10.10.0:
     resolution: {integrity: sha512-ZLMaYrR3QE+vD7nl3oNXuj79VZl9Kp8/u6A1IbTPDcuOu8b56cFdWRZNZ0vNr8jHewooEeq2doy8Oxtymr2ZPA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       symbol-observable: 1.2.0
     dev: false
@@ -5123,7 +5128,7 @@ packages:
   /jss-plugin-template@10.10.0:
     resolution: {integrity: sha512-ocXZBIOJOA+jISPdsgkTs8wwpK6UbsvtZK5JI7VUggTD6LWKbtoxUzadd2TpfF+lEtlhUmMsCkTRNkITdPKa6w==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5131,7 +5136,7 @@ packages:
   /jss-plugin-vendor-prefixer@10.10.0:
     resolution: {integrity: sha512-UY/41WumgjW8r1qMCO8l1ARg7NHnfRVWRhZ2E2m0DMYsr2DD91qIXLyNhiX83hHswR7Wm4D+oDYNC1zWCJWtqg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       css-vendor: 2.0.8
       jss: 10.10.0
     dev: false
@@ -5397,7 +5402,7 @@ packages:
     resolution: {integrity: sha512-8SVPMuHqlPME/z3gqVwWY4zVXn8lqKv/pAhC57FuJ40ImXyBpmO5ukh98zB2v7Blql2FiHjHv9LVztSIqjY+MA==}
     dependencies:
       '@types/mdast': 3.0.11
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-visit: 4.1.2
     dev: false
 
@@ -5405,7 +5410,7 @@ packages:
     resolution: {integrity: sha512-HN3W1gRIuN/ZW295c7zi7g9lVBllMgZE40RxCX37wrTPWXCWtpvOZdfnuK+1WNpvZje6XuJeI3Wnb4TJEUem+g==}
     dependencies:
       '@types/mdast': 3.0.11
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       decode-named-character-reference: 1.0.2
       mdast-util-to-string: 3.2.0
       micromark: 3.1.0
@@ -5423,7 +5428,7 @@ packages:
   /mdast-util-to-hast@12.3.0:
     resolution: {integrity: sha512-pits93r8PhnIoU4Vy9bjW39M2jJ6/tdHyja9rrot9uujkN7UTU9SDnE6WNJz/IGyQk3XHX6yNNtrBH6cQzm8Hw==}
     dependencies:
-      '@types/hast': 2.3.5
+      '@types/hast': 2.3.10
       '@types/mdast': 3.0.11
       mdast-util-definitions: 5.1.2
       micromark-util-sanitize-uri: 1.1.0
@@ -6229,7 +6234,7 @@ packages:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-is: 16.13.1
@@ -7547,25 +7552,25 @@ packages:
   /unist-util-is@5.2.1:
     resolution: {integrity: sha512-u9njyyfEh43npf1M+yGKDGVPbY/JWEemg5nH05ncKPfi+kBbKBJoTdsogMu33uhytuLlv9y0O7GH7fEdwLdLQw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-position@4.0.4:
     resolution: {integrity: sha512-kUBE91efOWfIVBo8xzh/uZQ7p9ffYRtUbMRZBNFYwf0RK8koUMx6dGUfwylLOKmaT2cs4wSW96QoYUSXAyEtpg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-stringify-position@3.0.3:
     resolution: {integrity: sha512-k5GzIBZ/QatR8N5X2y+drfpWG8IDBzdnVj6OInRNWm1oXrzydiaAT2OQiA8DPRRZyAKb9b6I2a6PxYklZD0gKg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-visit-parents@5.1.3:
     resolution: {integrity: sha512-x6+y8g7wWMyQhL1iZfhIPhDAs7Xwbn9nRosDXl7qoPTSCy0yNxnKc+hWokFifWQIDGi154rdUqKvbCa4+1kLhg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-is: 5.2.1
     dev: false
 
@@ -7706,7 +7711,7 @@ packages:
   /vfile-message@3.1.4:
     resolution: {integrity: sha512-fa0Z6P8HUrQN4BZaX05SIVXic+7kE3b05PWAtPuYP9QLHsLKYR7/AlLW3NtOrpXRLeawpDLMsVkmk5DG0NXgWw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-stringify-position: 3.0.3
     dev: false
 
@@ -8193,7 +8198,7 @@ packages:
     name: '@aptabase/tauri'
     version: 0.4.2
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.8
+      '@tauri-apps/api': 2.0.0-beta.3
       tslib: 2.6.2
     dev: false
 
@@ -8213,12 +8218,12 @@ packages:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-global-shortcut/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37}
+  github.com/tauri-apps/tauri-plugin-global-shortcut/beff8c971a9a5d6e1e3c52b1943fcb11c104f5a1:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/beff8c971a9a5d6e1e3c52b1943fcb11c104f5a1}
     name: '@tauri-apps/plugin-global-shortcut'
-    version: 2.0.0-beta.2
+    version: 2.0.0-beta.1
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.8
+      '@tauri-apps/api': 2.0.0-beta.2
     dev: false
 
   github.com/tauri-apps/tauri-plugin-http/65b360f8257f86d82588afba0e7ea9332abd7ca5:
