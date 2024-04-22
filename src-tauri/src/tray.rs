@@ -80,16 +80,14 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             ocr();
         }
         "show" => {
-            let window = app.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
-            window.set_focus().unwrap();
-            window.unminimize().unwrap();
-            window.show().unwrap();
+            crate::windows::show_translator_window(false, false, true);
         }
         "hide" => {
-            let window = app.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
-            window.set_focus().unwrap();
-            window.unminimize().unwrap();
-            window.hide().unwrap();
+            if let Some(window) = app.get_webview_window(TRANSLATOR_WIN_NAME) {
+                window.set_focus().unwrap();
+                window.unminimize().unwrap();
+                window.hide().unwrap();
+            }
         }
         "pin" => {
             let pinned = set_translator_window_always_on_top();
@@ -104,12 +102,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     });
     tray.on_tray_icon_event(|tray, event| {
         if event.click_type == ClickType::Left {
-            let app = tray.app_handle();
-            if let Some(window) = app.get_webview_window(TRANSLATOR_WIN_NAME) {
-                window.unminimize().unwrap();
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+            crate::windows::show_translator_window(false, false, true);
         }
     });
     tray.set_show_menu_on_left_click(false)?;

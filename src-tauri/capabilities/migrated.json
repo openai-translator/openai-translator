@@ -111,6 +111,7 @@
       "shell:allow-stdin-write",
       "autostart:allow-is-enabled",
       "autostart:allow-enable",
+      "autostart:allow-disable",
       "fs:allow-app-write",
       "fs:scope-app",
       "fs:scope-appcache",
