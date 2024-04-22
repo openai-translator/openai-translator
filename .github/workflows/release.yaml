@@ -129,12 +129,6 @@ jobs:
         with:
           targets: ${{ matrix.config.rust_target }}
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.config.rust_target }}
-          workspaces: './src-tauri -> target'
-
       - name: install dependencies (ubuntu only)
         if: matrix.config.os == 'ubuntu-latest'
         run: |
