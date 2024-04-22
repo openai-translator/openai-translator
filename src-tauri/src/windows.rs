@@ -88,18 +88,20 @@ pub fn get_mouse_location() -> Result<(i32, i32), String> {
 
 pub fn set_translator_window_always_on_top() -> bool {
     let handle = APP_HANDLE.get().unwrap();
-    let window = handle.get_webview_window(TRANSLATOR_WIN_NAME).unwrap();
+    if let Some(window) = handle.get_webview_window(TRANSLATOR_WIN_NAME) {
+        let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
 
-    let always_on_top = ALWAYS_ON_TOP.load(Ordering::Acquire);
-
-    if !always_on_top {
-        window.set_always_on_top(true).unwrap();
-        ALWAYS_ON_TOP.store(true, Ordering::Release);
+        if !always_on_top {
+            window.set_always_on_top(true).unwrap();
+            ALWAYS_ON_TOP.store(true, Ordering::Release);
+        } else {
+            window.set_always_on_top(false).unwrap();
+            ALWAYS_ON_TOP.store(false, Ordering::Release);
+        }
+        ALWAYS_ON_TOP.load(Ordering::Acquire)
     } else {
-        window.set_always_on_top(false).unwrap();
-        ALWAYS_ON_TOP.store(false, Ordering::Release);
+        false
     }
-    ALWAYS_ON_TOP.load(Ordering::Acquire)
 }
 
 #[tauri::command]
@@ -139,22 +141,27 @@ pub async fn show_translator_window_with_selected_text_command() {
     utils::show();
 }
 
+pub fn do_hide_translator_window() {
+    if let Some(handle) = APP_HANDLE.get() {
+        match handle.get_webview_window(TRANSLATOR_WIN_NAME) {
+            Some(window) => {
+                #[cfg(not(target_os = "macos"))]
+                {
+                    window.hide().unwrap();
+                }
+                #[cfg(target_os = "macos")]
+                {
+                    tauri::AppHandle::hide(&handle).unwrap();
+                }
+            }
+            None => {}
+        }
+    }
+}
+
 #[tauri::command]
 pub async fn hide_translator_window() {
-    let handle = APP_HANDLE.get().unwrap();
-    match handle.get_webview_window(TRANSLATOR_WIN_NAME) {
-        Some(window) => {
-            #[cfg(not(target_os = "macos"))]
-            {
-                window.hide().unwrap();
-            }
-            #[cfg(target_os = "macos")]
-            {
-                tauri::AppHandle::hide(&handle).unwrap();
-            }
-        }
-        None => {}
-    }
+    do_hide_translator_window();
 }
 
 pub fn delete_thumb() {
@@ -212,7 +219,7 @@ pub fn get_thumb_window(x: i32, y: i32) -> tauri::WebviewWindow {
             .inner_size(20.0, 20.0)
             .min_inner_size(20.0, 20.0)
             .max_inner_size(20.0, 20.0)
-            .visible(true)
+            .visible(false)
             .resizable(false)
             .skip_taskbar(true)
             .minimizable(false)
@@ -375,6 +382,7 @@ pub fn get_translator_window(
             .min_inner_size(540.0, 600.0)
             .resizable(true)
             .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(false))
+            .visible(false)
             .focused(false);
 
             build_window(builder)
@@ -390,10 +398,12 @@ pub fn get_translator_window(
     };
 
     if restore_previous_position {
+        debug_println!("Restoring previous position");
         if !cfg!(target_os = "macos") {
             window.unminimize().unwrap();
         }
     } else if to_mouse_position {
+        debug_println!("Setting position to mouse position");
         let (mouse_logical_x, mouse_logical_y): (i32, i32) = get_mouse_location().unwrap();
         let window_physical_size = window.outer_size().unwrap();
         let scale_factor = window.scale_factor().unwrap_or(1.0);
