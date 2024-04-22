@@ -84,7 +84,7 @@
 
 ### 手动安装
 
-1. 在 [Latest Release](https://github.com/yetone/openai-translator/releases/latest) 页面下载以 `.msi` 结尾的安装包
+1. 在 [Latest Release](https://github.com/yetone/openai-translator/releases/latest) 页面下载以 `.exe` 结尾的安装包
 2. 下载完成后双击安装包进行安装
 3. 如果提示不安全，可以点击 `更多信息` -> `仍要运行` 进行安装
 4. 开始使用吧！
