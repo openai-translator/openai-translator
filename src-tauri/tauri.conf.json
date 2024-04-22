@@ -67,7 +67,7 @@
       "resources/*"
     ],
     "shortDescription": "",
-    "targets": "all",
+    "targets": ["deb", "appimage", "msi", "app", "dmg", "updater"],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
