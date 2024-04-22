@@ -87,7 +87,7 @@ What began as a translation tool has now evolved to include surprisingly effecti
 
 ### Install Manually
 
-1. Download the installation package ending in `.exe` from the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page.
+1. Download the installation package ending in `.msi` from the [Latest Release](https://github.com/yetone/openai-translator/releases/latest) page.
 2. Double click the downloaded file to install it.
 3. If prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation.
 4. Ready to use!
