@@ -41,17 +41,15 @@ export class LocalDB extends Dexie {
 let localDB: LocalDB
 
 export const getLocalDB = () => {
-    if (!localDB) {
-        localDB = new LocalDB()
-        localDB.on('error', function (error) {
-            switch (error.name) {
-                case Dexie.errnames.OpenFailed:
-                    console.error('open failed due to ' + error.inner.name)
-                    break
-                default:
-                    console.error('error: ' + error.message)
-            }
-        })
-    }
-    return localDB
+    let db = new LocalDB()
+    db.on('error', function (error) {
+        switch (error.name) {
+            case Dexie.errnames.OpenFailed:
+                console.error('open failed due to ' + error.inner.name)
+                break
+            default:
+                console.error('error: ' + error.message)
+        }
+    })
+    return db
 }
