@@ -31,6 +31,7 @@ import {
     isUserscript,
     setSettings,
     isBrowserExtensionContentScript,
+    isMacOS,
 } from '../utils'
 import { InnerSettings } from './Settings'
 import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
@@ -87,6 +88,7 @@ import {
 import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
 import { Provider, engineIcons, getEngine } from '../engines'
+import color from 'color'
 
 const cache = new LRUCache({
     max: 500,
@@ -128,7 +130,6 @@ const useStyles = createUseStyles({
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
-        background: props.themeType === 'dark' ? props.theme.colors.backgroundPrimary : 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(10px)',
     }),
     'poweredBy': (props: IThemedStyleProps) => ({
@@ -155,7 +156,7 @@ const useStyles = createUseStyles({
                   'top': 0,
                   'width': '100%',
                   'boxSizing': 'border-box',
-                  'padding': navigator.userAgent.includes('Mac OS X') ? '30px 16px 8px' : '8px 16px',
+                  'padding': isMacOS ? '30px 16px 8px' : '8px 16px',
                   'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
                   'display': 'flex',
                   'flexDirection': 'row',
@@ -405,11 +406,11 @@ const useStyles = createUseStyles({
     'flexPlaceHolder': {
         marginRight: 'auto',
     },
-    'popupCardContentContainerMica': {
+    'popupCardContentContainerBackgroundBlur': {
         'height': '100vh',
         'boxSizing': 'border-box',
         'overflow': 'auto',
-        'paddingTop': '58px !important',
+        'paddingTop': isMacOS ? '82px !important' : '58px !important',
         'paddingBottom': '42px',
         'scrollbarWidth': 'none',
         '&::-webkit-scrollbar': {
@@ -1523,6 +1524,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [showSettings])
 
+    const getFooterBackgroundColor = useCallback(() => {
+        if (settings.enableBackgroundBlur) {
+            return 'transparent !important'
+        }
+        return color(theme.colors.backgroundPrimary).alpha(0.5).string()
+    }, [settings.enableBackgroundBlur, theme.colors.backgroundPrimary])
+
     return (
         <div
             className={clsx(styles.popupCard, {
@@ -1532,7 +1540,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
                 background: isDesktopApp() ? 'transparent' : theme.colors.backgroundPrimary,
-                paddingBottom: showSettings || settings.enableMica ? '0px' : '42px',
+                paddingBottom: showSettings || settings.enableBackgroundBlur ? '0px' : '42px',
             }}
         >
             {showSettings && (
@@ -1557,7 +1565,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         style={{
                             cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                             boxShadow: isDesktopApp() && !isScrolledToTop ? theme.lighting.shadow600 : undefined,
-                            background: settings.enableMica ? 'transparent' : '',
+                            background: settings.enableBackgroundBlur ? 'transparent' : '',
                         }}
                     >
                         {showLogo ? (
@@ -1782,7 +1790,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     <div
                         className={clsx(
                             styles.popupCardContentContainer,
-                            settings.enableMica && styles.popupCardContentContainerMica
+                            settings.enableBackgroundBlur && styles.popupCardContentContainerBackgroundBlur
                         )}
                     >
                         {settings?.apiURL === defaultAPIURL && (
@@ -1851,14 +1859,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         fontSize: `${settings.fontSize}px !important`,
                                                         width: '100%',
                                                         borderRadius: '0px',
-                                                        background: settings.enableMica
+                                                        background: settings.enableBackgroundBlur
                                                             ? 'transparent !important'
                                                             : undefined,
-                                                        borderWidth: settings.enableMica ? '1px' : undefined,
+                                                        borderWidth: settings.enableBackgroundBlur ? '1px' : undefined,
                                                     },
                                                 },
                                                 InputContainer: {
-                                                    style: settings.enableMica
+                                                    style: settings.enableBackgroundBlur
                                                         ? ({ $theme, $isFocused }) => ({
                                                               background:
                                                                   ($isFocused
@@ -2382,14 +2390,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     className={styles.footer}
                     style={{
                         boxShadow: isScrolledToBottom ? undefined : theme.lighting.shadow700,
-                        background:
-                            settings.enableMica && themeType === 'dark'
-                                ? 'rgba(31, 31, 31, 0.5)'
-                                : isScrolledToBottom
-                                ? undefined
-                                : themeType === 'dark'
-                                ? 'rgba(31, 31, 31, 0.5)'
-                                : undefined,
+                        backgroundColor: getFooterBackgroundColor(),
                     }}
                 >
                     <Tooltip content={showSettings ? t('Go to Translator') : t('Go to Settings')} placement='right'>

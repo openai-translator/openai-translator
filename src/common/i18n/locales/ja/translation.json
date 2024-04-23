@@ -189,5 +189,8 @@
     "UI font size": "UIフォントサイズ",
     "UI font family": "UIフォントファミリー",
     "Icon size": "アイコンサイズ",
+    "Window background blur": "ウィンドウ背景のぼかし",
+    "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "Windows 11専用です。ウィンドウの背景ぼかし効果が有効になっている場合は、「テーマ」を「システムに従う」に設定してください。ウィンドウの背景ぼかしがアクティブな場合、手動でライトテーマとダークテーマを切り替えることはできません。",
+    "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "ウィンドウの背景ぼかし効果が有効になっている場合は、「テーマ」を「システムに合わせる」に設定してください。ウィンドウの背景ぼかしがアクティブな場合、手動でライトテーマとダークテーマを切り替えることはできません。",
     "If you find this tool helpful, you can buy me a cup of coffee.": "このツールが役に立ったら、コーヒーを買ってください。"
 }

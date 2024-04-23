@@ -189,5 +189,8 @@
     "UI font size": "UI 字體大小",
     "UI font family": "UI 字體",
     "Icon size": "圖標大小",
+    "Window background blur": "視窗背景模糊",
+    "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "僅限Windows 11。如果啟用了視窗背景模糊效果，請確保將“主題”設置為“跟隨系統”，因為目前無法在視窗背景模糊生效時手動切換淺色和暗色主題。",
+    "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "如果啟用了視窗背景模糊效果，請確保將“主題”設置為“跟隨系統”，因為目前無法在視窗背景模糊生效時手動切換淺色和暗色主題。",
     "If you find this tool helpful, you can buy me a cup of coffee.": "如果您覺得這個工具有幫助，可以請我喝杯咖啡。"
 }

@@ -18,6 +18,7 @@ import { ActionForm } from './ActionForm'
 import { IconType } from 'react-icons'
 import { isDesktopApp } from '../utils'
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md'
+import { useSettings } from '../hooks/useSettings'
 
 const useStyles = createUseStyles({
     root: () => ({
@@ -153,6 +154,7 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
     const [showActionForm, setShowActionForm] = useState(false)
     const [updatingAction, setUpdatingAction] = useState<Action>()
     const [deletingAction, setDeletingAction] = useState<Action>()
+    const { settings } = useSettings()
 
     return (
         <div
@@ -161,7 +163,13 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                 width: !draggable ? '800px' : undefined,
             }}
         >
-            <div className={styles.header} data-tauri-drag-region>
+            <div
+                className={styles.header}
+                data-tauri-drag-region
+                style={{
+                    backgroundColor: settings.enableBackgroundBlur ? 'transparent' : undefined,
+                }}
+            >
                 <div className={styles.iconContainer}>
                     <img data-tauri-drag-region className={styles.icon} src={icon} />
                     <div className={styles.iconText}>{t('Action Manager')}</div>
@@ -187,6 +195,14 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
             </div>
             <div className={styles.actionList}>
                 <List
+                    overrides={{
+                        Item: {
+                            style: {
+                                backgroundColor: 'transparent',
+                                // backgroundColor: color(theme.colors.backgroundPrimary).alpha(0.9).lighten(0.8).string(),
+                            },
+                        },
+                    }}
                     onChange={async ({ oldIndex, newIndex }) => {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const newActions = arrayMove(actions!, oldIndex, newIndex)

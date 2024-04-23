@@ -209,7 +209,7 @@ export function TranslatorWindow() {
                 autoFocus
                 defaultShowSettings
                 editorRows={10}
-                containerStyle={{ paddingTop: settings.enableMica ? '' : '26px' }}
+                containerStyle={{ paddingTop: settings.enableBackgroundBlur ? '' : '26px' }}
                 onSettingsSave={(oldSettings) => {
                     invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)

@@ -65,7 +65,7 @@ import { usePromotionNeverDisplay } from '../hooks/usePromotionNeverDisplay'
 import { Textarea } from 'baseui-sd/textarea'
 import { ProxyTester } from './ProxyTester'
 import { CUSTOM_MODEL_ID } from '../constants'
-import { isMacOS, isWindows } from '../utils'
+import { isMacOS } from '../utils'
 import NumberInput from './NumberInput'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
@@ -2676,12 +2676,12 @@ export function InnerSettings({
                         </FormItem>
                         <FormItem
                             style={{
-                                display: isDesktopApp && isWindows ? 'block' : 'none',
+                                display: isDesktopApp ? 'block' : 'none',
                             }}
-                            name='enableMica'
-                            label={t('Enable mica (Experimental)')}
+                            name='enableBackgroundBlur'
+                            label={t('Window background blur')}
                             caption={t(
-                                '**Win11 only. If the mica effect is enabled, it is essential to set the `Theme` to `Follow the system`, as it is currently not possible to manually switch between the light and dark themes of mica.'
+                                "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active."
                             )}
                         >
                             <MyCheckbox onBlur={onBlur} />
