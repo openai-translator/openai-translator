@@ -43,6 +43,15 @@ let localDB: LocalDB
 export const getLocalDB = () => {
     if (!localDB) {
         localDB = new LocalDB()
+        localDB.on('error', function (error) {
+            switch (error.name) {
+                case Dexie.errnames.OpenFailed:
+                    console.error('open failed due to ' + error.inner.name)
+                    break
+                default:
+                    console.error('error: ' + error.message)
+            }
+        })
     }
     return localDB
 }
