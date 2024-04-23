@@ -1,4 +1,5 @@
 use crate::config;
+use crate::config::get_config;
 use crate::utils;
 use crate::UpdateResult;
 use crate::ALWAYS_ON_TOP;
@@ -315,6 +316,7 @@ pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
         let window = builder
             .title_bar_style(tauri::TitleBarStyle::Overlay)
             .hidden_title(true)
+            .transparent(true)
             .build()
             .unwrap();
 
@@ -325,12 +327,7 @@ pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
 
     #[cfg(not(target_os = "macos"))]
     {
-        let window = builder
-            .transparent(true)
-            .decorations(true)
-            // .shadow(true)
-            .build()
-            .unwrap();
+        let window = builder.transparent(true).decorations(true).build().unwrap();
 
         post_process_window(&window);
 

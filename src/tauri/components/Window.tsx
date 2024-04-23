@@ -16,7 +16,7 @@ import { createUseStyles } from 'react-jss'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { usePinned } from '../../common/hooks/usePinned'
-import { isMacOS } from '@/common/utils'
+import { isMacOS, isWindows } from '@/common/utils'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -95,19 +95,25 @@ export function InnerWindow(props: IWindowProps) {
     const { i18n } = useTranslation()
     const { settings } = useSettings()
 
-    const [mica, setMica] = useState(false)
+    const [backgroundBlur, setBackgroundBlur] = useState(false)
     useEffect(() => {
         const appWindow = getCurrent()
-        if (settings.enableMica) {
+        if (settings.enableBackgroundBlur) {
             //  TODO: It currently seems that the light/dark mode of the mica cannot be manually adjusted.
             // link: https://beta.tauri.app/references/v2/js/core/namespacewindow/#mica
-            appWindow.setEffects({ effects: [Effect.Mica] })
-            setMica(true)
+            if (isMacOS) {
+                appWindow.setEffects({ effects: [Effect.WindowBackground] })
+            } else if (isWindows) {
+                appWindow.setEffects({ effects: [Effect.Mica] })
+            }
+            setBackgroundBlur(true)
         } else {
-            appWindow.clearEffects()
-            setMica(false)
+            if (isMacOS || isWindows) {
+                appWindow.clearEffects()
+            }
+            setBackgroundBlur(false)
         }
-    }, [settings.enableMica, settings.themeType])
+    }, [settings.enableBackgroundBlur, settings.themeType])
 
     useEffect(() => {
         if (!props.isTranslatorWindow) {
@@ -151,7 +157,7 @@ export function InnerWindow(props: IWindowProps) {
         <div
             style={{
                 position: 'relative',
-                background: mica ? 'transparent' : theme.colors.backgroundPrimary,
+                background: backgroundBlur ? 'transparent' : theme.colors.backgroundPrimary,
                 font: '14px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
                 minHeight: '100vh',
             }}

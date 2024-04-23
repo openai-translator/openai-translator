@@ -189,5 +189,8 @@
     "UI font size": "UI yazı tipi boyutu",
     "UI font family": "UI yazı tipi ailesi",
     "Icon size": "Simge boyutu",
+    "Window background blur": "Pencere arka planı bulanıklığı",
+    "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "Yalnızca Windows 11 için. Pencere arka planı bulanıklık efekti etkinse, lütfen 'Tema'yı 'Sistemi Takip Et' olarak ayarladığınızdan emin olun, çünkü pencere arka planı bulanıklığı etkin olduğunda manuel olarak açık ve koyu temalar arasında geçiş yapmak mümkün değildir.",
+    "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "Pencere arka planı bulanıklık efekti etkinse, lütfen 'Tema'yı 'Sistemi Takip Et' olarak ayarladığınızdan emin olun, çünkü pencere arka planı bulanıklığı etkin olduğunda manuel olarak açık ve koyu temalar arasında geçiş yapmak mümkün değildir.",
     "If you find this tool helpful, you can buy me a cup of coffee.": "Bu aracı faydalı bulursanız bana bir fincan kahve ısmarlayabilirsiniz."
 }

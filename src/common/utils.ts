@@ -50,6 +50,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     azureAPIModel: 1,
     azMaxWords: 1,
     enableMica: 1,
+    enableBackgroundBlur: 1,
     miniMaxGroupID: 1,
     miniMaxAPIKey: 1,
     miniMaxAPIModel: 1,
@@ -181,8 +182,12 @@ export async function getSettings(): Promise<ISettings> {
     if (settings.automaticCheckForUpdates === undefined || settings.automaticCheckForUpdates === null) {
         settings.automaticCheckForUpdates = true
     }
-    if (settings.enableMica === undefined || settings.enableMica === null) {
-        settings.enableMica = false
+    if (settings.enableBackgroundBlur === undefined || settings.enableBackgroundBlur === null) {
+        if (settings.enableMica !== undefined && settings.enableMica !== null) {
+            settings.enableBackgroundBlur = settings.enableMica
+        } else {
+            settings.enableBackgroundBlur = false
+        }
     }
     if (!settings.languageDetectionEngine) {
         settings.languageDetectionEngine = 'baidu'

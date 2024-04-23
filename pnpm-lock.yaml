@@ -15,29 +15,32 @@ dependencies:
     specifier: ^7.61.0
     version: 7.61.0(react@18.2.0)
   '@tauri-apps/api':
-    specifier: 2.0.0-beta.3
-    version: 2.0.0-beta.3
+    specifier: 2.0.0-beta.9
+    version: 2.0.0-beta.9
   '@tauri-apps/plugin-autostart':
     specifier: github:tauri-apps/tauri-plugin-autostart#v2
     version: github.com/tauri-apps/tauri-plugin-autostart/f3fa131235dcdf7115b468c7da240ea53ab1ddc4
   '@tauri-apps/plugin-fs':
     specifier: github:tauri-apps/tauri-plugin-fs#v2
-    version: github.com/tauri-apps/tauri-plugin-fs/aca99d64d39b155088b06cb57d3d0302c1178065
+    version: github.com/tauri-apps/tauri-plugin-fs/67d1c347e13871947920f66d185cad294b6e040a
   '@tauri-apps/plugin-global-shortcut':
     specifier: github:tauri-apps/tauri-plugin-global-shortcut#v2
-    version: github.com/tauri-apps/tauri-plugin-global-shortcut/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37
+    version: github.com/tauri-apps/tauri-plugin-global-shortcut/985c29f73e756b7bf852e2752f69d4c2c91ab6de
   '@tauri-apps/plugin-http':
     specifier: github:tauri-apps/tauri-plugin-http#v2
-    version: github.com/tauri-apps/tauri-plugin-http/65b360f8257f86d82588afba0e7ea9332abd7ca5
+    version: github.com/tauri-apps/tauri-plugin-http/610c7e1fb84c0b81bcc568f0e0fd24b855a3e026
   '@tauri-apps/plugin-process':
     specifier: github:tauri-apps/tauri-plugin-process#v2
-    version: github.com/tauri-apps/tauri-plugin-process/0da0d1770b3818c0b65f0274eab35ca04b19bc40
+    version: github.com/tauri-apps/tauri-plugin-process/f19a4f06cbc5174fbe1ffd79aaeeb1e493c16040
   '@tauri-apps/plugin-shell':
     specifier: github:tauri-apps/tauri-plugin-shell#v2
-    version: github.com/tauri-apps/tauri-plugin-shell/a7c0d7bb742e960d9b6cfdb266bf0d4422a8dae9
+    version: github.com/tauri-apps/tauri-plugin-shell/173385de4b6f4d9f174a033d7d09dd77c355d0a7
   '@tauri-apps/plugin-updater':
     specifier: github:tauri-apps/tauri-plugin-updater#v2
-    version: github.com/tauri-apps/tauri-plugin-updater/e309e412507806fe969d351e1bbf81c019f42f09
+    version: github.com/tauri-apps/tauri-plugin-updater/9c655e3aa0af7809f2bb47db75c0281d11359093
+  '@types/color':
+    specifier: ^3.0.6
+    version: 3.0.6
   '@types/qs':
     specifier: ^6.9.10
     version: 6.9.10
@@ -56,6 +59,9 @@ dependencies:
   clsx:
     specifier: ^1.2.1
     version: 1.2.1
+  color:
+    specifier: ^4.2.3
+    version: 4.2.3
   common-tags:
     specifier: ^1.8.2
     version: 1.8.2
@@ -1307,7 +1313,7 @@ packages:
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.0.0
-      tslib: 2.5.2
+      tslib: 2.6.2
     dev: true
 
   /@playwright/test@1.34.3:
@@ -1361,7 +1367,7 @@ packages:
       '@sentry/core': 7.61.0
       '@sentry/types': 7.61.0
       '@sentry/utils': 7.61.0
-      tslib: 2.5.2
+      tslib: 2.6.2
     dev: false
 
   /@sentry/browser@7.61.0:
@@ -1382,7 +1388,7 @@ packages:
     dependencies:
       '@sentry/types': 7.61.0
       '@sentry/utils': 7.61.0
-      tslib: 2.5.2
+      tslib: 2.6.2
     dev: false
 
   /@sentry/react@7.61.0(react@18.2.0):
@@ -1563,13 +1569,13 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
-  /@tauri-apps/api@2.0.0-beta.3:
-    resolution: {integrity: sha512-gDSJzKpBs6efXw2ZWqjl9QVNImY5GR5qygXqB7JK4y7prcQInxnTj2ARFR0vD4wuzkrUHGrlIKraiJJPHWJ9vg==}
+  /@tauri-apps/api@2.0.0-beta.8:
+    resolution: {integrity: sha512-fN5u+9HsSfhRaXGOdD2kPGbqDgyX+nkm1XF/4d/LNuM4WiNfvHjjRAqWQYBhQsg1aF9nsTPmSW+tmy+Yn5T5+A==}
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
-  /@tauri-apps/api@2.0.0-beta.8:
-    resolution: {integrity: sha512-fN5u+9HsSfhRaXGOdD2kPGbqDgyX+nkm1XF/4d/LNuM4WiNfvHjjRAqWQYBhQsg1aF9nsTPmSW+tmy+Yn5T5+A==}
+  /@tauri-apps/api@2.0.0-beta.9:
+    resolution: {integrity: sha512-WFwFsqvvQBwGFL26eHoM+zaSF3wzAin3Itcl/KBGdCtPrconjUtOGcIJdg8jCyBqoU9bznhwF51TsRssw6SZwA==}
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: false
 
@@ -1718,6 +1724,22 @@ packages:
       '@types/har-format': 1.2.10
     dev: true
 
+  /@types/color-convert@2.0.3:
+    resolution: {integrity: sha512-2Q6wzrNiuEvYxVQqhh7sXM2mhIhvZR/Paq4FdsQkOMgWsCIkKvSGj8Le1/XalulrmgOzPMqNa0ix+ePY4hTrfg==}
+    dependencies:
+      '@types/color-name': 1.1.4
+    dev: false
+
+  /@types/color-name@1.1.4:
+    resolution: {integrity: sha512-hulKeREDdLFesGQjl96+4aoJSHY5b2GRjagzzcqCfIrWhe5vkCqIvrLbqzBaI1q94Vg8DNJZZqTR5ocdWmWclg==}
+    dev: false
+
+  /@types/color@3.0.6:
+    resolution: {integrity: sha512-NMiNcZFRUAiUUCCf7zkAelY8eV3aKqfbzyFQlXpPIEeoNDbsEHGpb854V3gzTsGKYj830I5zPuOwU/TP5/cW6A==}
+    dependencies:
+      '@types/color-convert': 2.0.3
+    dev: false
+
   /@types/common-tags@1.8.3:
     resolution: {integrity: sha512-v3smfzf7umSwpkJrmlUe+apSv6bVnrIFCeBeprnP4f8lIh6pECZxyD50e8yFwfouIt85TdxN5yXiFwS5fnsS3w==}
     dev: true
@@ -1774,7 +1796,7 @@ packages:
   /@types/hast@2.3.5:
     resolution: {integrity: sha512-SvQi0L/lNpThgPoleH53cdjB3y9zpLlVjRbqB3rH8hx1jiRSBGAhyjV3H+URFjNVRqt2EdYNrbZE5IsGlNfpRg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /@types/http-cache-semantics@4.0.1:
@@ -1818,7 +1840,7 @@ packages:
   /@types/mdast@3.0.11:
     resolution: {integrity: sha512-Y/uImid8aAwrEA24/1tcRZwpxX3pIFTSilcNDKSPn+Y2iDywSEachzRuvgAYYLR3wpGXAsMbv5lvKLDZLeYPAw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /@types/ms@0.7.31:
@@ -2770,6 +2792,21 @@ packages:
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
+  /color-string@1.9.1:
+    resolution: {integrity: sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==}
+    dependencies:
+      color-name: 1.1.4
+      simple-swizzle: 0.2.2
+    dev: false
+
+  /color@4.2.3:
+    resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
+    engines: {node: '>=12.5.0'}
+    dependencies:
+      color-convert: 2.0.1
+      color-string: 1.9.1
+    dev: false
+
   /colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
     dev: true
@@ -2924,7 +2961,7 @@ packages:
   /css-jss@10.10.0:
     resolution: {integrity: sha512-YyMIS/LsSKEGXEaVJdjonWe18p4vXLo8CMA4FrW/kcaEyqdIGKCFXao31gbJddXEdIxSXFFURWrenBJPlKTgAA==}
     dependencies:
-      '@babel/runtime': 7.21.5
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       jss-preset-default: 10.10.0
     dev: false
@@ -2940,7 +2977,7 @@ packages:
   /css-vendor@2.0.8:
     resolution: {integrity: sha512-x9Aq0XTInxrkuFeHKbYC7zWY8ai7qJ04Kxd9MnvbC1uO5DagxoHQjm4JvG+vCdXOoFtCjbL2XSZfxmoYa9uQVQ==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       is-in-browser: 1.1.3
     dev: false
 
@@ -4694,6 +4731,10 @@ packages:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
     dev: true
 
+  /is-arrayish@0.3.2:
+    resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
+    dev: false
+
   /is-bigint@1.0.4:
     resolution: {integrity: sha512-zB9CruMamjym81i2JZ3UMn54PKGsQzsJeo6xvN3HJJ4CAsQNB6iRutp2To77OfCNuoxspsIhzaPoO1zyCEhFOg==}
     dependencies:
@@ -5047,7 +5088,7 @@ packages:
   /jss-plugin-camel-case@10.10.0:
     resolution: {integrity: sha512-z+HETfj5IYgFxh1wJnUAU8jByI48ED+v0fuTuhKrPR+pRBYS2EDwbusU8aFOpCdYhtRc9zhN+PJ7iNE8pAWyPw==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       hyphenate-style-name: 1.0.4
       jss: 10.10.0
     dev: false
@@ -5055,7 +5096,7 @@ packages:
   /jss-plugin-compose@10.10.0:
     resolution: {integrity: sha512-F5kgtWpI2XfZ3Z8eP78tZEYFdgTIbpA/TMuX3a8vwrNolYtN1N4qJR/Ob0LAsqIwCMLojtxN7c7Oo/+Vz6THow==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5063,21 +5104,21 @@ packages:
   /jss-plugin-default-unit@10.10.0:
     resolution: {integrity: sha512-SvpajxIECi4JDUbGLefvNckmI+c2VWmP43qnEy/0eiwzRUsafg5DVSIWSzZe4d2vFX1u9nRDP46WCFV/PXVBGQ==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-expand@10.10.0:
     resolution: {integrity: sha512-ymT62W2OyDxBxr7A6JR87vVX9vTq2ep5jZLIdUSusfBIEENLdkkc0lL/Xaq8W9s3opUq7R0sZQpzRWELrfVYzA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-extend@10.10.0:
     resolution: {integrity: sha512-sKYrcMfr4xxigmIwqTjxNcHwXJIfvhvjTNxF+Tbc1NmNdyspGW47Ey6sGH8BcQ4FFQhLXctpWCQSpDwdNmXSwg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5085,14 +5126,14 @@ packages:
   /jss-plugin-global@10.10.0:
     resolution: {integrity: sha512-icXEYbMufiNuWfuazLeN+BNJO16Ge88OcXU5ZDC2vLqElmMybA31Wi7lZ3lf+vgufRocvPj8443irhYRgWxP+A==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-nested@10.10.0:
     resolution: {integrity: sha512-9R4JHxxGgiZhurDo3q7LdIiDEgtA1bTGzAbhSPyIOWb7ZubrjQe8acwhEQ6OEKydzpl8XHMtTnEwHXCARLYqYA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5100,14 +5141,14 @@ packages:
   /jss-plugin-props-sort@10.10.0:
     resolution: {integrity: sha512-5VNJvQJbnq/vRfje6uZLe/FyaOpzP/IH1LP+0fr88QamVrGJa0hpRRyAa0ea4U/3LcorJfBFVyC4yN2QC73lJg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
     dev: false
 
   /jss-plugin-rule-value-function@10.10.0:
     resolution: {integrity: sha512-uEFJFgaCtkXeIPgki8ICw3Y7VMkL9GEan6SqmT9tqpwM+/t+hxfMUdU4wQ0MtOiMNWhwnckBV0IebrKcZM9C0g==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5115,7 +5156,7 @@ packages:
   /jss-plugin-rule-value-observable@10.10.0:
     resolution: {integrity: sha512-ZLMaYrR3QE+vD7nl3oNXuj79VZl9Kp8/u6A1IbTPDcuOu8b56cFdWRZNZ0vNr8jHewooEeq2doy8Oxtymr2ZPA==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       symbol-observable: 1.2.0
     dev: false
@@ -5123,7 +5164,7 @@ packages:
   /jss-plugin-template@10.10.0:
     resolution: {integrity: sha512-ocXZBIOJOA+jISPdsgkTs8wwpK6UbsvtZK5JI7VUggTD6LWKbtoxUzadd2TpfF+lEtlhUmMsCkTRNkITdPKa6w==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       jss: 10.10.0
       tiny-warning: 1.0.3
     dev: false
@@ -5131,7 +5172,7 @@ packages:
   /jss-plugin-vendor-prefixer@10.10.0:
     resolution: {integrity: sha512-UY/41WumgjW8r1qMCO8l1ARg7NHnfRVWRhZ2E2m0DMYsr2DD91qIXLyNhiX83hHswR7Wm4D+oDYNC1zWCJWtqg==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       css-vendor: 2.0.8
       jss: 10.10.0
     dev: false
@@ -5397,7 +5438,7 @@ packages:
     resolution: {integrity: sha512-8SVPMuHqlPME/z3gqVwWY4zVXn8lqKv/pAhC57FuJ40ImXyBpmO5ukh98zB2v7Blql2FiHjHv9LVztSIqjY+MA==}
     dependencies:
       '@types/mdast': 3.0.11
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-visit: 4.1.2
     dev: false
 
@@ -5405,7 +5446,7 @@ packages:
     resolution: {integrity: sha512-HN3W1gRIuN/ZW295c7zi7g9lVBllMgZE40RxCX37wrTPWXCWtpvOZdfnuK+1WNpvZje6XuJeI3Wnb4TJEUem+g==}
     dependencies:
       '@types/mdast': 3.0.11
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       decode-named-character-reference: 1.0.2
       mdast-util-to-string: 3.2.0
       micromark: 3.1.0
@@ -5423,7 +5464,7 @@ packages:
   /mdast-util-to-hast@12.3.0:
     resolution: {integrity: sha512-pits93r8PhnIoU4Vy9bjW39M2jJ6/tdHyja9rrot9uujkN7UTU9SDnE6WNJz/IGyQk3XHX6yNNtrBH6cQzm8Hw==}
     dependencies:
-      '@types/hast': 2.3.5
+      '@types/hast': 2.3.10
       '@types/mdast': 3.0.11
       mdast-util-definitions: 5.1.2
       micromark-util-sanitize-uri: 1.1.0
@@ -6229,7 +6270,7 @@ packages:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.24.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-is: 16.13.1
@@ -6981,6 +7022,12 @@ packages:
     requiresBuild: true
     dev: true
 
+  /simple-swizzle@0.2.2:
+    resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
+    dependencies:
+      is-arrayish: 0.3.2
+    dev: false
+
   /slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -7547,25 +7594,25 @@ packages:
   /unist-util-is@5.2.1:
     resolution: {integrity: sha512-u9njyyfEh43npf1M+yGKDGVPbY/JWEemg5nH05ncKPfi+kBbKBJoTdsogMu33uhytuLlv9y0O7GH7fEdwLdLQw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-position@4.0.4:
     resolution: {integrity: sha512-kUBE91efOWfIVBo8xzh/uZQ7p9ffYRtUbMRZBNFYwf0RK8koUMx6dGUfwylLOKmaT2cs4wSW96QoYUSXAyEtpg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-stringify-position@3.0.3:
     resolution: {integrity: sha512-k5GzIBZ/QatR8N5X2y+drfpWG8IDBzdnVj6OInRNWm1oXrzydiaAT2OQiA8DPRRZyAKb9b6I2a6PxYklZD0gKg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
     dev: false
 
   /unist-util-visit-parents@5.1.3:
     resolution: {integrity: sha512-x6+y8g7wWMyQhL1iZfhIPhDAs7Xwbn9nRosDXl7qoPTSCy0yNxnKc+hWokFifWQIDGi154rdUqKvbCa4+1kLhg==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-is: 5.2.1
     dev: false
 
@@ -7706,7 +7753,7 @@ packages:
   /vfile-message@3.1.4:
     resolution: {integrity: sha512-fa0Z6P8HUrQN4BZaX05SIVXic+7kE3b05PWAtPuYP9QLHsLKYR7/AlLW3NtOrpXRLeawpDLMsVkmk5DG0NXgWw==}
     dependencies:
-      '@types/unist': 2.0.7
+      '@types/unist': 2.0.10
       unist-util-stringify-position: 3.0.3
     dev: false
 
@@ -8193,7 +8240,7 @@ packages:
     name: '@aptabase/tauri'
     version: 0.4.2
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.8
+      '@tauri-apps/api': 2.0.0-beta.9
       tslib: 2.6.2
     dev: false
 
@@ -8205,48 +8252,48 @@ packages:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-fs/aca99d64d39b155088b06cb57d3d0302c1178065:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/aca99d64d39b155088b06cb57d3d0302c1178065}
+  github.com/tauri-apps/tauri-plugin-fs/67d1c347e13871947920f66d185cad294b6e040a:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/67d1c347e13871947920f66d185cad294b6e040a}
     name: '@tauri-apps/plugin-fs'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-global-shortcut/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/489c5e0e1bcaf46dabf23985e7ed8cd488a46c37}
+  github.com/tauri-apps/tauri-plugin-global-shortcut/985c29f73e756b7bf852e2752f69d4c2c91ab6de:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/985c29f73e756b7bf852e2752f69d4c2c91ab6de}
     name: '@tauri-apps/plugin-global-shortcut'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-http/65b360f8257f86d82588afba0e7ea9332abd7ca5:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/65b360f8257f86d82588afba0e7ea9332abd7ca5}
+  github.com/tauri-apps/tauri-plugin-http/610c7e1fb84c0b81bcc568f0e0fd24b855a3e026:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/610c7e1fb84c0b81bcc568f0e0fd24b855a3e026}
     name: '@tauri-apps/plugin-http'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-process/0da0d1770b3818c0b65f0274eab35ca04b19bc40:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/0da0d1770b3818c0b65f0274eab35ca04b19bc40}
+  github.com/tauri-apps/tauri-plugin-process/f19a4f06cbc5174fbe1ffd79aaeeb1e493c16040:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/f19a4f06cbc5174fbe1ffd79aaeeb1e493c16040}
     name: '@tauri-apps/plugin-process'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-shell/a7c0d7bb742e960d9b6cfdb266bf0d4422a8dae9:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/a7c0d7bb742e960d9b6cfdb266bf0d4422a8dae9}
+  github.com/tauri-apps/tauri-plugin-shell/173385de4b6f4d9f174a033d7d09dd77c355d0a7:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/173385de4b6f4d9f174a033d7d09dd77c355d0a7}
     name: '@tauri-apps/plugin-shell'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-updater/e309e412507806fe969d351e1bbf81c019f42f09:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/e309e412507806fe969d351e1bbf81c019f42f09}
+  github.com/tauri-apps/tauri-plugin-updater/9c655e3aa0af7809f2bb47db75c0281d11359093:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/9c655e3aa0af7809f2bb47db75c0281d11359093}
     name: '@tauri-apps/plugin-updater'
     version: 2.0.0-beta.2
     dependencies:
