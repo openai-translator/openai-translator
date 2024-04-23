@@ -439,30 +439,37 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         const id = uuidv4()
         const unlistens: Array<() => void> = []
         const unlisten = () => {
-            unlistens.forEach((unlisten) => unlisten())
+            unlistens.forEach((cb) => cb())
         }
         return await new Promise<void>((resolve, reject) => {
+            let isAborted = false
             options.signal?.addEventListener('abort', () => {
+                isAborted = true
                 unlisten?.()
+                reject()
                 emit('abort-fetch-stream', { id })
-                resolve()
             })
             listen('fetch-stream-status-code', (event: Event<{ id: string; status: number }>) => {
+                if (isAborted) {
+                    return
+                }
                 if (event.payload.id === id) {
                     onStatusCode?.(event.payload.status)
                 }
             })
-                .then((unlisten) => unlistens.push(unlisten))
+                .then((cb) => unlistens.push(cb))
                 .catch((e) => reject(e))
             listen(
                 'fetch-stream-chunk',
                 (event: Event<{ id: string; data: string; done: boolean; status: number }>) => {
+                    if (isAborted) {
+                        return
+                    }
                     const payload = event.payload
                     if (payload.id !== id) {
                         return
                     }
                     if (payload.done) {
-                        resolve()
                         return
                     }
                     if (payload.status !== 200) {
@@ -472,7 +479,6 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                         } catch (e) {
                             onError(payload.data)
                         }
-                        resolve()
                         return
                     }
                     if (useJSONParser) {
@@ -498,7 +504,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                     reject(e)
                 })
                 .finally(() => {
+                    if (isAborted) {
+                        return
+                    }
                     unlisten?.()
+                    resolve()
                 })
         })
     }

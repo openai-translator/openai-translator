@@ -517,6 +517,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [showActionManager, setShowActionManager] = useState(false)
 
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
+    const translationIDRef = useRef(0)
 
     const editorRef = useRef<HTMLTextAreaElement>(null)
     const isCompositing = useRef(false)
@@ -1044,6 +1045,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const translateText = useDeepCompareCallback(
         async (selectedWord: string, signal: AbortSignal) => {
+            translationIDRef.current += 1
+            if (translationIDRef.current > 1024) {
+                translationIDRef.current = 0
+            }
+            const translationID = translationIDRef.current
             const { text, sourceLang, targetLang, action } = translateDeps
             if (!text || !sourceLang || !targetLang || !action) {
                 return
@@ -1153,7 +1159,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 setActionStr('Error')
                 setErrorMessage((error as Error).toString())
             } finally {
-                if (!isStopped) {
+                if (!isStopped && translationID === translationIDRef.current) {
                     stopLoading()
                     isStopped = true
                 }
