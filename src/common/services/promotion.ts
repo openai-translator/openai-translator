@@ -36,14 +36,20 @@ export interface IPromotionResponse {
 }
 
 export async function fetchPromotions(): Promise<IPromotionResponse> {
-    const resp = await fetch(
-        `https://raw.githubusercontent.com/yetone/openai-translator-configs/main/promotions.json?ts=${Date.now()}`,
-        { cache: 'no-cache' }
-    )
-    if (!resp.ok) {
-        throw new Error(resp.statusText)
+    try {
+        const resp = await fetch(
+            `https://raw.githubusercontent.com/yetone/openai-translator-configs/main/promotions.json?ts=${Date.now()}`,
+            { cache: 'no-cache' }
+        )
+        if (!resp.ok) {
+            throw new Error(resp.statusText)
+        }
+        return resp.json()
+    } catch (error) {
+        console.error('Error fetching promotions: ', error)
+
+        return {}
     }
-    return resp.json()
 }
 
 export async function choicePromotionItem(items?: IPromotionItem[]) {
