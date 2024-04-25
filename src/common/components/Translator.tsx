@@ -1574,174 +1574,207 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             background: settings.enableBackgroundBlur ? 'transparent' : '',
                         }}
                     >
-                        {showLogo ? (
-                            <LogoWithText ref={logoWithTextRef} />
-                        ) : (
-                            <div style={{ flexShrink: 0, marginRight: 'auto' }} />
-                        )}
-                        <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
-                            <div className={styles.from}>
-                                <Select
-                                    disabled={currentTranslateMode === 'explain-code'}
-                                    size='mini'
-                                    clearable={false}
-                                    options={sourceLangOptions}
-                                    value={[{ id: sourceLang }]}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                minWidth: '110px',
-                                            },
-                                        },
-                                    }}
-                                    onChange={({ value }) => {
-                                        const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
-                                        setSourceLang(langId as LangCode)
-                                        setTranslateDeps((v) => {
-                                            return {
-                                                ...v,
-                                                text: editableText,
-                                                sourceLang: langId as LangCode,
-                                            }
-                                        })
-                                    }}
-                                />
-                            </div>
-                            <div
-                                className={styles.arrow}
-                                onClick={() => {
-                                    setTranslateDeps((v) => ({
-                                        ...v,
-                                        text: translatedText,
-                                        sourceLang: targetLang ?? 'en',
-                                        targetLang: sourceLang,
-                                    }))
-                                    setSourceLang(targetLang ?? 'en')
-                                    setTargetLang(sourceLang)
-                                    editorRef.current?.focus()
-                                }}
-                            >
-                                <Tooltip content='Exchange' placement='top'>
-                                    <div>
-                                        <TbArrowsExchange />
-                                    </div>
-                                </Tooltip>
-                            </div>
-                            <div className={styles.to}>
-                                <Select
-                                    disabled={currentTranslateMode === 'polishing'}
-                                    size='mini'
-                                    clearable={false}
-                                    options={targetLangOptions}
-                                    value={[{ id: targetLang }]}
-                                    overrides={{
-                                        Root: {
-                                            style: {
-                                                minWidth: '110px',
-                                            },
-                                        },
-                                    }}
-                                    onChange={({ value }) => {
-                                        stopAutomaticallyChangeTargetLang.current = true
-                                        const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
-                                        setTargetLang(langId as LangCode)
-                                        setTranslateDeps((v) => {
-                                            return {
-                                                ...v,
-                                                text: editableText,
-                                                targetLang: langId as LangCode,
-                                            }
-                                        })
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
-                            {displayedActions?.map((action) => {
-                                return (
-                                    <Tooltip
-                                        key={action.id}
-                                        content={action.mode ? t(action.name) : action.name}
-                                        placement={isDesktopApp() ? 'bottom' : 'top'}
-                                    >
-                                        <Button
-                                            size='mini'
-                                            kind={action.id === activateAction?.id ? 'primary' : 'secondary'}
-                                            className={
-                                                action.id === activateAction?.id
-                                                    ? '__yetone-activate-action'
-                                                    : undefined
-                                            }
-                                            overrides={{
-                                                Root: {
-                                                    style: {
-                                                        height: '27px',
-                                                        display: 'flex',
-                                                        flexDirection: 'row',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                    },
+                        <div
+                            style={{
+                                display: 'flex',
+                                width: '100%',
+                            }}
+                        >
+                            {showLogo ? (
+                                <LogoWithText ref={logoWithTextRef} />
+                            ) : (
+                                <div style={{ flexShrink: 0, marginRight: 'auto' }} />
+                            )}
+                            <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
+                                <div className={styles.from}>
+                                    <Select
+                                        disabled={currentTranslateMode === 'explain-code'}
+                                        size='mini'
+                                        clearable={false}
+                                        options={sourceLangOptions}
+                                        value={[{ id: sourceLang }]}
+                                        overrides={{
+                                            Root: {
+                                                style: {
+                                                    minWidth: '110px',
                                                 },
-                                            }}
-                                            onClick={() => {
-                                                setActivateAction(action)
-                                                if (action.mode === 'polishing') {
-                                                    setTargetLang(sourceLang)
+                                            },
+                                        }}
+                                        onChange={({ value }) => {
+                                            const langId = value.length > 0 ? value[0].id : sourceLangOptions[0].id
+                                            setSourceLang(langId as LangCode)
+                                            setTranslateDeps((v) => {
+                                                return {
+                                                    ...v,
+                                                    text: editableText,
+                                                    sourceLang: langId as LangCode,
                                                 }
-                                            }}
-                                        >
-                                            {action.icon &&
-                                                React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {
-                                                    size: 15,
-                                                })}
-                                            {action.id === activateAction?.id && (
-                                                <div
-                                                    style={{
-                                                        maxWidth: 100,
-                                                        whiteSpace: 'nowrap',
-                                                        overflow: 'hidden',
-                                                        textOverflow: 'ellipsis',
-                                                    }}
-                                                >
-                                                    {action.mode ? t(action.name) : action.name}
-                                                </div>
-                                            )}
-                                        </Button>
+                                            })
+                                        }}
+                                    />
+                                </div>
+                                <div
+                                    className={styles.arrow}
+                                    onClick={() => {
+                                        setTranslateDeps((v) => ({
+                                            ...v,
+                                            text: translatedText,
+                                            sourceLang: targetLang ?? 'en',
+                                            targetLang: sourceLang,
+                                        }))
+                                        setSourceLang(targetLang ?? 'en')
+                                        setTargetLang(sourceLang)
+                                        editorRef.current?.focus()
+                                    }}
+                                >
+                                    <Tooltip content='Exchange' placement='top'>
+                                        <div>
+                                            <TbArrowsExchange />
+                                        </div>
                                     </Tooltip>
-                                )
-                            })}
-                        </div>
-                        {props.showSettingsIcon && (
-                            <div className={styles.popupCardHeaderMoreActionsContainer}>
-                                <StatefulPopover
-                                    autoFocus={false}
-                                    triggerType='hover'
-                                    showArrow
-                                    placement='bottom'
-                                    content={
-                                        <StatefulMenu
-                                            initialState={{
-                                                highlightedIndex: hiddenActions.findIndex(
-                                                    (action) => action.id === activateAction?.id
-                                                ),
-                                            }}
-                                            onItemSelect={async ({ item }) => {
-                                                const actionID = item.id
-                                                if (actionID === '__manager__') {
-                                                    if (isTauri()) {
-                                                        const { invoke } = await import('@tauri-apps/api/core')
-                                                        await invoke('show_action_manager_window')
-                                                    } else {
-                                                        setShowActionManager(true)
-                                                    }
-                                                    return
+                                </div>
+                                <div className={styles.to}>
+                                    <Select
+                                        disabled={currentTranslateMode === 'polishing'}
+                                        size='mini'
+                                        clearable={false}
+                                        options={targetLangOptions}
+                                        value={[{ id: targetLang }]}
+                                        overrides={{
+                                            Root: {
+                                                style: {
+                                                    minWidth: '110px',
+                                                },
+                                            },
+                                        }}
+                                        onChange={({ value }) => {
+                                            stopAutomaticallyChangeTargetLang.current = true
+                                            const langId = value.length > 0 ? value[0].id : targetLangOptions[0].id
+                                            setTargetLang(langId as LangCode)
+                                            setTranslateDeps((v) => {
+                                                return {
+                                                    ...v,
+                                                    text: editableText,
+                                                    targetLang: langId as LangCode,
                                                 }
-                                                setActivateAction(actions?.find((a) => a.id === (actionID as number)))
-                                            }}
-                                            items={[
-                                                ...hiddenActions.map((action) => {
-                                                    return {
-                                                        id: action.id,
+                                            })
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.popupCardHeaderButtonGroup} ref={headerActionButtonsRef}>
+                                {displayedActions?.map((action) => {
+                                    return (
+                                        <Tooltip
+                                            key={action.id}
+                                            content={action.mode ? t(action.name) : action.name}
+                                            placement={isDesktopApp() ? 'bottom' : 'top'}
+                                        >
+                                            <Button
+                                                size='mini'
+                                                kind={action.id === activateAction?.id ? 'primary' : 'secondary'}
+                                                className={
+                                                    action.id === activateAction?.id
+                                                        ? '__yetone-activate-action'
+                                                        : undefined
+                                                }
+                                                overrides={{
+                                                    Root: {
+                                                        style: {
+                                                            height: '27px',
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
+                                                            gap: '4px',
+                                                        },
+                                                    },
+                                                }}
+                                                onClick={() => {
+                                                    setActivateAction(action)
+                                                    if (action.mode === 'polishing') {
+                                                        setTargetLang(sourceLang)
+                                                    }
+                                                }}
+                                            >
+                                                {action.icon &&
+                                                    React.createElement(mdIcons[action.icon as keyof typeof mdIcons], {
+                                                        size: 15,
+                                                    })}
+                                                {action.id === activateAction?.id && (
+                                                    <div
+                                                        style={{
+                                                            maxWidth: 100,
+                                                            whiteSpace: 'nowrap',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                        }}
+                                                    >
+                                                        {action.mode ? t(action.name) : action.name}
+                                                    </div>
+                                                )}
+                                            </Button>
+                                        </Tooltip>
+                                    )
+                                })}
+                            </div>
+                            {props.showSettingsIcon && (
+                                <div className={styles.popupCardHeaderMoreActionsContainer}>
+                                    <StatefulPopover
+                                        autoFocus={false}
+                                        triggerType='hover'
+                                        showArrow
+                                        placement='bottom'
+                                        content={
+                                            <StatefulMenu
+                                                initialState={{
+                                                    highlightedIndex: hiddenActions.findIndex(
+                                                        (action) => action.id === activateAction?.id
+                                                    ),
+                                                }}
+                                                onItemSelect={async ({ item }) => {
+                                                    const actionID = item.id
+                                                    if (actionID === '__manager__') {
+                                                        if (isTauri()) {
+                                                            const { invoke } = await import('@tauri-apps/api/core')
+                                                            await invoke('show_action_manager_window')
+                                                        } else {
+                                                            setShowActionManager(true)
+                                                        }
+                                                        return
+                                                    }
+                                                    setActivateAction(
+                                                        actions?.find((a) => a.id === (actionID as number))
+                                                    )
+                                                }}
+                                                items={[
+                                                    ...hiddenActions.map((action) => {
+                                                        return {
+                                                            id: action.id,
+                                                            label: (
+                                                                <div
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        flexDirection: 'row',
+                                                                        alignItems: 'center',
+                                                                        gap: 6,
+                                                                    }}
+                                                                >
+                                                                    {action.icon
+                                                                        ? React.createElement(
+                                                                              (mdIcons as Record<string, IconType>)[
+                                                                                  action.icon
+                                                                              ],
+                                                                              { size: 15 }
+                                                                          )
+                                                                        : undefined}
+                                                                    {action.mode ? t(action.name) : action.name}
+                                                                </div>
+                                                            ),
+                                                        }
+                                                    }),
+                                                    { divider: true },
+                                                    {
+                                                        id: '__manager__',
                                                         label: (
                                                             <div
                                                                 style={{
@@ -1749,49 +1782,25 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                     flexDirection: 'row',
                                                                     alignItems: 'center',
                                                                     gap: 6,
+                                                                    fontWeight: 500,
                                                                 }}
                                                             >
-                                                                {action.icon
-                                                                    ? React.createElement(
-                                                                          (mdIcons as Record<string, IconType>)[
-                                                                              action.icon
-                                                                          ],
-                                                                          { size: 15 }
-                                                                      )
-                                                                    : undefined}
-                                                                {action.mode ? t(action.name) : action.name}
+                                                                <GiPlatform />
+                                                                {t('Action Manager')}
                                                             </div>
                                                         ),
-                                                    }
-                                                }),
-                                                { divider: true },
-                                                {
-                                                    id: '__manager__',
-                                                    label: (
-                                                        <div
-                                                            style={{
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                alignItems: 'center',
-                                                                gap: 6,
-                                                                fontWeight: 500,
-                                                            }}
-                                                        >
-                                                            <GiPlatform />
-                                                            {t('Action Manager')}
-                                                        </div>
-                                                    ),
-                                                },
-                                            ]}
-                                        />
-                                    }
-                                >
-                                    <div className={styles.popupCardHeaderMoreActionsBtn}>
-                                        <GrMoreVertical />
-                                    </div>
-                                </StatefulPopover>
-                            </div>
-                        )}
+                                                    },
+                                                ]}
+                                            />
+                                        }
+                                    >
+                                        <div className={styles.popupCardHeaderMoreActionsBtn}>
+                                            <GrMoreVertical />
+                                        </div>
+                                    </StatefulPopover>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div
                         className={clsx(
