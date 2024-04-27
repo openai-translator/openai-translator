@@ -171,16 +171,28 @@ export function TranslatorWindow() {
     useEffect(() => {
         const appWindow = getCurrent()
         let unlisten: (() => void) | undefined = undefined
+        let timer: number | undefined = undefined
         appWindow
             .onFocusChanged(({ payload: focused }) => {
-                if (!pinned && !focused && settings.autoHideWindowWhenOutOfFocus) {
-                    invoke('hide_translator_window')
+                if (!pinned && settings.autoHideWindowWhenOutOfFocus) {
+                    if (timer) {
+                        clearTimeout(timer)
+                    }
+                    if (focused) {
+                        return
+                    }
+                    timer = window.setTimeout(() => {
+                        invoke('hide_translator_window')
+                    }, 50)
                 }
             })
             .then((cb) => {
                 unlisten = cb
             })
         return () => {
+            if (timer) {
+                clearTimeout(timer)
+            }
             unlisten?.()
         }
     }, [pinned, settings.autoHideWindowWhenOutOfFocus])
