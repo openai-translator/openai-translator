@@ -7,6 +7,7 @@ import { codeBlock } from 'common-tags'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { chatgptArkoseReqParams } from '../constants'
+import { sha3_512 } from 'js-sha3'
 
 export const keyChatgptArkoseReqUrl = 'chatgptArkoseReqUrl'
 export const keyChatgptArkoseReqForm = 'chatgptArkoseReqForm'
@@ -62,6 +63,38 @@ async function getChatRequirements(accessToken: string) {
         conversation_mode_kind: 'primary_assistant',
     })
     return response.json()
+}
+
+async function GenerateProofToken(seed: string, diff: string | number | unknown[], userAgent: string) {
+    const cores = [8, 12, 16, 24]
+    const screens = [3000, 4000, 6000]
+    const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
+
+    const core = cores[randomInt(0, cores.length)]
+    const screen = screens[randomInt(0, screens.length)]
+
+    const now = new Date(Date.now() - 8 * 3600 * 1000)
+    const parseTime = now.toUTCString().replace('GMT', 'GMT-0500 (Eastern Time)')
+
+    const config = [core + screen, parseTime, 4294705152, 0, userAgent]
+    if (typeof diff === 'string') {
+        const diffLen = Math.floor(diff.length / 2)
+        // Continue with your code logic that uses diffLen
+        for (let i = 0; i < 100000; i++) {
+            config[3] = i
+            const jsonData = JSON.stringify(config)
+            const base = btoa(unescape(encodeURIComponent(jsonData)))
+            const hashValue = sha3_512(seed + base)
+
+            if (hashValue.substring(0, diffLen) <= diff) {
+                const result = 'gAAAAAB' + base
+                return result
+            }
+        }
+    }
+
+    const fallbackBase = btoa(unescape(encodeURIComponent(`"${seed}"`)))
+    return 'gAAAAABwQ8Lk5FbGpA2NcR9dShT6gYjU7VxZ4D' + fallbackBase
 }
 
 export class ChatGPT extends AbstractEngine {
@@ -150,11 +183,20 @@ export class ChatGPT extends AbstractEngine {
         const arkoseToken = await getArkoseToken()
         const requirements = await getChatRequirements(apiKey)
         const requirementstoken = requirements.token
+        const userAgent =
+            process.env.USER_AGENT ||
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+        const proofToken = await GenerateProofToken(
+            requirements.proofofwork.seed,
+            requirements.proofofwork.difficulty,
+            userAgent
+        )
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
             'Openai-Sentinel-Arkose-Token': arkoseToken,
             'Openai-Sentinel-Chat-Requirements-Token': requirementstoken,
+            'openai-sentinel-proof-token': proofToken,
         }
         const body = {
             action: 'next',

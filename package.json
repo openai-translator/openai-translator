@@ -68,6 +68,7 @@
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.1",
     "iso-639-1": "^3.0.1",
+    "js-sha3": "^0.9.3",
     "js-tiktoken": "^1.0.10",
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
