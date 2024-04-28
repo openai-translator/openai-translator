@@ -23,7 +23,7 @@ module.exports = {
         'baseui/deprecated-theme-api': 'warn',
         'baseui/deprecated-component-api': 'warn',
         'baseui/no-deep-imports': 'warn',
-        'prettier/prettier': 'error',
+        'prettier/prettier': ['error', { endOfLine: 'auto' }],
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
         'spaced-comment': ['error', 'always', { markers: ['/'] }],

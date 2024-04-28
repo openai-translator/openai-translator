@@ -22,10 +22,10 @@ dependencies:
     version: github.com/tauri-apps/tauri-plugin-autostart/f3fa131235dcdf7115b468c7da240ea53ab1ddc4
   '@tauri-apps/plugin-fs':
     specifier: github:tauri-apps/tauri-plugin-fs#v2
-    version: github.com/tauri-apps/tauri-plugin-fs/67d1c347e13871947920f66d185cad294b6e040a
+    version: github.com/tauri-apps/tauri-plugin-fs/8e33a6ea7ff89dde66194c97acd759997c7e2ce9
   '@tauri-apps/plugin-global-shortcut':
     specifier: github:tauri-apps/tauri-plugin-global-shortcut#v2
-    version: github.com/tauri-apps/tauri-plugin-global-shortcut/985c29f73e756b7bf852e2752f69d4c2c91ab6de
+    version: github.com/tauri-apps/tauri-plugin-global-shortcut/65d12db9d6d9537d25f6af3c4bc771fa24191f3b
   '@tauri-apps/plugin-http':
     specifier: github:tauri-apps/tauri-plugin-http#v2
     version: github.com/tauri-apps/tauri-plugin-http/610c7e1fb84c0b81bcc568f0e0fd24b855a3e026
@@ -34,10 +34,10 @@ dependencies:
     version: github.com/tauri-apps/tauri-plugin-process/f19a4f06cbc5174fbe1ffd79aaeeb1e493c16040
   '@tauri-apps/plugin-shell':
     specifier: github:tauri-apps/tauri-plugin-shell#v2
-    version: github.com/tauri-apps/tauri-plugin-shell/173385de4b6f4d9f174a033d7d09dd77c355d0a7
+    version: github.com/tauri-apps/tauri-plugin-shell/2712a2834f20489fba559ddaa3bde7851366ff85
   '@tauri-apps/plugin-updater':
     specifier: github:tauri-apps/tauri-plugin-updater#v2
-    version: github.com/tauri-apps/tauri-plugin-updater/9c655e3aa0af7809f2bb47db75c0281d11359093
+    version: github.com/tauri-apps/tauri-plugin-updater/8db23dcdb3970812e2ad2ea202398fde553d14b9
   '@types/color':
     specifier: ^3.0.6
     version: 3.0.6
@@ -98,6 +98,9 @@ dependencies:
   iso-639-1:
     specifier: ^3.0.1
     version: 3.0.1
+  js-sha3:
+    specifier: ^0.9.3
+    version: 0.9.3
   js-tiktoken:
     specifier: ^1.0.10
     version: 1.0.10
@@ -4968,6 +4971,10 @@ packages:
     resolution: {integrity: sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==}
     dev: false
 
+  /js-sha3@0.9.3:
+    resolution: {integrity: sha512-BcJPCQeLg6WjEx3FE591wVAevlli8lxsxm9/FzV4HXkV49TmBH38Yvrpce6fjbADGMKFrBMGTqrVz3qPIZ88Gg==}
+    dev: false
+
   /js-tiktoken@1.0.10:
     resolution: {integrity: sha512-ZoSxbGjvGyMT13x6ACo9ebhDha/0FHdKA+OsQcMOWcm1Zs7r90Rhk5lhERLzji+3rA7EKpXCgwXcM5fF3DMpdA==}
     dependencies:
@@ -8252,16 +8259,16 @@ packages:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-fs/67d1c347e13871947920f66d185cad294b6e040a:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/67d1c347e13871947920f66d185cad294b6e040a}
+  github.com/tauri-apps/tauri-plugin-fs/8e33a6ea7ff89dde66194c97acd759997c7e2ce9:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/8e33a6ea7ff89dde66194c97acd759997c7e2ce9}
     name: '@tauri-apps/plugin-fs'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-global-shortcut/985c29f73e756b7bf852e2752f69d4c2c91ab6de:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/985c29f73e756b7bf852e2752f69d4c2c91ab6de}
+  github.com/tauri-apps/tauri-plugin-global-shortcut/65d12db9d6d9537d25f6af3c4bc771fa24191f3b:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/65d12db9d6d9537d25f6af3c4bc771fa24191f3b}
     name: '@tauri-apps/plugin-global-shortcut'
     version: 2.0.0-beta.2
     dependencies:
@@ -8284,16 +8291,16 @@ packages:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-shell/173385de4b6f4d9f174a033d7d09dd77c355d0a7:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/173385de4b6f4d9f174a033d7d09dd77c355d0a7}
+  github.com/tauri-apps/tauri-plugin-shell/2712a2834f20489fba559ddaa3bde7851366ff85:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/2712a2834f20489fba559ddaa3bde7851366ff85}
     name: '@tauri-apps/plugin-shell'
     version: 2.0.0-beta.2
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.8
     dev: false
 
-  github.com/tauri-apps/tauri-plugin-updater/9c655e3aa0af7809f2bb47db75c0281d11359093:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/9c655e3aa0af7809f2bb47db75c0281d11359093}
+  github.com/tauri-apps/tauri-plugin-updater/8db23dcdb3970812e2ad2ea202398fde553d14b9:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/8db23dcdb3970812e2ad2ea202398fde553d14b9}
     name: '@tauri-apps/plugin-updater'
     version: 2.0.0-beta.2
     dependencies:
