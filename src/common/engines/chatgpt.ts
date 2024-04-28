@@ -68,7 +68,7 @@ async function getChatRequirements(accessToken: string) {
 async function GenerateProofToken(seed: string, diff: string | number | unknown[], userAgent: string) {
     const cores = [8, 12, 16, 24]
     const screens = [3000, 4000, 6000]
-    const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+    const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
     const core = cores[randomInt(0, cores.length)]
     const screen = screens[randomInt(0, screens.length)]
@@ -77,17 +77,19 @@ async function GenerateProofToken(seed: string, diff: string | number | unknown[
     const parseTime = now.toUTCString().replace('GMT', 'GMT-0500 (Eastern Time)')
 
     const config = [core + screen, parseTime, 4294705152, 0, userAgent]
-    const diffLen = Math.floor(diff.length / 2)
+    if (typeof diff === 'string') {
+        const diffLen = Math.floor(diff.length / 2)
+        // Continue with your code logic that uses diffLen
+        for (let i = 0; i < 100000; i++) {
+            config[3] = i
+            const jsonData = JSON.stringify(config)
+            const base = btoa(unescape(encodeURIComponent(jsonData)))
+            const hashValue = sha3_512(seed + base)
 
-    for (let i = 0; i < 100000; i++) {
-        config[3] = i
-        const jsonData = JSON.stringify(config)
-        const base = btoa(unescape(encodeURIComponent(jsonData)))
-        const hashValue = sha3_512(seed + base)
-
-        if (hashValue.substring(0, diffLen) <= diff) {
-            const result = 'gAAAAAB' + base
-            return result
+            if (hashValue.substring(0, diffLen) <= diff) {
+                const result = 'gAAAAAB' + base
+                return result
+            }
         }
     }
 
