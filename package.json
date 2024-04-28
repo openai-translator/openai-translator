@@ -54,6 +54,7 @@
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
     "baseui-sd": "^12.2.4",
+    "best-effort-json-parser": "^1.0.1",
     "clsx": "^1.2.1",
     "color": "^4.2.3",
     "common-tags": "^1.8.2",
