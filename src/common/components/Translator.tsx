@@ -89,6 +89,8 @@ import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
 import { Provider, engineIcons, getEngine } from '../engines'
 import color from 'color'
+import { useAtom } from 'jotai'
+import { showSettingsAtom } from '../store/setting'
 
 const cache = new LRUCache({
     max: 500,
@@ -498,7 +500,7 @@ export function Translator(props: ITranslatorProps) {
 }
 
 function InnerTranslator(props: IInnerTranslatorProps) {
-    const [showSettings, setShowSettings] = useState(false)
+    const [showSettings, setShowSettings] = useAtom(showSettingsAtom)
 
     useEffect(() => {
         setShowSettings(props.showSettings ?? false)
