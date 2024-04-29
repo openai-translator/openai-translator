@@ -380,7 +380,7 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
     } = options
 
     let prevJSONPartial = ''
-    let prevJSONPartialIndex = -1
+    let prevJSONPartialIndex = 0
     const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
@@ -389,13 +389,10 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         try {
             const parsedResponse = bestEffortJSONParse(prevJSONPartial + value)
             prevJSONPartial += value
-            parsedResponse.forEach((data: string, idx: number) => {
-                if (idx <= prevJSONPartialIndex) {
-                    return
-                }
-                prevJSONPartialIndex = idx
+            parsedResponse.slice(prevJSONPartialIndex).forEach((data: string) => {
                 onMessage(JSON.stringify(data))
             })
+            prevJSONPartialIndex = parsedResponse.length
         } catch (e) {
             console.error('streaming json parser error', e)
             console.error('streaming json parser value', value)
