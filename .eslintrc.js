@@ -25,7 +25,7 @@ module.exports = {
         'baseui/no-deep-imports': 'warn',
         'prettier/prettier': 'error',
         'react-hooks/rules-of-hooks': 'error',
-        'react-hooks/exhaustive-deps': 'warn',
+        'react-hooks/exhaustive-deps': 'error',
         'spaced-comment': ['error', 'always', { markers: ['/'] }],
     },
     settings: {

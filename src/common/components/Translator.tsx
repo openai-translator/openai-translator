@@ -504,7 +504,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     useEffect(() => {
         setShowSettings(props.showSettings ?? false)
-    }, [props.showSettings, props.uuid])
+    }, [props.showSettings, props.uuid, setShowSettings])
 
     const { onSettingsShow } = props
 
@@ -1211,7 +1211,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             setShowSettings(true)
             return
         }
-    }, [props.defaultShowSettings, settings])
+    }, [props.defaultShowSettings, setShowSettings, settings])
 
     const [isOCRProcessing, setIsOCRProcessing] = useState(false)
     const [showOCRProcessing, setShowOCRProcessing] = useState(false)
@@ -2423,7 +2423,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         headerPromotionID: settingsHeaderPromotion?.id,
                                     })
                                 } else {
-                                    setShowSettings((s) => !s)
+                                    setShowSettings((s: boolean) => !s)
                                 }
                             }}
                         >

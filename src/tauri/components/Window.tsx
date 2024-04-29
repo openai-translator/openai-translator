@@ -50,7 +50,7 @@ export function Window(props: IWindowProps) {
         return () => {
             document.removeEventListener('keydown', handleKeyPress)
         }
-    }, [])
+    }, [setShowSettings])
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
