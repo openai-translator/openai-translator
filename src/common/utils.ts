@@ -548,3 +548,26 @@ export function getAssetUrl(asset: string) {
 }
 export const isMacOS = navigator.userAgent.includes('Mac OS X')
 export const isWindows = navigator.userAgent.includes('Windows')
+
+export async function parseSSEResponse(resp: Response, onMessage: (message: string) => void) {
+    const parser = createParser((event) => {
+        if (event.type === 'event') {
+            onMessage(event.data)
+        }
+    })
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const reader = resp.body!.getReader()
+    try {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+                break
+            }
+            const str = new TextDecoder().decode(value)
+            parser.feed(str)
+        }
+    } finally {
+        reader.releaseLock()
+    }
+}
