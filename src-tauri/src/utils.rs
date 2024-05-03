@@ -350,8 +350,6 @@ pub fn get_selected_text_by_clipboard(
 
 #[cfg(target_os = "macos")]
 pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    use debug_print::debug_println;
-
     use crate::config::get_config;
 
     match get_selected_text_by_ax() {
@@ -519,43 +517,71 @@ pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
     Ok(selected_text.to_string())
 }
 
+const APPLE_SCRIPT: &str = r#"
+use AppleScript version "2.4"
+use scripting additions
+use framework "Foundation"
+use framework "AppKit"
+
+tell application "System Events"
+    set frontmostProcess to first process whose frontmost is true
+    set appName to name of frontmostProcess
+end tell
+
+if appName is equal to "OpenAI Translator" then
+    return
+end if
+
+set savedAlertVolume to alert volume of (get volume settings)
+
+-- Back up clipboard contents:
+set savedClipboard to the clipboard
+
+set thePasteboard to current application's NSPasteboard's generalPasteboard()
+set theCount to thePasteboard's changeCount()
+
+tell application "System Events"
+    set volume alert volume 0
+end tell
+
+-- Copy selected text to clipboard:
+tell application "System Events" to keystroke "c" using {command down}
+delay 0.1 -- Without this, the clipboard may have stale data.
+
+tell application "System Events"
+    set volume alert volume savedAlertVolume
+end tell
+
+if thePasteboard's changeCount() is theCount then
+    return ""
+end if
+
+set theSelectedText to the clipboard
+
+set the clipboard to savedClipboard
+
+theSelectedText
+"#;
+
 #[cfg(target_os = "macos")]
 pub fn get_selected_text_by_clipboard_using_applescript(
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let apple_script = APP_HANDLE
-        .get()
-        .unwrap()
-        .path()
-        .resolve(
-            "resources/get-selected-text.applescript",
-            BaseDirectory::Resource,
-        )
-        .expect("failed to resolve get-selected-text.applescript");
-
-    match std::process::Command::new("osascript")
-        .arg(apple_script)
-        .output()
-    {
-        Ok(output) => {
-            // check exit code
-            if output.status.success() {
-                // get output content
-                let content = String::from_utf8(output.stdout)
-                    .expect("failed to parse get-selected-text.applescript output");
-                // trim content
-                let content = content.trim();
-                Ok(content.to_string())
-            } else {
-                let err = output
-                    .stderr
-                    .into_iter()
-                    .map(|c| c as char)
-                    .collect::<String>()
-                    .into();
-                Err(err)
-            }
-        }
-        Err(e) => Err(Box::new(e)),
+    let output = std::process::Command::new("osascript")
+        .arg("-e")
+        .arg(APPLE_SCRIPT)
+        .output()?;
+    if output.status.success() {
+        let content = String::from_utf8(output.stdout)?;
+        let content = content.trim();
+        Ok(content.to_string())
+    } else {
+        let err = output
+            .stderr
+            .into_iter()
+            .map(|c| c as char)
+            .collect::<String>()
+            .into();
+        Err(err)
     }
 }
 
