@@ -90,6 +90,8 @@ import { SpeakerIcon } from './SpeakerIcon'
 import { Provider, engineIcons, getEngine } from '../engines'
 import color from 'color'
 import { IEngine } from '../engines/interfaces'
+import { useAtom } from 'jotai'
+import { showSettingsAtom } from '../store/setting'
 
 const cache = new LRUCache({
     max: 500,
@@ -499,11 +501,11 @@ export function Translator(props: ITranslatorProps) {
 }
 
 function InnerTranslator(props: IInnerTranslatorProps) {
-    const [showSettings, setShowSettings] = useState(false)
+    const [showSettings, setShowSettings] = useAtom(showSettingsAtom)
 
     useEffect(() => {
         setShowSettings(props.showSettings ?? false)
-    }, [props.showSettings, props.uuid])
+    }, [props.showSettings, props.uuid, setShowSettings])
 
     const { onSettingsShow } = props
 
@@ -641,7 +643,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
             setActivateAction(action)
         }
-    }, [settings?.defaultTranslateMode])
+    }, [settings.defaultTranslateMode])
 
     const headerRef = useRef<HTMLDivElement>(null)
     const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
@@ -790,7 +792,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
     const [isAutoCollectOn, setIsAutoCollectOn] = useState(
-        settings?.autoCollect === undefined ? false : settings.autoCollect
+        settings.autoCollect === undefined ? false : settings.autoCollect
     )
     const [engine, setEngine] = useState<IEngine | undefined>(undefined)
 
@@ -1223,7 +1225,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             setShowSettings(true)
             return
         }
-    }, [props.defaultShowSettings, settings])
+    }, [props.defaultShowSettings, setShowSettings, settings])
 
     const [isOCRProcessing, setIsOCRProcessing] = useState(false)
     const [showOCRProcessing, setShowOCRProcessing] = useState(false)
@@ -1375,7 +1377,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         console.debug('speak selected word', selectedWord)
         editableTextSpeakingIconRef.current?.click()
-    }, [selectedWord, settings?.readSelectedWordsFromInputElementsText])
+    }, [selectedWord, settings.readSelectedWordsFromInputElementsText])
 
     const enableVocabulary = !isUserscript()
 
@@ -2435,7 +2437,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         headerPromotionID: settingsHeaderPromotion?.id,
                                     })
                                 } else {
-                                    setShowSettings((s) => !s)
+                                    setShowSettings((s: boolean) => !s)
                                 }
                             }}
                         >

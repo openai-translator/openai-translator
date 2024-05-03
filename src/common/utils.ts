@@ -5,6 +5,7 @@ import { getUniversalFetch } from './universal-fetch'
 import { v4 as uuidv4 } from 'uuid'
 import { invoke } from '@tauri-apps/api/core'
 import { listen, Event, emit } from '@tauri-apps/api/event'
+import { parse as bestEffortJSONParse } from 'best-effort-json-parser'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -368,41 +369,6 @@ interface FetchSSEOptions extends RequestInit {
     useJSONParser?: boolean
 }
 
-function tryParse(currentText: string): {
-    remainingText: string
-    parsedResponse: any
-} {
-    let jsonText: string
-    if (currentText.startsWith('[')) {
-        if (currentText.endsWith(']')) {
-            jsonText = currentText
-        } else {
-            jsonText = currentText + ']'
-        }
-    } else if (currentText.startsWith(',')) {
-        if (currentText.endsWith(']')) {
-            jsonText = '[' + currentText.slice(1)
-        } else {
-            jsonText = '[' + currentText.slice(1) + ']'
-        }
-    } else {
-        return {
-            remainingText: currentText,
-            parsedResponse: null,
-        }
-    }
-
-    try {
-        const parsedResponse = JSON.parse(jsonText)
-        return {
-            remainingText: '',
-            parsedResponse,
-        }
-    } catch (e) {
-        throw new Error(`Invalid JSON: "${jsonText}"`)
-    }
-}
-
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
     const {
         onMessage,
@@ -413,19 +379,24 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         ...fetchOptions
     } = options
 
-    let currentText = ''
+    let prevJSONPartial = ''
+    let prevJSONPartialIndex = 0
     const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
         }
 
-        currentText += value
-        const { parsedResponse, remainingText } = tryParse(currentText)
-        if (parsedResponse) {
-            currentText = remainingText
-            for (const item of parsedResponse) {
-                await onMessage(JSON.stringify(item))
-            }
+        try {
+            const parsedResponse = bestEffortJSONParse(prevJSONPartial + value)
+            prevJSONPartial += value
+            parsedResponse.slice(prevJSONPartialIndex).forEach((data: string) => {
+                onMessage(JSON.stringify(data))
+            })
+            prevJSONPartialIndex = parsedResponse.length
+        } catch (e) {
+            console.error('streaming json parser error', e)
+            console.error('streaming json parser value', value)
+            return
         }
     }
 
