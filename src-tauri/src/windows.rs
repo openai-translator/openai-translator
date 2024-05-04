@@ -1,5 +1,4 @@
 use crate::config;
-use crate::config::get_config;
 use crate::utils;
 use crate::UpdateResult;
 use crate::ALWAYS_ON_TOP;
@@ -8,6 +7,7 @@ use crate::APP_HANDLE;
 use cocoa::appkit::NSWindow;
 use debug_print::debug_println;
 use enigo::*;
+use get_selected_text::get_selected_text;
 use mouse_position::mouse_position::Mouse;
 use serde_json::json;
 use std::sync::atomic::Ordering;
@@ -124,7 +124,7 @@ pub async fn show_translator_window_with_selected_text_command() {
             }
         };
     } else {
-        selected_text = match utils::get_selected_text() {
+        selected_text = match get_selected_text() {
             Ok(text) => text,
             Err(e) => {
                 eprintln!("Error getting selected text: {}", e);

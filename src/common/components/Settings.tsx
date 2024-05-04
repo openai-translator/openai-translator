@@ -2718,18 +2718,6 @@ export function InnerSettings({
                         >
                             <AlwaysShowIconsCheckbox onBlur={onBlur} />
                         </FormItem>
-                        <FormItem
-                            style={{
-                                display: isDesktopApp && isMacOS ? 'block' : 'none',
-                            }}
-                            name='allowUsingClipboardWhenSelectedTextNotAvailable'
-                            label={t('Using clipboard')}
-                            caption={t(
-                                'Allow using the clipboard to get the selected text when the selected text is not available'
-                            )}
-                        >
-                            <MyCheckbox onBlur={onBlur} />
-                        </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
                         </FormItem>
