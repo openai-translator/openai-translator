@@ -113,7 +113,7 @@ pub fn get_translator_window_always_on_top() -> bool {
 #[tauri::command]
 pub async fn show_translator_window_with_selected_text_command() {
     let mut window = show_translator_window(false, true, false);
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     let selected_text;
     if cfg!(target_os = "macos") {
         selected_text = match utils::get_selected_text_by_clipboard(&mut enigo, false) {
