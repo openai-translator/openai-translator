@@ -15,15 +15,18 @@ use crate::APP_HANDLE;
 static SELECT_ALL: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
     up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::A, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('a'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -46,18 +49,6 @@ pub fn select_all(enigo: &mut Enigo) {
         .expect("failed to wait");
 }
 
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn select_all(enigo: &mut Enigo) {
-    let _guard = SELECT_ALL.lock();
-
-    up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
-}
-
 pub static INPUT_LOCK: Mutex<()> = Mutex::new(());
 
 #[cfg(not(target_os = "macos"))]
@@ -65,7 +56,7 @@ pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::LeftArrow);
+        enigo.key(Key::LeftArrow, Direction::Click).unwrap();
     }
 }
 
@@ -94,7 +85,7 @@ pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::RightArrow);
+        enigo.key(Key::RightArrow, Direction::Click).unwrap();
     }
 }
 
@@ -123,7 +114,7 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::Backspace);
+        enigo.key(Key::Backspace, Direction::Click).unwrap();
     }
 }
 
@@ -148,51 +139,42 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
 }
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
+    enigo.key(Key::Control, Direction::Release).unwrap();
+    enigo.key(Key::Alt, Direction::Release).unwrap();
+    enigo.key(Key::Shift, Direction::Release).unwrap();
+    enigo.key(Key::Space, Direction::Release).unwrap();
+    enigo.key(Key::Tab, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Meta);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
-    enigo.key_up(Key::Option);
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
+    enigo.key(Key::Control, Direction::Release).unwrap();
+    enigo.key(Key::Meta, Direction::Release).unwrap();
+    enigo.key(Key::Alt, Direction::Release).unwrap();
+    enigo.key(Key::Shift, Direction::Release).unwrap();
+    enigo.key(Key::Space, Direction::Release).unwrap();
+    enigo.key(Key::Tab, Direction::Release).unwrap();
+    enigo.key(Key::Option, Direction::Release).unwrap();
 }
 
 static COPY_PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn copy(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('c'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::C, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('c'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -216,29 +198,18 @@ pub fn copy(enigo: &mut Enigo) {
 }
 
 #[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn copy(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
-
-    up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('c'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Control);
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn paste(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('v'));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::V, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('v'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -259,18 +230,6 @@ pub fn paste(enigo: &mut Enigo) {
         .expect("failed to run applescript")
         .wait()
         .expect("failed to wait");
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn paste(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
-
-    up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('v'));
-    enigo.key_up(Key::Control);
 }
 
 pub fn get_selected_text_by_clipboard(
