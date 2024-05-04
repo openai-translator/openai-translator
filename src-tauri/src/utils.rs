@@ -19,7 +19,7 @@ static SELECT_ALL: Mutex<()> = Mutex::new(());
 pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys(enigo);
+    up_control_keys(enigo);
 
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
@@ -51,7 +51,7 @@ pub fn select_all(enigo: &mut Enigo) {
 pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys(enigo);
+    up_control_keys(enigo);
 
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('a'));
@@ -234,7 +234,7 @@ pub fn copy(enigo: &mut Enigo) {
 pub fn paste(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
-    crate::utils::up_control_keys(enigo);
+    up_control_keys(enigo);
 
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
@@ -266,7 +266,7 @@ pub fn paste(enigo: &mut Enigo) {
 pub fn paste(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
-    crate::utils::up_control_keys(enigo);
+    up_control_keys(enigo);
 
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
