@@ -14,10 +14,11 @@ mod writing;
 
 use config::get_config;
 use debug_print::debug_println;
+use get_selected_text::get_selected_text;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::env;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::AtomicBool;
 use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
@@ -240,7 +241,7 @@ fn bind_mouse_hook() {
                         }
 
                         let _lock = RELEASE_THREAD_ID.lock();
-                        let selected_text = utils::get_selected_text().unwrap_or_default();
+                        let selected_text = get_selected_text().unwrap_or_default();
                         if !selected_text.is_empty() {
                             {
                                 *SELECTED_TEXT.lock() = selected_text;

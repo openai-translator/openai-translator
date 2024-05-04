@@ -3,11 +3,12 @@
 version = 3
 
 [[package]]
-name = "accessibility"
+name = "accessibility-ng"
 version = "0.1.6"
-source = "git+https://github.com/yetone/accessibility?branch=sync#0e74bb988932146fa137803582709f48f5415f86"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7cb28d49c934e5f32a0b2227510e00999423596eff62f257962db130c3fa716"
 dependencies = [
- "accessibility-sys 0.1.3 (git+https://github.com/yetone/accessibility?branch=sync)",
+ "accessibility-sys-ng",
  "cocoa 0.24.1",
  "core-foundation 0.9.4",
  "core-graphics-types",
@@ -16,18 +17,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "accessibility-sys"
+name = "accessibility-sys-ng"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf09354dda54177da27bcb8b9b83d8cab947db1dc1538a310a5e9da1c57fd4c2"
-dependencies = [
- "core-foundation-sys 0.8.6",
-]
-
-[[package]]
-name = "accessibility-sys"
-version = "0.1.3"
-source = "git+https://github.com/yetone/accessibility?branch=sync#0e74bb988932146fa137803582709f48f5415f86"
+checksum = "02eadf4b9910301a47799cea1a8eefa659536fec71f5b8496b583b5e521db0b3"
 dependencies = [
  "core-foundation-sys 0.8.6",
 ]
@@ -139,8 +132,8 @@ checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 name = "app"
 version = "0.1.0"
 dependencies = [
- "accessibility",
- "accessibility-sys 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "accessibility-ng",
+ "accessibility-sys-ng",
  "active-win-pos-rs",
  "arboard",
  "clipboard",
@@ -149,8 +142,9 @@ dependencies = [
  "core-graphics 0.22.3",
  "cpuid",
  "debug_print",
- "enigo",
+ "enigo 0.1.3 (git+https://github.com/enigo-rs/enigo?tag=v0.1.3)",
  "futures-util",
+ "get-selected-text",
  "image",
  "macos-accessibility-client",
  "mouce",
@@ -1372,6 +1366,19 @@ checksum = "a3d8a32ae18130a3c84dd492d4215c3d913c3b07c6b63c2eb3eb7ff1101ab7bf"
 [[package]]
 name = "enigo"
 version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "802e4b2ae123615659085369b453cba87c5562e46ed8050a909fee18a9bc3157"
+dependencies = [
+ "core-graphics 0.23.2",
+ "libc",
+ "objc",
+ "pkg-config",
+ "windows 0.51.1",
+]
+
+[[package]]
+name = "enigo"
+version = "0.1.3"
 source = "git+https://github.com/enigo-rs/enigo?tag=v0.1.3#423d7f0ba089778c275a56eb634a5a5419edeb23"
 dependencies = [
  "core-graphics 0.23.2",
@@ -1836,6 +1843,24 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "get-selected-text"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b010644878aa2348222c99b688a345e1d0ea4a2586fec5f8ff48151c1c26520c"
+dependencies = [
+ "accessibility-ng",
+ "accessibility-sys-ng",
+ "arboard",
+ "cocoa 0.24.1",
+ "core-foundation 0.9.4",
+ "core-graphics 0.22.3",
+ "enigo 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "macos-accessibility-client",
+ "objc",
+ "parking_lot",
 ]
 
 [[package]]
