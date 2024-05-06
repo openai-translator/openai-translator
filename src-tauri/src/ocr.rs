@@ -150,8 +150,8 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
     // check exit code
     if output.status.success() {
         // get output content
-        let content = String::from_utf8(output.stdout).expect("failed to parse ocr binary output");
-        crate::utils::send_text(content);
+        let content = String::from_utf8_lossy(&output.stdout);
+        crate::utils::send_text(content.to_string());
         crate::windows::show_translator_window(false, true, true);
         Ok(())
     } else {
