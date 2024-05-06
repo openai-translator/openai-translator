@@ -107,7 +107,7 @@ export class Gemini extends AbstractEngine {
             headers,
             body: JSON.stringify(body),
             signal: req.signal,
-            useJSONParser: true,
+            usePartialJSONParser: true,
             onMessage: async (msg) => {
                 if (finished) return
                 let resp
