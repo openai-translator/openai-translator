@@ -368,7 +368,7 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
     fetcher?: (input: string, options: RequestInit) => Promise<Response>
-    usePartialJSONParser?: boolean
+    usePartialArrayJSONParser?: boolean
     isJSONStream?: boolean
 }
 
@@ -377,29 +377,45 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         onMessage,
         onError,
         onStatusCode,
-        usePartialJSONParser = false,
+        usePartialArrayJSONParser = false,
         isJSONStream = false,
         fetcher = getUniversalFetch(),
         ...fetchOptions
     } = options
 
+    let prevArrayJSONPartial = ''
+    let prevArrayJSONPartialIndex = 0
+    const partialArrayJSONParser = async ({ value, done }: { value: string; done: boolean }) => {
+        if (done && !value) {
+            return
+        }
+
+        try {
+            const parsedResponse = bestEffortJSONParse(prevArrayJSONPartial + value)
+            prevArrayJSONPartial += value
+            parsedResponse.slice(prevArrayJSONPartialIndex).forEach((data: string) => {
+                onMessage(JSON.stringify(data))
+            })
+            prevArrayJSONPartialIndex = parsedResponse.length
+        } catch (e) {
+            console.error('streaming json parser error', e)
+            console.error('streaming json parser value', value)
+            return
+        }
+    }
+
     let prevJSONPartial = ''
-    let prevJSONPartialIndex = 0
     const partialJSONParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
         }
 
         try {
-            const parsedResponse = bestEffortJSONParse(prevJSONPartial + value)
-            prevJSONPartial += value
-            parsedResponse.slice(prevJSONPartialIndex).forEach((data: string) => {
-                onMessage(JSON.stringify(data))
-            })
-            prevJSONPartialIndex = parsedResponse.length
+            const parsedResponse = JSON.parse(prevJSONPartial + value)
+            prevJSONPartial = ''
+            onMessage(JSON.stringify(parsedResponse))
         } catch (e) {
-            console.error('streaming json parser error', e)
-            console.error('streaming json parser value', value)
+            prevJSONPartial += value
             return
         }
     }
@@ -457,15 +473,11 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                         return
                     }
                     if (isJSONStream) {
-                        if (usePartialJSONParser) {
-                            partialJSONParser({ value: payload.data, done: payload.done })
-                        } else {
-                            onMessage(payload.data)
-                        }
+                        partialJSONParser({ value: payload.data, done: payload.done })
                         return
                     }
-                    if (usePartialJSONParser) {
-                        partialJSONParser({ value: payload.data, done: payload.done })
+                    if (usePartialArrayJSONParser) {
+                        partialArrayJSONParser({ value: payload.data, done: payload.done })
                     } else {
                         sseParser.feed(payload.data)
                     }
@@ -513,14 +525,10 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
             }
             const str = new TextDecoder().decode(value)
             if (isJSONStream) {
-                if (usePartialJSONParser) {
-                    partialJSONParser({ value: str, done })
-                } else {
-                    onMessage(str)
-                }
+                partialJSONParser({ value: str, done })
             } else {
-                if (usePartialJSONParser) {
-                    partialJSONParser({ value: str, done })
+                if (usePartialArrayJSONParser) {
+                    partialArrayJSONParser({ value: str, done })
                 } else {
                     sseParser.feed(str)
                 }
