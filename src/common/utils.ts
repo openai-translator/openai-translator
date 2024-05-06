@@ -103,6 +103,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     kimiAccessToken: 1,
     chatglmAccessToken: 1,
     chatglmRefreshToken: 1,
+    cohereAPIKey: 1,
+    cohereAPIModel: 1,
     fontSize: 1,
     uiFontSize: 1,
     iconSize: 1,
@@ -366,7 +368,8 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
     fetcher?: (input: string, options: RequestInit) => Promise<Response>
-    useJSONParser?: boolean
+    usePartialJSONParser?: boolean
+    isJSONStream?: boolean
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
@@ -374,14 +377,15 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         onMessage,
         onError,
         onStatusCode,
-        useJSONParser = false,
+        usePartialJSONParser = false,
+        isJSONStream = false,
         fetcher = getUniversalFetch(),
         ...fetchOptions
     } = options
 
     let prevJSONPartial = ''
     let prevJSONPartialIndex = 0
-    const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
+    const partialJSONParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
         }
@@ -452,8 +456,16 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                         }
                         return
                     }
-                    if (useJSONParser) {
-                        jsonParser({ value: payload.data, done: payload.done })
+                    if (isJSONStream) {
+                        if (usePartialJSONParser) {
+                            partialJSONParser({ value: payload.data, done: payload.done })
+                        } else {
+                            onMessage(payload.data)
+                        }
+                        return
+                    }
+                    if (usePartialJSONParser) {
+                        partialJSONParser({ value: payload.data, done: payload.done })
                     } else {
                         sseParser.feed(payload.data)
                     }
@@ -500,10 +512,18 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 break
             }
             const str = new TextDecoder().decode(value)
-            if (useJSONParser) {
-                jsonParser({ value: str, done })
+            if (isJSONStream) {
+                if (usePartialJSONParser) {
+                    partialJSONParser({ value: str, done })
+                } else {
+                    onMessage(str)
+                }
             } else {
-                sseParser.feed(str)
+                if (usePartialJSONParser) {
+                    partialJSONParser({ value: str, done })
+                } else {
+                    sseParser.feed(str)
+                }
             }
         }
     } finally {
