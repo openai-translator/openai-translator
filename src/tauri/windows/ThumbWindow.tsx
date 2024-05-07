@@ -1,5 +1,5 @@
-import icon from '../../common/assets/images/icon.png'
-import { useTheme } from '../../common/hooks/useTheme'
+import icon from '@/common/assets/images/icon.png'
+import { useTheme } from '@/common/hooks/useTheme'
 import { BaseProvider } from 'baseui-sd'
 
 export function ThumbWindow() {
