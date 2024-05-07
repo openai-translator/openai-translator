@@ -301,7 +301,7 @@ export class ChatGPT extends AbstractEngine {
         if (responseMode === 'sse') {
             const resp = await this.postMessage(req)
             if (!resp) return
-            await utils.parseSSEResponse(resp, this.createMessageHanlder(req))
+            await utils.parseSSEResponse(resp, this.createMessageHandler(req))
             return
         }
 
@@ -314,7 +314,7 @@ export class ChatGPT extends AbstractEngine {
 
         const websocketRequestId = uuidv4()
 
-        const unsubscribe = this.subscribeWebsocket(websocketRequestId, this.createMessageHanlder(req))
+        const unsubscribe = this.subscribeWebsocket(websocketRequestId, this.createMessageHandler(req))
 
         const resp = await this.postMessage(req, websocketRequestId).catch((err) => {
             unsubscribe()
@@ -328,7 +328,7 @@ export class ChatGPT extends AbstractEngine {
         }
     }
 
-    private createMessageHanlder(req: IMessageRequest) {
+    private createMessageHandler(req: IMessageRequest) {
         return async (message: string) => {
             if (message === '[DONE]') {
                 console.debug('Received completion signal from server.')
