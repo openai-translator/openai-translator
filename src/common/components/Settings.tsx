@@ -1128,7 +1128,7 @@ const useHotkeyRecorderStyles = createUseStyles({
         lineHeight: '32px',
         padding: '0 14px',
         borderRadius: '4px',
-        width: '200px',
+        width: '300px',
         cursor: 'pointer',
         border: '1px dashed transparent',
         backgroundColor: props.theme.colors.backgroundTertiary,
