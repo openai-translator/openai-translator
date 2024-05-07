@@ -133,6 +133,8 @@ export interface ISettings {
     kimiRefreshToken: string
     chatglmAccessToken: string
     chatglmRefreshToken: string
+    cohereAPIKey: string
+    cohereAPIModel: string
     fontSize: number
     uiFontSize: number
     iconSize: number

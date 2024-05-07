@@ -47,7 +47,7 @@ pub fn writing_command() {
         incremental_actions.clear();
     }
     let mut is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     let selected_text =
         crate::utils::get_selected_text_by_clipboard(&mut enigo, false).unwrap_or_default();
     if !selected_text.is_empty() {
@@ -235,7 +235,7 @@ pub fn writing_command() {
 }
 
 fn do_incremental_writing(incremental_action: &IncrementalAction) {
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     if incremental_action.left_arrow_click_count > 0 {
         left_arrow_click(&mut enigo, incremental_action.left_arrow_click_count);
     } else if incremental_action.right_arrow_click_count > 0 {
@@ -273,32 +273,46 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
                             .collect::<Vec<&str>>();
                         for key in &keys {
                             if key.len() == 1 {
-                                enigo.key_down(Key::Layout(key.chars().next().unwrap()));
+                                enigo
+                                    .key(
+                                        Key::Unicode(key.chars().next().unwrap()),
+                                        Direction::Press,
+                                    )
+                                    .unwrap_or_default();
                             } else {
                                 match *key {
-                                    "ctrl" => enigo.key_down(Key::Control),
-                                    "alt" => enigo.key_down(Key::Alt),
-                                    "shift" => enigo.key_down(Key::Shift),
-                                    "meta" => enigo.key_down(Key::Meta),
-                                    "caps_lock" => enigo.key_down(Key::CapsLock),
-                                    "escape" => enigo.key_down(Key::Escape),
-                                    "enter" => enigo.key_down(Key::Return),
+                                    "ctrl" => enigo.key(Key::Control, Direction::Press).unwrap(),
+                                    "alt" => enigo.key(Key::Alt, Direction::Press).unwrap(),
+                                    "shift" => enigo.key(Key::Shift, Direction::Press).unwrap(),
+                                    "meta" => enigo.key(Key::Meta, Direction::Press).unwrap(),
+                                    "caps_lock" => {
+                                        enigo.key(Key::CapsLock, Direction::Press).unwrap()
+                                    }
+                                    "escape" => enigo.key(Key::Escape, Direction::Press).unwrap(),
+                                    "enter" => enigo.key(Key::Return, Direction::Press).unwrap(),
                                     _ => {}
                                 }
                             }
                         }
                         for key in keys.iter().rev() {
                             if key.len() == 1 {
-                                enigo.key_up(Key::Layout(key.chars().next().unwrap()));
+                                enigo
+                                    .key(
+                                        Key::Unicode(key.chars().next().unwrap()),
+                                        Direction::Release,
+                                    )
+                                    .unwrap_or_default();
                             } else {
                                 match *key {
-                                    "ctrl" => enigo.key_up(Key::Control),
-                                    "alt" => enigo.key_up(Key::Alt),
-                                    "shift" => enigo.key_up(Key::Shift),
-                                    "meta" => enigo.key_up(Key::Meta),
-                                    "caps_lock" => enigo.key_up(Key::CapsLock),
-                                    "escape" => enigo.key_up(Key::Escape),
-                                    "enter" => enigo.key_up(Key::Return),
+                                    "ctrl" => enigo.key(Key::Control, Direction::Release).unwrap(),
+                                    "alt" => enigo.key(Key::Alt, Direction::Release).unwrap(),
+                                    "shift" => enigo.key(Key::Shift, Direction::Release).unwrap(),
+                                    "meta" => enigo.key(Key::Meta, Direction::Release).unwrap(),
+                                    "caps_lock" => {
+                                        enigo.key(Key::CapsLock, Direction::Release).unwrap()
+                                    }
+                                    "escape" => enigo.key(Key::Escape, Direction::Release).unwrap(),
+                                    "enter" => enigo.key(Key::Return, Direction::Release).unwrap(),
                                     _ => {}
                                 }
                             }
@@ -307,11 +321,11 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
                     }
                 }
             }
-            enigo.key_sequence(&char);
+            enigo.text(&char).unwrap_or_default();
             thread::sleep(Duration::from_millis(20));
         }
     } else {
-        enigo.key_sequence(&text);
+        enigo.text(&text).unwrap_or_default();
     }
 }
 
@@ -321,7 +335,7 @@ pub fn write_to_input(text: String) {
     let incremental_contents = INCREMENTAL_ACTIONS.lock();
     let is_incremental_translate = !incremental_contents.is_empty();
     let mut is_start_writing = IS_START_WRITING.lock();
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     let mut new_text = text.clone();
     let is_first_writing = !*is_start_writing;
     let mut need_to_add_fingerprint = false;
@@ -364,7 +378,7 @@ pub fn finish_writing() {
     let mut is_writing = IS_WRITING.lock();
     *is_writing = false;
     let mut is_start_writing = IS_START_WRITING.lock();
-    let mut enigo = Enigo::new();
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     *is_start_writing = false;
 
     let mut incremental_actions = INCREMENTAL_ACTIONS.lock();

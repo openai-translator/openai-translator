@@ -130,16 +130,16 @@ pub async fn fetch_stream(id: String, url: String, options_str: String) -> Resul
     let mut stream = Abortable::new(stream, abort_registration);
 
     while let Some(item) = stream.next().await {
-        let chunk = item.map_err(|err| format!("failed to read response: {}", err))?;
-        let chunk_str = String::from_utf8(chunk.to_vec())
-            .map_err(|err| format!("failed to convert chunk to utf-8: {}", err))?;
+        // debug_println!("chunk item: {:#?}", item);
+        let chunk = item.map_err(|err| format!("failed to read response chunk: {}", err))?;
+        let chunk_str = String::from_utf8_lossy(&chunk);
         // debug_println!("chunk: {}", chunk_str);
         app_handle
             .emit(
                 "fetch-stream-chunk",
                 StreamChunk {
                     id: id.clone(),
-                    data: chunk_str.clone(),
+                    data: chunk_str.to_string(),
                     done: false,
                     status: status.as_u16(),
                 },

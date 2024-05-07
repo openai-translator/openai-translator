@@ -1,5 +1,5 @@
 #[cfg(target_os = "macos")]
-use accessibility_sys::{kAXErrorSuccess, AXError};
+use accessibility_sys_ng::{kAXErrorSuccess, AXError};
 #[cfg(target_os = "macos")]
 use core_graphics::geometry::CGRect;
 use enigo::*;
@@ -15,15 +15,18 @@ use crate::APP_HANDLE;
 static SELECT_ALL: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn select_all(enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
-    crate::utils::up_control_keys(enigo);
+    up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::A, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('a'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -46,18 +49,6 @@ pub fn select_all(enigo: &mut Enigo) {
         .expect("failed to wait");
 }
 
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn select_all(enigo: &mut Enigo) {
-    let _guard = SELECT_ALL.lock();
-
-    crate::utils::up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('a'));
-    enigo.key_up(Key::Control);
-}
-
 pub static INPUT_LOCK: Mutex<()> = Mutex::new(());
 
 #[cfg(not(target_os = "macos"))]
@@ -65,7 +56,7 @@ pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::LeftArrow);
+        enigo.key(Key::LeftArrow, Direction::Click).unwrap();
     }
 }
 
@@ -94,7 +85,7 @@ pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::RightArrow);
+        enigo.key(Key::RightArrow, Direction::Click).unwrap();
     }
 }
 
@@ -123,7 +114,7 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     for _ in 0..n {
-        enigo.key_click(Key::Backspace);
+        enigo.key(Key::Backspace, Direction::Click).unwrap();
     }
 }
 
@@ -148,51 +139,42 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
 }
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
+    enigo.key(Key::Control, Direction::Release).unwrap();
+    enigo.key(Key::Alt, Direction::Release).unwrap();
+    enigo.key(Key::Shift, Direction::Release).unwrap();
+    enigo.key(Key::Space, Direction::Release).unwrap();
+    enigo.key(Key::Tab, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
 pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Meta);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
-    enigo.key_up(Key::Option);
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn up_control_keys(enigo: &mut Enigo) {
-    enigo.key_up(Key::Control);
-    enigo.key_up(Key::Alt);
-    enigo.key_up(Key::Shift);
-    enigo.key_up(Key::Space);
-    enigo.key_up(Key::Tab);
+    enigo.key(Key::Control, Direction::Release).unwrap();
+    enigo.key(Key::Meta, Direction::Release).unwrap();
+    enigo.key(Key::Alt, Direction::Release).unwrap();
+    enigo.key(Key::Shift, Direction::Release).unwrap();
+    enigo.key(Key::Space, Direction::Release).unwrap();
+    enigo.key(Key::Tab, Direction::Release).unwrap();
+    enigo.key(Key::Option, Direction::Release).unwrap();
 }
 
 static COPY_PASTE: Mutex<()> = Mutex::new(());
 
 #[allow(dead_code)]
-#[cfg(target_os = "windows")]
+#[cfg(not(target_os = "macos"))]
 pub fn copy(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('c'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::C, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('c'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -216,29 +198,18 @@ pub fn copy(enigo: &mut Enigo) {
 }
 
 #[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn copy(enigo: &mut Enigo) {
+#[cfg(not(target_os = "macos"))]
+pub fn paste(enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     up_control_keys(enigo);
 
-    enigo.key_down(Key::Control);
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_click(Key::Layout('c'));
-    thread::sleep(Duration::from_millis(50));
-    enigo.key_up(Key::Control);
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "windows")]
-pub fn paste(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
-
-    crate::utils::up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('v'));
-    enigo.key_up(Key::Control);
+    enigo.key(Key::Control, Direction::Press).unwrap();
+    #[cfg(target_os = "windows")]
+    enigo.key(Key::V, Direction::Click).unwrap();
+    #[cfg(target_os = "linux")]
+    enigo.key(Key::Unicode('v'), Direction::Click).unwrap();
+    enigo.key(Key::Control, Direction::Release).unwrap();
 }
 
 #[allow(dead_code)]
@@ -259,24 +230,6 @@ pub fn paste(enigo: &mut Enigo) {
         .expect("failed to run applescript")
         .wait()
         .expect("failed to wait");
-}
-
-#[allow(dead_code)]
-#[cfg(target_os = "linux")]
-pub fn paste(enigo: &mut Enigo) {
-    let _guard = COPY_PASTE.lock();
-
-    crate::utils::up_control_keys(enigo);
-
-    enigo.key_down(Key::Control);
-    enigo.key_click(Key::Layout('v'));
-    enigo.key_up(Key::Control);
-}
-
-#[cfg(not(target_os = "macos"))]
-pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    let mut enigo = Enigo::new();
-    get_selected_text_by_clipboard(&mut enigo, false)
 }
 
 pub fn get_selected_text_by_clipboard(
@@ -349,36 +302,6 @@ pub fn get_selected_text_by_clipboard(
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_selected_text() -> Result<String, Box<dyn std::error::Error>> {
-    use debug_print::debug_println;
-
-    use crate::config::get_config;
-
-    match get_selected_text_by_ax() {
-        Ok(text) => Ok(text),
-        Err(err) => {
-            println!("get_selected_text_by_ax error: {}", err);
-            match get_config() {
-                Ok(config) => {
-                    if config
-                        .allow_using_clipboard_when_selected_text_not_available
-                        .unwrap_or(false)
-                    {
-                        get_selected_text_by_clipboard_using_applescript()
-                    } else {
-                        Ok(String::new())
-                    }
-                }
-                Err(err) => {
-                    println!("get_config error: {}", err);
-                    Ok(String::new())
-                }
-            }
-        }
-    }
-}
-
-#[cfg(target_os = "macos")]
 unsafe fn ax_call<F, V>(f: F) -> Result<V, AXError>
 where
     F: Fn(*mut V) -> AXError,
@@ -395,8 +318,8 @@ where
 
 #[cfg(target_os = "macos")]
 unsafe fn get_selected_text_frame_by_ax() -> Result<CGRect, Box<dyn std::error::Error>> {
-    use accessibility::{AXAttribute, AXUIElement, AXValue};
-    use accessibility_sys::{
+    use accessibility_ng::{AXAttribute, AXUIElement, AXValue};
+    use accessibility_sys_ng::{
         kAXBoundsForRangeParameterizedAttribute, kAXFocusedUIElementAttribute,
         kAXSelectedTextRangeAttribute,
     };
@@ -480,82 +403,6 @@ pub fn is_valid_selected_frame() -> Result<bool, Box<dyn std::error::Error>> {
                 Err(err)
             }
         }
-    }
-}
-
-#[cfg(target_os = "macos")]
-pub fn get_selected_text_by_ax() -> Result<String, Box<dyn std::error::Error>> {
-    use accessibility::{AXAttribute, AXUIElement};
-    use accessibility_sys::{kAXFocusedUIElementAttribute, kAXSelectedTextAttribute};
-    use core_foundation::string::CFString;
-
-    let system_element = AXUIElement::system_wide();
-    let Some(selected_element) = system_element
-        .attribute(&AXAttribute::new(&CFString::from_static_string(
-            kAXFocusedUIElementAttribute,
-        )))
-        .map(|element| element.downcast_into::<AXUIElement>())
-        .ok()
-        .flatten()
-    else {
-        return Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "No selected element",
-        )));
-    };
-    let Some(selected_text) = selected_element
-        .attribute(&AXAttribute::new(&CFString::from_static_string(
-            kAXSelectedTextAttribute,
-        )))
-        .map(|text| text.downcast_into::<CFString>())
-        .ok()
-        .flatten()
-    else {
-        return Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "No selected text",
-        )));
-    };
-    Ok(selected_text.to_string())
-}
-
-#[cfg(target_os = "macos")]
-pub fn get_selected_text_by_clipboard_using_applescript(
-) -> Result<String, Box<dyn std::error::Error>> {
-    let apple_script = APP_HANDLE
-        .get()
-        .unwrap()
-        .path()
-        .resolve(
-            "resources/get-selected-text.applescript",
-            BaseDirectory::Resource,
-        )
-        .expect("failed to resolve get-selected-text.applescript");
-
-    match std::process::Command::new("osascript")
-        .arg(apple_script)
-        .output()
-    {
-        Ok(output) => {
-            // check exit code
-            if output.status.success() {
-                // get output content
-                let content = String::from_utf8(output.stdout)
-                    .expect("failed to parse get-selected-text.applescript output");
-                // trim content
-                let content = content.trim();
-                Ok(content.to_string())
-            } else {
-                let err = output
-                    .stderr
-                    .into_iter()
-                    .map(|c| c as char)
-                    .collect::<String>()
-                    .into();
-                Err(err)
-            }
-        }
-        Err(e) => Err(Box::new(e)),
     }
 }
 

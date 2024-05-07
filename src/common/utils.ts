@@ -103,6 +103,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     kimiAccessToken: 1,
     chatglmAccessToken: 1,
     chatglmRefreshToken: 1,
+    cohereAPIKey: 1,
+    cohereAPIModel: 1,
     fontSize: 1,
     uiFontSize: 1,
     iconSize: 1,
@@ -366,7 +368,8 @@ interface FetchSSEOptions extends RequestInit {
     onError(error: any): void
     onStatusCode?: (statusCode: number) => void
     fetcher?: (input: string, options: RequestInit) => Promise<Response>
-    useJSONParser?: boolean
+    usePartialArrayJSONParser?: boolean
+    isJSONStream?: boolean
 }
 
 export async function fetchSSE(input: string, options: FetchSSEOptions) {
@@ -374,28 +377,45 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
         onMessage,
         onError,
         onStatusCode,
-        useJSONParser = false,
+        usePartialArrayJSONParser = false,
+        isJSONStream = false,
         fetcher = getUniversalFetch(),
         ...fetchOptions
     } = options
 
-    let prevJSONPartial = ''
-    let prevJSONPartialIndex = 0
-    const jsonParser = async ({ value, done }: { value: string; done: boolean }) => {
+    let prevArrayJSONPartial = ''
+    let prevArrayJSONPartialIndex = 0
+    const partialArrayJSONParser = async ({ value, done }: { value: string; done: boolean }) => {
         if (done && !value) {
             return
         }
 
         try {
-            const parsedResponse = bestEffortJSONParse(prevJSONPartial + value)
-            prevJSONPartial += value
-            parsedResponse.slice(prevJSONPartialIndex).forEach((data: string) => {
+            const parsedResponse = bestEffortJSONParse(prevArrayJSONPartial + value)
+            prevArrayJSONPartial += value
+            parsedResponse.slice(prevArrayJSONPartialIndex).forEach((data: string) => {
                 onMessage(JSON.stringify(data))
             })
-            prevJSONPartialIndex = parsedResponse.length
+            prevArrayJSONPartialIndex = parsedResponse.length
         } catch (e) {
             console.error('streaming json parser error', e)
             console.error('streaming json parser value', value)
+            return
+        }
+    }
+
+    let prevJSONPartial = ''
+    const partialJSONParser = async ({ value, done }: { value: string; done: boolean }) => {
+        if (done && !value) {
+            return
+        }
+
+        try {
+            const parsedResponse = JSON.parse(prevJSONPartial + value)
+            prevJSONPartial = ''
+            onMessage(JSON.stringify(parsedResponse))
+        } catch (e) {
+            prevJSONPartial += value
             return
         }
     }
@@ -452,8 +472,12 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                         }
                         return
                     }
-                    if (useJSONParser) {
-                        jsonParser({ value: payload.data, done: payload.done })
+                    if (isJSONStream) {
+                        partialJSONParser({ value: payload.data, done: payload.done })
+                        return
+                    }
+                    if (usePartialArrayJSONParser) {
+                        partialArrayJSONParser({ value: payload.data, done: payload.done })
                     } else {
                         sseParser.feed(payload.data)
                     }
@@ -500,10 +524,14 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                 break
             }
             const str = new TextDecoder().decode(value)
-            if (useJSONParser) {
-                jsonParser({ value: str, done })
+            if (isJSONStream) {
+                partialJSONParser({ value: str, done })
             } else {
-                sseParser.feed(str)
+                if (usePartialArrayJSONParser) {
+                    partialArrayJSONParser({ value: str, done })
+                } else {
+                    sseParser.feed(str)
+                }
             }
         }
     } finally {

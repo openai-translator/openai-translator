@@ -3,11 +3,12 @@
 version = 3
 
 [[package]]
-name = "accessibility"
+name = "accessibility-ng"
 version = "0.1.6"
-source = "git+https://github.com/yetone/accessibility?branch=sync#0e74bb988932146fa137803582709f48f5415f86"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7cb28d49c934e5f32a0b2227510e00999423596eff62f257962db130c3fa716"
 dependencies = [
- "accessibility-sys 0.1.3 (git+https://github.com/yetone/accessibility?branch=sync)",
+ "accessibility-sys-ng",
  "cocoa 0.24.1",
  "core-foundation 0.9.4",
  "core-graphics-types",
@@ -16,18 +17,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "accessibility-sys"
+name = "accessibility-sys-ng"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf09354dda54177da27bcb8b9b83d8cab947db1dc1538a310a5e9da1c57fd4c2"
-dependencies = [
- "core-foundation-sys 0.8.6",
-]
-
-[[package]]
-name = "accessibility-sys"
-version = "0.1.3"
-source = "git+https://github.com/yetone/accessibility?branch=sync#0e74bb988932146fa137803582709f48f5415f86"
+checksum = "02eadf4b9910301a47799cea1a8eefa659536fec71f5b8496b583b5e521db0b3"
 dependencies = [
  "core-foundation-sys 0.8.6",
 ]
@@ -139,8 +132,8 @@ checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 name = "app"
 version = "0.1.0"
 dependencies = [
- "accessibility",
- "accessibility-sys 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "accessibility-ng",
+ "accessibility-sys-ng",
  "active-win-pos-rs",
  "arboard",
  "clipboard",
@@ -151,6 +144,7 @@ dependencies = [
  "debug_print",
  "enigo",
  "futures-util",
+ "get-selected-text",
  "image",
  "macos-accessibility-client",
  "mouce",
@@ -501,6 +495,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "block-sys"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae85a0696e7ea3b835a453750bf002770776609115e6d25c6d2ff28a8200f7e7"
+dependencies = [
+ "objc-sys",
+]
+
+[[package]]
+name = "block2"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e58aa60e59d8dbfcc36138f5f18be5f24394d33b38b24f7fd0b1caa33095f22f"
+dependencies = [
+ "block-sys",
+ "objc2",
 ]
 
 [[package]]
@@ -1371,14 +1384,19 @@ checksum = "a3d8a32ae18130a3c84dd492d4215c3d913c3b07c6b63c2eb3eb7ff1101ab7bf"
 
 [[package]]
 name = "enigo"
-version = "0.1.3"
-source = "git+https://github.com/enigo-rs/enigo?tag=v0.1.3#423d7f0ba089778c275a56eb634a5a5419edeb23"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a4655cdcad61e57cf28922aaa3221b06ce29e644422bba506851a03b8817468"
 dependencies = [
  "core-graphics 0.23.2",
+ "foreign-types-shared 0.3.1",
+ "icrate",
  "libc",
- "objc",
- "pkg-config",
- "windows 0.51.1",
+ "log",
+ "objc2",
+ "windows 0.56.0",
+ "xkbcommon",
+ "xkeysym",
 ]
 
 [[package]]
@@ -1836,6 +1854,24 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "get-selected-text"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "668f3a1b0e5086569e88ccd05c2dd4c630b282f7cbc6aae7695779bf7671beb4"
+dependencies = [
+ "accessibility-ng",
+ "accessibility-sys-ng",
+ "arboard",
+ "cocoa 0.24.1",
+ "core-foundation 0.9.4",
+ "core-graphics 0.22.3",
+ "enigo",
+ "macos-accessibility-client",
+ "objc",
+ "parking_lot",
 ]
 
 [[package]]
@@ -2379,6 +2415,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "icrate"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fb69199826926eb864697bddd27f73d9fddcffc004f5733131e15b465e30642"
+dependencies = [
+ "block2",
+ "objc2",
+]
+
+[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2832,6 +2878,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
+name = "memmap2"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43a5a03cefb0d953ec0be133036f14e109412fa594edc2f77227249db66cc3ed"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "memoffset"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3085,6 +3140,28 @@ dependencies = [
  "objc",
  "objc_id",
 ]
+
+[[package]]
+name = "objc-sys"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da284c198fb9b7b0603f8635185e85fbd5b64ee154b1ed406d489077de2d6d60"
+
+[[package]]
+name = "objc2"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4b25e1034d0e636cd84707ccdaa9f81243d399196b8a773946dcffec0401659"
+dependencies = [
+ "objc-sys",
+ "objc2-encode",
+]
+
+[[package]]
+name = "objc2-encode"
+version = "4.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88658da63e4cc2c8adb1262902cd6af51094df0488b760d6fd27194269c0950a"
 
 [[package]]
 name = "objc_exception"
@@ -6046,16 +6123,6 @@ dependencies = [
 
 [[package]]
 name = "windows"
-version = "0.51.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca229916c5ee38c2f2bc1e9d8f04df975b4bd93f9955dc69fabb5d91270045c9"
-dependencies = [
- "windows-core 0.51.1",
- "windows-targets 0.48.5",
-]
-
-[[package]]
-name = "windows"
 version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
@@ -6084,15 +6151,6 @@ checksum = "1de69df01bdf1ead2f4ac895dc77c9351aefff65b2f3db429a343f9cbf05e132"
 dependencies = [
  "windows-core 0.56.0",
  "windows-targets 0.52.5",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.51.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1f8cf84f35d2db49a46868f947758c7a1138116f7fac3bc844f43ade1292e64"
-dependencies = [
- "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -6569,6 +6627,23 @@ dependencies = [
  "libc",
  "winapi 0.3.9",
 ]
+
+[[package]]
+name = "xkbcommon"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13867d259930edc7091a6c41b4ce6eee464328c6ff9659b7e4c668ca20d4c91e"
+dependencies = [
+ "libc",
+ "memmap2",
+ "xkeysym",
+]
+
+[[package]]
+name = "xkeysym"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "054a8e68b76250b253f671d1268cb7f1ae089ec35e195b2efb2a4e9a836d0621"
 
 [[package]]
 name = "zbus"
