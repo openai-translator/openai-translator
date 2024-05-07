@@ -19,7 +19,7 @@ const useStyles = createUseStyles({
     },
 })
 
-export interface ISpinnerIconProps extends IconBaseProps {}
+export type ISpinnerIconProps = IconBaseProps
 
 export function SpinnerIcon(props: ISpinnerIconProps) {
     const styles = useStyles()

@@ -16,6 +16,7 @@ import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { usePinned } from '../../common/hooks/usePinned'
 import { useMemoWindow } from '../../common/hooks/useMemoWindow'
 import { isMacOS } from '@/common/utils'
+import { getEngine } from '@/common/engines'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -105,7 +106,7 @@ export function TranslatorWindow() {
     }, [])
 
     const { settings } = useSettings()
-
+    const translateEngine = getEngine(settings.provider)
     useEffect(() => {
         if (!settings?.writingTargetLanguage) {
             return
@@ -118,42 +119,45 @@ export function TranslatorWindow() {
                 if (inputText) {
                     const sourceLang = await detectLang(inputText)
                     const targetLang = intoLangCode(settings.writingTargetLanguage)
-                    await translate({
-                        writing: true,
-                        action: {
-                            idx: 0,
-                            name: 'writing',
-                            mode: 'translate',
-                            updatedAt: Date.now() + '',
-                            createdAt: Date.now() + '',
+                    await translate(
+                        {
+                            writing: true,
+                            action: {
+                                idx: 0,
+                                name: 'writing',
+                                mode: 'translate',
+                                updatedAt: Date.now() + '',
+                                createdAt: Date.now() + '',
+                            },
+                            signal,
+                            text: inputText,
+                            detectFrom: sourceLang,
+                            detectTo: targetLang,
+                            onMessage: async (message) => {
+                                if (!message.content) {
+                                    return
+                                }
+                                writingQueue.current.push(message.content)
+                                writing()
+                            },
+                            onFinish: () => {
+                                writingQueue.current.push(0)
+                                writing()
+                            },
+                            onError: () => {
+                                writingQueue.current.push(0)
+                                writing()
+                            },
                         },
-                        signal,
-                        text: inputText,
-                        detectFrom: sourceLang,
-                        detectTo: targetLang,
-                        onMessage: async (message) => {
-                            if (!message.content) {
-                                return
-                            }
-                            writingQueue.current.push(message.content)
-                            writing()
-                        },
-                        onFinish: () => {
-                            writingQueue.current.push(0)
-                            writing()
-                        },
-                        onError: () => {
-                            writingQueue.current.push(0)
-                            writing()
-                        },
-                    })
+                        translateEngine
+                    )
                 }
             })
         })()
         return () => {
             unlisten?.()
         }
-    }, [settings.writingTargetLanguage])
+    }, [settings.writingTargetLanguage, translateEngine])
 
     useEffect(() => {
         let unlisten

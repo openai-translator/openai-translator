@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable camelcase */
 import { v4 as uuidv4 } from 'uuid'
 import { getUniversalFetch } from '../universal-fetch'

@@ -25,6 +25,7 @@ import { trackEvent } from '@aptabase/tauri'
 import { SpeakerIcon } from './SpeakerIcon'
 import { useSettings } from '../hooks/useSettings'
 import { LangCode, detectLang } from '../lang'
+import { getEngine } from '../engines'
 
 const RANDOM_SIZE = 10
 const MAX_WORDS = 50
@@ -287,44 +288,48 @@ const Vocabulary = (props: IVocabularyProps) => {
         articleUsedWord.current = [...frequentWordsArr]
         articleTxt.current = ''
         const str = frequentWordsArr.join(',')
+        const engine = getEngine(settings.provider)
         try {
-            await translate({
-                mode: 'big-bang',
-                signal,
-                text: str,
-                articlePrompt: prompt || '',
-                onMessage: async (message) => {
-                    if (!message.content) {
-                        return
-                    }
-                    setArticle((e) => {
-                        if (message.isFullText) {
-                            articleTxt.current = message.content
-                        } else {
-                            articleTxt.current += message.content
+            await translate(
+                {
+                    mode: 'big-bang',
+                    signal,
+                    text: str,
+                    articlePrompt: prompt || '',
+                    onMessage: async (message) => {
+                        if (!message.content) {
+                            return
                         }
-                        if (
-                            articleUsedWord.current?.find(
-                                (word) => word.toLowerCase().trim() === message.content.toLowerCase().trim()
-                            )
-                        ) {
-                            return e + `<b style="color: #f40;">${message.content}</b>`
-                        } else {
-                            return e + message.content
-                        }
-                    })
+                        setArticle((e) => {
+                            if (message.isFullText) {
+                                articleTxt.current = message.content
+                            } else {
+                                articleTxt.current += message.content
+                            }
+                            if (
+                                articleUsedWord.current?.find(
+                                    (word) => word.toLowerCase().trim() === message.content.toLowerCase().trim()
+                                )
+                            ) {
+                                return e + `<b style="color: #f40;">${message.content}</b>`
+                            } else {
+                                return e + message.content
+                            }
+                        })
+                    },
+                    onFinish: () => {
+                        setIsLoading(false)
+                    },
+                    onError: (error) => {
+                        setIsLoading(false)
+                        toast(error, {
+                            duration: 3000,
+                            icon: '😰',
+                        })
+                    },
                 },
-                onFinish: () => {
-                    setIsLoading(false)
-                },
-                onError: (error) => {
-                    setIsLoading(false)
-                    toast(error, {
-                        duration: 3000,
-                        icon: '😰',
-                    })
-                },
-            })
+                engine
+            )
         } finally {
             setIsLoading(false)
         }

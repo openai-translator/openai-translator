@@ -22,6 +22,7 @@ export function useSettings(): {
     )
 
     return {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         settings: settings!,
         isSettingsLoading: isLoading,
         setSettings,
