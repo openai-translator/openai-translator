@@ -378,7 +378,7 @@ pub fn get_translator_window(
             .inner_size(620.0, 700.0)
             .min_inner_size(540.0, 600.0)
             .resizable(true)
-            .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(false))
+            .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(true))
             .visible(false)
             .focused(false);
 
