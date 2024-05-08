@@ -241,6 +241,9 @@ export async function getSettings(): Promise<ISettings> {
     if (settings.azMaxWords === undefined || settings.azMaxWords === null) {
         settings.azMaxWords = 1024
     }
+    if (settings.hideTheIconInTheDock === undefined || settings.hideTheIconInTheDock === null) {
+        settings.hideTheIconInTheDock = true
+    }
     return settings
 }
 
