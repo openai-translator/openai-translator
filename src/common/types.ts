@@ -72,6 +72,8 @@ export interface ISettings {
     geminiAPIModel: string
     moonshotAPIKey: string
     moonshotAPIModel: string
+    deepSeekAPIKey: string
+    deepSeekAPIModel: string
     autoTranslate: boolean
     defaultTranslateMode: Exclude<TranslateMode, 'big-bang'> | 'nop'
     defaultTargetLanguage: string

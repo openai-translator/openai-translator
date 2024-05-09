@@ -105,6 +105,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     chatglmRefreshToken: 1,
     cohereAPIKey: 1,
     cohereAPIModel: 1,
+    deepSeekAPIKey: 1,
+    deepSeekAPIModel: 1,
     fontSize: 1,
     uiFontSize: 1,
     iconSize: 1,
