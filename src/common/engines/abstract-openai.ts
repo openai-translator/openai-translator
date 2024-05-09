@@ -55,7 +55,7 @@ export abstract class AbstractOpenAI extends AbstractEngine {
         const model = await this.getAPIModel()
         return {
             model,
-            temperature: 0,
+            temperature: 0.1,
             top_p: 1,
             frequency_penalty: 1,
             presence_penalty: 1,
