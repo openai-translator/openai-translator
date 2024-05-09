@@ -1356,6 +1356,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
               { label: 'Claude', id: 'Claude' },
+              { label: 'DeepSeek', id: 'DeepSeek' },
           ] as {
               label: string
               id: Provider
@@ -1372,6 +1373,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
               { label: 'Claude', id: 'Claude' },
+              { label: 'DeepSeek', id: 'DeepSeek' },
           ] as {
               label: string
               id: Provider
@@ -2427,6 +2429,45 @@ export function InnerSettings({
                                     provider='Cohere'
                                     currentProvider={values.provider}
                                     apiKey={values.cohereAPIKey}
+                                    onBlur={onBlur}
+                                />
+                            </FormItem>
+                        </div>
+                        <div
+                            style={{
+                                display: values.provider === 'DeepSeek' ? 'block' : 'none',
+                            }}
+                        >
+                            <FormItem
+                                required={values.provider === 'DeepSeek'}
+                                name='deepSeekAPIKey'
+                                label='DeepSeek API Key'
+                                caption={
+                                    <div>
+                                        {t('Go to the')}{' '}
+                                        <a
+                                            target='_blank'
+                                            href='https://platform.deepseek.com/api_keys'
+                                            rel='noreferrer'
+                                            style={linkStyle}
+                                        >
+                                            DeepSeek Dashboard
+                                        </a>{' '}
+                                        {t('to get your API Key.')}
+                                    </div>
+                                }
+                            >
+                                <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='deepSeekAPIModel'
+                                label={t('API Model')}
+                                required={values.provider === 'DeepSeek'}
+                            >
+                                <APIModelSelector
+                                    provider='DeepSeek'
+                                    currentProvider={values.provider}
+                                    apiKey={values.deepSeekAPIKey}
                                     onBlur={onBlur}
                                 />
                             </FormItem>
