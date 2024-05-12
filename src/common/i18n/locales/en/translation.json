@@ -192,5 +192,11 @@
     "Window background blur": "Window background blur",
     "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.",
     "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.",
+    "Seconds": "Seconds",
+    "Minutes": "Minutes",
+    "Hours": "Hours",
+    "Days": "Days",
+    "Forever": "Forever",
+    "The survival time of the Ollama model in memory": "The survival time of the Ollama model in memory",
     "If you find this tool helpful, you can buy me a cup of coffee.": "If you find this tool helpful, you can buy me a cup of coffee."
 }

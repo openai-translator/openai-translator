@@ -191,5 +191,11 @@
     "Window background blur": "พื้นหลังหน้าต่างที่เบลอ",
     "For Windows 11 only. If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "สำหรับ Windows 11 เท่านั้น หากเปิดใช้งานเอฟเฟกต์พื้นหลังหน้าต่างที่เบลอ โปรดตรวจสอบให้แน่ใจว่าตั้งค่า 'ธีม' เป็น 'ตามระบบ' เนื่องจากไม่สามารถสลับระหว่างธีมสว่างและธีมมืดด้วยตนเองได้ในขณะที่เอฟเฟกต์พื้นหลังหน้าต่างที่เบลอกำลังใช้งานอยู่",
     "If the window background blur effect is enabled, please ensure to set the 'Theme' to 'Follow the System', as it is currently not possible to manually switch between light and dark themes when the window background blur is active.": "หากเปิดใช้งานเอฟเฟกต์พื้นหลังหน้าต่างที่เบลอ โปรดตรวจสอบให้แน่ใจว่าตั้งค่า 'ธีม' เป็น 'ตามระบบ' เนื่องจากไม่สามารถสลับระหว่างธีมสว่างและธีมมืดด้วยตนเองได้ในขณะที่เอฟเฟกต์พื้นหลังหน้าต่างที่เบลอกำลังใช้งานอยู่",
+    "Seconds": "วินาที",
+    "Minutes": "นาที",
+    "Hours": "ชั่วโมง",
+    "Days": "วัน",
+    "Forever": "ตลอดไป",
+    "The survival time of the Ollama model in memory": "เวลาที่ Ollama model อยู่ในหน่วยความจำ",
     "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }
