@@ -299,9 +299,9 @@ pub fn post_process_window<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) 
             // Disable the automatic creation of "Show Tab Bar" etc menu items on macOS
             NSWindow::setAllowsAutomaticWindowTabbing_(ns_win, cocoa::base::NO);
 
-            let collection_behavior =
-                NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces
-                    | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary;
+            let mut collection_behavior = ns_win.collectionBehavior();
+            collection_behavior |=
+                NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
 
             ns_win.setCollectionBehavior_(collection_behavior);
         }
