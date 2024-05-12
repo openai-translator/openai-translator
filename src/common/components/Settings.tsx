@@ -67,6 +67,7 @@ import { ProxyTester } from './ProxyTester'
 import { CUSTOM_MODEL_ID } from '../constants'
 import { isMacOS } from '../utils'
 import NumberInput from './NumberInput'
+import { DurationPicker } from './DurationPicker'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -2074,6 +2075,13 @@ export function InnerSettings({
                                 caption={t('Generally, there is no need to modify this item.')}
                             >
                                 <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem
+                                name='ollamaModelLifetimeInMemory'
+                                label={t('The survival time of the Ollama model in memory')}
+                                required={values.provider === 'Ollama'}
+                            >
+                                <DurationPicker size='compact' />
                             </FormItem>
                             <FormItem
                                 name='ollamaAPIModel'

@@ -89,6 +89,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ollamaAPIURL: 1,
     ollamaAPIModel: 1,
     ollamaCustomModelName: 1,
+    ollamaModelLifetimeInMemory: 1,
     groqAPIURL: 1,
     groqAPIURLPath: 1,
     groqAPIModel: 1,
@@ -245,6 +246,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.hideTheIconInTheDock === undefined || settings.hideTheIconInTheDock === null) {
         settings.hideTheIconInTheDock = true
+    }
+    if (settings.ollamaModelLifetimeInMemory === undefined || settings.ollamaModelLifetimeInMemory === null) {
+        settings.ollamaModelLifetimeInMemory = '5m'
     }
     return settings
 }

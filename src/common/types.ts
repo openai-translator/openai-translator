@@ -121,6 +121,7 @@ export interface ISettings {
     ollamaAPIURL: string
     ollamaAPIModel: string
     ollamaCustomModelName: string
+    ollamaModelLifetimeInMemory: string
     groqAPIURL: string
     groqAPIURLPath: string
     groqAPIModel: string
