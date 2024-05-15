@@ -1,31 +1,39 @@
 /* eslint-disable camelcase */
+import { getUniversalFetch } from '../universal-fetch'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { IMessageRequest, IModel } from './interfaces'
 
 export abstract class AbstractOpenAI extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async listModels(apiKey_: string | undefined): Promise<IModel[]> {
-        return [
-            { name: 'gpt-3.5-turbo-1106', id: 'gpt-3.5-turbo-1106' },
-            { name: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
-            { name: 'gpt-3.5-turbo-0613', id: 'gpt-3.5-turbo-0613' },
-            { name: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
-            { name: 'gpt-3.5-turbo-16k', id: 'gpt-3.5-turbo-16k' },
-            { name: 'gpt-3.5-turbo-16k-0613', id: 'gpt-3.5-turbo-16k-0613' },
-            { name: 'gpt-4', id: 'gpt-4' },
-            { name: 'gpt-4o (recommended)', id: 'gpt-4o' },
-            { name: 'gpt-4-turbo', id: 'gpt-4-turbo' },
-            { name: 'gpt-4-turbo-2024-04-09', id: 'gpt-4-turbo-2024-04-09' },
-            { name: 'gpt-4-turbo-preview', id: 'gpt-4-turbo-preview' },
-            { name: 'gpt-4-0125-preview ', id: 'gpt-4-0125-preview' },
-            { name: 'gpt-4-1106-preview', id: 'gpt-4-1106-preview' },
-            { name: 'gpt-4-0314', id: 'gpt-4-0314' },
-            { name: 'gpt-4-0613', id: 'gpt-4-0613' },
-            { name: 'gpt-4-32k', id: 'gpt-4-32k' },
-            { name: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
-            { name: 'gpt-4-32k-0613', id: 'gpt-4-32k-0613' },
-        ]
+    async listModels(apiKey: string | undefined): Promise<IModel[]> {
+        if (!apiKey) {
+            return []
+        }
+        const apiKey_ = apiKey.split(',')[0]
+        const url = `${await this.getAPIURL()}/v1/models`
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey_}`,
+        }
+        const fetcher = getUniversalFetch()
+        const resp = await fetcher(url, {
+            method: 'GET',
+            headers,
+        })
+        const data = await resp.json()
+        return (
+            data.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .filter((model: any) => model.id.includes('gpt'))
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .map((model: any) => {
+                    return {
+                        id: model.id,
+                        name: model.id,
+                    }
+                })
+        )
     }
 
     async getModel() {
