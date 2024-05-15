@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { getUniversalFetch } from '../universal-fetch'
 import { fetchSSE, getSettings } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { IMessageRequest, IModel } from './interfaces'
@@ -24,13 +25,32 @@ const SAFETY_SETTINGS = [
 
 export class Gemini extends AbstractEngine {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async listModels(apiKey_: string | undefined): Promise<IModel[]> {
-        return [
-            {
-                id: 'gemini-pro',
-                name: 'gemini-pro',
+    async listModels(apiKey: string | undefined): Promise<IModel[]> {
+        if (!apiKey) {
+            return []
+        }
+        const settings = await getSettings()
+        const geminiAPIURL = settings.geminiAPIURL
+        const url = `${geminiAPIURL}/v1beta/models?key=${apiKey}&pageSize=1000`
+        const fetcher = getUniversalFetch()
+        const resp = await fetcher(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
             },
-        ]
+        })
+        const jsn = await resp.json()
+        if (!jsn.models) {
+            return []
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return jsn.models.map((model: any) => {
+            const name = model.name.split('/').pop()
+            return {
+                id: name,
+                name: name,
+            }
+        })
     }
 
     async getModel() {
