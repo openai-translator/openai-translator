@@ -140,6 +140,7 @@ export class ChatGLM extends AbstractEngine {
                         },
                     }),
                     signal: signalController.signal,
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function
                     onError: () => {},
                     onMessage: async (msg) => {
                         const data = JSON.parse(msg)

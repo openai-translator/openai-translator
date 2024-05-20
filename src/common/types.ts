@@ -142,3 +142,7 @@ export interface ISettings {
     uiFontSize: number
     iconSize: number
 }
+export interface PubSubPayload {
+    websocket_request_id?: string // WebSocket请求的唯一标识符
+    body: string // 消息的主体，可能是经过Base64编码的
+}

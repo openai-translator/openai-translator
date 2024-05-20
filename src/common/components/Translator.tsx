@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import toast from 'react-hot-toast/headless'
@@ -89,6 +90,7 @@ import { usePromotionShowed } from '../hooks/usePromotionShowed'
 import { SpeakerIcon } from './SpeakerIcon'
 import { Provider, engineIcons, getEngine } from '../engines'
 import color from 'color'
+import { IEngine } from '../engines/interfaces'
 import { useAtom } from 'jotai'
 import { showSettingsAtom } from '../store/setting'
 
@@ -822,6 +824,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [isAutoCollectOn, setIsAutoCollectOn] = useState(
         settings.autoCollect === undefined ? false : settings.autoCollect
     )
+    const [engine, setEngine] = useState<IEngine | undefined>(undefined)
+
+    useEffect(() => {
+        if (!settings) {
+            return
+        }
+        const engine = getEngine(settings.provider)
+        console.log('engine created', engine)
+        setEngine(engine)
+    }, [settings])
 
     const [translateDeps, setTranslateDeps] = useState<{
         sourceLang?: LangCode
@@ -1145,41 +1157,44 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             let isStopped = false
             try {
                 // console.debug('translate', sourceLang, targetLang, text)
-                await translate({
-                    action,
-                    signal,
-                    text,
-                    selectedWord,
-                    detectFrom: sourceLang,
-                    detectTo: targetLang,
-                    onStatusCode: (statusCode) => {
-                        setIsNotLogin(statusCode === 401 || statusCode === 403 || statusCode === 422)
-                    },
-                    onMessage: async (message) => {
-                        if (!message.content) {
-                            return
-                        }
-                        setIsWordMode(message.isWordMode)
-                        setTranslatedText((translatedText) => {
-                            if (message.isFullText) {
-                                return message.content
+                await translate(
+                    {
+                        action,
+                        signal,
+                        text,
+                        selectedWord,
+                        detectFrom: sourceLang,
+                        detectTo: targetLang,
+                        onStatusCode: (statusCode) => {
+                            setIsNotLogin(statusCode === 401 || statusCode === 403 || statusCode === 422)
+                        },
+                        onMessage: async (message) => {
+                            if (!message.content) {
+                                return
                             }
-                            return translatedText + message.content
-                        })
+                            setIsWordMode(message.isWordMode)
+                            setTranslatedText((translatedText) => {
+                                if (message.isFullText) {
+                                    return message.content
+                                }
+                                return translatedText + message.content
+                            })
+                        },
+                        onFinish: (reason) => {
+                            afterTranslate(reason)
+                            setTranslatedText((translatedText) => {
+                                const result = translatedText
+                                cache.set(cachedKey, result)
+                                return result
+                            })
+                        },
+                        onError: (error) => {
+                            setActionStr('Error')
+                            setErrorMessage(error)
+                        },
                     },
-                    onFinish: (reason) => {
-                        afterTranslate(reason)
-                        setTranslatedText((translatedText) => {
-                            const result = translatedText
-                            cache.set(cachedKey, result)
-                            return result
-                        })
-                    },
-                    onError: (error) => {
-                        setActionStr('Error')
-                        setErrorMessage(error)
-                    },
-                })
+                    engine
+                )
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 // if error is a AbortError then ignore this error

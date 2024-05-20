@@ -35,11 +35,35 @@ export function getManifest(browser: 'firefox' | 'chromium') {
             },
         ],
 
+        declarative_net_request: {
+            rule_resources: [
+                {
+                    id: 'ruleset',
+                    enabled: true,
+                    path: 'rules.json',
+                },
+            ],
+        },
+
+        web_accessible_resources: [
+            {
+                resources: ['rules.json'],
+                matches: ['<all_urls>'],
+            },
+        ],
+
         background: {
             service_worker: 'src/browser-extension/background/index.ts',
         },
 
-        permissions: ['storage', 'contextMenus', 'webRequest'],
+        permissions: [
+            'storage',
+            'contextMenus',
+            'sidePanel',
+            'webRequest',
+            'cookies',
+            'declarativeNetRequestWithHostAccess',
+        ],
 
         commands: {
             'open-popup': {
@@ -52,6 +76,7 @@ export function getManifest(browser: 'firefox' | 'chromium') {
         },
 
         host_permissions: [
+            'https://chatgpt.com/',
             'https://*.openai.com/',
             'https://*.openai.azure.com/',
             'https://*.ingest.sentry.io/',
