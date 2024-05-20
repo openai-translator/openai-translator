@@ -1501,9 +1501,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     )
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            refetchPromotions()
-        }, 1000 * 60 * 10)
+        const timer = setInterval(
+            () => {
+                refetchPromotions()
+            },
+            1000 * 60 * 10
+        )
         return () => {
             clearInterval(timer)
         }

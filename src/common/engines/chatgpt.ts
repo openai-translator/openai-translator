@@ -262,24 +262,24 @@ export class ChatGPT extends AbstractEngine {
                         name: 'oai-did',
                     })
                     if (oaiCookie) {
-                        oaiDeviceId = oaiCookie.value || ''
-                    } else if (oaiDeviceId = '') {
+                        oaiDeviceId = oaiCookie.value
+                    } else {
                         console.log('oai-did cookie not found or not accessible')
-                    } 
+                    }
                 } catch (error) {
                     console.error('Failed to get oai-did cookie:', error)
                 }
             }
 
             type HeadersType = {
-                'Content-Type': string;
-                Authorization: string;
-                'Openai-Sentinel-Arkose-Token': any;
-                'Openai-Sentinel-Chat-Requirements-Token': any;
-                'openai-sentinel-proof-token': string;
-                'Oai-Language': string;
-                'Oai-Device-Id'?: string;
-            };
+                'Content-Type': string
+                'Authorization': string
+                'Openai-Sentinel-Arkose-Token': string
+                'Openai-Sentinel-Chat-Requirements-Token': string
+                'openai-sentinel-proof-token': string
+                'Oai-Language': string
+                'Oai-Device-Id'?: string
+            }
 
             const headers: HeadersType = {
                 'Content-Type': 'application/json',

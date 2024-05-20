@@ -1442,9 +1442,12 @@ export function InnerSettings({
     const { data: promotions, mutate: refetchPromotions } = useSWR<IPromotionResponse>('promotions', fetchPromotions)
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            refetchPromotions()
-        }, 1000 * 60 * 10)
+        const timer = setInterval(
+            () => {
+                refetchPromotions()
+            },
+            1000 * 60 * 10
+        )
         return () => {
             clearInterval(timer)
         }
