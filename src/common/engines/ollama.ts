@@ -33,6 +33,17 @@ export class Ollama extends AbstractOpenAI {
         ]
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async getBaseRequestBody(): Promise<Record<string, any>> {
+        const settings = await getSettings()
+        const body = await super.getBaseRequestBody()
+        return {
+            ...body,
+            // eslint-disable-next-line camelcase
+            keep_alive: settings.ollamaModelLifetimeInMemory,
+        }
+    }
+
     async getAPIModel(): Promise<string> {
         const settings = await getSettings()
         if (settings.ollamaAPIModel === CUSTOM_MODEL_ID) {

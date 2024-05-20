@@ -89,6 +89,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ollamaAPIURL: 1,
     ollamaAPIModel: 1,
     ollamaCustomModelName: 1,
+    ollamaModelLifetimeInMemory: 1,
     groqAPIURL: 1,
     groqAPIURLPath: 1,
     groqAPIModel: 1,
@@ -105,6 +106,8 @@ const settingKeys: Record<keyof ISettings, number> = {
     chatglmRefreshToken: 1,
     cohereAPIKey: 1,
     cohereAPIModel: 1,
+    deepSeekAPIKey: 1,
+    deepSeekAPIModel: 1,
     fontSize: 1,
     uiFontSize: 1,
     iconSize: 1,
@@ -240,6 +243,12 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (settings.azMaxWords === undefined || settings.azMaxWords === null) {
         settings.azMaxWords = 1024
+    }
+    if (settings.hideTheIconInTheDock === undefined || settings.hideTheIconInTheDock === null) {
+        settings.hideTheIconInTheDock = true
+    }
+    if (settings.ollamaModelLifetimeInMemory === undefined || settings.ollamaModelLifetimeInMemory === null) {
+        settings.ollamaModelLifetimeInMemory = '5m'
     }
     return settings
 }

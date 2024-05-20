@@ -176,7 +176,7 @@ dependencies = [
  "tiny_http",
  "tokio",
  "whatlang",
- "windows 0.54.0",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -1274,7 +1274,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330c60081dcc4c72131f8eb70510f1ac07223e5d4163db481a04a0befcffa412"
 dependencies = [
- "libloading 0.8.3",
+ "libloading 0.7.4",
 ]
 
 [[package]]
@@ -1853,17 +1853,20 @@ dependencies = [
 
 [[package]]
 name = "get-selected-text"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "668f3a1b0e5086569e88ccd05c2dd4c630b282f7cbc6aae7695779bf7671beb4"
+checksum = "bc0bfdfae2f5e467daa631c20f8ac1a3e96e466a3ccf8d1c0579da75bcb9d18d"
 dependencies = [
  "accessibility-ng",
  "accessibility-sys-ng",
+ "active-win-pos-rs",
  "arboard",
  "cocoa 0.24.1",
  "core-foundation 0.9.4",
  "core-graphics 0.22.3",
+ "debug_print",
  "enigo",
+ "lru",
  "macos-accessibility-client",
  "objc",
  "parking_lot",
@@ -2809,6 +2812,15 @@ dependencies = [
  "serde_json",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "lru"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3262e75e648fce39813cb56ac41f3c3e3f65217ebf3844d818d1f9398cfb0dc"
+dependencies = [
+ "hashbrown 0.14.5",
 ]
 
 [[package]]
@@ -6165,16 +6177,6 @@ dependencies = [
 
 [[package]]
 name = "windows"
-version = "0.54.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9252e5725dbed82865af151df558e754e4a3c2c30818359eb17465f1346a1b49"
-dependencies = [
- "windows-core 0.54.0",
- "windows-targets 0.52.5",
-]
-
-[[package]]
-name = "windows"
 version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1de69df01bdf1ead2f4ac895dc77c9351aefff65b2f3db429a343f9cbf05e132"
@@ -6189,16 +6191,6 @@ version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
 dependencies = [
- "windows-targets 0.52.5",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.54.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12661b9c89351d684a50a8a643ce5f608e20243b9fb84687800163429f161d65"
-dependencies = [
- "windows-result",
  "windows-targets 0.52.5",
 ]
 

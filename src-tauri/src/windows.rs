@@ -153,6 +153,7 @@ pub fn do_hide_translator_window() {
                 #[cfg(target_os = "macos")]
                 {
                     tauri::AppHandle::hide(&handle).unwrap();
+                    window.hide().unwrap();
                 }
             }
             None => {}
@@ -291,14 +292,13 @@ pub fn post_process_window<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) 
     {
         use cocoa::appkit::NSWindowCollectionBehavior;
         use cocoa::base::id;
-        // Disable the automatic creation of "Show Tab Bar" etc menu items on macOS
-        unsafe {
-            let ns_window = window.ns_window().unwrap() as cocoa::base::id;
-            NSWindow::setAllowsAutomaticWindowTabbing_(ns_window, cocoa::base::NO);
-        }
 
         let ns_win = window.ns_window().unwrap() as id;
+
         unsafe {
+            // Disable the automatic creation of "Show Tab Bar" etc menu items on macOS
+            NSWindow::setAllowsAutomaticWindowTabbing_(ns_win, cocoa::base::NO);
+
             let mut collection_behavior = ns_win.collectionBehavior();
             collection_behavior |=
                 NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces;
@@ -378,7 +378,7 @@ pub fn get_translator_window(
             .inner_size(620.0, 700.0)
             .min_inner_size(540.0, 600.0)
             .resizable(true)
-            .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(false))
+            .skip_taskbar(config.hide_the_icon_in_the_dock.unwrap_or(true))
             .visible(false)
             .focused(false);
 

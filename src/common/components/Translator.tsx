@@ -518,6 +518,21 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
+    useEffect(() => {
+        if (!isDesktopApp()) {
+            return
+        }
+        let unlisten: undefined | (() => void)
+        listen('refresh-actions', () => {
+            refreshActions()
+        }).then((cb) => {
+            unlisten = cb
+        })
+        return () => {
+            unlisten?.()
+        }
+    }, [])
+
     const [showActionManager, setShowActionManager] = useState(false)
 
     const [translationFlag, forceTranslate] = useReducer((x: number) => x + 1, 0)
@@ -712,6 +727,20 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth, showLogo])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
+
+    useEffect(() => {
+        if (!activateAction) {
+            return
+        }
+        if (!actions) {
+            return
+        }
+        setActivateAction(
+            actions.find((action) =>
+                action.id !== undefined ? action.id === activateAction.id : action.mode === activateAction.mode
+            )
+        )
+    }, [actions, activateAction])
 
     const [displayedActions, setDisplayedActions] = useState<Action[]>([])
     const [hiddenActions, setHiddenActions] = useState<Action[]>([])
@@ -2533,9 +2562,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 isOpen={!isDesktopApp() && showActionManager}
                 onClose={() => {
                     setShowActionManager(false)
-                    if (!isDesktopApp()) {
-                        refreshActions()
-                    }
+                    refreshActions()
                 }}
                 closeable
                 size='auto'

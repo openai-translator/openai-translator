@@ -24,7 +24,7 @@ const isModifierKey = (key: string): boolean => {
 
 export function isMissingNormalKey(hotkey: string): boolean {
     const tokens = hotkey.split('+').map((token) => token.trim().toUpperCase())
-    return tokens.length === 1 || tokens.every((token) => isModifierKey(token))
+    return tokens.every((token) => isModifierKey(token))
 }
 
 export async function bindHotkey(oldHotKey?: string) {
