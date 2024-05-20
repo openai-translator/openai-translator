@@ -262,10 +262,10 @@ export class ChatGPT extends AbstractEngine {
                         name: 'oai-did',
                     })
                     if (oaiCookie) {
-                        oaiDeviceId = oaiCookie.value
-                    } else {
+                        oaiDeviceId = oaiCookie.value || ''
+                    } else if (oaiDeviceId = '') {
                         console.log('oai-did cookie not found or not accessible')
-                    }
+                    } 
                 } catch (error) {
                     console.error('Failed to get oai-did cookie:', error)
                 }
