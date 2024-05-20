@@ -271,14 +271,27 @@ export class ChatGPT extends AbstractEngine {
                 }
             }
 
-            const headers = {
+            type HeadersType = {
+                'Content-Type': string;
+                Authorization: string;
+                'Openai-Sentinel-Arkose-Token': any;
+                'Openai-Sentinel-Chat-Requirements-Token': any;
+                'openai-sentinel-proof-token': string;
+                'Oai-Language': string;
+                'Oai-Device-Id'?: string;
+            };
+
+            const headers: HeadersType = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
                 'Openai-Sentinel-Arkose-Token': arkoseToken,
                 'Openai-Sentinel-Chat-Requirements-Token': requirements.token,
                 'openai-sentinel-proof-token': proofToken,
-                'Oai-Device-Id': oaiDeviceId,
                 'Oai-Language': 'en-US',
+            }
+
+            if (oaiDeviceId) {
+                headers['Oai-Device-Id'] = oaiDeviceId
             }
 
             const body = {
