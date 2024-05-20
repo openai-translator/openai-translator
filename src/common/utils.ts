@@ -3,9 +3,9 @@ import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 import { v4 as uuidv4 } from 'uuid'
-import { invoke } from '@tauri-apps/api/core'
 import { listen, Event, emit } from '@tauri-apps/api/event'
 import { parse as bestEffortJSONParse } from 'best-effort-json-parser'
+import { commands } from '@/tauri/bindings'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -499,11 +499,8 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
                     reject(e)
                 })
 
-            invoke('fetch_stream', {
-                id,
-                url: input,
-                optionsStr: JSON.stringify(fetchOptions),
-            })
+            commands
+                .fetchStream(id, input, JSON.stringify(fetchOptions))
                 .catch((e) => {
                     reject(e)
                 })

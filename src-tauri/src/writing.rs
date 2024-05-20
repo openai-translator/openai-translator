@@ -34,6 +34,7 @@ struct IncrementalAction {
 static INCREMENTAL_ACTIONS: Mutex<Vec<IncrementalAction>> = Mutex::new(Vec::new());
 
 #[tauri::command]
+#[specta::specta]
 pub fn writing_command() {
     debug_println!("[writing] trigger");
     let is_writing = IS_WRITING.lock();
@@ -330,6 +331,7 @@ fn do_write_to_input(enigo: &mut Enigo, text: String, animation: bool) {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn write_to_input(text: String) {
     let is_translate_selected_text = IS_TRANSLATE_SELECTED_TEXT.lock();
     let incremental_contents = INCREMENTAL_ACTIONS.lock();
@@ -374,6 +376,7 @@ pub fn write_to_input(text: String) {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn finish_writing() {
     let mut is_writing = IS_WRITING.lock();
     *is_writing = false;

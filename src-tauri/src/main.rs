@@ -23,7 +23,8 @@ use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
-use windows::get_translator_window;
+use windows::{get_translator_window, CheckUpdateEvent};
+use tauri_specta::*;
 
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
@@ -52,7 +53,7 @@ pub static PREVIOUS_RELEASE_TIME: Mutex<u128> = Mutex::new(0);
 pub static PREVIOUS_RELEASE_POSITION: Mutex<(i32, i32)> = Mutex::new((0, 0));
 pub static RELEASE_THREAD_ID: Mutex<u32> = Mutex::new(0);
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateResult {
     version: String,
@@ -63,13 +64,13 @@ pub struct UpdateResult {
 pub static UPDATE_RESULT: Mutex<Option<Option<UpdateResult>>> = Mutex::new(None);
 
 #[tauri::command]
+#[specta::specta]
 fn get_update_result() -> (bool, Option<UpdateResult>) {
     if UPDATE_RESULT.lock().is_none() {
         return (false, None);
     }
     return (true, UPDATE_RESULT.lock().clone().unwrap());
 }
-
 #[cfg(target_os = "macos")]
 fn query_accessibility_permissions() -> bool {
     let trusted = macos_accessibility_client::accessibility::application_is_trusted_with_prompt();
@@ -285,6 +286,37 @@ fn main() {
         *CPU_VENDOR.lock() = vendor_id;
     }
 
+    let (invoke_handler, register_events) = {
+        let builder = tauri_specta::ts::builder()
+            .commands(tauri_specta::collect_commands![
+                get_update_result,
+                get_config_content,
+                clear_config_cache,
+                show_translator_window_command,
+                show_translator_window_with_selected_text_command,
+                show_action_manager_window,
+                get_translator_window_always_on_top,
+                fetch_stream,
+                writing_command,
+                write_to_input,
+                finish_writing,
+                detect_lang,
+                screenshot,
+                hide_translator_window,
+                // todo: migrate the following
+                // ocr_command,
+                // cut_image,
+                // finish_ocr,
+            ])
+            .events(tauri_specta::collect_events![CheckUpdateEvent])
+            .config(specta::ts::ExportConfig::default().formatter(specta::ts::formatter::prettier));
+
+        #[cfg(debug_assertions)]
+        let builder = builder.path("../src/tauri/bindings.ts");
+
+        builder.build().unwrap()
+    };
+
     let mut app = tauri::Builder::default()
         .plugin(
             tauri_plugin_aptabase::Builder::new("A-US-9856842764")
@@ -397,28 +429,16 @@ fn main() {
                     }
                 }
             });
-
+            register_events(app);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             get_update_result,
-            get_config_content,
-            clear_config_cache,
-            show_translator_window_command,
-            show_translator_window_with_selected_text_command,
-            show_action_manager_window,
-            get_translator_window_always_on_top,
             ocr_command,
-            fetch_stream,
-            writing_command,
-            write_to_input,
-            finish_writing,
-            detect_lang,
-            cut_image,
             finish_ocr,
-            screenshot,
-            hide_translator_window,
+            cut_image
         ])
+        .invoke_handler(invoke_handler)
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
 
@@ -442,7 +462,7 @@ fn main() {
             bind_mouse_hook();
             let handle = app.clone();
             tauri::async_runtime::spawn(async move {
-                let mut builder = handle.updater_builder();
+                let builder = handle.updater_builder();
                 let updater = builder.build().unwrap();
 
                 match updater.check().await {

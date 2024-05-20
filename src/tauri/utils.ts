@@ -2,6 +2,7 @@ import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-sh
 import { invoke } from '@tauri-apps/api/core'
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
+import { commands } from './bindings'
 
 const modifierKeys = [
     'OPTION',
@@ -44,7 +45,7 @@ export async function bindHotkey(oldHotKey?: string) {
         await unregister(settings.hotkey)
     }
     await register(settings.hotkey, () => {
-        invoke('show_translator_window_with_selected_text_command')
+        return commands.showTranslatorWindowWithSelectedTextCommand()
     }).then(() => {
         console.log('register hotkey success')
     })

@@ -51,6 +51,8 @@ tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptaba
 screenshots = "0.7.2"
 image = "0.24.7"
 get-selected-text = "0.1.4"
+specta = "=2.0.0-rc.12"
+tauri-specta = { version = "2.0.0-rc.10", features = ["javascript", "typescript"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24"

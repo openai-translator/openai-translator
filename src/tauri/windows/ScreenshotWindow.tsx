@@ -5,6 +5,7 @@ import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { currentMonitor } from '@tauri-apps/api/window'
 import { useEffect, useRef, useState } from 'react'
 import { createUseStyles } from 'react-jss'
+import { commands } from '../bindings'
 
 const useStyles = createUseStyles({
     selectNone: {
@@ -38,7 +39,7 @@ export function ScreenshotWindow() {
 
             const position = monitor.position
 
-            invoke('screenshot', { x: position.x, y: position.y }).then(() => {
+            commands.screenshot(position.x, position.y).then(() => {
                 appCacheDir().then((dir) => {
                     join(dir, 'ocr_images', 'fullscreen.png').then((path) => {
                         setImgURL(convertFileSrc(path))

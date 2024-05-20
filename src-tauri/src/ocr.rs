@@ -35,6 +35,7 @@ pub fn cut_image(left: u32, top: u32, width: u32, height: u32) {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn screenshot(x: i32, y: i32) {
     use screenshots::{Compression, Screen};
     use std::fs;
