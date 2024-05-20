@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "operation": "set",
+          "header": "origin",
+          "value": "https://www.bing.com"
+        },
+        {
+          "operation": "set",
+          "header": "referer",
+          "value": "https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx"
+        }
+      ]
+    },
+    "condition": {
+      "requestDomains": ["sydney.bing.com", "www.bing.com"],
+      "resourceTypes": ["xmlhttprequest", "websocket"]
+    }
+  },
+  {
+    "id": 2,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "operation": "set",
+          "header": "origin",
+          "value": "https://chatgpt.com"
+        },
+        {
+          "operation": "set",
+          "header": "referer",
+          "value": "https://chatgpt.com"
+        }
+      ]
+    },
+    "condition": {
+      "requestDomains": ["chatgpt.com"],
+      "resourceTypes": ["xmlhttprequest"]
+    }
+  },
+  {
+    "id": 3,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "operation": "set",
+          "header": "origin",
+          "value": "https://tcr9i.chat.openai.com"
+        },
+        {
+          "operation": "set",
+          "header": "referer",
+          "value": "https://tcr9i.chat.openai.com/v2/2.5.0/enforcement.13af146b6f5532afc450f0718859ea0f.html"
+        }
+      ]
+    },
+    "condition": {
+      "requestDomains": ["https://tcr9i.chat.openai.com"],
+      "resourceTypes": ["xmlhttprequest"]
+    }
+  }
+]

@@ -11,6 +11,7 @@ import { createParser } from 'eventsource-parser'
 import { PubSubPayload } from '../types'
 import { Base64 } from 'js-base64'
 import { OnGroupDataMessageArgs, OnServerDataMessageArgs, WebPubSubClient } from '@azure/web-pubsub-client'
+import Browser from 'webextension-polyfill'
 
 export const keyChatgptArkoseReqUrl = 'chatgptArkoseReqUrl'
 export const keyChatgptArkoseReqForm = 'chatgptArkoseReqForm'
@@ -28,7 +29,7 @@ export async function getArkoseToken() {
         throw new Error(
             'Failed to get arkose token.' +
                 '\n\n' +
-                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+                "Please keep https://chatgpt.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
         )
     }
     const fetcher = getUniversalFetch()
@@ -38,7 +39,7 @@ export async function getArkoseToken() {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'Origin': 'https://tcr9i.chat.openai.com',
-            'Referer': 'https://tcr9i.chat.openai.com/v2/2.4.4/enforcement.f73f1debe050b423e0e5cd1845b2430a.html',
+            'Referer': 'https://tcr9i.chat.openai.com/v2/2.5.0/enforcement.13af146b6f5532afc450f0718859ea0f',
         },
     })
         .then((resp) => resp.json())
@@ -48,7 +49,7 @@ export async function getArkoseToken() {
         throw new Error(
             'Failed to get arkose token.' +
                 '\n\n' +
-                "Please keep https://chat.openai.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
+                "Please keep https://chatgpt.com open and try again. If it still doesn't work, type some characters in the input box of chatgpt web page and try again."
         )
     }
     return arkoseToken
@@ -57,7 +58,7 @@ export async function getArkoseToken() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body?: any) {
     const fetcher = getUniversalFetch()
-    return fetcher(`https://chat.openai.com/backend-api${endpoint}`, {
+    return fetcher(`https://chatgpt.com/backend-api${endpoint}`, {
         method: method,
         headers: {
             'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ async function GenerateProofToken(seed: string, diff: string | number | unknown[
         for (let i = 0; i < 100000; i++) {
             config[3] = i
             const jsonData = JSON.stringify(config)
-            const base = btoa(unescape(encodeURIComponent(jsonData)))
+            const base = btoa(decodeURIComponent(encodeURIComponent(jsonData)))
             const hashValue = sha3_512(seed + base)
 
             if (hashValue.substring(0, diffLen) <= diff) {
@@ -102,7 +103,7 @@ async function GenerateProofToken(seed: string, diff: string | number | unknown[
         }
     }
 
-    const fallbackBase = btoa(unescape(encodeURIComponent(`"${seed}"`)))
+    const fallbackBase = btoa(decodeURIComponent(encodeURIComponent(`"${seed}"`)))
     return 'gAAAAABwQ8Lk5FbGpA2NcR9dShT6gYjU7VxZ4D' + fallbackBase
 }
 
@@ -240,12 +241,44 @@ export class ChatGPT extends AbstractEngine {
                 userAgent
             )
 
+            let cookie
+            let oaiDeviceId
+
+            if (Browser.cookies && Browser.cookies.getAll) {
+                try {
+                    const cookies = await Browser.cookies.getAll({ url: 'https://chatgpt.com/' })
+                    if (cookies.length > 0) {
+                        cookie = cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ') // eslint-disable-line @typescript-eslint/no-unused-vars
+                    } else {
+                        console.log('No cookies returned for the URL')
+                    }
+                } catch (error) {
+                    console.error('Failed to get cookies:', error)
+                }
+
+                try {
+                    const oaiCookie = await Browser.cookies.get({
+                        url: 'https://chatgpt.com/',
+                        name: 'oai-did',
+                    })
+                    if (oaiCookie) {
+                        oaiDeviceId = oaiCookie.value
+                    } else {
+                        console.log('oai-did cookie not found or not accessible')
+                    }
+                } catch (error) {
+                    console.error('Failed to get oai-did cookie:', error)
+                }
+            }
+
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
                 'Openai-Sentinel-Arkose-Token': arkoseToken,
                 'Openai-Sentinel-Chat-Requirements-Token': requirements.token,
                 'openai-sentinel-proof-token': proofToken,
+                'Oai-Device-Id': oaiDeviceId,
+                'Oai-Language': 'en-US',
             }
 
             const body = {
