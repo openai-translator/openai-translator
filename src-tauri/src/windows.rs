@@ -10,10 +10,10 @@ use enigo::*;
 use get_selected_text::get_selected_text;
 use mouse_position::mouse_position::Mouse;
 use serde_json::json;
-use tauri_specta::Event;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use tauri_plugin_updater::UpdaterExt;
+use tauri_specta::Event;
 
 pub const TRANSLATOR_WIN_NAME: &str = "translator";
 pub const SETTINGS_WIN_NAME: &str = "settings";
@@ -547,7 +547,9 @@ pub fn show_updater_window() {
                         version: update.version,
                         current_version: update.current_version,
                         body: update.body,
-                    }).emit(handle).unwrap();
+                    })
+                    .emit(handle)
+                    .unwrap();
                 }
                 Ok(None) => {
                     handle

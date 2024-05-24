@@ -28,7 +28,7 @@ use windows::{get_translator_window, CheckUpdateEvent};
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
-use crate::ocr::{cut_image, finish_ocr, start_ocr, screenshot};
+use crate::ocr::{cut_image, finish_ocr, screenshot, start_ocr};
 use crate::windows::{
     get_translator_window_always_on_top, hide_translator_window, show_action_manager_window,
     show_translator_window_command, show_translator_window_with_selected_text_command,

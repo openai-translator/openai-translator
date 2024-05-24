@@ -82,9 +82,9 @@ pub fn clear_config_cache() {
 #[specta::specta]
 pub fn get_config_content() -> String {
     if let Some(app) = APP_HANDLE.get() {
-        return get_config_content_by_app(app).unwrap()
+        return get_config_content_by_app(app).unwrap();
     } else {
-        return "{}".to_string()
+        return "{}".to_string();
     }
 }
 
