@@ -1,6 +1,6 @@
 import { trackEvent } from '@aptabase/tauri'
 import { appCacheDir, join } from '@tauri-apps/api/path'
-import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { currentMonitor } from '@tauri-apps/api/window'
 import { useEffect, useRef, useState } from 'react'
@@ -126,8 +126,8 @@ export function ScreenshotWindow() {
                     if (width <= 0 || height <= 0) {
                         await appWindow.close()
                     } else {
-                        await invoke('cut_image', { left, top, width, height })
-                        await invoke('finish_ocr')
+                        await commands.cutImage(left, top, width, height)
+                        await commands.finishOcr()
                         await appWindow.close()
                     }
                 }}

@@ -24,12 +24,11 @@ use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
 use windows::{get_translator_window, CheckUpdateEvent};
-use tauri_specta::*;
 
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
-use crate::ocr::{cut_image, finish_ocr, ocr_command, screenshot};
+use crate::ocr::{cut_image, finish_ocr, start_ocr, screenshot};
 use crate::windows::{
     get_translator_window_always_on_top, hide_translator_window, show_action_manager_window,
     show_translator_window_command, show_translator_window_with_selected_text_command,
@@ -289,8 +288,9 @@ fn main() {
     let (invoke_handler, register_events) = {
         let builder = tauri_specta::ts::builder()
             .commands(tauri_specta::collect_commands![
-                get_update_result,
+                // todo: migrate
                 get_config_content,
+                get_update_result,
                 clear_config_cache,
                 show_translator_window_command,
                 show_translator_window_with_selected_text_command,
@@ -303,10 +303,9 @@ fn main() {
                 detect_lang,
                 screenshot,
                 hide_translator_window,
-                // todo: migrate the following
-                // ocr_command,
-                // cut_image,
-                // finish_ocr,
+                start_ocr,
+                finish_ocr,
+                cut_image,
             ])
             .events(tauri_specta::collect_events![CheckUpdateEvent])
             .config(specta::ts::ExportConfig::default().formatter(specta::ts::formatter::prettier));
@@ -403,7 +402,7 @@ fn main() {
             tauri::async_runtime::spawn(async move {
                 loop {
                     std::thread::sleep(std::time::Duration::from_secs(60 * 10));
-                    let mut builder = handle.updater_builder();
+                    let builder = handle.updater_builder();
                     let updater = builder.build().unwrap();
 
                     match updater.check().await {
@@ -432,12 +431,6 @@ fn main() {
             register_events(app);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            get_update_result,
-            ocr_command,
-            finish_ocr,
-            cut_image
-        ])
         .invoke_handler(invoke_handler)
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

@@ -80,11 +80,11 @@ pub fn clear_config_cache() {
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_config_content() -> Result<String, String> {
+pub fn get_config_content() -> String {
     if let Some(app) = APP_HANDLE.get() {
-        return get_config_content_by_app(app);
+        return get_config_content_by_app(app).unwrap()
     } else {
-        Err("Config directory not found".to_string())
+        return "{}".to_string()
     }
 }
 

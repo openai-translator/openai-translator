@@ -5,6 +5,7 @@ use tauri::path::BaseDirectory;
 use tauri::Manager;
 
 #[tauri::command(async)]
+#[specta::specta]
 pub fn cut_image(left: u32, top: u32, width: u32, height: u32) {
     use image::GenericImage;
     let app_handle = crate::APP_HANDLE.get().unwrap();
@@ -161,7 +162,8 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[tauri::command(async)]
-pub fn ocr_command() {
+#[specta::specta]
+pub fn start_ocr() {
     ocr();
 }
 
@@ -170,6 +172,7 @@ pub fn ocr() {
 }
 
 #[tauri::command(async)]
+#[specta::specta]
 pub fn finish_ocr() {
     do_finish_ocr();
 }
