@@ -526,24 +526,26 @@ pub fn get_settings_window() -> tauri::WebviewWindow {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
-pub struct CheckUpdateEvent(UpdateResult);
+pub struct CheckUpdateResultEvent(UpdateResult);
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct CheckUpdateEvent;
 
 pub fn show_updater_window() {
     let window = get_updater_window();
     window.center().unwrap();
     window.show().unwrap();
-    let window_clone = window.clone();
 
-    window.listen("check_update", move |event| {
-        let handle = APP_HANDLE.get().unwrap();
-        let window_clone = window_clone.clone();
+    let handle = APP_HANDLE.get().unwrap();
+    CheckUpdateEvent::listen(handle, move |event| {
+        let window_clone = window.clone();
         tauri::async_runtime::spawn(async move {
             let builder = handle.updater_builder();
             let updater = builder.build().unwrap();
 
             match updater.check().await {
                 Ok(Some(update)) => {
-                    CheckUpdateEvent(UpdateResult {
+                    CheckUpdateResultEvent(UpdateResult {
                         version: update.version,
                         current_version: update.current_version,
                         body: update.body,
@@ -563,7 +565,7 @@ pub fn show_updater_window() {
                 }
                 Err(_) => {}
             }
-            window_clone.unlisten(event.id())
+            window_clone.unlisten(event.id)
         });
     });
 }

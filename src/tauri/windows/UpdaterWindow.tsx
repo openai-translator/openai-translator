@@ -14,7 +14,6 @@ import { IoIosCloseCircleOutline } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { trackEvent } from '@aptabase/tauri'
-import { emit } from '@tauri-apps/api/event'
 import { UpdateResult, commands, events } from '../bindings'
 
 const useStyles = createUseStyles({
@@ -54,7 +53,7 @@ export function UpdaterWindow() {
 
     useEffect(() => {
         let unlisten: (() => void) | undefined = undefined
-        events.checkUpdateEvent
+        events.checkUpdateResultEvent
             .once(async (event) => {
                 setCheckResult(event.payload)
                 setIsChecking(false)
@@ -63,7 +62,7 @@ export function UpdaterWindow() {
                 unlisten = cb
             })
 
-        emit('check_update')
+        events.checkUpdateEvent.emit()
         return () => {
             unlisten?.()
         }

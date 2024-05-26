@@ -23,7 +23,7 @@ use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
-use windows::{get_translator_window, CheckUpdateEvent};
+use windows::{get_translator_window, CheckUpdateEvent, CheckUpdateResultEvent};
 
 use crate::config::{clear_config_cache, get_config_content};
 use crate::fetch::fetch_stream;
@@ -307,7 +307,7 @@ fn main() {
                 finish_ocr,
                 cut_image,
             ])
-            .events(tauri_specta::collect_events![CheckUpdateEvent])
+            .events(tauri_specta::collect_events![CheckUpdateEvent, CheckUpdateResultEvent])
             .config(specta::ts::ExportConfig::default().formatter(specta::ts::formatter::prettier));
 
         #[cfg(debug_assertions)]

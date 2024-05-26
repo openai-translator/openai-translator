@@ -61,13 +61,16 @@ export const commands = {
 
 export const events = __makeEvents__<{
     checkUpdateEvent: CheckUpdateEvent
+    checkUpdateResultEvent: CheckUpdateResultEvent
 }>({
     checkUpdateEvent: 'check-update-event',
+    checkUpdateResultEvent: 'check-update-result-event',
 })
 
 /** user-defined types **/
 
-export type CheckUpdateEvent = UpdateResult
+export type CheckUpdateEvent = null
+export type CheckUpdateResultEvent = UpdateResult
 export type UpdateResult = { version: string; currentVersion: string; body: string | null }
 
 /** tauri-specta globals **/
