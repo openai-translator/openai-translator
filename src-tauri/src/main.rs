@@ -307,7 +307,10 @@ fn main() {
                 finish_ocr,
                 cut_image,
             ])
-            .events(tauri_specta::collect_events![CheckUpdateEvent, CheckUpdateResultEvent])
+            .events(tauri_specta::collect_events![
+                CheckUpdateEvent,
+                CheckUpdateResultEvent
+            ])
             .config(specta::ts::ExportConfig::default().formatter(specta::ts::formatter::prettier));
 
         #[cfg(debug_assertions)]
