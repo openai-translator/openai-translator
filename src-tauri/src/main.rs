@@ -288,7 +288,6 @@ fn main() {
     let (invoke_handler, register_events) = {
         let builder = tauri_specta::ts::builder()
             .commands(tauri_specta::collect_commands![
-                // todo: migrate
                 get_config_content,
                 get_update_result,
                 clear_config_cache,
