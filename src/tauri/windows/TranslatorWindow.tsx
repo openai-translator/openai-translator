@@ -3,7 +3,7 @@ import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
-import { bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey } from '../utils'
+import { bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey, onSettingsSave } from '../utils'
 import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../../common/constants'
 import { translate } from '../../common/translate'
@@ -222,13 +222,7 @@ export function TranslatorWindow() {
                 defaultShowSettings
                 editorRows={10}
                 containerStyle={{ paddingTop: settings.enableBackgroundBlur ? '' : '26px' }}
-                onSettingsSave={(oldSettings) => {
-                    invoke('clear_config_cache')
-                    bindHotkey(oldSettings.hotkey)
-                    bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
-                    bindOCRHotkey(oldSettings.ocrHotkey)
-                    bindWritingHotkey(oldSettings.writingHotkey)
-                }}
+                onSettingsSave={onSettingsSave}
                 onSettingsShow={onSettingsShow}
             />
         </Window>
