@@ -1282,7 +1282,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330c60081dcc4c72131f8eb70510f1ac07223e5d4163db481a04a0befcffa412"
 dependencies = [
- "libloading 0.8.3",
+ "libloading 0.7.4",
 ]
 
 [[package]]
@@ -1861,9 +1861,9 @@ dependencies = [
 
 [[package]]
 name = "get-selected-text"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc0bfdfae2f5e467daa631c20f8ac1a3e96e466a3ccf8d1c0579da75bcb9d18d"
+checksum = "7c549df57295e7308958f904f0444a35507e33bba9ec2d58fbae45db58eba72d"
 dependencies = [
  "accessibility-ng",
  "accessibility-sys-ng",

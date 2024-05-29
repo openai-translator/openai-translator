@@ -50,7 +50,7 @@ futures-util = "0.3.29"
 tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase", branch = "v2" }
 screenshots = "0.7.2"
 image = "0.24.7"
-get-selected-text = "0.1.4"
+get-selected-text = "0.1.6"
 specta = "=2.0.0-rc.12"
 tauri-specta = { version = "2.0.0-rc.10", features = ["javascript", "typescript"] }
 
