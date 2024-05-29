@@ -128,6 +128,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           targets: ${{ matrix.config.rust_target }}
+          toolchain: '1.78.0'
 
       - name: Install dependencies (ubuntu only)
         if: matrix.config.os == 'ubuntu-latest'
