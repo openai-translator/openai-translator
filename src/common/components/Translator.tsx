@@ -1760,8 +1760,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 const actionID = item.id
                                                 if (actionID === '__manager__') {
                                                     if (isTauri()) {
-                                                        const { invoke } = await import('@tauri-apps/api/core')
-                                                        await invoke('show_action_manager_window')
+                                                        const { commands } = await import('@/tauri/bindings')
+                                                        await commands.showActionManagerWindow()
                                                     } else {
                                                         setShowActionManager(true)
                                                     }

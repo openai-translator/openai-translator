@@ -1,10 +1,11 @@
 import { trackEvent } from '@aptabase/tauri'
 import { appCacheDir, join } from '@tauri-apps/api/path'
-import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { currentMonitor } from '@tauri-apps/api/window'
 import { useEffect, useRef, useState } from 'react'
 import { createUseStyles } from 'react-jss'
+import { commands } from '../bindings'
 
 const useStyles = createUseStyles({
     selectNone: {
@@ -38,7 +39,7 @@ export function ScreenshotWindow() {
 
             const position = monitor.position
 
-            invoke('screenshot', { x: position.x, y: position.y }).then(() => {
+            commands.screenshot(position.x, position.y).then(() => {
                 appCacheDir().then((dir) => {
                     join(dir, 'ocr_images', 'fullscreen.png').then((path) => {
                         setImgURL(convertFileSrc(path))
@@ -125,8 +126,8 @@ export function ScreenshotWindow() {
                     if (width <= 0 || height <= 0) {
                         await appWindow.close()
                     } else {
-                        await invoke('cut_image', { left, top, width, height })
-                        await invoke('finish_ocr')
+                        await commands.cutImage(left, top, width, height)
+                        await commands.finishOcr()
                         await appWindow.close()
                     }
                 }}

@@ -40,6 +40,7 @@ pub(crate) struct AbortEventPayload {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn fetch_stream(id: String, url: String, options_str: String) -> Result<String, String> {
     let options: FetchOptions = serde_json::from_str(&options_str).unwrap();
     let mut headers = HeaderMap::new();

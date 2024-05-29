@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Window } from '@/tauri/components/Window'
-import { Update, check } from '@tauri-apps/plugin-updater'
+import { check } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { Button } from 'baseui-sd/button'
-import { invoke } from '@tauri-apps/api/core'
 import { useTheme } from '@/common/hooks/useTheme'
 import monkey from '@/common/assets/images/monkey.gif'
 import icon from '@/common/assets/images/icon.png'
@@ -15,7 +14,7 @@ import { IoIosCloseCircleOutline } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
 import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { trackEvent } from '@aptabase/tauri'
-import { listen, Event, emit } from '@tauri-apps/api/event'
+import { UpdateResult, commands, events } from '../bindings'
 
 const useStyles = createUseStyles({
     icon: {
@@ -38,17 +37,13 @@ export function UpdaterWindow() {
     const styles = useStyles()
     const [isChecking, setIsChecking] = useState(true)
     const [isDownloading, setIsDownloading] = useState(false)
-    const [checkResult, setCheckResult] = useState<{
-        version: string
-        currentVersion: string
-        body?: string
-    } | null>(null)
+    const [checkResult, setCheckResult] = useState<UpdateResult | null>(null)
     const [progress, setProgress] = useState(0)
     const { t } = useTranslation()
 
     useEffect(() => {
         setIsChecking(true)
-        invoke<[boolean, Update]>('get_update_result').then(([exists, result]) => {
+        commands.getUpdateResult().then(([exists, result]) => {
             if (exists) {
                 setCheckResult(result)
                 setIsChecking(false)
@@ -58,14 +53,16 @@ export function UpdaterWindow() {
 
     useEffect(() => {
         let unlisten: (() => void) | undefined = undefined
-        listen('update_result', async (event: Event<{ result?: Update }>) => {
-            const { payload } = event
-            setCheckResult(payload.result ?? null)
-            setIsChecking(false)
-        }).then((cb) => {
-            unlisten = cb
-        })
-        emit('check_update')
+        events.checkUpdateResultEvent
+            .once(async (event) => {
+                setCheckResult(event.payload)
+                setIsChecking(false)
+            })
+            .then((cb) => {
+                unlisten = cb
+            })
+
+        events.checkUpdateEvent.emit()
         return () => {
             unlisten?.()
         }

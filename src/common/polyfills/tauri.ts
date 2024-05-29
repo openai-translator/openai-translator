@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs'
-import { invoke } from '@tauri-apps/api/core'
 import { Proxy, ProxyConfig, fetch } from '@tauri-apps/plugin-http'
 import * as utils from '../utils'
 import { IBrowser, ISettings } from '../types'
+import { commands } from '@/tauri/bindings'
 
 async function getSettings(): Promise<Record<string, any>> {
-    const settings = await invoke<string>('get_config_content')
+    const settings = await commands.getConfigContent()
     return JSON.parse(settings)
 }
 
