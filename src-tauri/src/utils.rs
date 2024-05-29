@@ -317,7 +317,7 @@ where
 }
 
 #[cfg(target_os = "macos")]
-unsafe fn get_selected_text_frame_by_ax() -> Result<CGRect, Box<dyn std::error::Error>> {
+fn get_selected_text_frame_by_ax() -> Result<CGRect, Box<dyn std::error::Error>> {
     use accessibility_ng::{AXAttribute, AXUIElement, AXValue};
     use accessibility_sys_ng::{
         kAXBoundsForRangeParameterizedAttribute, kAXFocusedUIElementAttribute,
