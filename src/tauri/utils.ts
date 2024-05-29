@@ -2,6 +2,7 @@ import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-sh
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { commands } from './bindings'
+import { ISettings } from '@/common/types'
 
 const modifierKeys = [
     'OPTION',
@@ -117,4 +118,12 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
     }).then(() => {
         console.log('writing hotkey registered')
     })
+}
+
+export function onSettingsSave(oldSettings: ISettings) {
+    commands.clearConfigCache()
+    bindHotkey(oldSettings.hotkey)
+    bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
+    bindOCRHotkey(oldSettings.ocrHotkey)
+    bindWritingHotkey(oldSettings.writingHotkey)
 }
