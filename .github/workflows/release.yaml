@@ -270,12 +270,14 @@ jobs:
         run: |
           mkdir release
           mv dist/browser-extension/chromium release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
+          mv dist/browser-extension/firefox release/openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}
           mv dist/openai-translator.user.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
           cd release
           zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
+          zip -r openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}.xpi ./openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}/*
 
-      - name: Upload extensions to release
-        id: upload-release-asset
+      - name: Upload Chrome extensions to release
+        id: upload-chrome-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -283,6 +285,17 @@ jobs:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
           asset_path: release/openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
           asset_name: openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Firefox extensions to release
+        id: upload-firefox-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
+          asset_path: release/openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}.xpi
+          asset_name: openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}.xpi
           asset_content_type: application/zip
 
       - name: Upload userscript to release
