@@ -271,9 +271,6 @@ jobs:
           mkdir release
           mv dist/browser-extension/*.zip release/
           mv dist/openai-translator.user.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
-          cd release
-          zip -r openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
-          zip -r openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}.xpi ./openai-translator-firefox-extension-${{ steps.get_version.outputs.version-without-v }}/*
 
       - name: Upload Chrome extensions to release
         id: upload-chrome-release-asset
