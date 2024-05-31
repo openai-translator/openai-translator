@@ -272,15 +272,15 @@ jobs:
           mv dist/browser-extension/*.zip release/
           mv dist/openai-translator.user.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
 
-      - name: Upload Chrome extensions to release
-        id: upload-chrome-release-asset
+      - name: Upload Chromium extensions to release
+        id: upload-chromium-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
-          asset_path: release/chrome.zip
-          asset_name: openai-translator-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip
+          asset_path: release/chromium.zip
+          asset_name: openai-translator-chromium-extension-${{ steps.get_version.outputs.version-without-v }}.zip
           asset_content_type: application/zip
 
       - name: Upload Firefox extensions to release
