@@ -1,7 +1,7 @@
 import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-shortcut'
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
-import { commands } from './bindings'
+import { commands, events } from './bindings'
 import { ISettings } from '@/common/types'
 
 const modifierKeys = [
@@ -121,7 +121,7 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
 }
 
 export function onSettingsSave(oldSettings: ISettings) {
-    commands.clearConfigCache()
+    events.configUpdatedEvent.emit()
     bindHotkey(oldSettings.hotkey)
     bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
     bindOCRHotkey(oldSettings.ocrHotkey)

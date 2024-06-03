@@ -9,26 +9,33 @@ use crate::windows::{
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use tauri::{
-    menu::{Menu, MenuItem},
+    menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::ClickType,
     Manager, Runtime,
 };
+use tauri_specta::Event;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub(crate) struct PinnedEventPayload {
+#[derive(Serialize, Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct PinnedFromTrayEvent {
     pinned: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct PinnedFromWindowEvent {
+    pinned: bool,
+}
+
+impl PinnedFromWindowEvent {
+    pub fn pinned(&self) -> &bool {
+        &self.pinned
+    }
 }
 
 pub static TRAY_EVENT_REGISTERED: AtomicBool = AtomicBool::new(false);
 
 pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let config = get_config().unwrap();
-    let mut ocr_text = String::from("OCR");
-    if let Some(ocr_hotkey) = config.ocr_hotkey {
-        ocr_text = format!("OCR ({})", ocr_hotkey);
-    }
     let check_for_updates_i = MenuItem::with_id(
         app,
         "check_for_updates",
@@ -41,15 +48,16 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             .set_text("💡 New version available!")
             .unwrap();
     }
-    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<String>)?;
-    let ocr_i = MenuItem::with_id(app, "ocr", ocr_text, true, None::<String>)?;
-    let show_i = MenuItem::with_id(app, "show", "Show", true, None::<String>)?;
-    let hide_i = MenuItem::with_id(app, "hide", "Hide", true, None::<String>)?;
+    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, Some("CmdOrCtrl+,"))?;
+    let ocr_i = MenuItem::with_id(app, "ocr", "OCR", true, config.ocr_hotkey)?;
+    let show_i = MenuItem::with_id(app, "show", "Show", true, config.display_window_hotkey)?;
+    let hide_i = PredefinedMenuItem::hide(app, Some("Hide"))?;
     let pin_i = MenuItem::with_id(app, "pin", "Pin", true, None::<String>)?;
     if ALWAYS_ON_TOP.load(Ordering::Acquire) {
         pin_i.set_text("Unpin").unwrap();
     }
-    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<String>)?;
+    let quit_i = PredefinedMenuItem::quit(app, Some("Quit"))?;
+    let separator_i = PredefinedMenuItem::separator(app)?;
     let menu = Menu::with_items(
         app,
         &[
@@ -59,6 +67,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             &show_i,
             &hide_i,
             &pin_i,
+            &separator_i,
             &quit_i,
         ],
     )?;
@@ -92,9 +101,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         "pin" => {
             let pinned = set_translator_window_always_on_top();
             let handle = app.app_handle();
-            handle
-                .emit("pinned-from-tray", json!({ "pinned": pinned }))
-                .unwrap_or_default();
+            let pinned_from_tray_event = PinnedFromTrayEvent { pinned };
+            pinned_from_tray_event.emit(handle).unwrap_or_default();
             create_tray(app).unwrap();
         }
         "quit" => app.exit(0),
@@ -106,13 +114,6 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         }
     });
     tray.set_show_menu_on_left_click(false)?;
-    let app_handle = app.app_handle();
-    let app_handle_clone = app.app_handle().clone();
-    app_handle.listen_any("pinned-from-window", move |msg| {
-        let payload: PinnedEventPayload = serde_json::from_str(&msg.payload()).unwrap();
-        ALWAYS_ON_TOP.store(payload.pinned, Ordering::Release);
-        create_tray(&app_handle_clone).unwrap();
-    });
 
     Ok(())
 }

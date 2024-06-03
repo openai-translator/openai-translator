@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::APP_HANDLE;
 
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct ConfigUpdatedEvent;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ProxyProtocol {
     HTTP,
@@ -33,6 +36,7 @@ pub struct ProxyConfig {
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
+    pub display_window_hotkey: Option<String>,
     pub ocr_hotkey: Option<String>,
     pub writing_hotkey: Option<String>,
     pub writing_newline_hotkey: Option<String>,

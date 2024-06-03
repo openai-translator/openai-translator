@@ -62,15 +62,24 @@ export const commands = {
 export const events = __makeEvents__<{
     checkUpdateEvent: CheckUpdateEvent
     checkUpdateResultEvent: CheckUpdateResultEvent
+    pinnedFromWindowEvent: PinnedFromWindowEvent
+    pinnedFromTrayEvent: PinnedFromTrayEvent
+    configUpdatedEvent: ConfigUpdatedEvent
 }>({
     checkUpdateEvent: 'check-update-event',
     checkUpdateResultEvent: 'check-update-result-event',
+    pinnedFromWindowEvent: 'pinned-from-window-event',
+    pinnedFromTrayEvent: 'pinned-from-tray-event',
+    configUpdatedEvent: 'config-updated-event',
 })
 
 /** user-defined types **/
 
 export type CheckUpdateEvent = null
 export type CheckUpdateResultEvent = UpdateResult
+export type ConfigUpdatedEvent = null
+export type PinnedFromTrayEvent = { pinned: boolean }
+export type PinnedFromWindowEvent = { pinned: boolean }
 export type UpdateResult = { version: string; currentVersion: string; body: string | null }
 
 /** tauri-specta globals **/

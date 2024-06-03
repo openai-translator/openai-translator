@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { isTauri } from '../utils'
 import { useGlobalState } from './global'
-import { listen, Event, emit } from '@tauri-apps/api/event'
+import { events } from '@/tauri/bindings'
 
 export function usePinned() {
     const [pinned, setPinned_] = useGlobalState('pinned')
@@ -11,11 +11,13 @@ export function usePinned() {
             return
         }
         let unlisten: () => void | undefined
-        listen('pinned-from-tray', (event: Event<{ pinned: boolean }>) => {
-            setPinned_(event.payload.pinned)
-        }).then((unlistenFn) => {
-            unlisten = unlistenFn
-        })
+        events.pinnedFromTrayEvent
+            .listen((event) => {
+                setPinned_(event.payload.pinned)
+            })
+            .then((unlistenFn) => {
+                unlisten = unlistenFn
+            })
         return () => {
             unlisten?.()
         }
@@ -28,7 +30,7 @@ export function usePinned() {
                 if (!isTauri()) {
                     return next
                 }
-                emit('pinned-from-window', { pinned: next })
+                events.pinnedFromWindowEvent.emit({ pinned: next })
                 return next
             })
         },

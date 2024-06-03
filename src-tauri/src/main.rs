@@ -18,14 +18,16 @@ use get_selected_text::get_selected_text;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::env;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use sysinfo::{CpuExt, System, SystemExt};
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
+use tauri_specta::Event;
+use tray::{PinnedFromTrayEvent, PinnedFromWindowEvent};
 use windows::{get_translator_window, CheckUpdateEvent, CheckUpdateResultEvent};
 
-use crate::config::{clear_config_cache, get_config_content};
+use crate::config::{clear_config_cache, get_config_content, ConfigUpdatedEvent};
 use crate::fetch::fetch_stream;
 use crate::lang::detect_lang;
 use crate::ocr::{cut_image, finish_ocr, screenshot, start_ocr};
@@ -308,7 +310,10 @@ fn main() {
             ])
             .events(tauri_specta::collect_events![
                 CheckUpdateEvent,
-                CheckUpdateResultEvent
+                CheckUpdateResultEvent,
+                PinnedFromWindowEvent,
+                PinnedFromTrayEvent,
+                ConfigUpdatedEvent
             ])
             .config(specta::ts::ExportConfig::default().formatter(specta::ts::formatter::prettier));
 
@@ -431,6 +436,19 @@ fn main() {
                 }
             });
             register_events(app);
+
+            let handle = app_handle.clone();
+            PinnedFromWindowEvent::listen_any(app_handle, move |event| {
+                let pinned = event.payload.pinned();
+                ALWAYS_ON_TOP.store(*pinned, Ordering::Release);
+                tray::create_tray(&handle).unwrap();
+            });
+
+            let handle = app_handle.clone();
+            ConfigUpdatedEvent::listen_any(app_handle, move |_event| {
+                clear_config_cache();
+                tray::create_tray(&handle).unwrap();
+            });
             Ok(())
         })
         .invoke_handler(invoke_handler)
