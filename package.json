@@ -131,7 +131,7 @@
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.6.0",
     "@vitejs/plugin-react": "^4.0.4",
-    "archiver": "^5.3.1",
+    "archiver": "^7.0.1",
     "base64-inline-loader": "^2.0.1",
     "chokidar-cli": "^3.0.0",
     "electron": "^23.1.3",
