@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@aptabase/tauri':
         specifier: github:aptabase/tauri-plugin-aptabase#v2
-        version: https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b
+        version: git+https://git@github.com:aptabase/tauri-plugin-aptabase.git#4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b
       '@floating-ui/dom':
         specifier: ^1.5.1
         version: 1.5.1
@@ -22,28 +22,28 @@ importers:
         version: 2.0.0-beta.9
       '@tauri-apps/plugin-autostart':
         specifier: github:tauri-apps/tauri-plugin-autostart#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/90f884797e3eb84060d949126b7e4b5e224c57fc
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-autostart.git#41d58532b5741ebb0d155dd3a1bd276910cb20d1
       '@tauri-apps/plugin-fs':
         specifier: github:tauri-apps/tauri-plugin-fs#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/d1498c69105552228c201865cdf24aa5ce5ea9de
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-fs.git#518d8263d132051eabb29f83bb3743e6b0fb9e8d
       '@tauri-apps/plugin-global-shortcut':
         specifier: github:tauri-apps/tauri-plugin-global-shortcut#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/6c67b18f148a84c13522dac85f5ed2c3bb0af824
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-global-shortcut.git#67d03c65040bce1299b68d127afb5d235831b552
       '@tauri-apps/plugin-http':
         specifier: github:tauri-apps/tauri-plugin-http#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/d15ae3ec24d209976b4b39445475bc9bf37ea5b2
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-http.git#b428e4ed05a1e61e22878c8a882e7e2ffd74387a
       '@tauri-apps/plugin-notification':
         specifier: github:tauri-apps/tauri-plugin-notification#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-notification/tar.gz/53269cff505324cdd7eab743017ea3d5a53b6638
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-notification.git#7fe9eeb31021fd3bef13b035c043539a31778b9b
       '@tauri-apps/plugin-process':
         specifier: github:tauri-apps/tauri-plugin-process#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/761378a1c3ad9dad7e15ada05f32ce4f134cb2ca
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-process.git#c964c7e9ba9f710a854084087667c1b46e133bb4
       '@tauri-apps/plugin-shell':
         specifier: github:tauri-apps/tauri-plugin-shell#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/9de755a6766ee1a56673d639669d5d21d5b92400
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-shell.git#d06be03760751d5465e24e87c98de4c59f701c4a
       '@tauri-apps/plugin-updater':
         specifier: github:tauri-apps/tauri-plugin-updater#v2
-        version: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/cabf7afd376bac10c145ad0bbc9ff88a9819b49e
+        version: git+https://git@github.com:tauri-apps/tauri-plugin-updater.git#70ca8f181737951f4880e5b2e1914572527f2301
       '@types/color':
         specifier: ^3.0.6
         version: 3.0.6
@@ -319,14 +319,14 @@ importers:
         specifier: ^8.9.0
         version: 8.9.0(eslint@8.46.0)
       eslint-import-resolver-typescript:
-        specifier: ^3.5.5
-        version: 3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0)
+        specifier: ^3.6.1
+        version: 3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0)
       eslint-plugin-baseui:
         specifier: ^13.0.0
         version: 13.0.0(eslint@8.46.0)
       eslint-plugin-import:
         specifier: ^2.28.0
-        version: 2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0)
+        version: 2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.6.1)(eslint@8.46.0)
       eslint-plugin-prettier:
         specifier: ^5.0.0
         version: 5.0.0(eslint-config-prettier@8.9.0(eslint@8.46.0))(eslint@8.46.0)(prettier@3.0.0)
@@ -389,8 +389,8 @@ packages:
     resolution: {integrity: sha512-lFMjJTrFL3j7L9yBxwYfCq2k6qqwHyzuUl/XBnif78PWTJYyL/dfowQHWE3sp6U6ZzqWiiIZnpTMO96zhkjwtg==}
     engines: {node: '>=6.0.0'}
 
-  '@aptabase/tauri@https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b':
-    resolution: {tarball: https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b}
+  '@aptabase/tauri@git+https://git@github.com:aptabase/tauri-plugin-aptabase.git#4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b':
+    resolution: {commit: 4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b, repo: git@github.com:aptabase/tauri-plugin-aptabase.git, type: git}
     version: 0.4.2
 
   '@babel/code-frame@7.21.4':
@@ -944,6 +944,7 @@ packages:
   '@playwright/test@1.34.3':
     resolution: {integrity: sha512-zPLef6w9P6T/iT6XDYG3mvGOqOyb6eHaV9XtkunYs0+OzxBtrPAAaHotc0X+PJ00WPPnLfFBTl7mf45Mn8DBmw==}
     engines: {node: '>=14'}
+    deprecated: Please update to the latest version of Playwright to test up-to-date browsers.
     hasBin: true
 
   '@rollup/pluginutils@5.1.0':
@@ -1073,8 +1074,8 @@ packages:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@tauri-apps/api@2.0.0-beta.11':
-    resolution: {integrity: sha512-wJRY+fBUm3KpqZDHMIz5HRv+1vlnvRJ/dFxiyY3NlINTx2qXqDou5qWYcP1CuZXsd39InWVPV3FAZvno/kGCkA==}
+  '@tauri-apps/api@2.0.0-beta.13':
+    resolution: {integrity: sha512-Np1opKANzRMF3lgJ9gDquBCB9SxlE2lRmNpVx1+L6RyzAmigkuh0ZulT5jMnDA3JLsuSDU135r/s4t/Pmx4atg==}
     engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
 
   '@tauri-apps/api@2.0.0-beta.9':
@@ -1146,37 +1147,37 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@tauri-apps/plugin-autostart@https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/90f884797e3eb84060d949126b7e4b5e224c57fc':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/90f884797e3eb84060d949126b7e4b5e224c57fc}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-autostart@git+https://git@github.com:tauri-apps/tauri-plugin-autostart.git#41d58532b5741ebb0d155dd3a1bd276910cb20d1':
+    resolution: {commit: 41d58532b5741ebb0d155dd3a1bd276910cb20d1, repo: git@github.com:tauri-apps/tauri-plugin-autostart.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-fs@https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/d1498c69105552228c201865cdf24aa5ce5ea9de':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/d1498c69105552228c201865cdf24aa5ce5ea9de}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-fs@git+https://git@github.com:tauri-apps/tauri-plugin-fs.git#518d8263d132051eabb29f83bb3743e6b0fb9e8d':
+    resolution: {commit: 518d8263d132051eabb29f83bb3743e6b0fb9e8d, repo: git@github.com:tauri-apps/tauri-plugin-fs.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-global-shortcut@https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/6c67b18f148a84c13522dac85f5ed2c3bb0af824':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/6c67b18f148a84c13522dac85f5ed2c3bb0af824}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-global-shortcut@git+https://git@github.com:tauri-apps/tauri-plugin-global-shortcut.git#67d03c65040bce1299b68d127afb5d235831b552':
+    resolution: {commit: 67d03c65040bce1299b68d127afb5d235831b552, repo: git@github.com:tauri-apps/tauri-plugin-global-shortcut.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-http@https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/d15ae3ec24d209976b4b39445475bc9bf37ea5b2':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/d15ae3ec24d209976b4b39445475bc9bf37ea5b2}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-http@git+https://git@github.com:tauri-apps/tauri-plugin-http.git#b428e4ed05a1e61e22878c8a882e7e2ffd74387a':
+    resolution: {commit: b428e4ed05a1e61e22878c8a882e7e2ffd74387a, repo: git@github.com:tauri-apps/tauri-plugin-http.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-notification@https://codeload.github.com/tauri-apps/tauri-plugin-notification/tar.gz/53269cff505324cdd7eab743017ea3d5a53b6638':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-notification/tar.gz/53269cff505324cdd7eab743017ea3d5a53b6638}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-notification@git+https://git@github.com:tauri-apps/tauri-plugin-notification.git#7fe9eeb31021fd3bef13b035c043539a31778b9b':
+    resolution: {commit: 7fe9eeb31021fd3bef13b035c043539a31778b9b, repo: git@github.com:tauri-apps/tauri-plugin-notification.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-process@https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/761378a1c3ad9dad7e15ada05f32ce4f134cb2ca':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/761378a1c3ad9dad7e15ada05f32ce4f134cb2ca}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-process@git+https://git@github.com:tauri-apps/tauri-plugin-process.git#c964c7e9ba9f710a854084087667c1b46e133bb4':
+    resolution: {commit: c964c7e9ba9f710a854084087667c1b46e133bb4, repo: git@github.com:tauri-apps/tauri-plugin-process.git, type: git}
+    version: 2.0.0-beta.5
 
-  '@tauri-apps/plugin-shell@https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/9de755a6766ee1a56673d639669d5d21d5b92400':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/9de755a6766ee1a56673d639669d5d21d5b92400}
-    version: 2.0.0-beta.4
+  '@tauri-apps/plugin-shell@git+https://git@github.com:tauri-apps/tauri-plugin-shell.git#d06be03760751d5465e24e87c98de4c59f701c4a':
+    resolution: {commit: d06be03760751d5465e24e87c98de4c59f701c4a, repo: git@github.com:tauri-apps/tauri-plugin-shell.git, type: git}
+    version: 2.0.0-beta.6
 
-  '@tauri-apps/plugin-updater@https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/cabf7afd376bac10c145ad0bbc9ff88a9819b49e':
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/cabf7afd376bac10c145ad0bbc9ff88a9819b49e}
-    version: 2.0.0-beta.3
+  '@tauri-apps/plugin-updater@git+https://git@github.com:tauri-apps/tauri-plugin-updater.git#70ca8f181737951f4880e5b2e1914572527f2301':
+    resolution: {commit: 70ca8f181737951f4880e5b2e1914572527f2301, repo: git@github.com:tauri-apps/tauri-plugin-updater.git, type: git}
+    version: 2.0.0-beta.5
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -1443,6 +1444,7 @@ packages:
 
   abab@2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
+    deprecated: Use your platform's native atob() and btoa() methods instead
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2135,6 +2137,7 @@ packages:
   domexception@4.0.0:
     resolution: {integrity: sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw==}
     engines: {node: '>=12'}
+    deprecated: Use your platform's native DOMException instead
 
   domhandler@5.0.3:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
@@ -2267,8 +2270,8 @@ packages:
   eslint-import-resolver-node@0.3.7:
     resolution: {integrity: sha512-gozW2blMLJCeFpBwugLTGyvVjNoeo1knonXAcatC6bjPBZitotxdWf7Gimr25N4c0AAOo4eOUfaG82IJPDpqCA==}
 
-  eslint-import-resolver-typescript@3.5.5:
-    resolution: {integrity: sha512-TdJqPHs2lW5J9Zpe17DZNQuDnox4xo2o+0tE7Pggain9Rbc19ik8kFtXdxZ250FVx2kF4vlt2RSf4qlUpG7bhw==}
+  eslint-import-resolver-typescript@3.6.1:
+    resolution: {integrity: sha512-xgdptdoi5W3niYeuQxKmzVDTATvLYqhpwmykwsh7f6HIOStGWEIL9iqZgQDF9u9OEzrRwR8no5q2VT+bjAujTg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       eslint: '*'
@@ -2415,6 +2418,10 @@ packages:
 
   fast-glob@3.2.12:
     resolution: {integrity: sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==}
+    engines: {node: '>=8.6.0'}
+
+  fast-glob@3.3.2:
+    resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
     engines: {node: '>=8.6.0'}
 
   fast-json-stable-stringify@2.1.0:
@@ -2576,6 +2583,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   global-agent@3.0.0:
     resolution: {integrity: sha512-PT6XReJ+D07JvGoxQMkT6qji/jVNfX/h364XHZOWeRzy64sSFr+xJ5OX7LI3b4MPQzdL4H8Y8M0xzPpsVMwA8Q==}
@@ -2596,10 +2604,6 @@ packages:
   globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
-
-  globby@13.1.4:
-    resolution: {integrity: sha512-iui/IiiW+QrJ1X1hKH5qwlMQyv34wJAYwH1vrf8b9kBA4sNiif3gKsMHa+BrdnOpEudWjpotfa7LrTzB1ERS/g==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
@@ -2747,6 +2751,7 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -3159,6 +3164,7 @@ packages:
 
   loupe@2.3.6:
     resolution: {integrity: sha512-RaPMZKiMy8/JruncMU5Bt6na1eftNoo++R4Y+N2FrxkDVTrGvcyzFTsaGif4QTeKESheMGegbhw6iUAq+5A8zA==}
+    deprecated: Please upgrade to 2.3.7 which fixes GHSA-4q6p-r6v2-jvc5
 
   lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
@@ -3945,6 +3951,7 @@ packages:
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   roarr@2.15.4:
@@ -4066,10 +4073,6 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
-
-  slash@4.0.0:
-    resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
-    engines: {node: '>=12'}
 
   slice-ansi@5.0.0:
     resolution: {integrity: sha512-FC+lgizVPfie0kkhqUScwRu1O/lF6NOgJmlCgK+/LYxDCTk8sGelYaHDhFcDN+Sn3Cv+3VSa4Byeo+IMCzpMgQ==}
@@ -4755,7 +4758,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
 
-  '@aptabase/tauri@https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b':
+  '@aptabase/tauri@git+https://git@github.com:aptabase/tauri-plugin-aptabase.git#4e2422a6ad3f73d0ba7b9696b9f3f64beb13295b':
     dependencies:
       '@tauri-apps/api': 2.0.0-beta.9
       tslib: 2.6.2
@@ -5392,7 +5395,7 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tauri-apps/api@2.0.0-beta.11': {}
+  '@tauri-apps/api@2.0.0-beta.13': {}
 
   '@tauri-apps/api@2.0.0-beta.9': {}
 
@@ -5439,37 +5442,37 @@ snapshots:
       '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-beta.13
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-autostart@https://codeload.github.com/tauri-apps/tauri-plugin-autostart/tar.gz/90f884797e3eb84060d949126b7e4b5e224c57fc':
+  '@tauri-apps/plugin-autostart@git+https://git@github.com:tauri-apps/tauri-plugin-autostart.git#41d58532b5741ebb0d155dd3a1bd276910cb20d1':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-fs@https://codeload.github.com/tauri-apps/tauri-plugin-fs/tar.gz/d1498c69105552228c201865cdf24aa5ce5ea9de':
+  '@tauri-apps/plugin-fs@git+https://git@github.com:tauri-apps/tauri-plugin-fs.git#518d8263d132051eabb29f83bb3743e6b0fb9e8d':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-global-shortcut@https://codeload.github.com/tauri-apps/tauri-plugin-global-shortcut/tar.gz/6c67b18f148a84c13522dac85f5ed2c3bb0af824':
+  '@tauri-apps/plugin-global-shortcut@git+https://git@github.com:tauri-apps/tauri-plugin-global-shortcut.git#67d03c65040bce1299b68d127afb5d235831b552':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-http@https://codeload.github.com/tauri-apps/tauri-plugin-http/tar.gz/d15ae3ec24d209976b4b39445475bc9bf37ea5b2':
+  '@tauri-apps/plugin-http@git+https://git@github.com:tauri-apps/tauri-plugin-http.git#b428e4ed05a1e61e22878c8a882e7e2ffd74387a':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-notification@https://codeload.github.com/tauri-apps/tauri-plugin-notification/tar.gz/53269cff505324cdd7eab743017ea3d5a53b6638':
+  '@tauri-apps/plugin-notification@git+https://git@github.com:tauri-apps/tauri-plugin-notification.git#7fe9eeb31021fd3bef13b035c043539a31778b9b':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-process@https://codeload.github.com/tauri-apps/tauri-plugin-process/tar.gz/761378a1c3ad9dad7e15ada05f32ce4f134cb2ca':
+  '@tauri-apps/plugin-process@git+https://git@github.com:tauri-apps/tauri-plugin-process.git#c964c7e9ba9f710a854084087667c1b46e133bb4':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-shell@https://codeload.github.com/tauri-apps/tauri-plugin-shell/tar.gz/9de755a6766ee1a56673d639669d5d21d5b92400':
+  '@tauri-apps/plugin-shell@git+https://git@github.com:tauri-apps/tauri-plugin-shell.git#d06be03760751d5465e24e87c98de4c59f701c4a':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
-  '@tauri-apps/plugin-updater@https://codeload.github.com/tauri-apps/tauri-plugin-updater/tar.gz/cabf7afd376bac10c145ad0bbc9ff88a9819b49e':
+  '@tauri-apps/plugin-updater@git+https://git@github.com:tauri-apps/tauri-plugin-updater.git#70ca8f181737951f4880e5b2e1914572527f2301':
     dependencies:
-      '@tauri-apps/api': 2.0.0-beta.11
+      '@tauri-apps/api': 2.0.0-beta.13
 
   '@tootallnate/once@2.0.0': {}
 
@@ -6784,32 +6787,31 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0):
+  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0):
     dependencies:
       debug: 4.3.4
       enhanced-resolve: 5.14.1
       eslint: 8.46.0
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0)
-      eslint-plugin-import: 2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0)
+      eslint-plugin-import: 2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.6.1)(eslint@8.46.0)
+      fast-glob: 3.3.2
       get-tsconfig: 4.5.0
-      globby: 13.1.4
       is-core-module: 2.12.1
       is-glob: 4.0.3
-      synckit: 0.8.5
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0):
+  eslint-module-utils@2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 6.6.0(eslint@8.46.0)(typescript@5.1.6)
       eslint: 8.46.0
       eslint-import-resolver-node: 0.3.7
-      eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -6818,7 +6820,7 @@ snapshots:
       eslint: 8.46.0
       jsx-ast-utils: 3.3.3
 
-  eslint-plugin-import@2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0):
+  eslint-plugin-import@2.28.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-typescript@3.6.1)(eslint@8.46.0):
     dependencies:
       array-includes: 3.1.6
       array.prototype.findlastindex: 1.2.2
@@ -6828,7 +6830,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.46.0
       eslint-import-resolver-node: 0.3.7
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.6.0(eslint@8.46.0)(typescript@5.1.6))(eslint-plugin-import@2.28.0)(eslint@8.46.0))(eslint@8.46.0)
       has: 1.0.3
       is-core-module: 2.12.1
       is-glob: 4.0.3
@@ -7008,6 +7010,14 @@ snapshots:
   fast-diff@1.3.0: {}
 
   fast-glob@3.2.12:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.5
+      '@nodelib/fs.walk': 1.2.8
+      glob-parent: 5.1.2
+      merge2: 1.4.1
+      micromatch: 4.0.5
+
+  fast-glob@3.3.2:
     dependencies:
       '@nodelib/fs.stat': 2.0.5
       '@nodelib/fs.walk': 1.2.8
@@ -7201,14 +7211,6 @@ snapshots:
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 3.0.0
-
-  globby@13.1.4:
-    dependencies:
-      dir-glob: 3.0.1
-      fast-glob: 3.2.12
-      ignore: 5.2.4
-      merge2: 1.4.1
-      slash: 4.0.0
 
   globrex@0.1.2: {}
 
@@ -8826,8 +8828,6 @@ snapshots:
       is-arrayish: 0.3.2
 
   slash@3.0.0: {}
-
-  slash@4.0.0: {}
 
   slice-ansi@5.0.0:
     dependencies:
