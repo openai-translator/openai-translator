@@ -523,6 +523,14 @@ fn main() {
 
             api.prevent_close();
         }
+        tauri::RunEvent::Reopen {
+            has_visible_windows,
+            ..
+        } => {
+            if !has_visible_windows {
+                windows::show_translator_window(false, false, false);
+            }
+        }
         _ => {}
     });
 }
