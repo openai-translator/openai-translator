@@ -96,7 +96,7 @@
     "react-i18next": "^13.0.3",
     "react-icons": "^5.0.1",
     "react-jss": "^10.10.0",
-    "react-latex-next": "^2.2.0",
+    "react-latex-next": "^3.0.0",
     "react-markdown": "^8.0.7",
     "react-syntax-highlighter": "npm:@fengkx/react-syntax-highlighter@15.6.1",
     "react-use": "^17.4.2",
