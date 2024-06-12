@@ -9,6 +9,7 @@ const sizeKey = '_size'
 export type WindowMemoProps = {
     size: boolean
     position: boolean
+    show: boolean
 }
 
 /**
@@ -48,13 +49,15 @@ export const useMemoWindow = (props: WindowMemoProps) => {
             } catch (e) {
                 console.error(e)
             } finally {
-                await appWindow.unminimize()
-                await appWindow.setFocus()
-                await appWindow.show()
+                if (props.show) {
+                    await appWindow.unminimize()
+                    await appWindow.setFocus()
+                    await appWindow.show()
+                }
             }
         }
         initWindow()
-    }, [props.position, props.size])
+    }, [props.position, props.size, props.show])
 
     useEffect(() => {
         const appWindow = getCurrent()
