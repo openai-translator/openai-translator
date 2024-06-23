@@ -7,7 +7,7 @@ export interface Config {
     isSource?: boolean // whether the language can be translated from, default `true`
     isTarget?: boolean // whether the language can be translated to, default `true`
     direction?: 'ltr' | 'rtl' // direction of the language, default `ltr`
-    rolePrompt?: string // prompt for the role of the translator, default `''`
+    genRolePrompt?: (sourceLanguageConfig: Required<Config>) => string
     genAssistantPrompts?: () => string[] // generate prompts for the assistant, default `() => []`
     genCommandPrompt?: (sourceLanguageConfig: Required<Config>) => string
     phoneticNotation?: string | false // string for the name of the transcription / transliteration system, `false` if not applicable, default 'transcription'
@@ -85,14 +85,16 @@ export const LANG_CONFIGS: Record<LangCode, Config> = {
         nameEn: 'Modern Standard Chinese',
         name: '近代白话文',
         phoneticNotation: 'Gwoyeu Romatzyh',
-        rolePrompt: '您是一位在中文系研究中文的资深学者',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        genRolePrompt: (sourceLanguageConfig) => '您是一位在中文系研究中文的资深学者',
         isSource: false,
     },
     'xdbhw': {
         nameEn: 'Contemporary Chinese',
         name: '现代白话文',
         phoneticNotation: 'Hanyu Pinyin',
-        rolePrompt: '您是一位在中文系研究中文的资深学者',
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        genRolePrompt: (sourceLanguageConfig) => '您是一位在中文系研究中文的资深学者',
         isSource: false,
     },
 
