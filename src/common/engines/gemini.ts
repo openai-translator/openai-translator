@@ -1,8 +1,10 @@
 /* eslint-disable camelcase */
+import { urlJoin } from 'url-join-ts'
 import { getUniversalFetch } from '../universal-fetch'
 import { fetchSSE, getSettings } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { IMessageRequest, IModel } from './interfaces'
+import qs from 'qs'
 
 const SAFETY_SETTINGS = [
     {
@@ -31,7 +33,9 @@ export class Gemini extends AbstractEngine {
         }
         const settings = await getSettings()
         const geminiAPIURL = settings.geminiAPIURL
-        const url = `${geminiAPIURL}/v1beta/models?key=${apiKey}&pageSize=1000`
+        const url =
+            urlJoin(geminiAPIURL, '/v1beta/models') +
+            qs.stringify({ key: apiKey, pageSize: 1000 }, { addQueryPrefix: true })
         const fetcher = getUniversalFetch()
         const resp = await fetcher(url, {
             method: 'GET',
@@ -63,7 +67,9 @@ export class Gemini extends AbstractEngine {
         const apiKey = settings.geminiAPIKey
         const geminiAPIURL = settings.geminiAPIURL
         const model = await this.getModel()
-        const url = `${geminiAPIURL}/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`
+        const url =
+            urlJoin(geminiAPIURL, '/v1beta/models/', `${model}:streamGenerateContent`) +
+            qs.stringify({ key: apiKey }, { addQueryPrefix: true })
         const headers = {
             'Content-Type': 'application/json',
             'User-Agent':

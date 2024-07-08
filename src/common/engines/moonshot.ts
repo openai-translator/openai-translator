@@ -1,3 +1,4 @@
+import { urlJoin } from 'url-join-ts'
 import { getSettings } from '../utils'
 import { AbstractOpenAI } from './abstract-openai'
 import { IModel } from './interfaces'
@@ -12,7 +13,7 @@ export class Moonshot extends AbstractOpenAI {
         if (!apiKey || !apiURL) {
             return []
         }
-        const url = `${apiURL}/v1/models`
+        const url = urlJoin(apiURL, '/v1/models')
         const response = await fetch(url, {
             method: 'GET',
             headers: {

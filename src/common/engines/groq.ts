@@ -1,3 +1,4 @@
+import { urlJoin } from 'url-join-ts'
 import { CUSTOM_MODEL_ID } from '../constants'
 import { getUniversalFetch } from '../universal-fetch'
 import { getSettings } from '../utils'
@@ -16,7 +17,8 @@ export class Groq extends AbstractOpenAI {
         }
         const fetcher = getUniversalFetch()
         const settings = await getSettings()
-        const resp = await fetcher(`${settings.groqAPIURL}/openai/v1/models`, {
+        const url = urlJoin(settings.groqAPIURL, '/openai/v1/models')
+        const resp = await fetcher(url, {
             cache: 'no-cache',
             headers: {
                 'Content-Type': 'application/json',
