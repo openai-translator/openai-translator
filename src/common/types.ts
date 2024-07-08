@@ -141,4 +141,5 @@ export interface ISettings {
     fontSize: number
     uiFontSize: number
     iconSize: number
+    noModelsAPISupport: boolean
 }

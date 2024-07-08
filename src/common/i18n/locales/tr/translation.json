@@ -198,5 +198,7 @@
     "Days": "Gün",
     "Forever": "Sonsuza dek",
     "The survival time of the Ollama model in memory": "Ollama modelinin bellekte kalma süresi",
+    "No models API support": "Modeller API desteği yok",
+    "Some providers claiming to be compatible with OpenAI's API do not actually support OpenAI's standard model API. Therefore, we have no choice but to offer this option. If you choose this option (and then need to click the save button), we will not attempt to dynamically fetch the latest model list from the model API, but will only use a fixed model list and custom models.": "OpenAI'nin API'siyle uyumlu olduğunu iddia eden bazı sağlayıcılar aslında OpenAI'nin standart model API'sini desteklememektedir. Bu nedenle, bu seçeneği sunmaktan başka seçeneğimiz yok. Bu seçeneği seçerseniz (ve ardından kaydet düğmesine tıklamanız gerekir), en son model listesini model API'sinden dinamik olarak almaya çalışmayacağız, ancak yalnızca sabit bir model listesi ve özel modelleri kullanacağız.",
     "If you find this tool helpful, you can buy me a cup of coffee.": "Bu aracı faydalı bulursanız bana bir fincan kahve ısmarlayabilirsiniz."
 }

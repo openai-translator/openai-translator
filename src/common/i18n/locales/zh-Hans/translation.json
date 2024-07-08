@@ -198,5 +198,7 @@
     "Days": "天",
     "Forever": "永久",
     "The survival time of the Ollama model in memory": "Ollama 模型在内存中的存活时间",
+    "No models API support": "无模型 API 支持",
+    "Some providers claiming to be compatible with OpenAI's API do not actually support OpenAI's standard model API. Therefore, we have no choice but to offer this option. If you choose this option (and then need to click the save button), we will not attempt to dynamically fetch the latest model list from the model API, but will only use a fixed model list and custom models.": "一些声称兼容 OpenAI API 的提供商竟然不支持 OpenAI 的标准的模型 API。因此，我们别无选择，只能提供此选项。如果您选择此选项（然后需要单击保存按钮），我们将不会尝试从模型 API 动态获取最新模型列表，而只会使用固定的模型列表和自定义模型。",
     "If you find this tool helpful, you can buy me a cup of coffee.": "如果您觉得这个工具对您有所帮助，您可以请我喝杯咖啡。"
 }
