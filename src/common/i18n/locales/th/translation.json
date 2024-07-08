@@ -197,5 +197,7 @@
     "Days": "วัน",
     "Forever": "ตลอดไป",
     "The survival time of the Ollama model in memory": "เวลาที่ Ollama model อยู่ในหน่วยความจำ",
+    "No models API support": "ไม่มีการสนับสนุน API โมเดล",
+    "Some providers claiming to be compatible with OpenAI's API do not actually support OpenAI's standard model API. Therefore, we have no choice but to offer this option. If you choose this option (and then need to click the save button), we will not attempt to dynamically fetch the latest model list from the model API, but will only use a fixed model list and custom models.": "บางผู้ให้บริการที่อ้างว่าเข้ากันได้กับ API ของ OpenAI จริง ๆ ไม่สนับสนุน API โมเดลมาตรฐานของ OpenAI ดังนั้นเราไม่มีทางเลือกนอกจากการเสนอตัวเลือกนี้ หากคุณเลือกตัวเลือกนี้ (แล้วต้องคลิกปุ่มบันทึก) เราจะไม่พยายามดึงรายการโมเดลล่าสุดจาก API โมเดลไดนามิก แต่จะใช้รายการโมเดลคงที่และโมเดลที่กำหนดเองเท่านั้น",
     "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }

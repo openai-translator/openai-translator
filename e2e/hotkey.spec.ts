@@ -14,7 +14,7 @@ test('hotkey should work', async ({ page, extensionId }) => {
         await page.keyboard.down('x')
         await page.keyboard.up('Alt')
         await page.keyboard.up('x')
-        await page.getByText('Save').click()
+        await page.getByText('Save', { exact: true }).click()
     })
 
     const popupCard = await test.step('show popup card using hotkey', async () => {

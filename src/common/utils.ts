@@ -111,6 +111,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     fontSize: 1,
     uiFontSize: 1,
     iconSize: 1,
+    noModelsAPISupport: 1,
 }
 
 export async function getSettings(): Promise<ISettings> {

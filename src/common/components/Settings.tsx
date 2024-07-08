@@ -108,25 +108,6 @@ function LanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
     )
 }
 
-interface AlwaysShowIconsCheckboxProps {
-    value?: boolean
-    onChange?: (value: boolean) => void
-    onBlur?: () => void
-}
-
-function AlwaysShowIconsCheckbox({ value, onChange, onBlur }: AlwaysShowIconsCheckboxProps) {
-    return (
-        <Checkbox
-            checkmarkType='toggle_round'
-            checked={value}
-            onChange={(e) => {
-                onChange?.(e.target.checked)
-                onBlur?.()
-            }}
-        />
-    )
-}
-
 interface ITranslateModeSelectorProps {
     value?: TranslateMode | 'nop'
     onChange?: (value: TranslateMode | 'nop') => void
@@ -2565,6 +2546,15 @@ export function InnerSettings({
                                     onBlur={onBlur}
                                 />
                             </FormItem>
+                            <FormItem
+                                name='noModelsAPISupport'
+                                label={t('No models API support')}
+                                caption={t(
+                                    "Some providers claiming to be compatible with OpenAI's API do not actually support OpenAI's standard model API. Therefore, we have no choice but to offer this option. If you choose this option (and then need to click the save button), we will not attempt to dynamically fetch the latest model list from the model API, but will only use a fixed model list and custom models."
+                                )}
+                            >
+                                <MyCheckbox onBlur={onBlur} />
+                            </FormItem>
                             <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
                                 <APIModelSelector
                                     provider='OpenAI'
@@ -2821,7 +2811,7 @@ export function InnerSettings({
                                 )
                             }
                         >
-                            <AlwaysShowIconsCheckbox onBlur={onBlur} />
+                            <MyCheckbox onBlur={onBlur} />
                         </FormItem>
                         <FormItem name='autoTranslate' label={t('Auto Translate')}>
                             <AutoTranslateCheckbox onBlur={onBlur} />
