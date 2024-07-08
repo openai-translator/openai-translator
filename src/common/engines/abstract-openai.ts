@@ -1,17 +1,17 @@
 /* eslint-disable camelcase */
+import { urlJoin } from 'url-join-ts'
 import { getUniversalFetch } from '../universal-fetch'
 import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { IMessageRequest, IModel } from './interfaces'
 
 export abstract class AbstractOpenAI extends AbstractEngine {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async listModels(apiKey: string | undefined): Promise<IModel[]> {
         if (!apiKey) {
             return []
         }
         const apiKey_ = apiKey.split(',')[0]
-        const url = `${await this.getAPIURL()}/v1/models`
+        const url = urlJoin(await this.getAPIURL(), '/v1/models')
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey_}`,
@@ -73,7 +73,7 @@ export abstract class AbstractOpenAI extends AbstractEngine {
     }
 
     async sendMessage(req: IMessageRequest): Promise<void> {
-        const url = `${await this.getAPIURL()}${await this.getAPIURLPath()}`
+        const url = urlJoin(await this.getAPIURL(), await this.getAPIURLPath())
         const headers = await this.getHeaders()
         const isChatAPI = await this.isChatAPI()
         const body = await this.getBaseRequestBody()

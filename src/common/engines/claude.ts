@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { urlJoin } from 'url-join-ts'
 import { CUSTOM_MODEL_ID } from '../constants'
 import { fetchSSE, getSettings } from '../utils'
 import { AbstractEngine } from './abstract-engine'
@@ -31,7 +32,7 @@ export class Claude extends AbstractEngine {
         const settings = await getSettings()
         const apiKey = settings.claudeAPIKey
         const model = await this.getModel()
-        const url = `${settings.claudeAPIURL}${settings.claudeAPIURLPath}`
+        const url = urlJoin(settings.claudeAPIURL, settings.claudeAPIURLPath)
         const headers = {
             'Content-Type': 'application/json',
             'User-Agent':

@@ -8,6 +8,7 @@ import { fetchSSE } from '../utils'
 import { AbstractEngine } from './abstract-engine'
 import { chatgptArkoseReqParams } from '../constants'
 import { sha3_512 } from 'js-sha3'
+import { urlJoin } from 'url-join-ts'
 
 export const keyChatgptArkoseReqUrl = 'chatgptArkoseReqUrl'
 export const keyChatgptArkoseReqForm = 'chatgptArkoseReqForm'
@@ -48,7 +49,8 @@ export async function getArkoseToken() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callBackendAPIWithToken(token: string, method: string, endpoint: string, body: any) {
     const fetcher = getUniversalFetch()
-    return fetcher(`https://chat.openai.com/backend-api${endpoint}`, {
+    const url = urlJoin('https://chat.openai.com/backend-api', endpoint)
+    return fetcher(url, {
         method: method,
         headers: {
             'Content-Type': 'application/json',
@@ -229,7 +231,8 @@ export class ChatGPT extends AbstractEngine {
         }
         let finished = false
         let length = 0
-        await fetchSSE(`${utils.defaultChatGPTWebAPI}/conversation`, {
+        const url = urlJoin(utils.defaultChatGPTWebAPI, '/conversation')
+        await fetchSSE(url, {
             method: 'POST',
             headers,
             body: JSON.stringify(body),
