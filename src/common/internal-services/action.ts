@@ -8,6 +8,9 @@ export interface ICreateActionOption {
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
+    temperature?: string
+    frequencyPenalty?: string
+    presencePenalty?: string
     outputRenderingFormat?: ActionOutputRenderingFormat
 }
 
@@ -18,6 +21,9 @@ export interface IUpdateActionOption {
     icon?: string
     rolePrompt?: string
     commandPrompt?: string
+    temperature?: string
+    frequencyPenalty?: string
+    presencePenalty?: string
     outputRenderingFormat?: ActionOutputRenderingFormat
 }
 
@@ -50,6 +56,9 @@ class ActionInternalService implements IActionInternalService {
                 icon: opt.icon,
                 rolePrompt: opt.rolePrompt,
                 commandPrompt: opt.commandPrompt,
+                temperature: opt.temperature,
+                frequencyPenalty: opt.frequencyPenalty,
+                presencePenalty: opt.presencePenalty,
                 outputRenderingFormat: opt.outputRenderingFormat,
                 createdAt: now,
                 updatedAt: now,

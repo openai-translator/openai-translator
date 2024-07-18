@@ -196,6 +196,9 @@ const chineseLangCodes = ['zh-Hans', 'zh-Hant', 'lzh', 'yue', 'jdbhw', 'xdbhw']
 export async function translate(query: TranslateQuery) {
     let rolePrompt = ''
     let commandPrompt = ''
+    let temperature = ''
+    let frequencyPenalty = ''
+    let presencePenalty = ''
     let contentPrompt = query.text
     let assistantPrompts: string[] = []
     let isWordMode = false
@@ -241,6 +244,9 @@ export async function translate(query: TranslateQuery) {
                     .replace('${sourceLang}', sourceLangName)
                     .replace('${targetLang}', targetLangName)
                     .replace('${text}', query.text)
+                temperature = query.action.temperature ?? ''
+                frequencyPenalty = query.action.frequencyPenalty ?? ''
+                presencePenalty = query.action.presencePenalty ?? ''
                 if (query.action.outputRenderingFormat) {
                     commandPrompt =
                         `(Requirements: The output format must be ${query.action.outputRenderingFormat}) ` +
@@ -404,6 +410,9 @@ If you understand, say "yes", and then we will begin.`
         signal: query.signal,
         rolePrompt,
         commandPrompt,
+        temperature,
+        frequencyPenalty,
+        presencePenalty,
         assistantPrompts,
         onMessage: async (message) => {
             await query.onMessage({ ...message, isWordMode })
