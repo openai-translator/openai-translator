@@ -77,22 +77,26 @@ export class Gemini extends AbstractEngine {
         }
         const body = {
             contents: [
-                {
-                    role: 'user',
-                    parts: [
-                        {
-                            text: 'Hello.',
-                        },
-                    ],
-                },
-                {
-                    role: 'model',
-                    parts: [
-                        {
-                            text: req.rolePrompt,
-                        },
-                    ],
-                },
+                ...(req.rolePrompt
+                    ? [
+                          {
+                              role: 'user',
+                              parts: [
+                                  {
+                                      text: 'Hello.',
+                                  },
+                              ],
+                          },
+                          {
+                              role: 'model',
+                              parts: [
+                                  {
+                                      text: req.rolePrompt,
+                                  },
+                              ],
+                          },
+                      ]
+                    : []),
                 {
                     role: 'user',
                     parts: [

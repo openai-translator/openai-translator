@@ -122,7 +122,7 @@ export class Kimi extends AbstractEngine {
         const messages = [
             {
                 role: 'user',
-                content: req.rolePrompt + '\n' + req.commandPrompt,
+                content: req.rolePrompt ? req.rolePrompt + '\n' + req.commandPrompt : req.commandPrompt,
             },
         ]
 

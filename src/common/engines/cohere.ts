@@ -57,16 +57,18 @@ export class Cohere extends AbstractEngine {
         const body = {
             stream: true,
             model: model,
-            chat_history: [
-                {
-                    role: 'USER',
-                    message: req.rolePrompt,
-                },
-                {
-                    role: 'CHATBOT',
-                    message: 'OK',
-                },
-            ],
+            chat_history: req.rolePrompt
+                ? [
+                      {
+                          role: 'USER',
+                          message: req.rolePrompt,
+                      },
+                      {
+                          role: 'CHATBOT',
+                          message: 'OK',
+                      },
+                  ]
+                : [],
             message: req.commandPrompt,
         }
 

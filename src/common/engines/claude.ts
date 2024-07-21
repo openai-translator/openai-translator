@@ -22,6 +22,14 @@ export class Claude extends AbstractEngine {
     async listModels(apiKey_: string | undefined): Promise<IModel[]> {
         return Promise.resolve([
             {
+                id: 'claude-3-5-sonnet-20240620',
+                name: 'claude-3-5-sonnet-20240620',
+            },
+            {
+                id: 'claude-3-sonnet-20240229',
+                name: 'claude-3-sonnet-20240229',
+            },
+            {
                 id: 'claude-3-opus-20240229',
                 name: 'claude-3-opus-20240229',
             },
@@ -45,22 +53,23 @@ export class Claude extends AbstractEngine {
             model,
             stream: true,
             max_tokens: 4096,
+            temperature: 0,
             messages: [
-                {
-                    role: 'user',
-                    content: req.rolePrompt,
-                },
-                {
-                    role: 'assistant',
-                    content: 'Ok, I will do that.',
-                },
+                ...(req.rolePrompt
+                    ? [
+                          {
+                              role: 'user',
+                              content: req.rolePrompt,
+                          },
+                          {
+                              role: 'assistant',
+                              content: 'Ok, I will do that.',
+                          },
+                      ]
+                    : []),
                 {
                     role: 'user',
                     content: req.commandPrompt,
-                },
-                {
-                    role: 'assistant',
-                    content: 'Ok, the result is:',
                 },
             ],
         }

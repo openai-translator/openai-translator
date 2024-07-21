@@ -133,7 +133,7 @@ export function ActionForm(props: IActionFormProps) {
             <FormItem required name='icon' label={t('Icon')}>
                 <IconPicker />
             </FormItem>
-            <FormItem required name='rolePrompt' label={t('Role Prompt')} caption={rolePromptCaption}>
+            <FormItem name='rolePrompt' label={`${t('Role Prompt')} (Optional)`} caption={rolePromptCaption}>
                 <Textarea
                     rows={4}
                     overrides={{
