@@ -1327,6 +1327,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
     const options = utils.isDesktopApp()
         ? ([
               { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'Claude', id: 'Claude' },
               { label: `Kimi (${t('Free')})`, id: 'Kimi' },
               { label: `${t('ChatGLM')} (${t('Free')})`, id: 'ChatGLM' },
               { label: 'Cohere', id: 'Cohere' },
@@ -1337,7 +1338,6 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
-              { label: 'Claude', id: 'Claude' },
               { label: 'DeepSeek', id: 'DeepSeek' },
           ] as {
               label: string
@@ -1345,6 +1345,7 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
           }[])
         : ([
               { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'Claude', id: 'Claude' },
               { label: `Kimi (${t('Free')})`, id: 'Kimi' },
               { label: `${t('ChatGLM')} (${t('Free')})`, id: 'ChatGLM' },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
@@ -1354,7 +1355,6 @@ function ProviderSelector({ value, onChange, hasPromotion }: IProviderSelectorPr
               { label: 'MiniMax', id: 'MiniMax' },
               { label: 'Moonshot', id: 'Moonshot' },
               { label: 'Groq', id: 'Groq' },
-              { label: 'Claude', id: 'Claude' },
               { label: 'DeepSeek', id: 'DeepSeek' },
           ] as {
               label: string
