@@ -41,11 +41,15 @@ export class MiniMax extends AbstractEngine {
             sample_messages: [],
             plugins: [],
             messages: [
-                {
-                    sender_type: 'USER',
-                    sender_name: '用户',
-                    text: req.rolePrompt,
-                },
+                ...(req.rolePrompt
+                    ? [
+                          {
+                              sender_type: 'USER',
+                              sender_name: '用户',
+                              text: req.rolePrompt,
+                          },
+                      ]
+                    : []),
                 {
                     sender_type: 'USER',
                     sender_name: '用户',

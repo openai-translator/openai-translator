@@ -369,7 +369,7 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
         isTarget: true,
         isVariant: false,
         direction: 'ltr',
-        rolePrompt: 'You are a translator, translate directly without explanation.',
+        rolePrompt: '',
         genAssistantPrompts: () => {
             return []
             // return [
@@ -379,9 +379,9 @@ export function getLangConfig(langCode: LangCode): LanguageConfig {
             //     without the style of machine translation.`,
             // ]
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         genCommandPrompt: (sourceLanguageConfig: LanguageConfig) =>
-            oneLine`
-            Translate the following text from ${sourceLanguageConfig.name} to ${config.name} without the style of machine translation.`,
+            oneLine`Only reply the translated result and nothing else. Please translate to ${config.name}`,
     }
     return { ...DEFAULT_CONFIG, ...config }
 }
