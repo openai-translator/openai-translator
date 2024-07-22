@@ -55,21 +55,9 @@ export class Claude extends AbstractEngine {
             max_tokens: 4096,
             temperature: 0,
             messages: [
-                ...(req.rolePrompt
-                    ? [
-                          {
-                              role: 'user',
-                              content: req.rolePrompt,
-                          },
-                          {
-                              role: 'assistant',
-                              content: 'Ok, I will do that.',
-                          },
-                      ]
-                    : []),
                 {
                     role: 'user',
-                    content: req.commandPrompt,
+                    content: req.rolePrompt ? req.rolePrompt + '\n\n' + req.commandPrompt : req.commandPrompt,
                 },
             ],
         }
