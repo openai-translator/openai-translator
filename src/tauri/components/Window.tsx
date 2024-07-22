@@ -20,6 +20,20 @@ import { useSetAtom } from 'jotai'
 
 import { showSettingsAtom } from '@/common/store/setting'
 import { commands } from '../bindings'
+import { trackEvent } from '@aptabase/tauri'
+
+addEventListener('unhandledrejection', (e) => {
+    trackEvent('promise_rejected', {
+        message: (e.reason?.message || e.reason || e).toString(),
+    })
+})
+
+window.addEventListener('error', (e) => {
+    trackEvent('js_error', {
+        message: e.message,
+    })
+})
+
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
 })
