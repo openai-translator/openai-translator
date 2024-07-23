@@ -200,7 +200,6 @@ export async function translate(query: TranslateQuery) {
     let frequencyPenalty = ''
     let presencePenalty = ''
     let contentPrompt = query.text
-    let assistantPrompts: string[] = []
     let isWordMode = false
 
     if (query.mode === 'big-bang') {
@@ -254,7 +253,6 @@ export async function translate(query: TranslateQuery) {
                 }
                 break
             case 'translate':
-                assistantPrompts = targetLangConfig.genAssistantPrompts()
                 commandPrompt = targetLangConfig.genCommandPrompt(sourceLangConfig)
                 contentPrompt = query.text
                 if (!query.writing && query.text.length < 5 && toChinese) {
@@ -400,7 +398,7 @@ If you understand, say "yes", and then we will begin.`
     }
 
     if (contentPrompt) {
-        commandPrompt = `${commandPrompt}:\n\n${contentPrompt.trimEnd()}`
+        commandPrompt = `Only reply the result and nothing else. ${commandPrompt}:\n\n${contentPrompt.trimEnd()}`
     }
 
     const settings = await getSettings()

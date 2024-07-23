@@ -77,57 +77,16 @@ export class Gemini extends AbstractEngine {
         }
         const body = {
             contents: [
-                ...(req.rolePrompt
-                    ? [
-                          {
-                              role: 'user',
-                              parts: [
-                                  {
-                                      text: 'Hello.',
-                                  },
-                              ],
-                          },
-                          {
-                              role: 'model',
-                              parts: [
-                                  {
-                                      text: req.rolePrompt,
-                                  },
-                              ],
-                          },
-                      ]
-                    : []),
                 {
                     role: 'user',
                     parts: [
                         {
-                            text: req.commandPrompt,
+                            text: req.rolePrompt ? req.rolePrompt + '\n\n' + req.commandPrompt : req.commandPrompt,
                         },
                     ],
                 },
             ],
             safetySettings: SAFETY_SETTINGS,
-        }
-
-        if (req.assistantPrompts) {
-            req.assistantPrompts.forEach((prompt) => {
-                body.contents.push({
-                    role: 'model',
-                    parts: [
-                        {
-                            text: 'Ok.',
-                        },
-                    ],
-                })
-                body.contents.push({
-                    role: 'user',
-                    parts: [
-                        {
-                            text: prompt,
-                        },
-                    ],
-                })
-            })
         }
 
         let hasError = false

@@ -177,7 +177,7 @@ export class ChatGLM extends AbstractEngine {
                         content: [
                             {
                                 type: 'text',
-                                text: req.rolePrompt + '\n' + req.commandPrompt,
+                                text: req.rolePrompt ? req.rolePrompt + '\n\n' + req.commandPrompt : req.commandPrompt,
                             },
                         ],
                     },

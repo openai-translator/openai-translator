@@ -43,7 +43,7 @@
     "@tauri-apps/api": "2.0.0-beta.9",
     "@tauri-apps/plugin-autostart": "github:tauri-apps/tauri-plugin-autostart#v2",
     "@tauri-apps/plugin-fs": "github:tauri-apps/tauri-plugin-fs#v2",
-    "@tauri-apps/plugin-global-shortcut": "github:tauri-apps/tauri-plugin-global-shortcut#v2",
+    "@tauri-apps/plugin-global-shortcut": "github:tauri-apps/tauri-plugin-global-shortcut#13c59ded715e231a17d2ce970710cc339757c4b1",
     "@tauri-apps/plugin-http": "github:tauri-apps/tauri-plugin-http#v2",
     "@tauri-apps/plugin-notification": "github:tauri-apps/tauri-plugin-notification#v2",
     "@tauri-apps/plugin-process": "github:tauri-apps/tauri-plugin-process#v2",

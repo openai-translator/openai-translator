@@ -107,30 +107,16 @@ export abstract class AbstractOpenAI extends AbstractEngine {
             if (req.rolePrompt) {
                 body[
                     'prompt'
-                ] = `<|im_start|>system\n${req.rolePrompt}\n<|im_end|>\n<|im_start|>user\n${req.commandPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
+                ] = `<|im_start|>user\n${req.rolePrompt}\n\n${req.commandPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
             } else {
                 body['prompt'] = `<|im_start|>user\n${req.commandPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
             }
             body['stop'] = ['<|im_end|>']
         } else {
             const messages = [
-                ...(req.rolePrompt
-                    ? [
-                          {
-                              role: 'system',
-                              content: req.rolePrompt,
-                          },
-                      ]
-                    : []),
-                ...(req.assistantPrompts?.map((prompt) => {
-                    return {
-                        role: 'user',
-                        content: prompt,
-                    }
-                }) ?? []),
                 {
                     role: 'user',
-                    content: req.commandPrompt,
+                    content: req.rolePrompt ? req.rolePrompt + '\n\n' + req.commandPrompt : req.commandPrompt,
                 },
             ]
             body['messages'] = messages
