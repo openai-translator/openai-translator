@@ -116,7 +116,7 @@
   "devDependencies": {
     "@playwright/test": "^1.34.3",
     "@samrum/vite-plugin-web-extension": "^5.0.0",
-    "@tauri-apps/cli": "2.0.0-beta.19",
+    "@tauri-apps/cli": "2.0.0-beta.23",
     "@types/chrome": "0.0.242",
     "@types/common-tags": "^1.8.3",
     "@types/fs-extra": "^11.0.1",
