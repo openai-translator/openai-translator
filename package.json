@@ -109,7 +109,7 @@
     "url-join-ts": "^1.0.5",
     "use-deep-compare": "^1.1.0",
     "use-resize-observer": "^9.1.0",
-    "uuid": "^9.0.0",
+    "uuid": "^10.0.0",
     "web-streams-polyfill": "^3.2.1",
     "zustand": "^4.4.0"
   },
@@ -126,7 +126,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/tampermonkey": "^4.0.10",
     "@types/underscore": "^1.11.6",
-    "@types/uuid": "^9.0.2",
+    "@types/uuid": "^10.0.0",
     "@types/webextension-polyfill": "^0.10.1",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.6.0",
