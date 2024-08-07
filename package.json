@@ -99,7 +99,7 @@
     "react-latex-next": "^2.2.0",
     "react-markdown": "^8.0.7",
     "react-syntax-highlighter": "npm:@fengkx/react-syntax-highlighter@15.6.1",
-    "react-use": "^17.4.2",
+    "react-use": "^17.5.1",
     "react-window": "^1.8.9",
     "styletron-engine-atomic": "^1.5.0",
     "styletron-react": "^6.1.0",
