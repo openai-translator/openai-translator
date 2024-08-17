@@ -27,8 +27,8 @@ export const required =
         const valid = !!(Array.isArray(val)
             ? val.length
             : typeof value === 'boolean' // for checkbox
-            ? value
-            : !(typeof val === 'undefined' || val === null || val === ''))
+              ? value
+              : !(typeof val === 'undefined' || val === null || val === ''))
         return valid ? Promise.resolve() : Promise.reject(msg)
     }
 

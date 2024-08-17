@@ -81,9 +81,8 @@ export abstract class AbstractOpenAI extends AbstractEngine {
             // Azure OpenAI Service supports multiple API.
             // We should check if the settings.apiURLPath is match `/deployments/{deployment-id}/chat/completions`.
             // If not, we should use the legacy parameters.
-            body[
-                'prompt'
-            ] = `<|im_start|>system\n${req.rolePrompt}\n<|im_end|>\n<|im_start|>user\n${req.commandPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
+            body['prompt'] =
+                `<|im_start|>system\n${req.rolePrompt}\n<|im_end|>\n<|im_start|>user\n${req.commandPrompt}\n<|im_end|>\n<|im_start|>assistant\n`
             body['stop'] = ['<|im_end|>']
         } else {
             const messages = [

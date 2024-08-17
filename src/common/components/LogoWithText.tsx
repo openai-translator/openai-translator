@@ -42,24 +42,20 @@ const LogoWithText = forwardRef<LogoWithTextRef, unknown>(function LogoWithText(
 
     const logoTextRef = useRef<HTMLDivElement>(null)
 
-    useImperativeHandle(
-        ref,
-        () => {
-            return {
-                hideText() {
-                    if (logoTextRef.current) {
-                        logoTextRef.current.style.display = 'none'
-                    }
-                },
-                showText() {
-                    if (logoTextRef.current) {
-                        logoTextRef.current.style.display = 'flex'
-                    }
-                },
-            }
-        },
-        []
-    )
+    useImperativeHandle(ref, () => {
+        return {
+            hideText() {
+                if (logoTextRef.current) {
+                    logoTextRef.current.style.display = 'none'
+                }
+            },
+            showText() {
+                if (logoTextRef.current) {
+                    logoTextRef.current.style.display = 'flex'
+                }
+            },
+        }
+    }, [])
 
     return (
         <div data-tauri-drag-region className={styles.iconContainer}>
