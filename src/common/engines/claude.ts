@@ -46,6 +46,7 @@ export class Claude extends AbstractEngine {
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
             'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': true,
             'anthropic-beta': 'messages-2023-12-15',
             'x-api-key': apiKey,
         }
