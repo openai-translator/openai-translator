@@ -34,7 +34,8 @@ export abstract class AbstractOpenAI extends AbstractEngine {
             ]
         }
         const apiKey_ = apiKey.split(',')[0]
-        const url = urlJoin(await this.getAPIURL(), '/v1/models')
+        const apiUrl = await this.getAPIURL()
+        const url = urlJoin(apiUrl, '/v1/models')
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey_}`,
@@ -48,7 +49,14 @@ export abstract class AbstractOpenAI extends AbstractEngine {
         return (
             data.data
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .filter((model: any) => model.id.includes('gpt'))
+                .filter((model: any) => {
+                    if (apiUrl === 'https://api.openai.com') {
+                        return model.id.includes('gpt')
+                    }
+                    return ['text-', 'dall-', 'tts-', 'winsper-', 'davinci', 'babbage'].every(
+                        (it) => !(model.id as string).startsWith(it)
+                    )
+                })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .map((model: any) => {
                     return {
