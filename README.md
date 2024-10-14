@@ -6,7 +6,7 @@
     <br> English | <a href="README-CN.md">中文</a>
 </p>
 <p align="center">
-    <em>The translator that does more than just translation - powered by OpenAI.</em>
+    <em>The translator that does more than just translation - powered by EchoLingo.</em>
 </p>
 
 <p align="center">
