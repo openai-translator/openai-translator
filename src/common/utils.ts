@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { listen, Event, emit } from '@tauri-apps/api/event'
 import { parse as bestEffortJSONParse } from 'best-effort-json-parser'
 import { commands } from '@/tauri/bindings'
+import browser from 'webextension-polyfill'
 
 export const defaultAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -115,7 +116,6 @@ const settingKeys: Record<keyof ISettings, number> = {
 }
 
 export async function getSettings(): Promise<ISettings> {
-    const browser = await getBrowser()
     const items = await browser.storage.sync.get(Object.keys(settingKeys))
 
     const settings = items as ISettings
@@ -255,11 +255,10 @@ export async function getSettings(): Promise<ISettings> {
 }
 
 export async function setSettings(settings: Partial<ISettings>) {
-    const browser = await getBrowser()
     await browser.storage.sync.set(settings)
 }
 
-export async function getBrowser(): Promise<IBrowser> {
+export async function wser(): Promise<IBrowser> {
     if (isElectron()) {
         return (await import('./polyfills/electron')).electronBrowser
     }

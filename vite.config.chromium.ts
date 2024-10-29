@@ -15,6 +15,7 @@ export default defineConfig({
         svgr(),
         webExtension({
             manifest: getManifest('chromium'),
+            useDynamicUrlWebAccessibleResources: false,
         }),
     ],
     resolve: {

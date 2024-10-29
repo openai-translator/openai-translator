@@ -19,6 +19,7 @@ import { type ReferenceElement } from '@floating-ui/dom'
 import InnerContainer from './InnerContainer'
 import TitleBar from './TitleBar'
 import { setExternalOriginalText } from '@/common/store'
+import browser from 'webextension-polyfill'
 
 let root: Root | null = null
 const generateId = createGenerateId()
@@ -71,7 +72,6 @@ async function createPopupCard() {
             const { addViteStyleTarget } = await import('@samrum/vite-plugin-web-extension/client')
             await addViteStyleTarget(shadowRoot)
         } else {
-            const browser = await utils.getBrowser()
             import.meta.PLUGIN_WEB_EXT_CHUNK_CSS_PATHS?.forEach((cssPath) => {
                 const styleEl = document.createElement('link')
                 styleEl.setAttribute('rel', 'stylesheet')
@@ -180,7 +180,6 @@ async function showPopupThumb(text: string, x: number, y: number) {
 }
 
 async function main() {
-    const browser = await utils.getBrowser()
     let mousedownTarget: EventTarget | null
     let lastMouseEvent: UserEventType | undefined
 
