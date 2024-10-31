@@ -52,7 +52,7 @@
     "@types/color": "^3.0.6",
     "@types/qs": "^6.9.10",
     "@types/react-copy-to-clipboard": "^5.0.4",
-    "@types/react-syntax-highlighter": "^15.5.7",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/react-window": "^1.8.5",
     "baseui-sd": "^12.2.4",
     "best-effort-json-parser": "^1.0.1",
