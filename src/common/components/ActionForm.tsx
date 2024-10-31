@@ -164,6 +164,48 @@ export function ActionForm(props: IActionFormProps) {
             <FormItem name='outputRenderingFormat' label={t('Output rendering format')}>
                 <RenderingFormatSelector />
             </FormItem>
+            <FormItem required name='temperature' label={t('Temperature')}>
+                <Textarea
+                    rows={1}
+                    overrides={{
+                        Root: {
+                            style: {
+                                width: '100%',
+                            },
+                        },
+                    }}
+                    size='compact'
+                    resize='vertical'
+                />
+            </FormItem>
+            <FormItem required name='frequencyPenalty' label={t('Frequency Penalty')}>
+                <Textarea
+                    rows={1}
+                    overrides={{
+                        Root: {
+                            style: {
+                                width: '100%',
+                            },
+                        },
+                    }}
+                    size='compact'
+                    resize='vertical'
+                />
+            </FormItem>
+            <FormItem required name='presencePenalty' label={t('Presence Penalty')}>
+                <Textarea
+                    rows={1}
+                    overrides={{
+                        Root: {
+                            style: {
+                                width: '100%',
+                            },
+                        },
+                    }}
+                    size='compact'
+                    resize='vertical'
+                />
+            </FormItem>
             <div
                 style={{
                     display: 'flex',
