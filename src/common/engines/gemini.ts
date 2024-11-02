@@ -114,7 +114,7 @@ export class Gemini extends AbstractEngine {
                     req.onError('no candidates')
                     return
                 }
-                if (resp.candidates[0].finishReason !== 'STOP') {
+                if (resp.candidates[0].finishReason && resp.candidates[0].finishReason !== 'STOP') {
                     finished = true
                     req.onFinished(resp.candidates[0].finishReason)
                     return
