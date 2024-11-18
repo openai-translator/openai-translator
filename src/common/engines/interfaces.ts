@@ -12,6 +12,10 @@ export interface IMessage {
 export interface IMessageRequest {
     rolePrompt: string
     commandPrompt: string
+    temperature: string
+    frequencyPenalty: string
+    presencePenalty: string
+    assistantPrompts?: string[]
     onMessage: (message: { content: string; role: string; isFullText?: boolean }) => Promise<void>
     onError: (error: string) => void
     onFinished: (reason: string) => void

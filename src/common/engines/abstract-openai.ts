@@ -128,6 +128,19 @@ export abstract class AbstractOpenAI extends AbstractEngine {
                 },
             ]
             body['messages'] = messages
+            // add custom model parameters for custom actions
+            if (req.temperature !== '') {
+                const temperature = parseFloat(req.temperature ?? '0')
+                body['temperature'] = temperature
+            }
+            if (req.frequencyPenalty !== '') {
+                const frequencyPenalty = parseFloat(req.frequencyPenalty ?? '1')
+                body['frequency_penalty'] = frequencyPenalty
+            }
+            if (req.presencePenalty !== '') {
+                const presencePenalty = parseFloat(req.presencePenalty ?? '1')
+                body['presence_penalty'] = presencePenalty
+            }
         }
         let finished = false // finished can be called twice because event.data is 1. "finish_reason":"stop"; 2. [DONE]
         await fetchSSE(url, {
